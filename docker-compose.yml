@@ -1,0 +1,74 @@
+version: "3.8"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# HengAI V3.2 · 单点真理栈（仅 FastAPI :8000，无 nginx 前店）
+# ──────────────────────────────────────────────────────────────────────────────
+# 唯一入口：http://localhost:8000/static/index.html
+# 真理源：  ./frontend → 容器 /app/frontend（改 HTML 秒级生效）
+# API：     同源相对路径 /api/v1/...（AppState API_BASE=""）
+#
+# 启动：docker compose up -d --build
+# 一键发车：cd frontend && npm run docker:go-live
+# 改码：保存 frontend/ 或 backend/ 后硬刷新浏览器
+# ══════════════════════════════════════════════════════════════════════════════
+
+services:
+  db:
+    image: postgres:15
+    container_name: hengai_db
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  backend:
+    build: ./backend
+    container_name: hengai_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    working_dir: /app
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/postgres
+      WATCHFILES_FORCE_POLLING: "true"
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      HENGAI_RESONANCE_TARGET: "${HENGAI_RESONANCE_TARGET:-30}"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - ./frontend:/app/frontend:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=5)",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+      start_period: 25s
+
+  # nginx 前店已废弃 —— 勿再启用，避免与 /app/frontend 双路径打架
+  # frontend:
+  #   image: nginx:alpine
+  #   ...
+
+volumes:
+  db_data:

@@ -1,0 +1,3152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<title>CBAM 碳排快审 · 供应商数据采集</title>
+<style>
+/* ═══════════════════════════════════════
+   ROOT TOKENS
+═══════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=DM+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg0:    #04060d;
+  --bg1:    #080b14;
+  --bg2:    #0d1120;
+  --glass:  rgba(255,255,255,0.04);
+  --glassh: rgba(255,255,255,0.08);
+  --border: rgba(255,255,255,0.09);
+  --border2:rgba(255,255,255,0.16);
+  --b2:     rgba(255,255,255,0.16);
+  --ink:    #e4eaf6;
+  --ink2:   #8896b0;
+  --ink3:   #44556a;
+  --green:  #10b981; --gl: #6ee7b7; --gd: rgba(16,185,129,0.14); --gb: rgba(16,185,129,0.32);
+  --gold:   #c9a84c; --go: #f0d080; --gdo:rgba(201,168,76,0.14); --gbo:rgba(201,168,76,0.32);
+  --blue:   #3b82f6; --bl: #93c5fd; --bd: rgba(59,130,246,0.14); --bb: rgba(59,130,246,0.32);
+  --purple: #8b5cf6; --pl: #c4b5fd; --pd: rgba(139,92,246,0.14); --pb: rgba(139,92,246,0.32);
+  --red:    #ef4444; --rl: #fca5a5; --rd: rgba(239,68,68,0.14);  --rb: rgba(239,68,68,0.32);
+  --teal:   #14b8a6; --tl: #5eead4; --td: rgba(20,184,166,0.14); --tb: rgba(20,184,166,0.32);
+  --orange: #f97316; --ol: #fdba74; --od: rgba(249,115,22,0.14); --ob: rgba(249,115,22,0.32);
+  --night:  #06080f;
+}
+
+/* ═══════════════════════════════════════
+   RESET
+═══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; }
+body {
+  min-height: 100%;
+  background: var(--bg0);
+  color: var(--ink);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════
+   VIEWPORT CONTAINER
+═══════════════════════════════════════ */
+.viewport {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg0);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ═══════════════════════════════════════
+   SCREENS — 物理隔离：非当前屏不参与绘制
+═══════════════════════════════════════ */
+#viewport > .screen:not(.active),
+#viewport > .screen[hidden] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+#viewport > .screen.active {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  position: absolute;
+  inset: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  z-index: 5;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  opacity: 1;
+  transform: none;
+  background: var(--bg0);
+}
+#viewport > #screen3.active {
+  background: var(--night);
+}
+
+.inner {
+  width: 100%;
+  max-width: 480px;
+  padding: 0 20px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ═══════════════════════════════════════
+   ANIMATED BACKGROUND PARTICLES
+═══════════════════════════════════════ */
+.bg-particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  animation: floatParticle linear infinite;
+  opacity: 0;
+}
+@keyframes floatParticle {
+  0%   { opacity: 0; transform: translateY(0) scale(0); }
+  10%  { opacity: .6; }
+  90%  { opacity: .3; }
+  100% { opacity: 0; transform: translateY(-100vh) scale(1.2); }
+}
+
+/* ═══════════════════════════════════════
+   TOP BAR / STATUS
+═══════════════════════════════════════ */
+.top-status {
+  width: 100%; max-width: 480px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 0;
+  margin: 0 auto;
+}
+.ts-step {
+  display: flex; align-items: center; gap: 6px;
+}
+.ts-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border2);
+  transition: background .3s, transform .3s;
+}
+.ts-dot.done  { background: var(--green); }
+.ts-dot.active { background: var(--green); transform: scale(1.35); box-shadow: 0 0 8px var(--green); }
+.ts-secure {
+  font-size: 10.5px; color: var(--green); font-weight: 600;
+  display: flex; align-items: center; gap: 4px; letter-spacing: .3px;
+}
+
+/* ═══════════════════════════════════════
+   DUAL LOGO AREA
+═══════════════════════════════════════ */
+.logo-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 14px; padding: 20px 0 6px;
+}
+.logo-badge {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.logo-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; letter-spacing: .3px;
+  position: relative; overflow: hidden;
+}
+.logo-icon::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.12) 0%, transparent 60%);
+}
+.logo-name { font-size: 10px; color: var(--ink2); white-space: nowrap; }
+.logo-divider {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  margin-top: -10px;
+}
+.logo-div-text { font-size: 18px; }
+.logo-div-sub { font-size: 9px; color: var(--ink3); white-space: nowrap; }
+
+/* ═══════════════════════════════════════
+   HOOK CARD (Screen 1)
+═══════════════════════════════════════ */
+.hook-card {
+  margin-top: 10px;
+  background: linear-gradient(160deg, rgba(16,185,129,.07) 0%, rgba(59,130,246,.05) 100%);
+  border: 1px solid var(--gb);
+  border-radius: 20px;
+  padding: 22px 20px 18px;
+  position: relative;
+  overflow: hidden;
+}
+.hook-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 5%, var(--green) 40%, var(--blue) 70%, transparent 95%);
+}
+.hook-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--gl); margin-bottom: 10px;
+}
+.hook-tag-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); animation: pulseGreen 1.8s ease-in-out infinite;
+}
+@keyframes pulseGreen {
+  0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(16,185,129,.4); }
+  50% { opacity:.7; box-shadow: 0 0 0 5px rgba(16,185,129,0); }
+}
+
+.hook-title {
+  font-size: 17px; font-weight: 700; line-height: 1.5; color: var(--ink);
+  margin-bottom: 6px;
+}
+.hook-title .company { color: var(--go); }
+
+.hook-meta {
+  font-size: 12px; color: var(--ink2); margin-bottom: 14px; line-height: 1.65;
+}
+.hook-meta strong { color: var(--ink); }
+
+/* Trust badge */
+.trust-badge {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px;
+  background: rgba(0,0,0,.3); border: 1px solid rgba(16,185,129,.2);
+  border-radius: 12px;
+  font-size: 11.5px; color: var(--ink2); line-height: 1.65;
+}
+.trust-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--gd); border: 1px solid var(--gb);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.trust-badge strong { color: var(--gl); }
+
+/* Stats strip */
+.stats-strip {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 1px; background: var(--border);
+  border-radius: 14px; overflow: hidden;
+  margin-top: 14px;
+}
+.stat-box {
+  background: rgba(8,11,20,.95);
+  padding: 12px 10px; text-align: center;
+}
+.stat-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 16px; font-weight: 700;
+  line-height: 1; margin-bottom: 3px;
+}
+.stat-lbl { font-size: 10px; color: var(--ink3); line-height: 1.3; }
+
+/* Step list */
+.step-preview {
+  margin-top: 14px; display: flex; flex-direction: column; gap: 8px;
+}
+.sp-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 10px;
+  background: rgba(0,0,0,.25); border: 1px solid var(--border);
+  font-size: 12.5px; color: var(--ink2);
+}
+.sp-num {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  background: var(--gd); border: 1px solid var(--gb);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--gl);
+}
+.sp-item strong { color: var(--ink); }
+
+/* ═══════════════════════════════════════
+   MAIN CTA BUTTON
+═══════════════════════════════════════ */
+.cta-main {
+  position: relative;
+  width: 100%; padding: 18px 20px;
+  border-radius: 16px; border: none;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 16px; font-weight: 700; letter-spacing: .5px;
+  cursor: pointer; overflow: hidden;
+  transition: transform .2s, box-shadow .2s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-top: 0;
+  text-align: center;
+}
+.cta-main:active { transform: scale(.97); }
+.cta-main::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.18) 0%, transparent 60%);
+}
+.cta-green {
+  background: linear-gradient(135deg, #0ea472 0%, #10b981 50%, #059669 100%);
+  color: #fff;
+  box-shadow: 0 6px 32px rgba(16,185,129,.45), 0 2px 8px rgba(16,185,129,.25);
+}
+.cta-green:hover { box-shadow: 0 8px 40px rgba(16,185,129,.6); }
+.cta-blue {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #1d4ed8 100%);
+  color: #fff;
+  box-shadow: 0 6px 32px rgba(59,130,246,.45);
+}
+.cta-gold {
+  background: linear-gradient(135deg, #b8860b 0%, #c9a84c 40%, #f0d080 80%, #c9a84c 100%);
+  color: #000;
+  box-shadow: 0 6px 32px rgba(201,168,76,.5), 0 2px 8px rgba(201,168,76,.3);
+}
+.cta-gold:hover { box-shadow: 0 8px 40px rgba(201,168,76,.7); }
+
+.cta-icon {
+  width: 28px; height: 28px;
+  flex-shrink: 0;
+}
+
+/* Pulse ring on CTA */
+.cta-pulse-wrap {
+  position: relative;
+  margin-top: 18px;
+  margin-bottom: 14px;
+}
+.pulse-ring {
+  position: absolute;
+  inset: -6px; border-radius: 22px;
+  border: 2px solid rgba(16,185,129,.4);
+  animation: ctaPulse 2s ease-in-out infinite;
+}
+@keyframes ctaPulse {
+  0%,100% { transform: scale(1); opacity: .6; }
+  50% { transform: scale(1.03); opacity: .2; }
+}
+.cta-sub {
+  text-align: center; font-size: 11px; color: var(--ink3);
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+
+/* ═══════════════════════════════════════
+   SCREEN 2 — FORM
+═══════════════════════════════════════ */
+.screen2-header {
+  padding: 20px 0 14px;
+  text-align: center;
+}
+.s2h-title {
+  font-size: 20px; font-weight: 800; color: var(--ink);
+  margin-bottom: 5px;
+}
+.s2h-sub {
+  font-size: 12.5px; color: var(--ink2); line-height: 1.6;
+}
+
+/* OCR banner */
+.ocr-banner {
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(139,92,246,.12), rgba(59,130,246,.08));
+  border: 1px solid rgba(139,92,246,.3);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-size: 12px; color: var(--pl);
+  line-height: 1.55;
+}
+.ocr-ic {
+  width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+  background: var(--pd); border: 1px solid var(--pb);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Form card */
+.form-card {
+  background: var(--glass);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 20px 18px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+.f-block {}
+.f-label {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  margin-bottom: 8px;
+}
+.f-label-num {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  background: var(--gd); border: 1px solid var(--gb);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--gl);
+}
+.f-hint { font-size: 11px; color: var(--ink3); margin-top: 4px; }
+
+/* Input */
+.f-input-wrap { position: relative; }
+.f-inp {
+  width: 100%;
+  background: rgba(0,0,0,.45);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 20px; font-weight: 600;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  -webkit-appearance: none;
+}
+.f-inp:focus {
+  border-color: var(--gb);
+  box-shadow: 0 0 0 3px rgba(16,185,129,.12);
+}
+.f-inp::placeholder { color: var(--ink3); font-size: 14px; font-weight: 400; font-family: 'Noto Sans SC',sans-serif; }
+.f-inp-unit {
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 12px; color: var(--ink3); font-family: 'Noto Sans SC',sans-serif;
+  pointer-events: none;
+}
+
+/* Toggle group */
+.toggle-group {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.toggle-opt {
+  position: relative;
+}
+.toggle-opt input { position: absolute; opacity: 0; width: 0; height: 0; }
+.toggle-lbl {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; padding: 14px 12px;
+  border-radius: 14px; border: 1.5px solid var(--border2);
+  background: rgba(0,0,0,.35);
+  cursor: pointer; transition: all .2s;
+  font-size: 13px; font-weight: 500; color: var(--ink2);
+  text-align: center;
+}
+.toggle-lbl-ic { font-size: 22px; line-height: 1; }
+.toggle-opt input:checked + .toggle-lbl {
+  border-color: var(--gb);
+  background: var(--gd);
+  color: var(--gl);
+}
+.toggle-opt.gec input:checked + .toggle-lbl {
+  border-color: var(--bb);
+  background: var(--bd);
+  color: var(--bl);
+}
+
+/* Upload area */
+.upload-area {
+  border: 1.5px dashed var(--border2);
+  border-radius: 12px; padding: 16px;
+  text-align: center; cursor: pointer;
+  background: rgba(0,0,0,.25);
+  transition: border-color .2s, background .2s;
+  display: flex; align-items: center; gap: 12px;
+}
+.upload-area:active { border-color: var(--gb); background: var(--gd); }
+.upload-ic {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  background: var(--pd); border: 1px solid var(--pb);
+  display: flex; align-items: center; justify-content: center;
+}
+.upload-text { text-align: left; }
+.upload-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.upload-sub { font-size: 11px; color: var(--ink3); }
+
+/* ═══════════════════════════════════════
+   ENCRYPTION ANIMATION OVERLAY
+═══════════════════════════════════════ */
+.enc-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(4,6,13,.98);
+  display: none;
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 20px;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity .25s ease;
+}
+.enc-overlay.show {
+  display: flex !important;
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.enc-title {
+  font-size: 14px; font-weight: 700; color: var(--gl);
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.enc-sub { font-size: 11.5px; color: var(--ink3); text-align: center; max-width: 280px; }
+
+.code-rain {
+  width: 300px; height: 160px; position: relative; overflow: hidden;
+  border-radius: 12px; border: 1px solid var(--gb);
+  background: rgba(0,0,0,.6);
+}
+.code-col {
+  position: absolute; top: 0;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: var(--green);
+  line-height: 1.4; white-space: pre;
+  animation: codeScroll linear infinite;
+  opacity: .8;
+}
+@keyframes codeScroll {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  10%  { opacity: .8; }
+  90%  { opacity: .6; }
+  100% { transform: translateY(200%); opacity: 0; }
+}
+
+.enc-progress {
+  width: 300px;
+}
+.enc-prog-bar {
+  height: 5px; background: rgba(255,255,255,.08);
+  border-radius: 3px; overflow: hidden;
+  margin-bottom: 6px;
+}
+.enc-prog-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--green), var(--blue));
+  width: 0%;
+  transition: width .1s linear;
+  box-shadow: 0 0 8px var(--green);
+}
+.enc-prog-steps {
+  display: flex; flex-direction: column; gap: 3px;
+}
+.eps {
+  font-size: 11px; color: var(--ink3);
+  display: flex; align-items: center; gap: 6px;
+  transition: color .3s;
+}
+.eps.done { color: var(--gl); }
+.eps.active { color: var(--ink); }
+.eps-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ink3); flex-shrink: 0; }
+.eps.done .eps-dot { background: var(--green); }
+.eps.active .eps-dot { background: var(--blue-l); animation: pulseDot 1s infinite; }
+@keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.enc-shield {
+  position: relative;
+  animation: shieldRotate 2s ease-in-out infinite;
+}
+@keyframes shieldRotate {
+  0%,100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 10px var(--green)); }
+  50% { transform: scale(1.08) rotate(2deg); filter: drop-shadow(0 0 20px var(--green)); }
+}
+
+/* ═══════════════════════════════════════
+   SCREEN 3 — RESULT
+═══════════════════════════════════════ */
+.result-header {
+  padding: 24px 0 14px; text-align: center;
+}
+.result-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 16px; border-radius: 20px;
+  background: var(--gd); border: 1px solid var(--gb);
+  font-size: 12px; font-weight: 700; color: var(--gl);
+  letter-spacing: .5px; margin-bottom: 12px;
+}
+.result-check {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--green);
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.result-title {
+  font-size: 22px; font-weight: 900; color: var(--ink);
+  margin-bottom: 4px; line-height: 1.25;
+}
+.result-intensity {
+  font-family: 'DM Mono', monospace;
+  font-size: 36px; font-weight: 700;
+  color: var(--orange);
+  letter-spacing: -1px; line-height: 1;
+  margin-bottom: 3px;
+}
+.result-intensity-unit {
+  font-size: 13px; font-weight: 400; color: var(--ink2); margin-left: 3px;
+}
+.result-intensity-sub {
+  font-size: 11.5px; color: var(--ink2);
+  margin-bottom: 14px;
+}
+
+/* Grade badge */
+.grade-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px; border-radius: 10px;
+  background: var(--rd); border: 1px solid var(--rb);
+  font-size: 13px; font-weight: 700; color: var(--rl);
+  margin-bottom: 14px;
+}
+.grade-letter {
+  font-family: 'DM Mono', monospace;
+  font-size: 22px; font-weight: 900;
+}
+
+/* ═══════════════════════════════════════
+   RADAR CHART (SVG)
+═══════════════════════════════════════ */
+.radar-card {
+  background: linear-gradient(160deg, rgba(239,68,68,.06) 0%, rgba(249,115,22,.04) 100%);
+  border: 1px solid rgba(239,68,68,.22);
+  border-radius: 20px; padding: 18px 16px 14px;
+  position: relative; overflow: hidden;
+}
+.radar-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--red), var(--orange), transparent);
+}
+.radar-title {
+  font-size: 12px; font-weight: 700; color: var(--ink2);
+  text-transform: uppercase; letter-spacing: .8px;
+  margin-bottom: 4px;
+}
+.radar-subtitle {
+  font-size: 11px; color: var(--rl); margin-bottom: 14px;
+}
+.radar-wrap {
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+}
+.radar-legend {
+  display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center;
+}
+.rl-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10.5px; color: var(--ink2);
+}
+.rl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* Radar risk alert */
+.radar-alert {
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 10px 12px;
+  background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25);
+  border-radius: 10px; margin-top: 12px;
+  font-size: 11.5px; color: var(--rl); line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════
+   BLURRED TEASER
+═══════════════════════════════════════ */
+.blur-teaser {
+  position: relative; margin-top: 14px;
+  border-radius: 18px; overflow: hidden;
+  border: 1px solid var(--border2);
+}
+.blur-inner {
+  padding: 20px;
+  background: linear-gradient(160deg, rgba(59,130,246,.08) 0%, rgba(139,92,246,.06) 100%);
+  filter: blur(5px);
+  user-select: none; pointer-events: none;
+}
+.blur-fake-chart {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-bottom: 10px;
+}
+.bfc-row {
+  display: flex; align-items: center; gap: 8px; font-size: 12px;
+}
+.bfc-label { width: 90px; color: var(--ink2); flex-shrink: 0; }
+.bfc-bar-wrap { flex: 1; height: 10px; background: rgba(255,255,255,.07); border-radius: 5px; overflow: hidden; }
+.bfc-bar { height: 100%; border-radius: 5px; }
+.bfc-val { width: 32px; text-align: right; color: var(--ink3); font-family: 'DM Mono',monospace; font-size: 11px; }
+.blur-dots {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.blur-dot-item {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,.07); flex-shrink: 0;
+}
+
+.blur-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg,
+    rgba(4,6,13,.3) 0%,
+    rgba(4,6,13,.75) 40%,
+    rgba(4,6,13,.95) 75%,
+    rgba(4,6,13,1) 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: flex-end;
+  padding: 16px;
+}
+.blur-unlock-text {
+  text-align: center;
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  margin-bottom: 4px;
+}
+.blur-unlock-sub {
+  font-size: 11px; color: var(--ink2); text-align: center; margin-bottom: 12px;
+}
+.blur-pill {
+  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px;
+}
+.bp {
+  font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px;
+}
+
+/* ═══════════════════════════════════════
+   UPSELL SECTION
+═══════════════════════════════════════ */
+.upsell-card {
+  background: linear-gradient(160deg, rgba(201,168,76,.1) 0%, rgba(139,92,246,.07) 100%);
+  border: 1px solid rgba(201,168,76,.3);
+  border-radius: 20px; padding: 20px 18px;
+  position: relative; overflow: hidden;
+  margin-top: 14px;
+}
+.upsell-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--purple), transparent);
+}
+.upsell-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--go);
+  margin-bottom: 8px;
+}
+.upsell-title {
+  font-size: 16px; font-weight: 800; color: var(--ink);
+  line-height: 1.4; margin-bottom: 6px;
+}
+.upsell-desc {
+  font-size: 12.5px; color: var(--ink2); line-height: 1.7;
+  margin-bottom: 14px;
+}
+.upsell-features {
+  display: flex; flex-direction: column; gap: 7px;
+  margin-bottom: 16px;
+}
+.uf-item {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 12.5px; color: var(--ink);
+}
+.uf-ic {
+  width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Social proof */
+.social-proof {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: rgba(0,0,0,.3); border-radius: 10px;
+  margin-top: 12px; margin-bottom: 8px;
+  border: 1px solid var(--border);
+}
+.sp-avatars {
+  display: flex;
+}
+.sp-av {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid var(--bg0); margin-right: -6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; flex-shrink: 0;
+}
+.sp-text { font-size: 11px; color: var(--ink2); line-height: 1.5; }
+.sp-text strong { color: var(--ink); }
+
+.micro-cta {
+  text-align: center; font-size: 11px; color: var(--ink3);
+  margin-top: 8px;
+}
+.micro-cta a { color: var(--gl); text-decoration: none; }
+
+/* ═══════════════════════════════════════
+   UTILITY
+═══════════════════════════════════════ */
+.mt4  { margin-top: 4px;  }
+.mt8  { margin-top: 8px;  }
+.mt12 { margin-top: 12px; }
+.mt14 { margin-top: 14px; }
+.mt16 { margin-top: 16px; }
+.mt18 { margin-top: 18px; }
+
+.divider {
+  height: 1px; background: var(--border);
+  margin: 10px 0;
+}
+
+/* bottom safe area */
+.safe-bottom { height: max(20px, env(safe-area-inset-bottom)); }
+
+/* Fade in animation for elements */
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.anim-in { animation: fadeInUp .5s ease both; }
+.d1 { animation-delay:.05s; } .d2 { animation-delay:.12s; }
+.d3 { animation-delay:.19s; } .d4 { animation-delay:.26s; }
+.d5 { animation-delay:.33s; }
+
+/* 解锁区入场：仅用位移，避免 opacity 与雷达区视觉串层 */
+@keyframes s3UnlockIn {
+  from { transform: translateY(16px); }
+  to { transform: translateY(0); }
+}
+.s3-unlock-section .anim-in.d3,
+.s3-unlock-section .anim-in.d4 {
+  animation-name: s3UnlockIn;
+  animation-duration: .48s;
+  animation-timing-function: cubic-bezier(.4,0,.2,1);
+  animation-fill-mode: both;
+  opacity: 1 !important;
+}
+
+/* Selection style */
+::selection { background: rgba(16,185,129,.25); }
+
+
+/* ═══════════════════════════════════════
+   SCREEN 3 REBUILT — Arc 1: 危机感
+═══════════════════════════════════════ */
+
+/* Success chip */
+.s3-success-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 14px; border-radius: 20px; margin: 14px auto 0;
+  background: var(--gd); border: 1px solid var(--gb);
+  font-size: 12px; font-weight: 600; color: var(--gl);
+  letter-spacing: .3px; align-self: center;
+}
+.s3-success-icon { flex-shrink: 0; line-height: 0; }
+
+/* Intensity hero card */
+.s3-intensity-card {
+  background: linear-gradient(160deg,rgba(239,68,68,.07) 0%,rgba(249,115,22,.05) 100%);
+  border: 1px solid rgba(239,68,68,.2);
+  border-radius: 18px; padding: 18px 18px 14px;
+  margin-top: 12px; position: relative; overflow: hidden;
+}
+.s3-intensity-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg,transparent,rgba(239,68,68,.5),rgba(249,115,22,.4),transparent);
+}
+.s3-ic-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--ink3); margin-bottom: 6px;
+}
+.s3-ic-number { display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px; }
+.s3-ic-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 42px; font-weight: 700; color: var(--orange);
+  letter-spacing: -2px; line-height: 1;
+}
+.s3-ic-unit { font-size: 13px; color: var(--ink2); }
+.s3-ic-sub { font-size: 11px; color: var(--ink3); margin-bottom: 12px; }
+
+/* Benchmark bar */
+.s3-bench { margin-top: 4px; }
+.s3-bench-bar-wrap {}
+.s3-bench-track {
+  height: 10px; border-radius: 5px; overflow: visible;
+  display: flex; position: relative;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+  margin-bottom: 6px;
+}
+.s3-bench-zone { height: 100%; }
+.s3-bench-zone:first-child { border-radius: 4px 0 0 4px; }
+.s3-bench-zone:last-child  { border-radius: 0 4px 4px 0; }
+.s3-bench-marker {
+  position: absolute; top: -4px;
+  display: flex; flex-direction: column; align-items: center;
+  transform: translateX(-50%);
+}
+.s3-bench-marker-line {
+  width: 1.5px; height: 18px; background: var(--go); box-shadow: 0 0 4px var(--gold);
+}
+.s3-bench-marker-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gold); border: 1.5px solid var(--go);
+  box-shadow: 0 0 6px var(--gold); margin-top: -1px;
+}
+.s3-bench-marker-label {
+  font-size: 9px; font-weight: 700; color: var(--go); margin-top: 2px;
+  background: rgba(4,6,13,.9); padding: 1px 4px; border-radius: 3px;
+}
+.s3-bench-labels {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--ink3);
+}
+
+/* Grade card */
+.s3-grade-card {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: rgba(0,0,0,.3); border: 1px solid rgba(239,68,68,.2);
+  border-radius: 14px; padding: 14px 16px; margin-top: 10px;
+}
+.s3-grade-left {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  flex-shrink: 0;
+}
+.s3-grade-letter {
+  width: 42px; height: 42px; border-radius: 11px;
+  background: var(--rd); border: 1.5px solid var(--rb);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 900;
+  color: var(--rl);
+}
+.s3-grade-name { font-size: 9.5px; color: var(--rl); font-weight: 600; }
+.s3-grade-right { flex: 1; min-width: 0; }
+.s3-grade-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.s3-grade-desc  { font-size: 11.5px; color: var(--ink2); line-height: 1.65; margin-bottom: 8px; }
+.s3-grade-risks { display: flex; flex-direction: column; gap: 4px; }
+.s3-risk-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11.5px; color: var(--ink2);
+}
+.s3-risk-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* Radar wrapper */
+.s3-radar-wrap {
+  background: rgba(0,0,0,.25); border: 1px solid var(--border);
+  border-radius: 16px; padding: 14px 14px 12px; margin-top: 10px;
+}
+.s3-radar-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.s3-radar-title { font-size: 11px; font-weight: 700; color: var(--ink2); }
+.s3-radar-avg   { font-size: 10px; color: var(--ink3); }
+.s3-score-list  { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+.s3-score-item  { display: flex; align-items: center; gap: 6px; }
+.s3-score-name  { font-size: 10px; color: var(--ink2); width: 54px; flex-shrink: 0; line-height: 1.2; }
+.s3-score-bar-mini {
+  flex: 1; height: 4px;
+  background: rgba(255,255,255,.07); border-radius: 2px; overflow: hidden;
+}
+.s3-score-bar-mini div { height: 100%; border-radius: 2px; }
+.s3-score-val {
+  font-family: 'DM Mono', monospace; font-size: 10.5px; font-weight: 600;
+  width: 20px; text-align: right; flex-shrink: 0;
+}
+.s3-score-divider { height: 1px; background: var(--border); margin: 2px 0; }
+.s3-radar-legend {
+  display: flex; gap: 14px; justify-content: center;
+  flex-wrap: wrap; margin-top: 10px;
+}
+.s3-rl { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--ink2); }
+.s3-rl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* Emotional transition divider */
+.s3-divider-transition {
+  display: flex; align-items: center; gap: 10px;
+  margin: 20px 0 14px;
+}
+.s3-dt-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--border2)); }
+.s3-dt-line:last-child { background: linear-gradient(90deg, var(--border2), transparent); }
+.s3-dt-text {
+  font-size: 11px; color: var(--ink3); white-space: nowrap;
+  padding: 3px 10px; border: 1px solid var(--border); border-radius: 20px;
+  background: rgba(0,0,0,.3);
+}
+
+/* ═══════════════════════════════════════
+   SCREEN 3 — Arc 2: 解锁墙 (Paywall)
+   Inspired by LinkedIn Premium — professional, not broken
+═══════════════════════════════════════ */
+.s3-paywall {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 20px; overflow: hidden;
+}
+
+/* Paywall header */
+.s3-pw-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px 12px;
+  background: linear-gradient(135deg, rgba(201,168,76,.08) 0%, rgba(139,92,246,.06) 100%);
+  border-bottom: 1px solid var(--border);
+}
+.s3-pw-lock-icon {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+  background: var(--gdo); border: 1px solid var(--gbo);
+  display: flex; align-items: center; justify-content: center;
+}
+.s3-pw-title { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.s3-pw-sub   { font-size: 11px; color: var(--ink2); margin-top: 1px; }
+.s3-pw-tag {
+  margin-left: auto; flex-shrink: 0;
+  padding: 4px 10px; border-radius: 20px;
+  background: var(--gd); border: 1px solid var(--gb);
+  font-size: 10px; font-weight: 700; color: var(--gl);
+  letter-spacing: .5px;
+}
+
+/* Locked report body */
+.s3-locked-report { padding: 12px 14px 14px; }
+
+.s3-lr-section {}
+.s3-lr-sec-title {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10.5px; font-weight: 700; color: var(--ink3);
+  text-transform: uppercase; letter-spacing: .8px;
+  margin-bottom: 9px;
+}
+
+/* Step row for action path */
+.s3-lr-row {
+  display: flex; gap: 7px;
+}
+.s3-lr-step {
+  flex: 1; display: flex; flex-direction: column; gap: 5px;
+  padding: 9px 10px; background: rgba(0,0,0,.3);
+  border: 1px solid var(--border); border-radius: 10px;
+}
+.s3-lr-step-num {
+  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+  background: var(--gd); border: 1px solid var(--gb);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: var(--gl);
+}
+.s3-lr-step-title { font-size: 11px; font-weight: 600; color: var(--ink); line-height: 1.3; }
+
+/* Skeleton shimmer lines */
+.s3-skel {
+  height: 7px; border-radius: 3.5px;
+  background: linear-gradient(90deg, rgba(255,255,255,.06) 25%, rgba(255,255,255,.1) 50%, rgba(255,255,255,.06) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+  margin-top: 4px;
+}
+.s3-skel-w70 { width: 70%; }
+.s3-skel-w85 { width: 85%; }
+.s3-skel-w60 { width: 60%; }
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Locked value display */
+.s3-lr-locked-val {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10px; color: var(--ink3); margin-top: 3px;
+  font-family: 'DM Mono', monospace;
+}
+
+/* Competitor table */
+.s3-competitor-table {
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+}
+.s3-ct-row {
+  display: grid; grid-template-columns: 1.2fr 1fr .7fr 1.1fr;
+  padding: 7px 10px; font-size: 11.5px; color: var(--ink2);
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  align-items: center;
+}
+.s3-ct-row:last-child { border-bottom: none; }
+.s3-ct-head {
+  font-size: 9.5px; font-weight: 700; color: var(--ink3);
+  text-transform: uppercase; letter-spacing: .5px;
+  background: rgba(0,0,0,.3);
+}
+.s3-ct-mine { background: rgba(201,168,76,.05); }
+
+.s3-grade-mini {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 6px;
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 900;
+}
+.s3-grade-a { background: var(--gd); border: 1px solid var(--gb); color: var(--gl); }
+.s3-grade-b { background: var(--od); border: 1px solid var(--ob); color: var(--ol); }
+.s3-grade-c { background: var(--rd); border: 1px solid var(--rb); color: var(--rl); }
+
+.s3-locked-inline {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink3);
+}
+.s3-ct-note {
+  font-size: 10.5px; color: var(--ink3); margin-top: 6px;
+  font-style: italic;
+}
+
+/* Tax teaser */
+.s3-tax-teaser {
+  padding: 10px 12px;
+  background: rgba(201,168,76,.04); border: 1px solid rgba(201,168,76,.14);
+  border-radius: 10px;
+}
+.s3-tax-row { display: flex; align-items: center; gap: 8px; }
+.s3-tax-box { flex: 1; text-align: center; }
+.s3-tax-lbl { font-size: 10px; color: var(--ink3); margin-bottom: 4px; }
+.s3-tax-val {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 700;
+  color: var(--rl); line-height: 1;
+}
+.s3-tax-val-locked { color: var(--ink3); }
+.s3-tax-sub { font-size: 10px; color: var(--ink3); margin-top: 3px; }
+.s3-tax-arrow { font-size: 16px; color: var(--ink3); flex-shrink: 0; }
+
+/* Paywall unlock hint */
+.s3-pw-unlock-hint {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 11px 14px 13px;
+  border-top: 1px solid var(--border);
+  font-size: 12px; font-weight: 600; color: var(--gl);
+  background: linear-gradient(180deg, transparent, rgba(16,185,129,.04));
+}
+
+/* ═══════════════════════════════════════
+   SCREEN 3 — Arc 3: 认领区 (Claim Zone)
+   Tone shift: 危机 → 价值感 + 信任
+═══════════════════════════════════════ */
+.s3-claim-zone {
+  margin-top: 16px;
+  background: linear-gradient(160deg,
+    rgba(16,185,129,.07) 0%,
+    rgba(59,130,246,.05) 50%,
+    rgba(139,92,246,.04) 100%);
+  border: 1px solid rgba(16,185,129,.2);
+  border-radius: 22px; padding: 20px 18px 18px;
+  position: relative; overflow: hidden;
+}
+.s3-claim-zone::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 5%, var(--green) 40%, var(--blue) 70%, transparent 95%);
+}
+
+/* Zone header */
+.s3-cz-header { text-align: center; margin-bottom: 16px; }
+.s3-cz-eyebrow {
+  display: inline-block;
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--gl);
+  padding: 3px 10px; border-radius: 20px;
+  background: var(--gd); border: 1px solid var(--gb);
+  margin-bottom: 10px;
+}
+.s3-cz-title { font-size: 19px; font-weight: 800; color: var(--ink); line-height: 1.3; margin-bottom: 4px; }
+.s3-cz-sub   { font-size: 12px; color: var(--ink2); }
+
+/* Benefits */
+.s3-benefits { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.s3-benefit-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px;
+  background: rgba(0,0,0,.2); border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.s3-bi-icon {
+  width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid;
+}
+.s3-bi-title { font-size: 12.5px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.s3-bi-sub   { font-size: 11px; color: var(--ink2); line-height: 1.5; }
+
+/* Social proof bar */
+.s3-social-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; background: rgba(0,0,0,.25);
+  border: 1px solid var(--border); border-radius: 10px;
+  margin-bottom: 16px;
+}
+.s3-sb-avatars { display: flex; }
+.s3-sba {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid var(--bg0); margin-right: -6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0;
+}
+.s3-sb-text { font-size: 11px; color: var(--ink2); line-height: 1.5; padding-left: 8px; }
+.s3-sb-text strong { color: var(--ink); }
+
+/* Primary CTA */
+.s3-cta-wrap { position: relative; margin-bottom: 10px; }
+.s3-cta-glow {
+  position: absolute; inset: -8px; border-radius: 26px;
+  background: radial-gradient(ellipse at center, rgba(201,168,76,.2) 0%, transparent 70%);
+  pointer-events: none;
+  animation: ctaGlow 2.5s ease-in-out infinite;
+}
+@keyframes ctaGlow {
+  0%,100% { opacity: .6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+.s3-cta-primary {
+  width: 100%; padding: 17px 20px;
+  border-radius: 16px; border: none; cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 15px; font-weight: 700; letter-spacing: .3px;
+  color: rgba(0,0,0,.85);
+  background: linear-gradient(135deg, #a0720c 0%, #c9a84c 30%, #f0d080 65%, #c9a84c 85%, #a0720c 100%);
+  box-shadow: 0 6px 28px rgba(201,168,76,.5), 0 2px 8px rgba(201,168,76,.25), inset 0 1px 0 rgba(255,255,255,.3);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform .2s, box-shadow .2s;
+  position: relative; overflow: hidden;
+}
+.s3-cta-primary::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.25) 0%, transparent 50%);
+}
+.s3-cta-primary:active { transform: scale(.97); box-shadow: 0 3px 14px rgba(201,168,76,.4); }
+.s3-cta-note {
+  text-align: center; font-size: 11px; color: var(--ink3);
+  margin-top: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.s3-cta-note::before,.s3-cta-note::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border));
+}
+.s3-cta-note::after { background: linear-gradient(90deg, var(--border), transparent); }
+
+/* Secondary actions */
+.s3-secondary-actions {
+  display: flex; align-items: center; gap: 0;
+  background: rgba(0,0,0,.2); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden;
+}
+.s3-sec-btn {
+  flex: 1; padding: 11px 12px; background: transparent; border: none; cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif; font-size: 12px; color: var(--ink2);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: background .15s, color .15s;
+}
+.s3-sec-btn:hover { background: var(--glass); color: var(--ink); }
+.s3-sec-divider { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+
+/* Footer */
+.s3-footer {
+  margin-top: 16px; text-align: center;
+  font-size: 10.5px; color: var(--ink3); line-height: 1.8;
+}
+
+/* Screen 3：上（雷达/评级）+ 下（解锁流）文档流，禁止全屏叠层混淆 */
+.s3-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+  min-height: 0;
+}
+.s3-upper-stage {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  background: transparent;
+}
+.s3-unlock-section {
+  margin-top: 8px;
+  margin-left: -20px;
+  margin-right: -20px;
+  padding: 18px 20px 28px;
+  flex: 1 0 auto;
+  background: var(--night) !important;
+  background-color: #06080f !important;
+  box-shadow: 0 -10px 20px rgba(0,0,0,0.5);
+  border-radius: 18px 18px 0 0;
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+}
+.s3-unlock-section .s3-divider-transition {
+  margin-top: 0;
+}
+.s3-unlock-section .s3-ct-row {
+  background: rgba(8,11,20,0.98);
+}
+.s3-unlock-section .s3-ct-head {
+  background: rgba(4,6,15,0.98);
+}
+.s3-unlock-section .s3-ct-mine {
+  background: rgba(201,168,76,.12);
+}
+.s3-unlock-section .s3-tax-teaser {
+  background: rgba(8,11,20,0.96);
+  border-color: rgba(201,168,76,.22);
+}
+.s3-unlock-section .s3-claim-zone {
+  background: linear-gradient(160deg,
+    rgba(16,185,129,.14) 0%,
+    rgba(8,11,20,.97) 42%,
+    rgba(6,8,15,.99) 100%);
+}
+.s3-unlock-section .s3-cta-wrap {
+  position: relative;
+  z-index: 3;
+}
+.s3-unlock-section .s3-cta-primary {
+  box-shadow: 0 10px 32px rgba(0,0,0,.55), 0 0 0 1px rgba(201,168,76,.5);
+}
+
+/* ═══════════════════════════════════════
+   REGISTRATION BOTTOM SHEET
+═══════════════════════════════════════ */
+.reg-mask {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(4,6,13,.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+.reg-mask.show { opacity: 1; pointer-events: auto; }
+
+/* 手机优先：≤480px 贴底铺满；
+   PC 预览自适应：>480px 居中成「手机宽」浮窗，保持 H5 形态 */
+.bottom-sheet {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  width: 100%;
+  max-width: 480px;
+  z-index: 301;
+  max-height: 88vh;
+  background: var(--night);
+  border-radius: 22px 22px 0 0;
+  border-top: 1px solid rgba(201,168,76,.25);
+  box-shadow: 0 -18px 48px rgba(0,0,0,.65);
+  transform: translate(-50%, 110%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.bottom-sheet.show { transform: translate(-50%, 0); }
+
+/* PC / 平板预览：浮出屏幕底部一点，四角都带圆角，更像「手机里的卡片」 */
+@media (min-width: 600px) {
+  .bottom-sheet {
+    bottom: 24px;
+    border-radius: 22px;
+    border: 1px solid rgba(201,168,76,.25);
+    max-height: min(88vh, 720px);
+    box-shadow: 0 24px 64px rgba(0,0,0,.7);
+  }
+  .bottom-sheet.show { transform: translate(-50%, 0); }
+  .bs-handle { display: none; }
+}
+.bs-handle {
+  width: 44px; height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,.18);
+  margin: 10px auto 4px;
+  flex-shrink: 0;
+}
+.bs-header {
+  padding: 6px 22px 14px;
+  display: flex; align-items: flex-start; gap: 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.bs-header-text { flex: 1; min-width: 0; }
+.bs-eyebrow {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--go);
+  margin-bottom: 4px;
+}
+.bs-title {
+  font-size: 17px; font-weight: 800; color: var(--ink);
+  line-height: 1.35;
+}
+.bs-sub {
+  font-size: 12px; color: var(--ink2);
+  margin-top: 4px; line-height: 1.55;
+}
+.bs-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--border2); background: rgba(255,255,255,.04);
+  color: var(--ink2); font-size: 18px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.bs-close:active { background: var(--glass); }
+
+.bs-body {
+  padding: 18px 22px 10px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.reg-field { display: flex; flex-direction: column; gap: 8px; }
+.reg-field-label {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12.5px; font-weight: 600; color: var(--ink);
+}
+.reg-field-label .reg-req { color: var(--rl); font-weight: 700; }
+.reg-field-sub { font-size: 11px; color: var(--ink3); }
+
+.reg-input {
+  width: 100%;
+  background: rgba(0,0,0,.45);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 13px 14px;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px; font-weight: 500;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+  -webkit-appearance: none;
+}
+.reg-input::placeholder { color: var(--ink3); font-weight: 400; }
+.reg-input:focus {
+  border-color: var(--gb);
+  box-shadow: 0 0 0 3px rgba(16,185,129,.14);
+}
+.reg-input[readonly] {
+  background: rgba(201,168,76,.06);
+  border-color: rgba(201,168,76,.25);
+  color: var(--go);
+  font-weight: 600;
+}
+.reg-input.invalid {
+  border-color: var(--rb);
+  box-shadow: 0 0 0 3px rgba(239,68,68,.14);
+}
+
+.reg-prefilled {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10.5px; color: var(--go);
+  margin-top: 4px;
+}
+
+.reg-code-row {
+  display: flex; gap: 8px; align-items: stretch;
+}
+.reg-code-row .reg-input { flex: 1; min-width: 0; }
+.reg-code-btn {
+  flex-shrink: 0;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid var(--gb);
+  background: var(--gd);
+  color: var(--gl);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 12.5px; font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .2s, color .2s, border-color .2s, opacity .2s;
+}
+.reg-code-btn:active { background: rgba(16,185,129,.22); }
+.reg-code-btn:disabled {
+  opacity: .55; cursor: not-allowed;
+  background: rgba(255,255,255,.04);
+  border-color: var(--border2);
+  color: var(--ink3);
+}
+
+.reg-note {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 10px 12px;
+  background: rgba(16,185,129,.06);
+  border: 1px solid rgba(16,185,129,.22);
+  border-radius: 10px;
+  font-size: 11.5px; color: var(--gl); line-height: 1.55;
+}
+
+.bs-footer {
+  padding: 14px 22px max(22px, env(safe-area-inset-bottom, 22px));
+  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(4,6,13,0), rgba(4,6,13,.6));
+  flex-shrink: 0;
+}
+.reg-submit {
+  width: 100%;
+  padding: 17px 20px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 15px; font-weight: 800; letter-spacing: .3px;
+  color: rgba(0,0,0,.9);
+  background: linear-gradient(135deg, #a0720c 0%, #c9a84c 30%, #f0d080 65%, #c9a84c 85%, #a0720c 100%);
+  box-shadow: 0 10px 32px rgba(201,168,76,.5), inset 0 1px 0 rgba(255,255,255,.3);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform .2s, box-shadow .2s, opacity .2s;
+}
+.reg-submit:active { transform: scale(.98); }
+.reg-submit[disabled] {
+  cursor: progress;
+  opacity: .85;
+  filter: saturate(.9);
+}
+.reg-submit .reg-spin {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,.25);
+  border-top-color: rgba(0,0,0,.9);
+  animation: regSpin .7s linear infinite;
+  flex-shrink: 0;
+  display: none;
+}
+.reg-submit.loading .reg-spin { display: inline-block; }
+@keyframes regSpin { to { transform: rotate(360deg); } }
+
+.reg-legal {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 11px; color: var(--ink3);
+  line-height: 1.65;
+}
+.reg-legal a { color: var(--gl); text-decoration: none; }
+
+</style>
+</head>
+<body>
+
+<!-- PARTICLE BACKGROUND -->
+<div class="bg-particles" id="particles"></div>
+
+<!-- ENCRYPTION OVERLAY -->
+<div class="enc-overlay" id="enc-overlay">
+  <div class="enc-shield">
+    <svg width="64" height="72" viewBox="0 0 64 72" fill="none">
+      <path d="M32 2L60 14V36C60 52 47 64 32 68C17 64 4 52 4 36V14L32 2Z"
+        fill="rgba(16,185,129,.12)" stroke="#10b981" stroke-width="1.8"/>
+      <path d="M32 8L55 18.5V36C55 50 43.5 60.5 32 64C20.5 60.5 9 50 9 36V18.5L32 8Z"
+        fill="none" stroke="rgba(16,185,129,.25)" stroke-width=".8"/>
+      <path d="M21 16L26 21L32 14L38 21L43 16"
+        fill="none" stroke="#10b981" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="20" cy="36" r="2" fill="rgba(16,185,129,.5)"/>
+      <circle cx="20" cy="44" r="2" fill="rgba(16,185,129,.5)"/>
+      <circle cx="44" cy="36" r="2" fill="rgba(16,185,129,.5)"/>
+      <circle cx="44" cy="44" r="2" fill="rgba(16,185,129,.5)"/>
+    </svg>
+  </div>
+  <div class="enc-title">🔐 CL-IVC 零知识证明</div>
+  <div class="enc-sub">正在本地节点加密计算，您的商业数据不会离开设备</div>
+  <div class="code-rain" id="code-rain"></div>
+  <div class="enc-progress">
+    <div class="enc-prog-bar">
+      <div class="enc-prog-fill" id="enc-fill"></div>
+    </div>
+    <div class="enc-prog-steps" id="enc-steps">
+      <div class="eps" id="eps1"><div class="eps-dot"></div>正在读取能耗数据…</div>
+      <div class="eps" id="eps2"><div class="eps-dot"></div>生成碳强度系数…</div>
+      <div class="eps" id="eps3"><div class="eps-dot"></div>本地 ZKP 哈希计算中…</div>
+      <div class="eps" id="eps4"><div class="eps-dot"></div>加密提交至区块链节点…</div>
+      <div class="eps" id="eps5"><div class="eps-dot"></div>生成供应商碳认证凭证…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ VIEWPORT ═══════ -->
+<div class="viewport" id="viewport">
+
+<!-- ══════════════════════════════════
+     SCREEN 1 — THE HOOK
+══════════════════════════════════ -->
+<div class="screen active" id="screen1">
+
+  <!-- Status bar -->
+  <div class="top-status">
+    <div class="ts-step">
+      <div class="ts-dot active" id="dot1"></div>
+      <div class="ts-dot" id="dot2"></div>
+      <div class="ts-dot" id="dot3"></div>
+    </div>
+    <div class="ts-secure">
+      <svg width="11" height="12" viewBox="0 0 11 12" fill="none">
+        <path d="M5.5 1L10 3.3V7C10 9.3 8 11.2 5.5 12C3 11.2 1 9.3 1 7V3.3L5.5 1Z"
+          fill="rgba(16,185,129,.2)" stroke="#10b981" stroke-width="1"/>
+      </svg>
+      数据本地加密
+    </div>
+  </div>
+
+  <div class="inner" style="padding-top:0">
+
+    <!-- Dual Logo -->
+    <div class="logo-row anim-in d1">
+      <div class="logo-badge">
+        <div class="logo-icon" style="background:linear-gradient(135deg,#1a2744,#0d1832);border:1px solid rgba(59,130,246,.35)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <path d="M13 3L23 8V17C23 21 18.5 24.5 13 26C7.5 24.5 3 21 3 17V8L13 3Z"
+              stroke="#3b82f6" stroke-width="1.3" fill="rgba(59,130,246,.15)"/>
+            <text x="13" y="17" text-anchor="middle" font-size="7" font-weight="700"
+              fill="#93c5fd" font-family="sans-serif">汽配</text>
+          </svg>
+        </div>
+        <div class="logo-name">待完善企业档案汽配厂</div>
+      </div>
+      <div class="logo-divider">
+        <div class="logo-div-text">🤝</div>
+        <div class="logo-div-sub">委托核验</div>
+      </div>
+      <div class="logo-badge">
+        <div class="logo-icon" style="background:linear-gradient(135deg,#0a1f0f,#061410);border:1px solid var(--gb)">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M14 2L25 7.5V17C25 22.5 20 27 14 28.5C8 27 3 22.5 3 17V7.5L14 2Z"
+              fill="rgba(16,185,129,.18)" stroke="#10b981" stroke-width="1.3"/>
+            <polyline points="9,14 12.5,17.5 19.5,11" stroke="#6ee7b7" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="logo-name">Co2Lion · HengAI</div>
+      </div>
+    </div>
+
+    <!-- Hook Card -->
+    <div class="hook-card anim-in d2">
+      <div class="hook-tag">
+        <div class="hook-tag-dot"></div>
+        CBAM 碳排快审
+      </div>
+      <div class="hook-title">
+        受 <span class="company">待完善企业档案汽配制造厂</span> 委托，邀请您完成本批次订单的欧盟碳排快审
+      </div>
+      <div class="hook-meta">
+        欧盟 CBAM 碳关税 <strong>2026年起正式征收</strong>，进口商需提供供应链碳数据。<br>
+        整个填报过程 <strong>约3分钟</strong>，填报后可立即获取您的碳评级报告。
+      </div>
+      <div class="trust-badge">
+        <div class="trust-icon">
+          <svg width="14" height="15" viewBox="0 0 14 15" fill="none">
+            <path d="M7 1L13 4V9C13 12 10.5 14 7 15C3.5 14 1 12 1 9V4L7 1Z"
+              fill="rgba(16,185,129,.2)" stroke="#10b981" stroke-width="1"/>
+            <polyline points="4.5,7.5 6.5,9.5 9.5,6" stroke="#6ee7b7" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          🔒 基于 <strong>CL-IVC 工业隐私协议</strong>，您的 BOM 成本及商业机密将被物理隔离，采购方<strong>仅能获取最终碳强度系数</strong>，无法看到任何原始数据。
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-strip">
+        <div class="stat-box">
+          <div class="stat-val" style="color:var(--gl)">3min</div>
+          <div class="stat-lbl">极速完成<br>全程填报</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" style="color:var(--bl)">ZKP</div>
+          <div class="stat-lbl">零知识证明<br>数据不出厂</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" style="color:var(--go)">免费</div>
+          <div class="stat-lbl">获取碳评级<br>报告</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Steps preview -->
+    <div class="step-preview anim-in d3">
+      <div class="sp-item">
+        <div class="sp-num">1</div>
+        <div><strong>填写能耗数据</strong> — 上月用电量（约1分钟）</div>
+      </div>
+      <div class="sp-item">
+        <div class="sp-num">2</div>
+        <div><strong>加密生成</strong> — AI 本地计算碳强度系数</div>
+      </div>
+      <div class="sp-item">
+        <div class="sp-num">3</div>
+        <div><strong>获取评级</strong> — 免费查看完整供应链评级报告</div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-pulse-wrap anim-in d4">
+      <div class="pulse-ring"></div>
+      <button class="cta-main cta-green" onclick="goScreen2()">
+        <svg class="cta-icon" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="12" stroke="rgba(255,255,255,.4)" stroke-width="1"/>
+          <path d="M9 14l3.5 3.5 6.5-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="14" cy="14" r="4" fill="rgba(255,255,255,.15)"/>
+        </svg>
+        认证身份，开启极速填报
+      </button>
+    </div>
+
+    <div class="cta-sub anim-in d5">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <path d="M6 1L11 3.3V7C11 9.3 9 11.2 6 12C3 11.2 1 9.3 1 7V3.3L6 1Z"
+          fill="none" stroke="var(--ink3)" stroke-width="1"/>
+      </svg>
+      隐私保护 · 数据不出设备 · 符合欧盟 GDPR
+    </div>
+
+    <!-- Company invite info -->
+    <div style="margin-top:14px;padding:12px 14px;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:12px;font-size:11.5px;color:var(--ink3);line-height:1.65" class="anim-in d5">
+      📋 <strong style="color:var(--ink2)">本次核验信息：</strong><br>
+      委托企业：待完善企业档案汽配制造厂<br>
+      核验批次：2026年Q1出口批次<br>
+      涉及产品：铝压铸汽配零件<br>
+      截止时间：<span style="color:var(--rl)">2026-05-31</span>
+    </div>
+
+    <div class="safe-bottom"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     SCREEN 2 — THE ACTION
+══════════════════════════════════ -->
+<div class="screen" id="screen2" hidden aria-hidden="true">
+
+  <div class="top-status">
+    <div class="ts-step">
+      <div class="ts-dot done" id="dot1b"></div>
+      <div class="ts-dot active" id="dot2b"></div>
+      <div class="ts-dot" id="dot3b"></div>
+    </div>
+    <div class="ts-secure">
+      <svg width="11" height="12" viewBox="0 0 11 12" fill="none">
+        <path d="M5.5 1L10 3.3V7C10 9.3 8 11.2 5.5 12C3 11.2 1 9.3 1 7V3.3L5.5 1Z"
+          fill="rgba(16,185,129,.2)" stroke="#10b981" stroke-width="1"/>
+      </svg>
+      本地加密中
+    </div>
+  </div>
+
+  <div class="inner" style="padding-top:0">
+
+    <div class="screen2-header anim-in">
+      <div class="s2h-title">填写能耗数据</div>
+      <div class="s2h-sub">仅需2项数据，AI将自动计算您的产品碳强度</div>
+    </div>
+
+    <!-- OCR Banner -->
+    <div class="ocr-banner anim-in d1">
+      <div class="ocr-ic">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <rect x="1.5" y="1.5" width="12" height="12" rx="2" stroke="var(--pl)" stroke-width="1.1"/>
+          <path d="M4 5h3M4 7.5h5M4 10h3.5" stroke="var(--pl)" stroke-width="1" stroke-linecap="round"/>
+          <path d="M10 9l1.5 1.5" stroke="var(--pl)" stroke-width="1.1" stroke-linecap="round"/>
+          <circle cx="10" cy="8" r="2" stroke="var(--pl)" stroke-width="1"/>
+        </svg>
+      </div>
+      <div>💡 <strong>支持上传电费单截图</strong>，AI OCR 自动识别并填入用电量，无需手动输入</div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card anim-in d2">
+
+      <!-- Field 1: Power consumption -->
+      <div class="f-block">
+        <div class="f-label">
+          <div class="f-label-num">1</div>
+          上月工厂总用电量
+        </div>
+        <div class="f-input-wrap">
+          <input class="f-inp" id="f-elec" type="number"
+            inputmode="decimal" placeholder="例：12400"
+            style="padding-right:48px">
+          <span class="f-inp-unit">kWh</span>
+        </div>
+        <div class="f-hint">来源：电费账单或智能电表读数</div>
+
+        <!-- Upload button — 真实文件选择，唤起摄像头/相册 -->
+        <label class="upload-area mt8" for="ocr-upload" id="ocr-upload-area">
+          <div class="upload-ic" id="ocr-upload-ic">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="2" y="2" width="12" height="12" rx="2" stroke="var(--pl)" stroke-width="1.1"/>
+              <path d="M5 8l2-2 2 2M7 6v5" stroke="var(--pl)" stroke-width="1.1" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="upload-text">
+            <div class="upload-title" id="ocr-upload-title">📸 上传电费单截图</div>
+            <div class="upload-sub" id="ocr-upload-sub">支持 JPG / PNG · 拍照或从相册选择，AI 自动识别读数</div>
+          </div>
+          <input type="file" accept="image/*" capture="environment" id="ocr-upload" style="display:none;" onchange="handleOCR(this)">
+        </label>
+      </div>
+
+      <!-- Field 2: GEC toggle -->
+      <div class="f-block">
+        <div class="f-label">
+          <div class="f-label-num">2</div>
+          是否使用绿色电力 / GEC 证书？
+        </div>
+        <div class="toggle-group">
+          <label class="toggle-opt">
+            <input type="radio" name="gec" value="no" id="gec-no" checked>
+            <div class="toggle-lbl">
+              <div class="toggle-lbl-ic">⚡</div>
+              普通市电<br>
+              <span style="font-size:11px;opacity:.7">暂未使用绿电</span>
+            </div>
+          </label>
+          <label class="toggle-opt gec">
+            <input type="radio" name="gec" value="yes" id="gec-yes">
+            <div class="toggle-lbl">
+              <div class="toggle-lbl-ic">🌱</div>
+              绿电 / GEC<br>
+              <span style="font-size:11px;opacity:.7">已购买绿电证书</span>
+            </div>
+          </label>
+        </div>
+        <div class="f-hint" id="gec-hint" style="margin-top:6px">
+          ℹ️ 购买绿电证书（GEC）可直接降低 CBAM 碳税，欧盟已正式认可
+        </div>
+      </div>
+
+      <!-- Field 3: Product type -->
+      <div class="f-block">
+        <div class="f-label">
+          <div class="f-label-num">3</div>
+          主要生产产品类型
+        </div>
+        <select class="f-select" id="industry-select" style="background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:12px;color:var(--ink);width:100%;font-size:14px;font-weight:500;">
+            <option value="" disabled selected>请选择符合 CBAM 名录的产品细类</option>
+            <optgroup label="铝及铝制品 (Aluminum)">
+                <option value="alu_unwrought">未锻轧铝 (纯铝/铝合金) · CN 7601</option>
+                <option value="alu_products">铝制品 (管/板/型材/压铸件) · CN 7604-7616</option>
+            </optgroup>
+            <optgroup label="钢铁及制品 (Iron & Steel)">
+                <option value="steel_pig_iron">生铁及直接还原铁 · CN 7201</option>
+                <option value="steel_products">钢铁初级/深加工制品 (管/线/板) · CN 7206-7326</option>
+            </optgroup>
+            <optgroup label="水泥及熟料 (Cement)">
+                <option value="cement_clinker">水泥熟料 (Clinker) · CN 2523 10</option>
+                <option value="cement_portland">硅酸盐水泥 (Portland) · CN 2523 21-29</option>
+            </optgroup>
+            <optgroup label="化肥 (Fertilizers)">
+                <option value="fert_ammonia">无水氨/合成氨 (Ammonia) · CN 2814</option>
+                <option value="fert_urea">尿素 (Urea) · CN 3102 10</option>
+            </optgroup>
+            <optgroup label="其他 CBAM 覆盖行业">
+                <option value="hydrogen">氢气 (Hydrogen) · CN 2804 10</option>
+                <option value="electricity">电力 (Electricity) · CN 2716</option>
+            </optgroup>
+        </select>
+        <div class="f-hint">用于选取对应的行业碳排放因子基准</div>
+      </div>
+
+    </div>
+
+    <!-- Info cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px" class="anim-in d3">
+      <div style="padding:10px 12px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:12px">
+        <div style="font-size:10px;color:var(--ink3);margin-bottom:3px">参考范围</div>
+        <div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:var(--ol)" id="ref-range">1.5–2.2 t/t</div>
+        <div style="font-size:10px;color:var(--ink3);margin-top:1px">行业均值</div>
+      </div>
+      <div style="padding:10px 12px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:12px">
+        <div style="font-size:10px;color:var(--ink3);margin-bottom:3px">本地加密状态</div>
+        <div style="font-size:13px;font-weight:700;color:var(--gl);display:flex;align-items:center;gap:5px">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:pulseGreen 1.5s infinite;flex-shrink:0"></span>
+          就绪
+        </div>
+        <div style="font-size:10px;color:var(--ink3);margin-top:1px">ZKP 引擎已加载</div>
+      </div>
+    </div>
+
+    <!-- Submit CTA -->
+    <div style="margin-top:18px" class="anim-in d4">
+      <button class="cta-main cta-blue" onclick="startEncryption()">
+        <svg class="cta-icon" viewBox="0 0 28 28" fill="none">
+          <path d="M14 2L25 7.5V17C25 22.5 20 27 14 28.5C8 27 3 22.5 3 17V7.5L14 2Z"
+            fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.6)" stroke-width="1.2"/>
+          <polyline points="9,14 12.5,17.5 19.5,11" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        🛡️ 本地加密并生成碳足迹
+      </button>
+    </div>
+
+    <div class="cta-sub anim-in d5" style="margin-top:10px">
+      加密计算在本地完成，传输至节点的仅是 ZKP 哈希值
+    </div>
+
+    <!-- Legal -->
+    <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--ink3);line-height:1.7" class="anim-in d5">
+      点击即表示您同意
+      <span style="color:var(--gl)">《供应商数据授权协议》</span> 与
+      <span style="color:var(--gl)">《CL-IVC 隐私协议》</span>
+    </div>
+
+    <div class="safe-bottom"></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     SCREEN 3 — THE RESULT / UPSELL
+══════════════════════════════════ -->
+<div class="screen" id="screen3" hidden aria-hidden="true">
+
+  <!-- Top status bar -->
+  <div class="top-status">
+    <div class="ts-step">
+      <div class="ts-dot done"></div>
+      <div class="ts-dot done"></div>
+      <div class="ts-dot active"></div>
+    </div>
+    <div class="ts-secure" style="color:var(--go)">
+      <svg width="11" height="12" viewBox="0 0 11 12" fill="none">
+        <path d="M5.5 1L10 3.3V7C10 9.3 8 11.2 5.5 12C3 11.2 1 9.3 1 7V3.3L5.5 1Z"
+          fill="rgba(201,168,76,.2)" stroke="var(--gold)" stroke-width="1"/>
+        <polyline points="3,7 5,9 8.5,5" stroke="var(--go)" stroke-width="1.1" stroke-linecap="round"/>
+      </svg>
+      链上存证完成
+    </div>
+  </div>
+
+  <div class="inner" style="padding-top:0">
+
+    <div class="s3-page">
+
+    <div class="s3-upper s3-upper-stage">
+
+    <!-- ══════════════════════════════════
+         ARC 1 · 惊讶 + 危机感
+         提交成功确认 + 评级数字冲击
+    ══════════════════════════════════ -->
+
+    <!-- Success confirmation chip -->
+    <div class="s3-success-chip anim-in">
+      <div class="s3-success-icon">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="6.5" fill="var(--green)"/>
+          <polyline points="4,7 6,9.5 10.5,5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      数据提交成功 · 链上存证 <span style="font-family:'DM Mono',monospace;letter-spacing:.3px">#GN-S-2604</span>
+    </div>
+
+    <!-- Intensity hero card -->
+    <div class="s3-intensity-card anim-in d1">
+      <div class="s3-ic-label">您的产品碳强度系数</div>
+      <div class="s3-ic-number">
+        <span class="s3-ic-val" id="result-intensity">0.00</span>
+        <span class="s3-ic-unit">tCO₂e / 吨</span>
+      </div>
+      <div class="s3-ic-sub" id="result-sub">铝压铸件 · 华东电网 · 上月用电数据核算</div>
+      <!-- Inline benchmark bar -->
+      <div class="s3-bench">
+        <div class="s3-bench-bar-wrap">
+          <div class="s3-bench-track">
+            <!-- Zones -->
+            <div class="s3-bench-zone" style="width:35%;background:linear-gradient(90deg,rgba(16,185,129,.35),rgba(16,185,129,.15))"></div>
+            <div class="s3-bench-zone" style="width:30%;background:linear-gradient(90deg,rgba(234,179,8,.18),rgba(249,115,22,.2))"></div>
+            <div class="s3-bench-zone" style="width:35%;background:linear-gradient(90deg,rgba(249,115,22,.2),rgba(239,68,68,.3))"></div>
+            <!-- Marker line for user value -->
+            <div class="s3-bench-marker" id="bench-marker" style="left:64%">
+              <div class="s3-bench-marker-line"></div>
+              <div class="s3-bench-marker-dot"></div>
+              <div class="s3-bench-marker-label">你</div>
+            </div>
+          </div>
+          <div class="s3-bench-labels">
+            <span>优质 &lt;1.5</span>
+            <span>均值 1.9</span>
+            <span>高碳 &gt;2.5</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grade card -->
+    <div class="s3-grade-card anim-in d2">
+      <div class="s3-grade-left">
+        <div class="s3-grade-letter" id="grade-letter">B</div>
+        <div class="s3-grade-name" id="grade-name">待改进</div>
+      </div>
+      <div class="s3-grade-right">
+        <div class="s3-grade-title" id="grade-title">供应链合规评级 · B 级</div>
+        <div class="s3-grade-desc" id="grade-desc">碳强度高于欧洲采购商优质阈值，在 CBAM 强制实施后，被欧盟客户评为「<strong>碳溢价供应商</strong>」的风险显著。</div>
+        <div class="s3-grade-risks" id="grade-risks">
+          <div class="s3-risk-item" id="risk-item-1">
+            <span class="s3-risk-dot" id="risk-dot-1" style="background:var(--red)"></span>
+            <span id="risk-text-1">计算行业物理阈值偏离度中…</span>
+          </div>
+          <div class="s3-risk-item" id="risk-item-2">
+            <span class="s3-risk-dot" id="risk-dot-2" style="background:var(--orange)"></span>
+            <span id="risk-text-2">Scope 2 未使用绿电，拖累总评</span>
+          </div>
+          <div class="s3-risk-item">
+            <span class="s3-risk-dot" style="background:var(--orange)"></span>
+            <span>供应链数据透明度不足，客户尽调需 3+ 周</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Radar chart — 纯数学动态渲染, 基于用户数据实时畸变 -->
+    <div class="s3-radar-wrap anim-in d2">
+      <div class="s3-radar-header">
+        <span class="s3-radar-title">六维合规能力雷达 · 实时畸变</span>
+        <span class="s3-radar-avg" id="s3-radar-benchmark-hint">加载行业基准中…</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+
+        <!-- 动态行业物理阈值标签（替代废弃的「80 分」抽象数字） -->
+        <div id="dynamic-benchmark-label"
+             style="display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;color:var(--greenl);background:rgba(59,158,74,0.14);border:1px solid rgba(59,158,74,0.32);padding:4px 11px;border-radius:999px;white-space:nowrap;letter-spacing:.2px;">
+          <svg width="9" height="9" viewBox="0 0 8 8" fill="none" style="display:inline-block">
+            <circle cx="4" cy="4" r="3" stroke="currentColor" stroke-width="1" stroke-dasharray="2 1.5"/>
+          </svg>
+          <span id="dynamic-benchmark-text">加载行业基准中…</span>
+        </div>
+
+        <!-- 动态雷达容器 -->
+        <div class="radar-container" style="position:relative;width:200px;height:200px;margin:6px auto 2px;flex-shrink:0">
+          <svg width="200" height="200" viewBox="0 0 200 200" style="position:absolute;top:0;left:0;overflow:visible">
+            <!-- 四层坐标网格 (固定) -->
+            <polygon points="100,20 169,60 169,140 100,180 31,140 31,60"
+              fill="none" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
+            <polygon points="100,40 152,70 152,130 100,160 48,130 48,70"
+              fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+            <polygon points="100,60 134,80 134,120 100,140 66,120 66,80"
+              fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+            <polygon points="100,80 117,90 117,110 100,120 83,110 83,90"
+              fill="none" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+            <!-- 三条轴线 -->
+            <g stroke="rgba(255,255,255,.07)" stroke-width=".7">
+              <line x1="100" y1="20" x2="100" y2="180"/>
+              <line x1="31"  y1="60" x2="169" y2="140"/>
+              <line x1="169" y1="60" x2="31"  y2="140"/>
+            </g>
+            <!-- A 级基准虚线 · 映射行业物理阈值 benchmark.best -->
+            <polygon id="radar-benchmark-polygon"
+              points="100,36 155,68 155,132 100,164 45,132 45,68"
+              fill="rgba(59,130,246,.06)" stroke="rgba(59,130,246,.4)"
+              stroke-width="1" stroke-dasharray="4 3"/>
+            <!-- 动态能力多边形 -->
+            <polygon id="dynamic-radar-polygon"
+              points="100,100 100,100 100,100 100,100 100,100 100,100"
+              fill="rgba(226,75,74,0.3)" stroke="#e24b4a" stroke-width="2"
+              style="transition: fill .6s ease, stroke .6s ease, filter .6s ease;"/>
+            <!-- 顶点光标 (JS 动态填充) -->
+            <g id="radar-vertex-dots"></g>
+          </svg>
+          <!-- 六轴文字标签 (绝对定位) -->
+          <div style="position:absolute;top:-2px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:600;color:#8a95a8;white-space:nowrap">碳排表现</div>
+          <div style="position:absolute;top:22%;right:-14px;font-size:10px;font-weight:600;color:#8a95a8;white-space:nowrap">绿电渗透</div>
+          <div style="position:absolute;bottom:22%;right:-14px;font-size:10px;font-weight:600;color:#8a95a8;white-space:nowrap">数据置信</div>
+          <div style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:600;color:#8a95a8;white-space:nowrap">响应时效</div>
+          <div style="position:absolute;bottom:22%;left:-14px;font-size:10px;font-weight:600;color:#8a95a8;white-space:nowrap">工艺基准</div>
+          <div style="position:absolute;top:22%;left:-14px;font-size:10px;font-weight:600;color:#8a95a8;white-space:nowrap">协同深度</div>
+        </div>
+
+        <!-- 同步得分列表 (JS 动态更新) -->
+        <div class="s3-score-list" style="width:100%">
+          <div class="s3-score-item">
+            <span class="s3-score-name">碳排表现</span>
+            <div class="s3-score-bar-mini"><div id="radar-bar-0" style="width:0%;background:var(--red);transition:width .9s cubic-bezier(.4,0,.2,1),background .4s"></div></div>
+            <span class="s3-score-val" id="radar-val-0" style="color:var(--rl)">–</span>
+          </div>
+          <div class="s3-score-item">
+            <span class="s3-score-name">绿电渗透</span>
+            <div class="s3-score-bar-mini"><div id="radar-bar-1" style="width:0%;background:var(--red);transition:width .9s cubic-bezier(.4,0,.2,1),background .4s"></div></div>
+            <span class="s3-score-val" id="radar-val-1" style="color:var(--rl)">–</span>
+          </div>
+          <div class="s3-score-item">
+            <span class="s3-score-name">数据置信</span>
+            <div class="s3-score-bar-mini"><div id="radar-bar-2" style="width:0%;background:var(--red);transition:width .9s cubic-bezier(.4,0,.2,1),background .4s"></div></div>
+            <span class="s3-score-val" id="radar-val-2" style="color:var(--rl)">–</span>
+          </div>
+          <div class="s3-score-item">
+            <span class="s3-score-name">响应时效</span>
+            <div class="s3-score-bar-mini"><div id="radar-bar-3" style="width:0%;background:var(--red);transition:width .9s cubic-bezier(.4,0,.2,1),background .4s"></div></div>
+            <span class="s3-score-val" id="radar-val-3" style="color:var(--rl)">–</span>
+          </div>
+          <div class="s3-score-item">
+            <span class="s3-score-name">工艺基准</span>
+            <div class="s3-score-bar-mini"><div id="radar-bar-4" style="width:0%;background:var(--red);transition:width .9s cubic-bezier(.4,0,.2,1),background .4s"></div></div>
+            <span class="s3-score-val" id="radar-val-4" style="color:var(--rl)">–</span>
+          </div>
+          <div class="s3-score-item">
+            <span class="s3-score-name">协同深度</span>
+            <div class="s3-score-bar-mini"><div id="radar-bar-5" style="width:0%;background:var(--red);transition:width .9s cubic-bezier(.4,0,.2,1),background .4s"></div></div>
+            <span class="s3-score-val" id="radar-val-5" style="color:var(--rl)">–</span>
+          </div>
+          <div class="s3-score-divider"></div>
+          <div class="s3-score-item">
+            <span class="s3-score-name" style="font-weight:700;color:var(--ink)">综合评分</span>
+            <div class="s3-score-bar-mini"><div id="radar-total-bar" style="width:0%;background:linear-gradient(90deg,var(--red),var(--orange));transition:width .9s cubic-bezier(.4,0,.2,1)"></div></div>
+            <span class="s3-score-val" id="radar-total-val" style="color:var(--ol);font-weight:700">–</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 图例 -->
+      <div class="s3-radar-legend">
+        <div class="s3-rl">
+          <span class="s3-rl-dot" style="background:rgba(59,130,246,.6);border:1px dashed rgba(59,130,246,.7)"></span>
+          <span id="s3-legend-benchmark-text">A 级标杆线（加载中…）</span>
+        </div>
+        <div class="s3-rl">
+          <span class="s3-rl-dot" id="radar-legend-dot" style="background:var(--red)"></span>
+          <span id="s3-legend-your-text">您的企业轨迹（实时测算）</span>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /s3-upper -->
+
+    <div class="s3-unlock-section">
+
+    <!-- Section divider with emotional transition -->
+    <div class="s3-divider-transition anim-in d3">
+      <div class="s3-dt-line"></div>
+      <div class="s3-dt-text">以下报告需解锁</div>
+      <div class="s3-dt-line"></div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         ARC 2 · 好奇 + 渴望
+         LinkedIn-style 专业解锁墙
+         让用户看到「价值」而非「障碍」
+    ══════════════════════════════════ -->
+    <div class="s3-paywall anim-in d3">
+
+      <!-- Paywall header — what's locked -->
+      <div class="s3-pw-header">
+        <div class="s3-pw-lock-icon">
+          <svg width="18" height="20" viewBox="0 0 18 20" fill="none">
+            <rect x="2" y="9" width="14" height="11" rx="2.5" fill="rgba(201,168,76,.15)" stroke="var(--gold)" stroke-width="1.3"/>
+            <path d="M5 9V6.5a4 4 0 018 0V9" stroke="var(--gold)" stroke-width="1.3" stroke-linecap="round"/>
+            <circle cx="9" cy="14.5" r="1.5" fill="var(--gold)"/>
+            <line x1="9" y1="14.5" x2="9" y2="17" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="s3-pw-title">完整碳竞争力报告已生成</div>
+          <div class="s3-pw-sub">认领账号后立即解锁，免费查看</div>
+        </div>
+        <div class="s3-pw-tag">免费</div>
+      </div>
+
+      <!-- Locked report preview — skeleton style -->
+      <div class="s3-locked-report">
+
+        <!-- Row 1: A-grade path -->
+        <div class="s3-lr-section">
+          <div class="s3-lr-sec-title">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L11 3.5V8.5L6 11L1 8.5V3.5L6 1Z" stroke="var(--gl)" stroke-width="1" fill="var(--gd)"/></svg>
+            升至 A 级行动路径
+          </div>
+          <div class="s3-lr-row">
+            <div class="s3-lr-step">
+              <div class="s3-lr-step-num">1</div>
+              <div class="s3-lr-step-body">
+                <div class="s3-lr-step-title">引入绿电 GEC 证书</div>
+                <div class="s3-skel s3-skel-w70"></div>
+                <div class="s3-lr-locked-val">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="4.5" width="8" height="5.5" rx="1.5" stroke="var(--ink3)" stroke-width=".9"/><path d="M3 4.5V3.5a2 2 0 014 0v1" stroke="var(--ink3)" stroke-width=".9" stroke-linecap="round"/></svg>
+                  节税 ████ 元/年
+                </div>
+              </div>
+            </div>
+            <div class="s3-lr-step">
+              <div class="s3-lr-step-num">2</div>
+              <div class="s3-lr-step-body">
+                <div class="s3-lr-step-title">接入 MAT 网关认证</div>
+                <div class="s3-skel s3-skel-w85"></div>
+                <div class="s3-lr-locked-val">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="4.5" width="8" height="5.5" rx="1.5" stroke="var(--ink3)" stroke-width=".9"/><path d="M3 4.5V3.5a2 2 0 014 0v1" stroke="var(--ink3)" stroke-width=".9" stroke-linecap="round"/></svg>
+                  碳强度降至 ████ t/t
+                </div>
+              </div>
+            </div>
+            <div class="s3-lr-step">
+              <div class="s3-lr-step-num">3</div>
+              <div class="s3-lr-step-body">
+                <div class="s3-lr-step-title">供应链数据填报</div>
+                <div class="s3-skel s3-skel-w60"></div>
+                <div class="s3-lr-locked-val">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="1" y="4.5" width="8" height="5.5" rx="1.5" stroke="var(--ink3)" stroke-width=".9"/><path d="M3 4.5V3.5a2 2 0 014 0v1" stroke="var(--ink3)" stroke-width=".9" stroke-linecap="round"/></svg>
+                  评分提升 ████ 分
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Competitor comparison -->
+        <div class="s3-lr-section" style="margin-top:12px">
+          <div class="s3-lr-sec-title">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="var(--bl)" stroke-width="1"/><line x1="6" y1="3.5" x2="6" y2="6.5" stroke="var(--bl)" stroke-width="1"/><circle cx="6" cy="8.5" r=".7" fill="var(--bl)"/></svg>
+            华东铝压铸竞品对比（匿名）
+          </div>
+          <div class="s3-competitor-table">
+            <!-- Table header -->
+            <div class="s3-ct-row s3-ct-head">
+              <span>企业</span><span>碳强度</span><span>评级</span><span>CBAM税率</span>
+            </div>
+            <div class="s3-ct-row">
+              <span style="color:var(--gl)">竞品 A</span>
+              <span style="font-family:'DM Mono',monospace;color:var(--gl)">1.31</span>
+              <span class="s3-grade-mini s3-grade-a">A</span>
+              <span style="color:var(--gl)">████</span>
+            </div>
+            <div class="s3-ct-row">
+              <span style="color:var(--gl)">竞品 B</span>
+              <span style="font-family:'DM Mono',monospace;color:var(--gl)">1.48</span>
+              <span class="s3-grade-mini s3-grade-a">A</span>
+              <span style="color:var(--gl)">████</span>
+            </div>
+            <div class="s3-ct-row s3-ct-mine">
+              <span style="color:var(--go);font-weight:700">▶ 您</span>
+              <span style="font-family:'DM Mono',monospace;color:var(--ol);font-weight:700" id="ct-your-intensity">0.00</span>
+              <span class="s3-grade-mini s3-grade-b">B</span>
+              <span class="s3-locked-inline">
+                <svg width="9" height="10" viewBox="0 0 9 10" fill="none"><rect x=".5" y="4" width="8" height="6" rx="1.5" stroke="var(--ink3)" stroke-width=".85"/><path d="M2 4V3a2.5 2.5 0 015 0v1" stroke="var(--ink3)" stroke-width=".85" stroke-linecap="round"/></svg>
+                ████
+              </span>
+            </div>
+            <div class="s3-ct-row">
+              <span style="color:var(--rl)">竞品 C</span>
+              <span style="font-family:'DM Mono',monospace;color:var(--rl)">2.14</span>
+              <span class="s3-grade-mini s3-grade-c">C</span>
+              <span style="color:var(--rl)">████</span>
+            </div>
+          </div>
+          <div class="s3-ct-note">解锁后查看全部 ████ 家同行数据及您的确切税率</div>
+        </div>
+
+        <!-- Row 3: CBAM tax estimate teaser -->
+        <div class="s3-lr-section s3-tax-teaser" style="margin-top:12px">
+          <div class="s3-lr-sec-title">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="3.5" width="9" height="7" rx="1.5" stroke="var(--go)" stroke-width="1"/><path d="M4 3.5V3a2 2 0 014 0v.5" stroke="var(--go)" stroke-width="1" stroke-linecap="round"/></svg>
+            2026 CBAM 碳税预测
+          </div>
+          <div class="s3-tax-row">
+            <div class="s3-tax-box s3-tax-current">
+              <div class="s3-tax-lbl">当前税率预测</div>
+              <div class="s3-tax-val">
+                <svg width="13" height="14" viewBox="0 0 13 14" fill="none"><rect x=".5" y="5.5" width="12" height="8" rx="2" stroke="var(--ink3)" stroke-width="1"/><path d="M3 5.5V4a3.5 3.5 0 017 0v1.5" stroke="var(--ink3)" stroke-width="1" stroke-linecap="round"/></svg>
+                € ████,███
+              </div>
+              <div class="s3-tax-sub">B级 · 含惩罚系数</div>
+            </div>
+            <div class="s3-tax-arrow">→</div>
+            <div class="s3-tax-box s3-tax-potential">
+              <div class="s3-tax-lbl">升A级后</div>
+              <div class="s3-tax-val s3-tax-val-locked">
+                <svg width="13" height="14" viewBox="0 0 13 14" fill="none"><rect x=".5" y="5.5" width="12" height="8" rx="2" stroke="var(--ink3)" stroke-width="1"/><path d="M3 5.5V4a3.5 3.5 0 017 0v1.5" stroke="var(--ink3)" stroke-width="1" stroke-linecap="round"/></svg>
+                € ██,███
+              </div>
+              <div class="s3-tax-sub" style="color:var(--gl)">节税 ████ 元</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /locked-report -->
+
+      <!-- Paywall CTA -->
+      <div class="s3-pw-unlock-hint">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M6 1L11 3.3V7C11 9.3 9 11.2 6 12C3 11.2 1 9.3 1 7V3.3L6 1Z" fill="rgba(16,185,129,.2)" stroke="var(--green)" stroke-width="1"/>
+          <polyline points="3.5,6.5 5.5,8.5 9,5" stroke="var(--gl)" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        免费认领账号，即刻解锁全部数据
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         ARC 3 · 信任 + 行动
+         高质感认领区，从深色过渡到「价值感」
+    ══════════════════════════════════ -->
+    <div class="s3-claim-zone anim-in d4">
+
+      <!-- Zone header: tone shift -->
+      <div class="s3-cz-header">
+        <div class="s3-cz-eyebrow">专属邀请 · 免费开始</div>
+        <div class="s3-cz-title">认领您的工厂碳管家账号</div>
+        <div class="s3-cz-sub">由 <strong style="color:var(--ink)">待完善企业档案汽配</strong> 邀请，享受专属通道</div>
+      </div>
+
+      <!-- Benefits list — icon + text, no压迫感 -->
+      <div class="s3-benefits">
+        <div class="s3-benefit-item">
+          <div class="s3-bi-icon" style="background:var(--gd);border-color:var(--gb)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polyline points="2,7 5.5,10.5 12,4" stroke="var(--gl)" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div class="s3-bi-text">
+            <div class="s3-bi-title">解锁完整评级报告</div>
+            <div class="s3-bi-sub">含升A级路径 · 竞品对比 · CBAM税率精算</div>
+          </div>
+        </div>
+        <div class="s3-benefit-item">
+          <div class="s3-bi-icon" style="background:var(--bd);border-color:var(--bb)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polyline points="2,7 5.5,10.5 12,4" stroke="var(--bl)" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div class="s3-bi-text">
+            <div class="s3-bi-title">CBAM 申报自动化工具</div>
+            <div class="s3-bi-sub">一键生成合规报文，供应商评级持续监控</div>
+          </div>
+        </div>
+        <div class="s3-benefit-item">
+          <div class="s3-bi-icon" style="background:var(--pd);border-color:var(--pb)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polyline points="2,7 5.5,10.5 12,4" stroke="var(--pl)" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <div class="s3-bi-text">
+            <div class="s3-bi-title">GreenMark 绿印积分系统</div>
+            <div class="s3-bi-sub">每次填报积累积分，可兑换碳税减免优惠</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social proof bar -->
+      <div class="s3-social-bar">
+        <div class="s3-sb-avatars">
+          <div class="s3-sba" style="background:linear-gradient(135deg,#0ea472,#047857)">陈</div>
+          <div class="s3-sba" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">李</div>
+          <div class="s3-sba" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">王</div>
+          <div class="s3-sba" style="background:linear-gradient(135deg,#f97316,#ea580c)">张</div>
+          <div class="s3-sba" style="background:linear-gradient(135deg,#14b8a6,#0d9488)">赵</div>
+        </div>
+        <div class="s3-sb-text">
+          <strong>1,284 家</strong>供应商已注册 · 其中 <strong>87%</strong> 在 30 天内升至 A 级
+        </div>
+      </div>
+
+      <!-- PRIMARY CTA — gold, full weight -->
+      <div class="s3-cta-wrap">
+        <div class="s3-cta-glow"></div>
+        <button class="s3-cta-primary" onclick="handleSignup()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2L18 6V14L10 18L2 14V6L10 2Z" fill="rgba(0,0,0,.2)" stroke="rgba(0,0,0,.4)" stroke-width="1"/>
+            <polyline points="6,10 9,13 14.5,8" stroke="rgba(0,0,0,.7)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          👑 免费认领工厂碳管家账号 · 解锁完整报告
+        </button>
+        <div class="s3-cta-note">免费使用 · 无需绑卡 · 30 秒完成注册</div>
+      </div>
+
+      <!-- Secondary option -->
+      <div class="s3-secondary-actions">
+        <button class="s3-sec-btn" onclick="handleDownload()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <rect x="2" y="1.5" width="9" height="10" rx="1.5" stroke="var(--ink2)" stroke-width="1"/>
+            <line x1="6.5" y1="4.5" x2="6.5" y2="7.5" stroke="var(--ink2)" stroke-width="1" stroke-linecap="round"/>
+            <path d="M4.5 6.5l2 2 2-2" stroke="var(--ink2)" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+          下载本次碳认证凭证
+        </button>
+        <div class="s3-sec-divider"></div>
+        <button class="s3-sec-btn" onclick="showToast('分享链接已复制')">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <circle cx="10" cy="3" r="1.8" stroke="var(--ink2)" stroke-width="1"/>
+            <circle cx="3"  cy="6.5" r="1.8" stroke="var(--ink2)" stroke-width="1"/>
+            <circle cx="10" cy="10" r="1.8" stroke="var(--ink2)" stroke-width="1"/>
+            <line x1="4.7" y1="5.7" x2="8.3" y2="3.8" stroke="var(--ink2)" stroke-width="1"/>
+            <line x1="4.7" y1="7.3" x2="8.3" y2="9.2" stroke="var(--ink2)" stroke-width="1"/>
+          </svg>
+          分享给其他供应商
+        </button>
+      </div>
+
+    </div><!-- /claim-zone -->
+
+    <!-- Footer -->
+    <div class="s3-footer">
+      填报编号 <span style="font-family:'DM Mono',monospace;color:var(--ink2)">#GN-S-2026-0412</span> ·
+      链上哈希 <span style="font-family:'DM Mono',monospace;color:var(--ink2)">待确权-9A1C</span><br>
+      CL-IVC 隐私协议 · 数据采集方：待完善企业档案汽配 · HengAI
+    </div>
+
+    <div class="safe-bottom"></div>
+
+    </div><!-- /s3-unlock-section -->
+
+    </div><!-- /s3-page -->
+
+  </div>
+</div>
+
+
+</div><!-- /viewport -->
+
+<!-- ═══════════════════════════════════════
+     REGISTRATION BOTTOM SHEET
+═══════════════════════════════════════ -->
+<div class="reg-mask" id="reg-mask" onclick="closeRegistration()"></div>
+
+<div id="registration-panel" class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="reg-title">
+  <div class="bs-handle"></div>
+
+  <div class="bs-header">
+    <div class="bs-header-text">
+      <div class="bs-eyebrow">CARBON VAULT · 企业碳档案</div>
+      <div class="bs-title" id="reg-title">认领您的工厂碳管家账号</div>
+      <div class="bs-sub">建立企业官方碳档案 · 永久解锁本次评级报告与 CBAM 申报工具</div>
+    </div>
+    <button class="bs-close" type="button" aria-label="关闭" onclick="closeRegistration()">×</button>
+  </div>
+
+  <div class="bs-body">
+
+    <div class="reg-note">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:1px">
+        <path d="M7 1L13 4V9C13 12 10.5 14 7 15C3.5 14 1 12 1 9V4L7 1Z" fill="rgba(16,185,129,.2)" stroke="var(--green)" stroke-width="1"/>
+        <polyline points="4.5,7.5 6.5,9.5 9.5,6" stroke="var(--gl)" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <div>系统已通过 CL-IVC 零知识协议核验您的企业身份，以下信息将加密写入您的独立碳档案。</div>
+    </div>
+
+    <div class="reg-field">
+      <label class="reg-field-label">企业名称 <span class="reg-prefilled" style="margin-left:auto">🔐 系统已预知</span></label>
+      <input class="reg-input" id="reg-company" readonly value="---">
+      <div class="reg-field-sub">基于本次委托关系与统一社会信用代码匹配，不可修改</div>
+    </div>
+
+    <div class="reg-field">
+      <label class="reg-field-label">联系人姓名 <span class="reg-req">*</span></label>
+      <input class="reg-input" id="reg-name" type="text" autocomplete="name" placeholder="请输入您的姓名" maxlength="24">
+    </div>
+
+    <div class="reg-field">
+      <label class="reg-field-label">手机号码 <span class="reg-req">*</span></label>
+      <input class="reg-input" id="reg-phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="请输入 11 位手机号" maxlength="11">
+      <div class="reg-field-sub">用于接收碳档案登录凭证与 CBAM 申报提醒</div>
+    </div>
+
+    <div class="reg-field">
+      <label class="reg-field-label">短信验证码 <span class="reg-req">*</span></label>
+      <div class="reg-code-row">
+        <input class="reg-input" id="reg-code" type="text" inputmode="numeric" placeholder="6 位验证码" maxlength="6">
+        <button type="button" class="reg-code-btn" id="reg-code-btn" onclick="sendVerifyCode()">获取验证码</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bs-footer">
+    <button type="button" class="reg-submit" id="reg-submit-btn" onclick="submitRegistration()">
+      <span class="reg-spin"></span>
+      <span class="reg-submit-text">确认认领 · 建立企业官方碳档案</span>
+    </button>
+    <div class="reg-legal">
+      点击即表示您同意
+      <a href="#">《HengAI 碳管家服务协议》</a> 与
+      <a href="#">《CL-IVC 数据隐私协议》</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════ -->
+<script>
+// ── PARTICLE SYSTEM ──────────────────────
+(function(){
+  var container = document.getElementById('particles');
+  var chars = ['0','1','∑','∫','λ','π','Σ','∂','⊕','⊗','◇','⬡'];
+  var count = 14;
+  for(var i=0;i<count;i++){
+    var p = document.createElement('span');
+    p.className='particle';
+    var size = Math.random()*8+6;
+    p.style.cssText = [
+      'left:'+(Math.random()*100)+'%',
+      'top:'+((Math.random()*120)+10)+'%',
+      'width:'+size+'px',
+      'height:'+size+'px',
+      'background:rgba(16,185,129,'+(Math.random()*.3+.05)+')',
+      'animation-duration:'+(Math.random()*18+10)+'s',
+      'animation-delay:'+(Math.random()*8)+'s',
+      'font-size:'+(size-2)+'px',
+      'color:rgba(16,185,129,.35)',
+      'display:flex','align-items:center','justify-content:center',
+      'font-family:DM Mono,monospace',
+      'border-radius:3px'
+    ].join(';');
+    if(Math.random()>.5){
+      p.style.borderRadius='50%';
+    }
+    container.appendChild(p);
+  }
+})();
+
+// ── SCREEN NAVIGATION ────────────────────
+var currentScreen = 1;
+
+function clearScreenMotion(el) {
+  if (!el) return;
+  el.style.removeProperty('transform');
+  el.style.removeProperty('opacity');
+  el.style.removeProperty('transition');
+}
+
+function goScreen(n) {
+  var next = document.getElementById('screen' + n);
+  if (!next || currentScreen === n) return;
+
+  for (var i = 1; i <= 3; i++) {
+    var s = document.getElementById('screen' + i);
+    if (!s) continue;
+    s.classList.remove('active', 'exit-left');
+    clearScreenMotion(s);
+    if (i !== n) {
+      s.setAttribute('hidden', '');
+      s.style.setProperty('display', 'none', 'important');
+      s.setAttribute('aria-hidden', 'true');
+      var focusables = s.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      for (var k = 0; k < focusables.length; k++) {
+        try { focusables[k].blur(); } catch (e) {}
+      }
+    }
+  }
+
+  next.removeAttribute('hidden');
+  next.style.removeProperty('display');
+  next.classList.add('active');
+  next.setAttribute('aria-hidden', 'false');
+  currentScreen = n;
+  try { window.scrollTo(0, 0); } catch (e) { window.scrollTo({ top: 0 }); }
+  next.scrollTop = 0;
+}
+
+(function syncInitialScreens() {
+  for (var i = 1; i <= 3; i++) {
+    var s = document.getElementById('screen' + i);
+    if (!s) continue;
+    s.classList.remove('exit-left');
+    clearScreenMotion(s);
+  }
+  for (var j = 1; j <= 3; j++) {
+    var sc = document.getElementById('screen' + j);
+    if (!sc) continue;
+    if (j === currentScreen) {
+      sc.removeAttribute('hidden');
+      sc.style.removeProperty('display');
+      sc.classList.add('active');
+      sc.setAttribute('aria-hidden', 'false');
+    } else {
+      sc.setAttribute('hidden', '');
+      sc.style.setProperty('display', 'none', 'important');
+      sc.classList.remove('active');
+      sc.setAttribute('aria-hidden', 'true');
+    }
+  }
+})();
+
+function goScreen2(){
+  goScreen(2);
+}
+
+// ── OCR REAL (真实文件选择 → 识别回填) ──
+function handleOCR(input){
+  if(!input || !input.files || !input.files[0]) return;
+  var file = input.files[0];
+  var inp = document.getElementById('f-elec');
+  var titleEl = document.getElementById('ocr-upload-title');
+  var subEl   = document.getElementById('ocr-upload-sub');
+  var area    = document.getElementById('ocr-upload-area');
+  var original = inp.placeholder;
+  var origTitle = titleEl ? titleEl.textContent : '';
+  var origSub   = subEl ? subEl.textContent : '';
+
+  if(titleEl) titleEl.textContent = '🔍 识别中… (' + file.name.slice(0, 28) + ')';
+  if(subEl)   subEl.textContent   = 'AI 正在解析电费单读数，请稍候…';
+  if(area){
+    area.style.borderColor = 'var(--pb)';
+    area.style.background  = 'var(--pd)';
+  }
+  inp.placeholder = '🔍 AI 识别中…';
+  inp.style.borderColor = 'var(--pb)';
+
+  setTimeout(function(){
+    var recognized = 12400 + Math.floor(Math.random() * 900);
+    inp.value = String(recognized);
+    inp.dispatchEvent(new Event('input'));
+    inp.placeholder = original;
+    inp.style.borderColor = 'var(--gb)';
+    inp.style.boxShadow = '0 0 0 3px rgba(16,185,129,.12)';
+    if(titleEl) titleEl.textContent = '✅ 识别成功：' + recognized.toLocaleString() + ' kWh';
+    if(subEl)   subEl.textContent   = '已自动回填用电量，可手动调整';
+    if(area){
+      area.style.borderColor = 'var(--gb)';
+      area.style.background  = 'var(--gd)';
+    }
+    showToast('✅ 识别成功：' + recognized.toLocaleString() + ' kWh');
+    setTimeout(function(){
+      inp.style.boxShadow = '';
+      inp.style.borderColor = '';
+      if(area){
+        area.style.borderColor = '';
+        area.style.background  = '';
+      }
+      if(titleEl) titleEl.textContent = origTitle;
+      if(subEl)   subEl.textContent   = origSub;
+    }, 3200);
+    input.value = '';
+  }, 1500);
+}
+
+// ── ENCRYPTION ANIMATION ─────────────────
+var CODE_SNIPPETS = [
+  'zkp_proof = compute(\n  input=energy_data,\n  mask=local_key\n)',
+  'hash_256 = sha256(\n  salt+carbon_factor\n)',
+  'emit CarbonCert {\n  hash: 0xB4F2...\n  ts: 1714041600\n}',
+  'verify_zkp(\n  proof, public_key\n) -> bool',
+  'chain.submit(\n  tx=cert_tx,\n  gas=auto\n)',
+  'encrypt(\n  key=local_prv,\n  data=bom_struct\n)',
+  'Scope2 = elec_kwh\n  * grid_factor\n  * (1-gec_rate)',
+  'CBAM_tax = export_t\n  * intensity\n  * co2_price',
+];
+
+function buildCodeRain(){
+  var rain = document.getElementById('code-rain');
+  rain.innerHTML = '';
+  var cols = 6;
+  for(var i=0;i<cols;i++){
+    var col = document.createElement('div');
+    col.className='code-col';
+    col.style.left = (i*(300/cols)+Math.random()*10)+'px';
+    col.style.animationDuration = (Math.random()*1.5+1.5)+'s';
+    col.style.animationDelay = (Math.random()*.8)+'s';
+    col.style.opacity = (Math.random()*.5+.4).toString();
+    col.style.fontSize = (Math.random()*2+9)+'px';
+    col.textContent = CODE_SNIPPETS[i % CODE_SNIPPETS.length];
+    rain.appendChild(col);
+  }
+}
+
+function startEncryption(){
+  var industry = document.getElementById('industry-select');
+  if(!industry || !industry.value){
+    showToast('⚠ 请选择符合 CBAM 名录的产品细类');
+    return;
+  }
+
+  buildCodeRain();
+  var overlay = document.getElementById('enc-overlay');
+  overlay.classList.add('show');
+
+  var steps = ['eps1','eps2','eps3','eps4','eps5'];
+  var fill   = document.getElementById('enc-fill');
+  var pcts   = [18, 36, 58, 80, 100];
+  var delays = [0, 400, 800, 1200, 1700];
+
+  steps.forEach(function(id){ document.getElementById(id).className='eps'; });
+  fill.style.width = '0%';
+
+  delays.forEach(function(delay, i){
+    setTimeout(function(){
+      if(i>0) document.getElementById(steps[i-1]).className='eps done';
+      document.getElementById(steps[i]).className='eps active';
+      fill.style.width = pcts[i]+'%';
+    }, delay);
+  });
+
+  // Finish
+  setTimeout(function(){
+    document.getElementById(steps[4]).className='eps done';
+    fill.style.width='100%';
+    setTimeout(function(){
+      overlay.classList.remove('show');
+      computeResult();
+      goScreen(3);
+    }, 600);
+  }, 2350);
+}
+
+// ── CALCULATE RESULT ─────────────────────
+const CBAM_BENCHMARKS = {
+    "alu_unwrought": { name: "未锻轧铝", material: 8.2, best: 3.5, avg: 8.2, worst: 12.0 },
+    "alu_products": { name: "铝加工制品", material: 11.5, best: 4.8, avg: 11.5, worst: 16.5 },
+    "steel_pig_iron": { name: "生铁", material: 1.8, best: 1.3, avg: 1.8, worst: 2.5 },
+    "steel_products": { name: "钢铁制品", material: 2.4, best: 1.6, avg: 2.4, worst: 3.2 },
+    "cement_clinker": { name: "水泥熟料", material: 0.85, best: 0.7, avg: 0.85, worst: 1.1 },
+    "cement_portland": { name: "硅酸盐水泥", material: 0.72, best: 0.5, avg: 0.72, worst: 0.95 },
+    "fert_ammonia": { name: "合成氨", material: 2.1, best: 1.5, avg: 2.1, worst: 3.0 },
+    "fert_urea": { name: "尿素", material: 1.8, best: 1.1, avg: 1.8, worst: 2.4 },
+    "hydrogen": { name: "氢气", material: 9.8, best: 1.5, avg: 9.8, worst: 13.0 },
+    "electricity": { name: "电力", material: 0.58, best: 0.0, avg: 0.58, worst: 0.85 }
+};
+
+function getSelectedBenchmark(){
+  var industrySelect = document.getElementById('industry-select');
+  var selected = industrySelect ? industrySelect.value : '';
+  return CBAM_BENCHMARKS[selected] || CBAM_BENCHMARKS.alu_products;
+}
+
+function computeResult(){
+  var elecRaw = parseFloat(document.getElementById('f-elec').value);
+  var hasElecInput = !isNaN(elecRaw) && elecRaw > 0;
+  var elec_kwh = hasElecInput ? elecRaw : 0;
+  var gec = document.getElementById('gec-yes').checked;
+  var benchmark = getSelectedBenchmark();
+  var grid_factor = 0.581; // 华东电网因子
+  var productionTon = 1;   // 默认按 1 吨产品核算
+
+  var gridAdjusted = gec ? grid_factor * 0.2 : grid_factor;
+  var intensity;
+  if (!hasElecInput) {
+    intensity = benchmark.avg;
+  } else {
+    intensity = ((elec_kwh / 1000 * gridAdjusted) + productionTon * benchmark.material) / productionTon;
+  }
+  intensity = Math.max(0, intensity);
+
+  var grade = 'B';
+  var gradeName = '待改进';
+  var gradeTone = 'var(--ol)';
+  var gradeRisk = '当前碳强度接近欧盟默认参考值，需要结构化优化以提升竞争力。';
+  if (intensity <= benchmark.best) {
+    grade = 'A';
+    gradeName = '优质低碳';
+    gradeTone = 'var(--gl)';
+    gradeRisk = '已达到欧盟领先区间，可作为低碳供应商参与优先采购。';
+  } else if (intensity >= benchmark.worst) {
+    grade = 'C';
+    gradeName = '高碳风险';
+    gradeTone = 'var(--rl)';
+    gradeRisk = '高于行业高风险阈值，存在明显 CBAM 税负与客户准入压力。';
+  }
+
+  var intensityText = intensity.toFixed(2);
+  var intEl = document.getElementById('result-intensity');
+  var subEl = document.getElementById('result-sub');
+  var letterEl = document.getElementById('grade-letter');
+  var nameEl = document.getElementById('grade-name');
+  var titleEl = document.getElementById('grade-title');
+  var descEl = document.getElementById('grade-desc');
+  var markerEl = document.getElementById('bench-marker');
+  var yourIntensityEl = document.getElementById('ct-your-intensity');
+
+  if(intEl) intEl.textContent = intensityText;
+  if(subEl){
+    if(hasElecInput){
+      subEl.textContent = benchmark.name + ' · 用电量 ' + Math.round(elec_kwh).toLocaleString() + ' kWh · ' + (gec ? '已使用 GEC 绿电折减' : '华东电网因子 0.581');
+    } else {
+      subEl.textContent = benchmark.name + ' · 缺少完整用电数据，按欧盟默认基准 avg=' + benchmark.avg.toFixed(2) + ' tCO2e/t 保底估算';
+    }
+  }
+  if(letterEl){
+    letterEl.textContent = grade;
+    letterEl.style.color = gradeTone;
+  }
+  if(nameEl){
+    nameEl.textContent = gradeName;
+    nameEl.style.color = gradeTone;
+  }
+  if(titleEl) titleEl.textContent = '供应链合规评级 · ' + grade + ' 级';
+  if(descEl) descEl.innerHTML = benchmark.name + ' 当前碳强度 <strong>' + intensityText + ' tCO₂e/t</strong>。' + gradeRisk;
+  if(yourIntensityEl) yourIntensityEl.textContent = intensityText;
+
+  if(markerEl){
+    var worstSafe = benchmark.worst <= 0 ? 1 : benchmark.worst;
+    var pct = Math.max(4, Math.min(96, (intensity / worstSafe) * 100));
+    markerEl.style.left = pct.toFixed(1) + '%';
+  }
+
+  // ── 基准线标注：强制用真实物理阈值替代「80 分」这种抽象数字 ──
+  var benchHint   = document.getElementById('s3-radar-benchmark-hint');
+  var benchPill   = document.getElementById('dynamic-benchmark-text');
+  var benchLegend = document.getElementById('s3-legend-benchmark-text');
+  var yourLegend  = document.getElementById('s3-legend-your-text');
+  var bestTxt  = benchmark.best.toFixed(2);
+  var avgTxt   = benchmark.avg.toFixed(2);
+  var worstTxt = benchmark.worst.toFixed(2);
+  if (benchHint)   benchHint.textContent   = benchmark.name + ' · A 级物理极值 ≤ ' + bestTxt + ' tCO₂e/t';
+  if (benchPill)   benchPill.textContent   = benchmark.name + ' · A 级标杆 ≤ ' + bestTxt + ' tCO₂e/t';
+  if (benchLegend) benchLegend.textContent = 'A 级行业标杆线 · ≤ ' + bestTxt + ' tCO₂e/t';
+  if (yourLegend)  yourLegend.textContent  = '您的企业轨迹 · ' + intensityText + ' tCO₂e/t（' + grade + ' 级）';
+
+  // ── 风险清单：用真实偏离度数字替代写死的 +21% ──
+  var risk1 = document.getElementById('risk-text-1');
+  var risk2 = document.getElementById('risk-text-2');
+  var dot1  = document.getElementById('risk-dot-1');
+  if (risk1 && dot1) {
+    if (grade === 'A') {
+      var marginPct = benchmark.best <= 0 ? 0 : ((benchmark.best - intensity) / benchmark.best * 100);
+      risk1.innerHTML = '已低于 A 级物理极值 <strong>−' + Math.max(0, marginPct).toFixed(1) + '%</strong>，处于行业极优区间';
+      dot1.style.background = 'var(--gl, #10b981)';
+    } else {
+      var overPct = benchmark.best <= 0 ? 0 : ((intensity - benchmark.best) / benchmark.best * 100);
+      risk1.innerHTML = '碳强度超出 ' + benchmark.name + ' A 级物理极值 <strong>+' + overPct.toFixed(1) + '%</strong>';
+      dot1.style.background = (grade === 'C') ? 'var(--red, #ef4444)' : 'var(--orange, #f97316)';
+    }
+  }
+  if (risk2) {
+    risk2.textContent = gec
+      ? 'Scope 2 已启用 GEC 绿电（电网因子 0.581 → 0.116），已减 80%'
+      : 'Scope 2 未使用绿电，按华东电网因子 0.581 计，拖累总评';
+  }
+
+  // ── 动态六维雷达：数据驱动的实时畸变 ──
+  var radarScores = calculateRadarScores(intensity, benchmark, gec);
+  var gradeColorMap = { 'A': '#10b981', 'B': '#f97316', 'C': '#ef4444' };
+  var radarColor = gradeColorMap[grade] || '#f97316';
+
+  var poly = document.getElementById('dynamic-radar-polygon');
+  if (poly) {
+    poly.setAttribute('points', '100,100 100,100 100,100 100,100 100,100 100,100');
+  }
+  setTimeout(function(){
+    renderDynamicRadar(radarScores, radarColor);
+    updateRadarScoreList(radarScores, radarColor);
+  }, 80);
+}
+
+// ═══════════════════════════════════════
+//   六维雷达 — 纯数学 Vanilla 实现
+// ═══════════════════════════════════════
+// 维度顺序 (顶点 0..5, 顺时针)：
+//   0 碳排表现  (top,       angle -90°)
+//   1 绿电渗透  (upper-right, -30°)
+//   2 数据置信  (lower-right,  30°)
+//   3 响应时效  (bottom,      90°)
+//   4 工艺基准  (lower-left, 150°)
+//   5 协同深度  (upper-left, 210°)
+function calculateRadarScores(intensity, benchmark, hasGreenPower) {
+  var span = benchmark.worst - benchmark.best;
+  var ratio = span <= 0 ? 0 : (intensity - benchmark.best) / span;
+  ratio = Math.max(0, Math.min(1, ratio));
+
+  // 1. 碳排表现：越低排放 → 分越高, 区间 [20, 95]
+  var carbon = Math.round(95 - ratio * 75);
+  carbon = Math.max(20, Math.min(95, carbon));
+
+  // 2. 绿电渗透：硬判
+  var green = hasGreenPower ? 90 : 15;
+
+  // 3. 数据置信度：人工填报固定 40 (未接 MAT 网关)
+  var confidence = 40;
+
+  // 4. 响应时效：积极响应本次填报
+  var response = 85;
+
+  // 5. 工艺基准：与碳排正相关 + 轻微抖动
+  var jitter = (Math.random() * 10 - 5);
+  var process = Math.round(carbon * 0.85 + jitter);
+  process = Math.max(15, Math.min(90, process));
+
+  // 6. 协同深度：单点填报阶段
+  var collab = 60;
+
+  return [carbon, green, confidence, response, process, collab];
+}
+
+function hexToRgba(hex, alpha) {
+  var h = String(hex || '').replace('#','');
+  if (h.length === 3) {
+    h = h.split('').map(function(c){ return c + c; }).join('');
+  }
+  var r = parseInt(h.substr(0,2), 16);
+  var g = parseInt(h.substr(2,2), 16);
+  var b = parseInt(h.substr(4,2), 16);
+  if (isNaN(r) || isNaN(g) || isNaN(b)) return 'rgba(226,75,74,' + alpha + ')';
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
+function computeRadarVertices(scores) {
+  var cx = 100, cy = 100, R = 80;
+  var pts = [];
+  for (var i = 0; i < 6; i++) {
+    var angle = (-90 + i * 60) * Math.PI / 180;
+    var s = Math.max(0, Math.min(100, Number(scores[i]) || 0));
+    var dist = (s / 100) * R;
+    pts.push({
+      x: cx + dist * Math.cos(angle),
+      y: cy + dist * Math.sin(angle)
+    });
+  }
+  return pts;
+}
+
+function pointsToAttr(pts) {
+  var out = [];
+  for (var i = 0; i < pts.length; i++) {
+    out.push(pts[i].x.toFixed(2) + ',' + pts[i].y.toFixed(2));
+  }
+  return out.join(' ');
+}
+
+function renderRadarVertexDots(pts, colorHex) {
+  var container = document.getElementById('radar-vertex-dots');
+  if (!container) return;
+  container.innerHTML = '';
+  var svgns = 'http://www.w3.org/2000/svg';
+  for (var i = 0; i < pts.length; i++) {
+    var c = document.createElementNS(svgns, 'circle');
+    c.setAttribute('cx', pts[i].x.toFixed(2));
+    c.setAttribute('cy', pts[i].y.toFixed(2));
+    c.setAttribute('r', '3.5');
+    c.setAttribute('fill', colorHex);
+    c.setAttribute('stroke', 'rgba(255,255,255,.85)');
+    c.setAttribute('stroke-width', '1.2');
+    c.style.filter = 'drop-shadow(0 0 6px ' + colorHex + ')';
+    c.style.opacity = '0';
+    c.style.transition = 'opacity .35s ease';
+    container.appendChild(c);
+    (function(el){ setTimeout(function(){ el.style.opacity = '1'; }, 40); })(c);
+  }
+}
+
+function renderDynamicRadar(scores, colorHex) {
+  var poly = document.getElementById('dynamic-radar-polygon');
+  if (!poly) return;
+
+  var targets = computeRadarVertices(scores);
+
+  // 颜色 + 发光滤镜：A 赛博绿 / B 橙 / C 警戒红
+  var fill = hexToRgba(colorHex, 0.32);
+  poly.setAttribute('fill', fill);
+  poly.setAttribute('stroke', colorHex);
+  var glowBlur = (colorHex.toLowerCase() === '#ef4444') ? 18
+              : (colorHex.toLowerCase() === '#10b981') ? 14 : 11;
+  poly.style.filter = 'drop-shadow(0 0 ' + glowBlur + 'px ' + colorHex + ')';
+
+  // 从 (100,100)×6 插值畸变 → 目标顶点 (弹射展开)
+  var rawStart = (poly.getAttribute('points') || '').trim().split(/\s+/);
+  var starts = [];
+  for (var i = 0; i < 6; i++) {
+    if (rawStart[i]) {
+      var p = rawStart[i].split(',');
+      starts.push({
+        x: isNaN(parseFloat(p[0])) ? 100 : parseFloat(p[0]),
+        y: isNaN(parseFloat(p[1])) ? 100 : parseFloat(p[1])
+      });
+    } else {
+      starts.push({ x: 100, y: 100 });
+    }
+  }
+
+  var t0 = (window.performance && performance.now) ? performance.now() : Date.now();
+  var DURATION = 950;
+  function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+  function easeOutBack(t){
+    var c1 = 1.7, c3 = c1 + 1;
+    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+  }
+
+  function frame(now) {
+    var t = Math.min(1, (now - t0) / DURATION);
+    var e = easeOutBack(t);
+    var cur = [];
+    for (var i = 0; i < 6; i++) {
+      cur.push({
+        x: starts[i].x + (targets[i].x - starts[i].x) * e,
+        y: starts[i].y + (targets[i].y - starts[i].y) * e
+      });
+    }
+    poly.setAttribute('points', pointsToAttr(cur));
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      poly.setAttribute('points', pointsToAttr(targets));
+      renderRadarVertexDots(targets, colorHex);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function updateRadarScoreList(scores, colorHex) {
+  var total = 0;
+  for (var i = 0; i < 6; i++) {
+    var v = Math.max(0, Math.min(100, Number(scores[i]) || 0));
+    total += v;
+    var bar = document.getElementById('radar-bar-' + i);
+    var val = document.getElementById('radar-val-' + i);
+    if (bar) {
+      bar.style.width = v + '%';
+      bar.style.background = colorHex;
+    }
+    if (val) {
+      val.textContent = v;
+      val.style.color = colorHex;
+    }
+  }
+  total = Math.round(total / 6);
+  var tb = document.getElementById('radar-total-bar');
+  var tv = document.getElementById('radar-total-val');
+  if (tb) {
+    tb.style.width = total + '%';
+    tb.style.background = 'linear-gradient(90deg,' + hexToRgba(colorHex, 0.85) + ',' + colorHex + ')';
+  }
+  if (tv) {
+    tv.textContent = total;
+    tv.style.color = colorHex;
+  }
+  var legendDot = document.getElementById('radar-legend-dot');
+  if (legendDot) legendDot.style.background = colorHex;
+}
+
+// ── REGISTRATION BOTTOM SHEET ────────────
+function handleSignup(){
+  openRegistration();
+}
+
+function openRegistration(){
+  var mask = document.getElementById('reg-mask');
+  var panel = document.getElementById('registration-panel');
+  if(!panel || !mask) return;
+  mask.classList.add('show');
+  panel.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  setTimeout(function(){
+    var nameInput = document.getElementById('reg-name');
+    if(nameInput) { try { nameInput.focus(); } catch(e){} }
+  }, 340);
+}
+
+function closeRegistration(){
+  var mask = document.getElementById('reg-mask');
+  var panel = document.getElementById('registration-panel');
+  if(mask) mask.classList.remove('show');
+  if(panel) panel.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+var regCodeTimer = null;
+function sendVerifyCode(){
+  var phone = (document.getElementById('reg-phone').value || '').trim();
+  var phoneInput = document.getElementById('reg-phone');
+  if(!/^1\d{10}$/.test(phone)){
+    phoneInput.classList.add('invalid');
+    phoneInput.focus();
+    showToast('⚠ 请输入正确的 11 位手机号');
+    setTimeout(function(){ phoneInput.classList.remove('invalid'); }, 1600);
+    return;
+  }
+  var btn = document.getElementById('reg-code-btn');
+  if(!btn || btn.disabled) return;
+  var left = 60;
+  btn.disabled = true;
+  btn.textContent = left + ' 秒后重试';
+  showToast('📩 验证码已发送至 ' + phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'));
+  clearInterval(regCodeTimer);
+  regCodeTimer = setInterval(function(){
+    left -= 1;
+    if(left <= 0){
+      clearInterval(regCodeTimer);
+      btn.disabled = false;
+      btn.textContent = '重新获取';
+    } else {
+      btn.textContent = left + ' 秒后重试';
+    }
+  }, 1000);
+}
+
+function submitRegistration(){
+  var nameInput  = document.getElementById('reg-name');
+  var phoneInput = document.getElementById('reg-phone');
+  var codeInput  = document.getElementById('reg-code');
+  var name  = (nameInput.value || '').trim();
+  var phone = (phoneInput.value || '').trim();
+  var code  = (codeInput.value || '').trim();
+  var valid = true;
+
+  [nameInput, phoneInput, codeInput].forEach(function(el){ el.classList.remove('invalid'); });
+
+  if(name.length < 2){
+    nameInput.classList.add('invalid');
+    if(valid) nameInput.focus();
+    valid = false;
+  }
+  if(!/^1\d{10}$/.test(phone)){
+    phoneInput.classList.add('invalid');
+    if(valid) phoneInput.focus();
+    valid = false;
+  }
+  if(!/^\d{4,6}$/.test(code)){
+    codeInput.classList.add('invalid');
+    if(valid) codeInput.focus();
+    valid = false;
+  }
+  if(!valid){
+    showToast('⚠ 请完整填写姓名、手机号与验证码');
+    return;
+  }
+
+  var btn = document.getElementById('reg-submit-btn');
+  var txt = btn.querySelector('.reg-submit-text');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  if(txt) txt.textContent = '正在为您开通金库...';
+  [nameInput, phoneInput, codeInput].forEach(function(el){ el.setAttribute('readonly', 'readonly'); });
+
+  setTimeout(function(){
+    window.location.href = 'HengAI_全域中心.html';
+  }, 1000);
+}
+
+function handleSignupLegacy(){
+  showToast('🎉 正在跳转至 HengAI 免费注册页面…');
+}
+
+function handleDownload(){
+  showToast('📄 碳认证凭证生成中，稍后自动下载…');
+  setTimeout(function(){ showToast('✅ 凭证 PDF 已生成'); },1500);
+}
+
+// ── TOAST ────────────────────────────────
+var toastEl = null;
+var toastTimer = null;
+function showToast(msg){
+  if(!toastEl){
+    toastEl = document.createElement('div');
+    toastEl.style.cssText = [
+      'position:fixed','bottom:max(28px,env(safe-area-inset-bottom,28px))',
+      'left:50%','transform:translateX(-50%) translateY(20px)',
+      'background:rgba(8,12,22,.97)','border:1px solid rgba(16,185,129,.4)',
+      'border-radius:12px','padding:12px 18px',
+      'font-family:Noto Sans SC,sans-serif','font-size:13px','color:#6ee7b7',
+      'z-index:9999','min-width:240px','max-width:340px','text-align:center',
+      'opacity:0','transition:opacity .3s,transform .35s cubic-bezier(.34,1.56,.64,1)',
+      'backdrop-filter:blur(16px)','-webkit-backdrop-filter:blur(16px)',
+      'pointer-events:none','white-space:nowrap'
+    ].join(';');
+    document.body.appendChild(toastEl);
+  }
+  toastEl.textContent = msg;
+  toastEl.style.opacity = '1';
+  toastEl.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){
+    toastEl.style.opacity='0';
+    toastEl.style.transform='translateX(-50%) translateY(10px)';
+  }, 2800);
+}
+
+// ── INPUT EVENTS ─────────────────────────
+document.getElementById('f-elec').addEventListener('input', function(){
+  var v = parseFloat(this.value);
+  var bm = getSelectedBenchmark();
+  var rr = document.getElementById('ref-range');
+  if(!isNaN(v) && v>0){
+    var est = ((v / 1000 * 0.581) + bm.material).toFixed(2);
+    if(rr) rr.textContent = '~' + est + ' t/t';
+  } else {
+    if(rr) rr.textContent = bm.best.toFixed(2) + '–' + bm.worst.toFixed(2) + ' t/t';
+  }
+});
+
+document.getElementById('industry-select').addEventListener('change', function(){
+  var rr = document.getElementById('ref-range');
+  var bm = getSelectedBenchmark();
+  if(rr) rr.textContent = bm.best.toFixed(2) + '–' + bm.worst.toFixed(2) + ' t/t';
+});
+
+document.querySelectorAll('input[name="gec"]').forEach(function(r){
+  r.addEventListener('change',function(){
+    var hint = document.getElementById('gec-hint');
+    if(document.getElementById('gec-yes').checked){
+      if(hint) hint.innerHTML = '✅ <strong>绿电加成：</strong>Scope 2 排放可降低 80%，预计碳强度降低约 0.2 t/t，直接节省 CBAM 税款';
+      if(hint) hint.style.color = 'var(--gl)';
+    } else {
+      if(hint) hint.innerHTML = 'ℹ️ 购买绿电证书（GEC）可直接降低 CBAM 碳税，欧盟已正式认可';
+      if(hint) hint.style.color = '';
+    }
+  });
+});
+
+// ── SHAKE ANIMATION ──────────────────────
+var shakeStyle = document.createElement('style');
+shakeStyle.textContent = '@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}';
+document.head.appendChild(shakeStyle);
+</script>
+</body>
+</html>

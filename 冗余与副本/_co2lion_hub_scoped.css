@@ -1,0 +1,550 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@1,400&display=swap');
+
+#co2lion-hub-overlay{
+  --night: #06080f;
+  --dark: #0a0e1a;
+  --panel: #0d1220;
+  --panel2: #111827;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --ink: #e8edf5;
+  --ink2: #8a95a8;
+  --ink3: #4a5568;
+  --gold: #c9a84c;
+  --gold-l: #f0d080;
+  --gold-d: rgba(201,168,76,0.12);
+  --green: #3b9e4a;
+  --green-l: #7dd98a;
+  --green-d: rgba(59,158,74,0.11);
+  --teal: #1d9e75;
+  --teal-l: #6dd5b0;
+  --teal-d: rgba(29,158,117,0.1);
+  --blue: #185fa5;
+  --blue-l: #93c5fd;
+  --blue-d: rgba(24,95,165,0.12);
+  --purple: #7f77dd;
+  --purple-l: #c4b5fd;
+  --purple-d: rgba(127,119,221,0.1);
+  --red: #e24b4a;
+  --red-l: #fca5a5;
+  --red-d: rgba(226,75,74,0.1);
+  --amber: #c9a84c;
+  --amber-d: rgba(201,168,76,0.1);
+}
+
+#co2lion-hub-overlay *{ box-sizing: border-box; margin: 0; padding: 0; }
+
+#co2lion-hub-overlay{
+  background: var(--night);
+  color: var(--ink);
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+
+#co2lion-hub-overlay .shell{ display: flex; min-height: 100vh; }
+
+
+#co2lion-hub-overlay .sidebar{
+  width: 220px;
+  background: var(--dark);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+#co2lion-hub-overlay .logo-area{
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#co2lion-hub-overlay .logo-icon{
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: var(--green-d);
+  border: 1px solid rgba(59,158,74,0.35);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+#co2lion-hub-overlay .logo-text{ font-size: 14px; font-weight: 700; letter-spacing: 0.3px; }
+#co2lion-hub-overlay .logo-sub{ font-size: 9.5px; color: var(--ink3); margin-top: 1px; }
+
+
+#co2lion-hub-overlay .phase-strip{
+  margin: 12px 14px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 7px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+#co2lion-hub-overlay .phase-strip.p1{ background: var(--green-d); border: 1px solid rgba(59,158,74,0.25); color: var(--green-l); }
+#co2lion-hub-overlay .phase-strip.p2{ background: var(--gold-d); border: 1px solid rgba(201,168,76,0.25); color: var(--gold-l); }
+#co2lion-hub-overlay .phase-strip.p3{ background: var(--purple-d); border: 1px solid rgba(127,119,221,0.25); color: var(--purple-l); }
+#co2lion-hub-overlay .phase-dot{ width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+#co2lion-hub-overlay .nav-section{ padding: 12px 14px 5px; font-size: 9.5px; color: var(--ink3); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+
+#co2lion-hub-overlay .nav-item{
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  color: var(--ink2);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+  border-radius: 0;
+}
+#co2lion-hub-overlay .nav-item:hover{ color: var(--ink); background: rgba(255,255,255,0.04); }
+#co2lion-hub-overlay .nav-item.active{ color: var(--ink); background: rgba(255,255,255,0.06); border-left-color: var(--teal); }
+#co2lion-hub-overlay .nav-item.locked{ color: var(--ink3); cursor: not-allowed; }
+#co2lion-hub-overlay .nav-dot-g{ width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+#co2lion-hub-overlay .nav-dot-y{ width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+#co2lion-hub-overlay .nav-dot-b{ width: 6px; height: 6px; border-radius: 50%; background: var(--blue-l); flex-shrink: 0; }
+#co2lion-hub-overlay .nav-dot-lock{ width: 6px; height: 6px; border-radius: 50%; background: var(--ink3); flex-shrink: 0; }
+
+#co2lion-hub-overlay .sidebar-footer{
+  margin-top: auto;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+}
+#co2lion-hub-overlay .user-row{
+  display: flex; align-items: center; gap: 9px;
+}
+#co2lion-hub-overlay .user-av{
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--teal-d);
+  border: 1.5px solid var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: var(--teal-l);
+  flex-shrink: 0;
+}
+#co2lion-hub-overlay .user-name{ font-size: 12.5px; font-weight: 500; }
+#co2lion-hub-overlay .user-meta{ font-size: 10px; color: var(--ink3); }
+
+
+#co2lion-hub-overlay .main{ flex: 1; overflow-y: auto; overflow-x: hidden; min-width: 0; padding-bottom: 60px; }
+
+
+#co2lion-hub-overlay .topbar{
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(6,8,15,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#co2lion-hub-overlay .topbar-left{ display: flex; align-items: center; gap: 14px; }
+#co2lion-hub-overlay .page-title{ font-size: 14px; font-weight: 500; }
+#co2lion-hub-overlay .phase-badge{
+  font-size: 9px; font-weight: 700;
+  padding: 3px 8px; border-radius: 20px;
+  letter-spacing: 0.8px; text-transform: uppercase;
+}
+#co2lion-hub-overlay .pb-p1{ background: var(--green-d); color: var(--green-l); border: 1px solid rgba(59,158,74,0.3); }
+#co2lion-hub-overlay .pb-p2{ background: var(--gold-d); color: var(--gold-l); border: 1px solid rgba(201,168,76,0.3); }
+#co2lion-hub-overlay .pb-p3{ background: var(--purple-d); color: var(--purple-l); border: 1px solid rgba(127,119,221,0.3); }
+
+#co2lion-hub-overlay .topbar-right{ display: flex; align-items: center; gap: 12px; }
+#co2lion-hub-overlay .gm-chip{
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 20px;
+  background: var(--gold-d); border: 1px solid rgba(201,168,76,0.3);
+  font-size: 11.5px; font-weight: 600; color: var(--gold-l);
+  cursor: pointer;
+}
+#co2lion-hub-overlay .gm-chip-val{ font-size: 14px; font-weight: 700; color: var(--gold); font-family: 'DM Mono', monospace; }
+#co2lion-hub-overlay .topbar-btn{
+  padding: 5px 12px; border-radius: 8px;
+  font-size: 11.5px; font-weight: 500;
+  border: 1px solid var(--border2);
+  background: transparent; color: var(--ink);
+  cursor: pointer; font-family: inherit;
+  transition: all 0.15s;
+}
+#co2lion-hub-overlay .topbar-btn:hover{ background: rgba(255,255,255,0.07); }
+#co2lion-hub-overlay .topbar-btn.primary{ background: var(--teal-d); border-color: rgba(29,158,117,0.4); color: var(--teal-l); }
+
+
+#co2lion-hub-overlay .content{ padding: 24px 28px 48px; }
+
+
+#co2lion-hub-overlay .sec-head{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+#co2lion-hub-overlay .sec-title{ font-size: 11px; font-weight: 600; color: var(--ink3); letter-spacing: 1.2px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+#co2lion-hub-overlay .sec-title::after{ content: ''; flex: 1; height: 1px; background: var(--border); min-width: 30px; }
+#co2lion-hub-overlay .sec-action{ font-size: 11px; color: var(--teal-l); cursor: pointer; white-space: nowrap; }
+
+
+#co2lion-hub-overlay .card{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+
+#co2lion-hub-overlay .g2{ display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+#co2lion-hub-overlay .g3{ display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+#co2lion-hub-overlay .g4{ display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+#co2lion-hub-overlay .g21{ display: grid; grid-template-columns: minmax(0,2fr) minmax(0,1fr); gap: 14px; }
+#co2lion-hub-overlay .g12{ display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.6fr); gap: 14px; }
+
+
+#co2lion-hub-overlay .id-card{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+  margin-bottom: 20px;
+  position: relative;
+}
+#co2lion-hub-overlay .id-card::before{
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(29,158,117,0.6), transparent);
+}
+#co2lion-hub-overlay .id-card-inner{
+  padding: 20px 22px 18px;
+  display: flex; align-items: flex-start; gap: 16px;
+}
+#co2lion-hub-overlay .id-avatar{
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--teal-d); border: 2px solid var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: var(--teal-l);
+  flex-shrink: 0; position: relative;
+}
+#co2lion-hub-overlay .id-online{ position: absolute; bottom: 1px; right: 1px; width: 11px; height: 11px; border-radius: 50%; background: var(--green); border: 2px solid var(--panel); }
+#co2lion-hub-overlay .id-info{ flex: 1; min-width: 0; }
+#co2lion-hub-overlay .id-name{ font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+#co2lion-hub-overlay .id-meta{ font-size: 11px; color: var(--ink2); margin-bottom: 9px; }
+#co2lion-hub-overlay .id-tags{ display: flex; gap: 5px; flex-wrap: wrap; }
+#co2lion-hub-overlay .id-tag{ font-size: 9.5px; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+
+#co2lion-hub-overlay .id-right{ flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+#co2lion-hub-overlay .level-shield{
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+#co2lion-hub-overlay .shield-body{
+  width: 48px; height: 54px; position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+#co2lion-hub-overlay .shield-body svg{ position: absolute; inset: 0; width: 100%; height: 100%; }
+#co2lion-hub-overlay .shield-num{ position: relative; z-index: 1; font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; }
+#co2lion-hub-overlay .shield-label{ font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
+
+
+#co2lion-hub-overlay .reg-timeline{
+  padding: 10px 22px 14px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0;
+  background: rgba(0,0,0,0.2);
+  overflow-x: auto;
+}
+#co2lion-hub-overlay .rt-item{ display: flex; align-items: center; gap: 0; flex-shrink: 0; }
+#co2lion-hub-overlay .rt-dot{
+  width: 24px; height: 24px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; z-index: 1;
+}
+#co2lion-hub-overlay .rt-dot.done{ background: var(--green-d); border: 1.5px solid var(--green); }
+#co2lion-hub-overlay .rt-dot.done svg{ width: 11px; height: 9px; }
+#co2lion-hub-overlay .rt-dot.active{ background: var(--blue-d); border: 1.5px solid var(--blue-l); }
+#co2lion-hub-overlay .rt-dot.lock{ background: rgba(255,255,255,0.03); border: 1.5px solid var(--border2); }
+#co2lion-hub-overlay .rt-line{ width: 32px; height: 1px; background: var(--border); flex-shrink: 0; }
+#co2lion-hub-overlay .rt-line.done{ background: rgba(59,158,74,0.4); }
+#co2lion-hub-overlay .rt-info{ position: absolute; }
+#co2lion-hub-overlay .rt-wrap{ position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 0 2px; }
+#co2lion-hub-overlay .rt-label{ font-size: 9px; color: var(--ink3); text-align: center; white-space: nowrap; }
+#co2lion-hub-overlay .rt-label.done{ color: var(--green); }
+#co2lion-hub-overlay .rt-label.active{ color: var(--blue-l); }
+#co2lion-hub-overlay .rt-date{ font-size: 8.5px; color: var(--ink3); font-family: 'DM Mono', monospace; }
+
+
+#co2lion-hub-overlay .gm-card{ background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; }
+#co2lion-hub-overlay .gm-header{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+#co2lion-hub-overlay .gm-val-big{ font-size: 32px; font-weight: 700; color: var(--gold); font-family: 'DM Mono', monospace; letter-spacing: -1px; line-height: 1; }
+#co2lion-hub-overlay .gm-delta{ font-size: 11px; color: var(--green-l); margin-top: 3px; }
+#co2lion-hub-overlay .gm-bar-track{ height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; margin: 10px 0 6px; }
+#co2lion-hub-overlay .gm-bar-fill{ height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--gold), rgba(201,168,76,0.5)); transition: width 1s ease; }
+#co2lion-hub-overlay .gm-bar-label{ display: flex; justify-content: space-between; font-size: 10px; color: var(--ink3); }
+#co2lion-hub-overlay .gm-events{ display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+#co2lion-hub-overlay .gm-event{ display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; background: rgba(0,0,0,0.25); border-radius: 8px; border: 1px solid var(--border); }
+#co2lion-hub-overlay .gm-event-left{ display: flex; align-items: center; gap: 8px; }
+#co2lion-hub-overlay .gm-event-icon{ width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+#co2lion-hub-overlay .gm-event-text{ font-size: 11.5px; color: var(--ink); }
+#co2lion-hub-overlay .gm-event-sub{ font-size: 10px; color: var(--ink3); margin-top: 1px; }
+#co2lion-hub-overlay .gm-event-val{ font-size: 12px; font-weight: 700; font-family: 'DM Mono', monospace; }
+
+
+#co2lion-hub-overlay .metric-box{ background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 11px; padding: 12px 14px; }
+#co2lion-hub-overlay .metric-label{ font-size: 10px; color: var(--ink3); margin-bottom: 5px; }
+#co2lion-hub-overlay .metric-val{ font-size: 22px; font-weight: 700; font-family: 'DM Mono', monospace; letter-spacing: -0.5px; line-height: 1; }
+#co2lion-hub-overlay .metric-unit{ font-size: 11px; font-weight: 400; margin-left: 2px; }
+#co2lion-hub-overlay .metric-sub{ font-size: 10px; color: var(--ink2); margin-top: 3px; line-height: 1.4; }
+
+
+#co2lion-hub-overlay .ent-header{
+  padding: 16px 18px 14px;
+  display: flex; align-items: flex-start; gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+#co2lion-hub-overlay .ent-logo{
+  width: 42px; height: 42px; border-radius: 10px;
+  background: var(--blue-d); border: 1px solid rgba(24,95,165,0.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--blue-l);
+  flex-shrink: 0;
+}
+#co2lion-hub-overlay .ent-name{ font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+#co2lion-hub-overlay .ent-meta{ font-size: 11px; color: var(--ink2); margin-bottom: 7px; }
+#co2lion-hub-overlay .ent-status{
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 20px;
+}
+
+
+#co2lion-hub-overlay .alarm-box{
+  background: var(--red-d); border: 1px solid rgba(226,75,74,0.25);
+  border-radius: 11px; padding: 13px 16px;
+  display: flex; align-items: flex-start; gap: 11px;
+}
+#co2lion-hub-overlay .alarm-icon{ flex-shrink: 0; margin-top: 1px; }
+#co2lion-hub-overlay .alarm-val{ font-size: 22px; font-weight: 700; color: var(--red); font-family: 'DM Mono', monospace; }
+#co2lion-hub-overlay .alarm-label{ font-size: 10.5px; color: rgba(252,165,165,0.8); margin-top: 2px; }
+#co2lion-hub-overlay .alarm-desc{ font-size: 11px; color: rgba(252,165,165,0.75); line-height: 1.65; }
+
+
+#co2lion-hub-overlay .sc-table{ width: 100%; border-collapse: collapse; }
+#co2lion-hub-overlay .sc-table th{ font-size: 10px; color: var(--ink3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 7px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+#co2lion-hub-overlay .sc-table td{ padding: 10px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; vertical-align: middle; }
+#co2lion-hub-overlay .sc-table tr:last-child td{ border-bottom: none; }
+#co2lion-hub-overlay .sc-table tr:hover td{ background: rgba(255,255,255,0.02); }
+#co2lion-hub-overlay .status-pill{ font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; }
+#co2lion-hub-overlay .sp-done{ background: var(--green-d); color: var(--green-l); border: 1px solid rgba(59,158,74,0.3); }
+#co2lion-hub-overlay .sp-partial{ background: var(--gold-d); color: var(--gold-l); border: 1px solid rgba(201,168,76,0.3); }
+#co2lion-hub-overlay .sp-missing{ background: var(--red-d); color: var(--red-l); border: 1px solid rgba(226,75,74,0.3); }
+#co2lion-hub-overlay .sp-pending{ background: rgba(255,255,255,0.05); color: var(--ink2); border: 1px solid var(--border); }
+#co2lion-hub-overlay .progress-mini{ height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; width: 60px; }
+#co2lion-hub-overlay .progress-mini-fill{ height: 100%; border-radius: 2px; }
+#co2lion-hub-overlay .action-link{ font-size: 11px; color: var(--teal-l); cursor: pointer; white-space: nowrap; }
+#co2lion-hub-overlay .action-link:hover{ text-decoration: underline; }
+
+
+#co2lion-hub-overlay .coverage-wrap{ display: flex; align-items: center; gap: 16px; }
+#co2lion-hub-overlay .coverage-ring{ position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+#co2lion-hub-overlay .coverage-ring svg{ width: 100%; height: 100%; transform: rotate(-90deg); }
+#co2lion-hub-overlay .coverage-center{ position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#co2lion-hub-overlay .coverage-pct{ font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; line-height: 1; }
+#co2lion-hub-overlay .coverage-sub{ font-size: 8.5px; color: var(--ink3); }
+
+
+#co2lion-hub-overlay .roi-row{ display: grid; grid-template-columns: 1fr 24px 1fr 24px 1fr; align-items: center; gap: 4px; }
+#co2lion-hub-overlay .roi-box{ border-radius: 10px; padding: 12px 14px; text-align: center; }
+#co2lion-hub-overlay .roi-val{ font-size: 20px; font-weight: 700; font-family: 'DM Mono', monospace; letter-spacing: -0.5px; line-height: 1; margin-bottom: 3px; }
+#co2lion-hub-overlay .roi-label{ font-size: 9.5px; font-weight: 500; }
+#co2lion-hub-overlay .roi-note{ font-size: 9px; opacity: 0.7; margin-top: 2px; }
+#co2lion-hub-overlay .roi-arrow{ display: flex; align-items: center; justify-content: center; color: var(--ink3); }
+
+
+#co2lion-hub-overlay .action-grid{ display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+#co2lion-hub-overlay .action-btn{
+  background: rgba(0,0,0,0.3); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 10px 12px;
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 8px;
+  font-family: inherit; font-size: 12px; color: var(--ink);
+  text-align: left;
+}
+#co2lion-hub-overlay .action-btn:hover{ background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.18); }
+#co2lion-hub-overlay .action-btn-icon{ width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+#co2lion-hub-overlay .action-btn-label{ font-size: 12px; font-weight: 500; }
+#co2lion-hub-overlay .action-btn-sub{ font-size: 10px; color: var(--ink3); margin-top: 1px; }
+
+
+#co2lion-hub-overlay .report-banner{
+  background: var(--panel); border: 1px solid rgba(29,158,117,0.25);
+  border-radius: 14px; padding: 16px 18px;
+  position: relative; overflow: hidden;
+}
+#co2lion-hub-overlay .report-banner::before{
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(29,158,117,0.6), transparent);
+}
+#co2lion-hub-overlay .report-status{ display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+#co2lion-hub-overlay .report-live{ width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+#co2lion-hub-overlay .report-title{ font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+#co2lion-hub-overlay .report-meta{ font-size: 11px; color: var(--ink2); margin-bottom: 12px; }
+#co2lion-hub-overlay .report-pills{ display: flex; gap: 6px; flex-wrap: wrap; }
+#co2lion-hub-overlay .report-pill{ font-size: 10px; font-weight: 500; padding: 3px 9px; border-radius: 20px; }
+
+
+#co2lion-hub-overlay .dual-rail{
+  background: var(--panel); border: 1px solid rgba(127,119,221,0.22);
+  border-radius: 16px; overflow: hidden;
+  position: relative;
+}
+#co2lion-hub-overlay .dual-rail::before{
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.6), transparent);
+}
+#co2lion-hub-overlay .dual-rail-row{ display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); }
+#co2lion-hub-overlay .rail-personal{
+  padding: 20px 22px;
+  border-right: 1px solid var(--border);
+}
+#co2lion-hub-overlay .rail-corp{ padding: 20px 22px; }
+#co2lion-hub-overlay .rail-tag{ font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+#co2lion-hub-overlay .rail-level{ font-size: 26px; font-weight: 700; line-height: 1.1; margin-bottom: 4px; }
+#co2lion-hub-overlay .rail-en{ font-size: 10px; color: var(--ink2); letter-spacing: 1px; margin-bottom: 12px; }
+#co2lion-hub-overlay .rail-stat{ font-size: 36px; font-weight: 700; font-family: 'DM Mono', monospace; letter-spacing: -1px; line-height: 1; }
+#co2lion-hub-overlay .rail-stat-label{ font-size: 11px; color: var(--ink2); margin-top: 4px; margin-bottom: 14px; }
+
+#co2lion-hub-overlay .cert-vault{
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 13px; border-radius: 9px;
+  background: var(--teal-d); border: 1px solid rgba(29,158,117,0.3);
+  margin-top: 12px;
+}
+#co2lion-hub-overlay .vault-pulse{ width: 7px; height: 7px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+#co2lion-hub-overlay .vault-text{ font-size: 11px; color: var(--teal-l); }
+
+#co2lion-hub-overlay .gateway-row{ display: flex; flex-direction: column; gap: 7px; margin-top: 12px; }
+#co2lion-hub-overlay .gateway-item{
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 11px; border-radius: 8px;
+  background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+}
+#co2lion-hub-overlay .gw-status{ width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+#co2lion-hub-overlay .gw-text{ flex: 1; font-size: 11.5px; color: var(--ink); }
+#co2lion-hub-overlay .gw-label{ font-size: 10px; color: var(--ink3); }
+
+
+#co2lion-hub-overlay .page-view{ display: none; }
+#co2lion-hub-overlay .page-view.active{ display: block; }
+
+
+#co2lion-hub-overlay .badge{ display: inline-flex; align-items: center; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; white-space: nowrap; }
+#co2lion-hub-overlay .bdg-g{ background: var(--green-d); color: var(--green-l); border: 1px solid rgba(59,158,74,0.3); }
+#co2lion-hub-overlay .bdg-y{ background: var(--gold-d); color: var(--gold-l); border: 1px solid rgba(201,168,76,0.3); }
+#co2lion-hub-overlay .bdg-b{ background: var(--blue-d); color: var(--blue-l); border: 1px solid rgba(24,95,165,0.3); }
+#co2lion-hub-overlay .bdg-r{ background: var(--red-d); color: var(--red-l); border: 1px solid rgba(226,75,74,0.3); }
+#co2lion-hub-overlay .bdg-p{ background: var(--purple-d); color: var(--purple-l); border: 1px solid rgba(127,119,221,0.3); }
+#co2lion-hub-overlay .bdg-gray{ background: rgba(255,255,255,0.05); color: var(--ink2); border: 1px solid var(--border); }
+
+
+#co2lion-hub-overlay .insight{
+  padding: 11px 14px; border-radius: 9px;
+  font-size: 11.5px; line-height: 1.7;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+#co2lion-hub-overlay .insight-teal{ background: var(--teal-d); border: 1px solid rgba(29,158,117,0.2); color: var(--teal-l); }
+#co2lion-hub-overlay .insight-gold{ background: var(--gold-d); border: 1px solid rgba(201,168,76,0.2); color: var(--gold-l); }
+#co2lion-hub-overlay .insight-red{ background: var(--red-d); border: 1px solid rgba(226,75,74,0.2); color: var(--red-l); }
+#co2lion-hub-overlay .insight-purple{ background: var(--purple-d); border: 1px solid rgba(127,119,221,0.2); color: var(--purple-l); }
+#co2lion-hub-overlay .insight svg{ flex-shrink: 0; margin-top: 2px; }
+
+
+#co2lion-hub-overlay .steps{ display: flex; flex-direction: column; gap: 0; position: relative; padding-left: 30px; }
+#co2lion-hub-overlay .steps::before{ content: ''; position: absolute; left: 11px; top: 14px; bottom: 14px; width: 1px; background: var(--border); }
+#co2lion-hub-overlay .step{ display: flex; gap: 14px; padding-bottom: 16px; position: relative; }
+#co2lion-hub-overlay .step-dot{ width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 1; position: absolute; left: -30px; }
+#co2lion-hub-overlay .step-done{ background: var(--green-d); border: 1.5px solid var(--green); }
+#co2lion-hub-overlay .step-active{ background: var(--blue-d); border: 1.5px solid var(--blue-l); }
+#co2lion-hub-overlay .step-lock{ background: rgba(255,255,255,0.03); border: 1.5px solid var(--border2); color: var(--ink3); font-size: 10px; font-weight: 600; }
+#co2lion-hub-overlay .step-title{ font-size: 12.5px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+#co2lion-hub-overlay .step-desc{ font-size: 11px; color: var(--ink2); line-height: 1.6; }
+
+
+#co2lion-hub-overlay .divider{ border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+
+
+#co2lion-hub-overlay .gap-14{ display: flex; flex-direction: column; gap: 14px; }
+#co2lion-hub-overlay .gap-10{ display: flex; flex-direction: column; gap: 10px; }
+#co2lion-hub-overlay .mb-14{ margin-bottom: 14px; }
+#co2lion-hub-overlay .mb-20{ margin-bottom: 20px; }
+#co2lion-hub-overlay .text-muted{ color: var(--ink2); }
+#co2lion-hub-overlay .text-small{ font-size: 10.5px; }
+#co2lion-hub-overlay .mono{ font-family: 'DM Mono', monospace; }
+#co2lion-hub-overlay .flex-between{ display: flex; justify-content: space-between; align-items: center; }
+#co2lion-hub-overlay .flex-center{ display: flex; align-items: center; }
+
+
+#co2lion-hub-overlay .toast{
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--panel2); border: 1px solid rgba(29,158,117,0.4);
+  border-radius: 12px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12.5px; color: var(--teal-l);
+  z-index: 999; opacity: 0; transform: translateY(10px);
+  transition: all 0.3s;
+  pointer-events: none;
+  min-width: 260px;
+}
+#co2lion-hub-overlay .toast.show{ opacity: 1; transform: translateY(0); }
+
+
+#co2lion-hub-overlay .phase-selector{
+  position: fixed; bottom: 20px; right: 20px; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  display: flex; gap: 6px;
+}
+#co2lion-hub-overlay .ps-btn{
+  font-size: 10px; font-weight: 700; padding: 4px 10px;
+  border-radius: 6px; cursor: pointer; border: 1px solid var(--border2);
+  background: var(--panel); color: var(--ink2);
+  font-family: inherit; transition: all 0.15s;
+  letter-spacing: 0.5px;
+}
+#co2lion-hub-overlay .ps-btn:hover{ background: rgba(255,255,255,0.08); }
+#co2lion-hub-overlay .ps-btn.p1-active{ background: var(--green-d); color: var(--green-l); border-color: rgba(59,158,74,0.4); }
+#co2lion-hub-overlay .ps-btn.p2-active{ background: var(--gold-d); color: var(--gold-l); border-color: rgba(201,168,76,0.4); }
+#co2lion-hub-overlay .ps-btn.p3-active{ background: var(--purple-d); color: var(--purple-l); border-color: rgba(127,119,221,0.4); }
+
+
+@keyframes pulse-glow { 0% { box-shadow: 0 0 0 0 rgba(201,168,76,0.4); } 70% { box-shadow: 0 0 0 6px rgba(201,168,76,0); } 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); } }
+@keyframes pulse-glow-green { 0% { box-shadow: 0 0 0 0 rgba(29,158,117,0.4); } 70% { box-shadow: 0 0 0 6px rgba(29,158,117,0); } 100% { box-shadow: 0 0 0 0 rgba(29,158,117,0); } }
+#co2lion-hub-overlay .magic-trigger-gm{ display:inline-flex; align-items:center; gap:4px; font-size:10px; color:var(--gold-l); background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); padding:3px 8px; border-radius:12px; cursor:pointer; animation:pulse-glow 2s infinite; transition:all 0.2s; margin-left:8px; vertical-align:middle; }
+#co2lion-hub-overlay .magic-trigger-gm:hover{ background:rgba(201,168,76,0.2); }
+#co2lion-hub-overlay .magic-trigger-co2{ display:inline-flex; align-items:center; gap:4px; font-size:10px; color:var(--teal-l); background:rgba(29,158,117,0.1); border:1px solid rgba(29,158,117,0.3); padding:3px 8px; border-radius:12px; cursor:pointer; animation:pulse-glow-green 2s infinite; transition:all 0.2s; margin-left:8px; vertical-align:middle; }
+#co2lion-hub-overlay .magic-trigger-co2:hover{ background:rgba(29,158,117,0.2); }
+
+
+#co2lion-hub-overlay .earth-ledger-modal{ position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.85); backdrop-filter:blur(12px); display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.4s ease; }
+#co2lion-hub-overlay .earth-ledger-modal.show{ display:flex; opacity:1; }
+#co2lion-hub-overlay .earth-monolith{ background:linear-gradient(180deg, #0a0e1a 0%, #000000 100%); border:1px solid rgba(29,158,117,0.3); box-shadow:0 20px 50px rgba(0,0,0,0.8), inset 0 0 40px rgba(29,158,117,0.05); border-radius:16px; width:90%; max-width:640px; padding:48px 40px; position:relative; text-align:center; transform:scale(0.95); transition:transform 0.4s ease; }
+#co2lion-hub-overlay .earth-ledger-modal.show .earth-monolith{ transform:scale(1); }
+#co2lion-hub-overlay .manifesto-text{ font-family:'Playfair Display', serif; font-size:16px; color:#e8edf5; line-height:1.9; margin-bottom:20px; font-style:italic; opacity:0.9; }
+#co2lion-hub-overlay .manifesto-highlight{ color:var(--teal-l); font-weight:700; font-size:20px; margin:30px 0; letter-spacing:1px; font-style:normal; text-shadow:0 0 15px rgba(29,158,117,0.4); }
+
+
+#co2lion-hub-overlay .protocol-drawer{ position:fixed; top:0; right:-400px; width:400px; height:100vh; background:#0a0e1a; border-left:1px solid rgba(201,168,76,0.2); box-shadow:-10px 0 30px rgba(0,0,0,0.6); z-index:9998; transition:right 0.3s cubic-bezier(0.4, 0, 0.2, 1); display:flex; flex-direction:column; }
+#co2lion-hub-overlay .protocol-drawer.open{ right:0; }
+#co2lion-hub-overlay .protocol-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9997; display:none; backdrop-filter:blur(4px); }
+#co2lion-hub-overlay .protocol-overlay.show{ display:block; }
+#co2lion-hub-overlay .bounty-card{ background:linear-gradient(135deg, rgba(201,168,76,0.15), rgba(0,0,0,0.5)); border:1px dashed rgba(201,168,76,0.4); border-radius:10px; padding:12px 16px; margin-bottom:16px; display:flex; gap:12px; align-items:center; }
+
+@media (max-width: 1100px) {
+    #co2lion-hub-overlay .roi-row{ grid-template-columns: 1fr; gap: 8px; }
+    #co2lion-hub-overlay .roi-arrow{ transform: rotate(90deg); margin: 4px auto; }
+}

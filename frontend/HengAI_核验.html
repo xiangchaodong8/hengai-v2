@@ -1,0 +1,1141 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · 产业链核验</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+/* embed=1：隐藏子页 chrome，由全域中心 iframe 承载 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<style>
+/* embed=1：与全域中心 .embed-panel / 供应链协同 同规格，内容区全宽铺排，消除两侧留白 */
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .sb,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] body { background: var(--bg0, #06080f) !important; overflow: hidden !important; height: 100% !important; }
+html[data-embed="1"] .app { height: 100% !important; min-height: 0 !important; overflow: hidden !important; }
+html[data-embed="1"] .main-wrap {
+  margin-left: 0 !important; width: 100% !important; flex: 1; min-width: 0; min-height: 0;
+  overflow: hidden !important; display: flex !important; flex-direction: column !important;
+}
+html[data-embed="1"] .main-scroll {
+  flex: 1; min-height: 0 !important; overflow-y: auto !important; overflow-x: hidden !important;
+}
+html[data-embed="1"] .main-pad {
+  max-width: none !important; margin: 0 !important; width: 100% !important;
+  padding: 24px 28px 72px !important; box-sizing: border-box;
+}
+html[data-embed="1"] .main-pad .fu { animation: none !important; }
+</style>
+<script src="hengai-load-appstate.js"></script>
+<script src="hengai-embed-boot.js"></script>
+<script src="hengai-verify-downstream.js"></script>
+<style>
+:root{--bg0:#06080f;--bg1:#0a0d16;--bg2:#0e1220;--bg3:rgba(255,255,255,.04);--bg4:rgba(255,255,255,.07);--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--ink:#e2e8f4;--ink2:#8896aa;--ink3:#44556a;--green:#10b981;--green-l:#6ee7b7;--green-d:rgba(16,185,129,.13);--green-b:rgba(16,185,129,.30);--gold:#c9a84c;--gold-l:#f0d080;--gold-d:rgba(201,168,76,.13);--gold-b:rgba(201,168,76,.30);--blue:#3b82f6;--blue-l:#93c5fd;--blue-d:rgba(59,130,246,.13);--blue-b:rgba(59,130,246,.30);--teal:#14b8a6;--teal-l:#5eead4;--teal-d:rgba(20,184,166,.13);--teal-b:rgba(20,184,166,.30);--purple:#8b5cf6;--purple-l:#c4b5fd;--purple-d:rgba(139,92,246,.13);--purple-b:rgba(139,92,246,.30);--red:#ef4444;--red-l:#fca5a5;--red-d:rgba(239,68,68,.13);--red-b:rgba(239,68,68,.30);--orange:#f97316;--orange-l:#fdba74;--orange-d:rgba(249,115,22,.13);--orange-b:rgba(249,115,22,.30);--sb-w:220px;--tb-h:52px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--ink);font-family:"Noto Sans SC",sans-serif;font-size:13px;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh}
+.sidebar{width:var(--sb-w);flex-shrink:0;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto;scrollbar-width:thin}
+.sb-brand{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-ic{width:32px;height:32px;border-radius:9px;background:var(--blue-d);border:1px solid var(--blue-b);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-name{font-size:14px;font-weight:700}.sb-sub{font-size:9.5px;color:var(--ink3);margin-top:1px}
+.sb-phase{margin:10px 12px 2px;padding:7px 12px;border-radius:9px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:8px;background:var(--purple-d);border:1px solid var(--purple-b);color:var(--purple-l)}
+.sb-phase-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.sb-gt{padding:10px 14px 3px;font-size:9px;color:var(--ink3);letter-spacing:1.4px;text-transform:uppercase;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:12.5px;color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all .14s}
+.sb-item:hover{color:var(--ink);background:var(--bg4)}
+.sb-item.on{color:var(--ink);background:rgba(255,255,255,.06);border-left-color:var(--blue)}
+.sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-footer{border-top:1px solid var(--border);padding:10px 14px;margin-top:auto}
+.sb-av{width:30px;height:30px;border-radius:50%;background:var(--blue-d);border:1px solid var(--blue-b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--blue-l);flex-shrink:0;text-transform:uppercase}
+.sb-uname{font-size:12px;font-weight:600}.sb-urole{font-size:10px;color:var(--ink3);margin-top:1px}
+.main-wrap{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:var(--tb-h);display:flex;align-items:center;padding:0 18px;gap:10px;border-bottom:1px solid var(--border);background:var(--bg1);flex-shrink:0}
+.tb-l{display:flex;align-items:center;gap:8px;flex:1}.tb-r{display:flex;align-items:center;gap:8px}
+.tb-title{font-size:14px;font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid transparent}
+.p-b{background:var(--blue-d);color:var(--blue-l);border-color:var(--blue-b)}
+.p-g{background:var(--green-d);color:var(--green-l);border-color:var(--green-b)}
+.p-r{background:var(--red-d);color:var(--red-l);border-color:var(--red-b)}
+.p-y{background:var(--gold-d);color:var(--gold-l);border-color:var(--gold-b)}
+.p-o{background:var(--orange-d);color:var(--orange-l);border-color:var(--orange-b)}
+.p-t{background:var(--teal-d);color:var(--teal-l);border-color:var(--teal-b)}
+.p-p{background:var(--purple-d);color:var(--purple-l);border-color:var(--purple-b)}
+.gm-chip{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:8px;background:var(--gold-d);border:1px solid var(--gold-b);cursor:pointer}
+.gm-chip-lbl{font-size:9.5px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.5px}
+.gm-chip-val{font-family:"DM Mono",monospace;font-size:13px;font-weight:700;color:var(--gold-l)}
+.btn{padding:6px 13px;border-radius:7px;border:1px solid var(--border2);background:var(--bg4);font-size:11.5px;color:var(--ink2);cursor:pointer;transition:all .14s;font-family:"Noto Sans SC",sans-serif}
+.btn:hover{border-color:var(--blue-b);color:var(--blue-l)}
+.btn-b{background:var(--blue-d);border-color:var(--blue-b);color:var(--blue-l)}
+.main-scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.main-scroll::-webkit-scrollbar{width:4px}
+.main-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+/* 与全域中心 / 供应链 / 因子精算一致：全宽 + 24/28/72 内边距（勿 max-width 居中） */
+.main-pad{padding:24px 28px 72px;width:100%;box-sizing:border-box}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sh-t{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700}
+.sh-line{width:18px;height:1px;background:var(--border2)}
+/* STEPS */
+.steps{display:flex;gap:0;margin-bottom:18px;overflow-x:auto}
+.step{flex:1;min-width:100px;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative}
+.step:not(:last-child)::after{content:"";position:absolute;top:14px;left:calc(50% + 16px);right:calc(-50% + 16px);height:2px;background:var(--border);z-index:0}
+.step.done:not(:last-child)::after{background:var(--green)}
+.step.active:not(:last-child)::after{background:var(--border)}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-family:"DM Mono",monospace;font-size:11px;font-weight:700;z-index:1;flex-shrink:0;transition:all .3s}
+.step.done .step-dot{background:var(--green-d);border-color:var(--green-b);color:var(--green-l)}
+.step.active .step-dot{background:var(--blue-d);border-color:var(--blue);color:var(--blue-l);box-shadow:0 0 0 4px rgba(59,130,246,.15)}
+.step-label{font-size:10px;color:var(--ink3);text-align:center;line-height:1.3}
+.step.active .step-label{color:var(--blue-l)}
+.step.done .step-label{color:var(--green-l)}
+/* BATCH CARD */
+.batch-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;transition:border-color .14s;cursor:pointer}
+.batch-card:hover{border-color:var(--blue-b)}
+.batch-card.active{border-color:var(--blue-b);background:var(--blue-d)}
+.batch-id{font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3);margin-bottom:3px}
+.batch-name{font-size:13px;font-weight:700;margin-bottom:4px}
+.batch-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--ink2)}
+/* LAYER CARD */
+.layer-card{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:13px;margin-bottom:9px}
+.layer-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.layer-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.layer-title{font-size:12.5px;font-weight:700;flex:1}
+.layer-status{font-size:11px}
+.factor-match{background:var(--green-d);border:1px solid var(--green-b);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:11.5px;margin-top:6px}
+.factor-missing{background:var(--orange-d);border:1px solid var(--orange-b);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:11.5px;margin-top:6px}
+.anomaly-flag{background:var(--red-d);border:1px solid var(--red-b);border-radius:8px;padding:8px 12px;font-size:11.5px;margin-top:6px;display:flex;align-items:center;gap:8px}
+/* APPROVAL */
+.approval-track{display:flex;flex-direction:column;gap:8px}
+.approval-step{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:9px}
+.ap-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ap-role{font-size:12px;font-weight:600;flex:1}
+.ap-ts{font-family:"DM Mono",monospace;font-size:10px;color:var(--ink3)}
+/* CERT */
+.cert-card{background:linear-gradient(135deg,rgba(16,185,129,.1) 0%,rgba(59,130,246,.08) 100%);border:2px solid rgba(16,185,129,.35);border-radius:16px;padding:20px;text-align:center;position:relative;overflow:hidden}
+.cert-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--blue))}
+.cert-no{font-family:"DM Mono",monospace;font-size:11px;color:var(--ink3);margin-bottom:6px}
+.cert-title{font-size:16px;font-weight:700;margin-bottom:4px}
+.cert-sub{font-size:11.5px;color:var(--ink2);margin-bottom:14px}
+.cert-factor{font-family:"DM Mono",monospace;font-size:32px;font-weight:700;color:var(--green-l);margin-bottom:4px}
+.cert-unit{font-size:12px;color:var(--ink2);margin-bottom:14px}
+.cert-meta{display:flex;justify-content:center;gap:16px;font-size:11px;color:var(--ink3);margin-bottom:14px;flex-wrap:wrap}
+/* FORM */
+.f-grp{margin-bottom:12px}
+.f-lbl{display:block;font-size:10.5px;color:var(--ink3);margin-bottom:5px;font-weight:500}
+.f-inp,.f-sel{width:100%;padding:8px 11px;background:var(--bg1);border:1px solid var(--border2);border-radius:8px;color:var(--ink);font-size:12.5px;outline:none;transition:border-color .14s;font-family:"Noto Sans SC",sans-serif}
+.f-inp:focus,.f-sel:focus{border-color:var(--blue-b)}
+.f-row{display:flex;gap:10px}.f-row .f-grp{flex:1}
+.cta{width:100%;padding:11px;border-radius:10px;border:none;background:var(--blue);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:"Noto Sans SC",sans-serif;transition:opacity .15s}
+.cta:hover{opacity:.87}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .35s ease both}.fu2{animation-delay:.07s}.fu3{animation-delay:.14s}
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);z-index:9999;padding:8px 16px;border-radius:12px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.4);color:var(--blue-l);font-size:12.5px;font-weight:500;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;display:flex;align-items:center;gap:7px}
+#optin-modal.open{opacity:1 !important;pointer-events:all !important}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-ic"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="var(--blue-l)" stroke-width="1.1"/><polyline points="5,8 7.5,10.5 11.5,5.5" stroke="var(--blue-l)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+    <div><div class="sb-name">HengAI</div><div class="sb-sub">Co2Lion 全域合规中心</div></div>
+  </div>
+  <div class="sb-phase"><div class="sb-phase-dot" style="background:var(--purple)"></div><span data-state-bind="flags.phaseLabel">...</span></div>
+  <div class="sb-gt">个人工作台</div>
+  <div class="sb-item" onclick="nav('全域中心.html')"><div class="sb-dot" style="background:var(--green)"></div>全域总览</div>
+  <div class="sb-item" onclick="nav('HengAI_CBAM测算工具.html')"><div class="sb-dot" style="background:var(--gold)"></div>CBAM 测算工具</div>
+  <div class="sb-item" onclick="nav('HengAI_法规知识库.html')"><div class="sb-dot" style="background:var(--purple-l)"></div>企业法规库</div>
+  <div class="sb-item" onclick="nav('HengAI_工业原厂精算.html')"><div class="sb-dot" style="background:var(--orange)"></div>原厂因子精算</div>
+  <div class="sb-gt">企业工作台</div>
+  <div class="sb-item" onclick="nav('HengAI_企业数字档案.html')"><div class="sb-dot" style="background:var(--teal-l)"></div>企业数字档案</div>
+  <div class="sb-item" onclick="nav('HengAI_供应链协同.html')"><div class="sb-dot" style="background:var(--teal)"></div>供应链协同</div>
+  <div class="sb-item on"><div class="sb-dot" style="background:var(--blue)"></div>产业链核验</div>
+  <div class="sb-item" onclick="nav('HengAI_全域诊断报告.html')"><div class="sb-dot" style="background:var(--blue-l)"></div>全域诊断报告</div>
+  <div class="sb-gt">深潜模块</div>
+  <div class="sb-item" onclick="nav('HengAI_EU_Customs.html')"><div class="sb-dot" style="background:var(--blue)"></div>欧盟海关直连</div>
+  <div class="sb-item" onclick="nav('HengAI_GM_Wallet.html')"><div class="sb-dot" style="background:var(--gold)"></div>GM 绿印钱包</div>
+  <div class="sb-footer">
+    <div style="display:flex;align-items:center;gap:9px">
+      <div class="sb-av" data-state-bind="user.name" data-bind-transform="initial">...</div>
+      <div><div class="sb-uname" data-state-bind="user.name">...</div><div class="sb-urole" data-state-bind="user.tier">...</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main-wrap">
+  <div class="topbar">
+    <div class="tb-l">
+      <span class="tb-title">产业链核验</span>
+      <span class="pill p-b">Batch Carbon Verification</span>
+      <span class="pill p-g" id="tb-cert-count">已签发 0 张证书</span>
+    </div>
+    <div class="tb-r">
+      <div class="gm-chip" onclick="nav('HengAI_GM_Wallet.html')">
+        <span class="gm-chip-lbl">GM</span>
+        <span class="gm-chip-val" data-state-bind="user.gmBalance" data-bind-format="number">0</span>
+      </div>
+      <button class="btn" onclick="showPendingApprovals()">待审批 <span id="pending-badge" style="background:var(--red);color:#fff;border-radius:10px;padding:0 5px;font-size:10px;margin-left:3px">0</span></button>
+      <button class="btn btn-b" onclick="openNewBatch()">新建核验批次 →</button>
+    </div>
+  </div>
+  <div class="main-scroll"><div class="main-pad">
+
+    <!-- 核验流程步骤 -->
+    <div class="card fu" id="step-track-card">
+      <div class="sh"><div class="sh-t">当前核验进度 <div class="sh-line"></div></div><span class="pill p-b" id="current-step-pill">选择批次</span></div>
+      <div class="steps" id="step-track">
+        <div class="step active" id="s1"><div class="step-dot">1</div><div class="step-label">选择<br>批次</div></div>
+        <div class="step" id="s2"><div class="step-dot">2</div><div class="step-label">上游<br>溯源</div></div>
+        <div class="step" id="s3"><div class="step-dot">3</div><div class="step-label">下游<br>核验</div></div>
+        <div class="step" id="s4"><div class="step-dot">4</div><div class="step-label">审批<br>流程</div></div>
+        <div class="step" id="s5"><div class="step-dot">5</div><div class="step-label">签发<br>证书</div></div>
+      </div>
+    </div>
+
+    <!-- 步骤1: 批次列表 -->
+    <div id="view-step1">
+      <div class="card fu fu2">
+        <div class="sh"><div class="sh-t">出货批次列表 <div class="sh-line"></div></div><span class="pill p-b" id="batch-count-pill">0 个批次</span></div>
+        <div id="batch-prefill-notice" style="display:none;margin-bottom:12px;padding:10px 14px;background:var(--blue-d);border:1px solid var(--blue-b);border-radius:10px;font-size:12px;color:var(--blue-l);line-height:1.65">💡 以下批次由系统从 CBAM 待申报 / 供应链节点识别预填，<strong>请确认后点击批次</strong>开始核验（系统不会自动替您选定）。</div>
+        <div id="batch-list"><div style="color:var(--ink3);font-size:12px;text-align:center;padding:24px">暂无批次，请点击"新建核验批次"</div></div>
+      </div>
+    </div>
+
+    <!-- 步骤2: 上游溯源 -->
+    <div id="view-step2" style="display:none">
+      <div class="card fu">
+        <div class="sh"><div class="sh-t">上游原料溯源 <div class="sh-line"></div></div><span class="pill p-o">向上溯源</span></div>
+        <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;line-height:1.7">系统正在从公共因子核验池中匹配该批次原料的确权碳因子。匹配成功则自动引用，未匹配则触发原厂因子请求。</div>
+        <div id="upstream-layers"><div style="color:var(--ink3);font-size:12px;text-align:center;padding:16px">加载中...</div></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn" style="flex:1" onclick="goStep(1)">← 返回批次列表</button>
+          <button class="btn btn-b" style="flex:1" onclick="goStep(3)" id="btn-to-step3">下一步：下游核验 →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 步骤3: 下游核验 -->
+    <div id="view-step3" style="display:none">
+      <div class="card fu">
+        <div class="sh"><div class="sh-t">下游供应商核验 <div class="sh-line"></div></div><span class="pill p-t">向下核验</span></div>
+        <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;line-height:1.7">核验本批次生产所使用的供应商碳数据。系统将自动标记异常值，合规人员可对标记项进行人工复核。</div>
+        <div id="downstream-layers"><div style="color:var(--ink3);font-size:12px;text-align:center;padding:16px">加载中...</div></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn" style="flex:1" onclick="goStep(2)">← 返回上游溯源</button>
+          <button class="btn btn-b" style="flex:1" onclick="goStep(4)" id="btn-to-step4">下一步：提交审批 →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 步骤4: 审批流程 -->
+    <div id="view-step4" style="display:none">
+      <div class="card fu">
+        <div class="sh"><div class="sh-t">内部审批流程 <div class="sh-line"></div></div><span class="pill p-y">防操纵保障</span></div>
+        <div style="font-size:12px;color:var(--ink2);margin-bottom:14px;line-height:1.7">核验结论需经企业内部授权审批人二次确认后方可签发证书，防止合规人员单方操纵。所有审批记录链上存证，不可篡改。</div>
+        <div class="approval-track" id="approval-track"></div>
+        <div style="margin-top:14px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;font-size:12px;color:var(--ink2);line-height:1.65" id="approval-summary">汇总：<span id="asum-batch">—</span>批次 · 综合碳强度 <span id="asum-factor">—</span> tCO₂e/t · 数据置信度 Lv.4</div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn" style="flex:1" onclick="goStep(3)">← 返回核验</button>
+          <button class="btn btn-b" style="flex:1" onclick="submitApproval()" id="btn-submit-approval">提交审批申请 →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 步骤5: 证书签发 -->
+    <div id="view-step5" style="display:none">
+      <div class="cert-card fu">
+        <div class="cert-no" id="cert-no">CERT-CL-2026-000001</div>
+        <div class="cert-title">批次碳足迹核验证书</div>
+        <div class="cert-sub">Batch Carbon Footprint Verification Certificate · CL-IVC链上存证</div>
+        <div class="cert-factor" id="cert-factor">0.000</div>
+        <div class="cert-unit">tCO₂e / 吨产品 · 综合碳强度（已核验）</div>
+        <div class="cert-meta">
+          <span>批次：<strong id="cert-batch-id">—</strong></span>
+          <span>出货：<strong id="cert-ship-date">—</strong></span>
+          <span>目的地：<strong id="cert-dest">—</strong></span>
+          <span>签发：<strong id="cert-issue-date">—</strong></span>
+        </div>
+        <!-- 节税与服务费明细（cert-card内） -->
+        <div id="cert-fee-info" style="display:none;margin-bottom:14px;padding:12px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;text-align:left">
+          <div style="font-size:10.5px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+            节税与服务费明细
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+            <span style="color:var(--ink2)">本次节省 CBAM 税款</span>
+            <strong style="color:var(--green-l)" id="cert-tax-saved">—</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+            <span style="color:var(--ink2)">Co2Lion 服务费</span>
+            <strong style="color:var(--orange-l)" id="cert-service-fee">—</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px">
+            <span style="color:var(--ink2)">供应链护航基金</span>
+            <strong style="color:var(--gold-l)" id="cert-nursing-fund">—</strong>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <span class="pill p-g">上游溯源 · 已验证</span>
+          <span class="pill p-t">下游核验 · 已通过</span>
+          <span class="pill p-b">双重审批 · 已确认</span>
+          <span class="pill p-p">CL-IVC · 链上存证</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+          <button class="btn btn-b" style="flex:1" onclick="exportCert()">下载证书 PDF</button>
+          <button class="btn" style="flex:1" onclick="sendToCustoms()">直通欧盟海关申报</button>
+          <button class="btn" style="flex:1" onclick="resetFlow()">新建下一批次</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 历史证书 -->
+    <div class="card fu fu3">
+      <div class="sh"><div class="sh-t">历史核验证书 <div class="sh-line"></div></div><span class="pill p-g" id="hist-count-pill">0 张</span></div>
+      <div id="cert-history"><div style="color:var(--ink3);font-size:12px;text-align:center;padding:16px">暂无历史证书</div></div>
+    </div>
+
+  </div></div>
+</div>
+</div>
+
+<!-- 新建批次 Modal -->
+<div style="position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s" id="new-batch-modal">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:480px;max-width:calc(100vw - 32px);position:relative">
+    <button onclick="closeNewBatch()" style="position:absolute;top:14px;right:14px;width:26px;height:26px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);color:var(--ink2);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    <div style="font-size:15px;font-weight:700;margin-bottom:4px">新建核验批次</div>
+    <div style="font-size:11.5px;color:var(--ink2);margin-bottom:16px">每张核验证书绑定一个出货批次，证书随批次存证，不可挪用</div>
+    <div class="f-row">
+      <div class="f-grp"><label class="f-lbl">批次编号</label><input class="f-inp" id="nb-id" placeholder="如：2026-Q2-001"></div>
+      <div class="f-grp"><label class="f-lbl">产品类别</label><input class="f-inp" id="nb-product" placeholder="如：铝压铸件"></div>
+    </div>
+    <div class="f-row">
+      <div class="f-grp"><label class="f-lbl">出货数量（吨）</label><input class="f-inp" type="number" id="nb-qty" placeholder="0"></div>
+      <div class="f-grp"><label class="f-lbl">出货日期</label><input class="f-inp" type="date" id="nb-date"></div>
+    </div>
+    <div class="f-grp"><label class="f-lbl">目的地海关</label><input class="f-inp" id="nb-dest" placeholder="如：德国汉堡 DEHAM"></div>
+    <div class="f-grp"><label class="f-lbl">上游主要原料来源</label><input class="f-inp" id="nb-upstream" placeholder="如：宝武钢铁 · 武汉钢厂（系统将自动匹配因子池）"></div>
+    <button class="cta" onclick="createBatch()">创建批次，开始核验</button>
+  </div>
+</div>
+
+<!-- 认领选择弹窗 -->
+<div style="position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s" id="optin-modal">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:24px;width:440px;max-width:calc(100vw - 32px)">
+    <div style="font-size:15px;font-weight:700;margin-bottom:6px">
+      是否允许原厂查看您的引用信息？
+    </div>
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:18px;line-height:1.7">
+      您即将引用原厂确权因子完成本次批次核验。<br>
+      选择<strong style="color:var(--green-l)">允许认领</strong>：
+      原厂可看到您的企业名称和本次引用量，
+      有助于双方建立碳合规合作关系。<br>
+      选择<strong style="color:var(--ink2)">匿名使用</strong>：
+      原厂仅看到一条匿名记录，保护您的商业隐私。
+    </div>
+
+    <div style="padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;margin-bottom:16px;font-size:11.5px;color:var(--ink3);line-height:1.65">
+      🛡 无论您选择哪种方式，Co2Lion 保证：原厂只能
+      看到您认领或匿名的引用信息，
+      <strong style="color:var(--ink)">
+        不会将您的信息用于引导其他原厂接触您
+      </strong>（数据不竞争原则）。
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button onclick="confirmOptIn(true)" style="flex:1;padding:11px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans SC',sans-serif">
+        ✓ 允许认领，建立合作
+      </button>
+      <button onclick="confirmOptIn(false)" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border2);background:var(--bg4);color:var(--ink2);font-size:13px;cursor:pointer;font-family:'Noto Sans SC',sans-serif">
+        匿名使用
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="var(--blue-l)" stroke-width="1.5" stroke-linecap="round"/></svg><span id="toast-msg"></span></div>
+
+<script>
+/* ──────────────────────────────────────────────
+   核验模块 (Batch Carbon Verification)
+   入网协议 · AppState版本
+
+   [CURSOR缝合点-A] AppState需追加（appstate.js的MOCK_STATE中添加）：
+   batchVerification: {
+     batches: [
+       {id:'2026-Q2-001', product:'铝压铸件', qty:85, date:'2026-06-15',
+        dest:'德国汉堡 DEHAM', upstream:'宝武钢铁', status:'pending',
+        upstreamFactor:null, downstreamOk:false, approved:false}
+     ],
+     certificates: [],
+     pendingApprovals: []
+   }
+
+   [CURSOR缝合点-B] EventBus事件（本模块监听）：
+   - FACTOR_POOL_UPDATED: 由工业原厂精算.html发射
+     本模块响应: 重新匹配当前批次的上游因子，更新upstream-layers视图
+   - STATE_SYNCED: 标准入网协议
+
+   [CURSOR缝合点-C] EventBus事件（本模块发射）：
+   - BATCH_CERT_ISSUED: 证书签发完成
+     payload: {certNo, batchId, factor, dest, issueDate}
+     监听方: 欧盟海关直连.html（自动填充申报数据）、全域中心.html（更新指标）
+
+   [CURSOR缝合点-D] 欧盟海关直连联动：
+   证书签发后，用户点击"直通欧盟海关申报"时：
+   AppState.update('cbam.pendingDeclaration', {
+     batchId: currentBatch.id,
+     certNo: certNo,
+     factor: certFactor,
+     dest: currentBatch.dest
+   });
+   然后 nav('HengAI_EU_Customs.html');
+
+   [CURSOR缝合点-E] 全域中心侧边栏（企业工作台/供应链协同下方追加）：
+   <div class="sb-item" onclick="nav('HengAI_核验.html')">
+     <div class="sb-dot" style="background:var(--blue)"></div>核验
+   </div>
+
+   [CURSOR缝合点-F] 供应链协同联动：
+   供应链协同.html中，当供应商完成H5填报后：
+   AppState.update('batchVerification.batches[pending].downstreamData', supplierData);
+   (typeof emitAppStateEvent==='function'?emitAppStateEvent:EventBus.emit)('SUPPLIER_DATA_READY', {batchId, supplierName, factor});
+────────────────────────────────────────────── */
+
+var currentStep = 1;
+var currentBatch = null;
+var certCounter = 1;
+
+function getPath(o,p){if(!o||!p)return null;return p.split('.').reduce(function(c,k){return c!=null?c[k]:null;},o);}
+function setText(id,v){var el=document.getElementById(id);if(el&&v!=null)el.textContent=String(v);}
+function nav(u){window.location.href=u;}
+function showToast(msg, kind){
+  if(typeof window.hengaiEmbedToast==='function'&&window.hengaiEmbedToast(msg,kind||'info'))return;
+  var t=document.getElementById('toast'),m=document.getElementById('toast-msg');if(!t||!m)return;m.textContent=msg;t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';clearTimeout(window._tt);window._tt=setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';},2800);
+}
+function bindStateNodes(state){document.querySelectorAll('[data-state-bind]').forEach(function(el){var p=el.getAttribute('data-state-bind'),f=el.getAttribute('data-bind-format')||'',tx=el.getAttribute('data-bind-transform')||'';var v=getPath(state,p);if(v==null)return;var d=f==='number'?Number(v).toLocaleString('zh-CN'):String(v);if(tx==='initial')d=d[0]?d[0].toUpperCase():'?';el.textContent=d;});}
+function ensureBatchVerificationShape(st){
+  if(!st||typeof st!=='object')return;
+  if(!st.batchVerification||typeof st.batchVerification!=='object')st.batchVerification={};
+  if(!Array.isArray(st.batchVerification.batches))st.batchVerification.batches=[];
+  if(!Array.isArray(st.batchVerification.certificates))st.batchVerification.certificates=[];
+  if(!Array.isArray(st.batchVerification.pendingApprovals))st.batchVerification.pendingApprovals=[];
+  if(!Array.isArray(st.batchVerification.factorUsageLog))st.batchVerification.factorUsageLog=[];
+}
+function firstExportCountry(state){
+  var raw=getPath(state,'company.exportCountries')||'';
+  var txt=String(raw).split(/[,，]/)[0]||'欧盟';
+  txt=String(txt||'').trim();
+  return txt||'欧盟';
+}
+function buildBatchesFromOverviewSnapshot(st){
+  if(!st)return 0;
+  ensureBatchVerificationShape(st);
+  var bv=st.batchVerification||{};
+  if((bv.batches||[]).length)return 0;
+  var generated=[];
+  var pending=getPath(st,'cbam.pendingDeclaration');
+  if(pending&&pending.batchId){
+    generated.push({
+      id:String(pending.batchId),
+      product:(getPath(st,'company.mainProduct')||'出口产品'),
+      qty:Number((pending.qtyTons!=null?pending.qtyTons:pending.qty_tons)||0),
+      date:new Date().toISOString().slice(0,10),
+      dest:String(pending.dest||firstExportCountry(st)),
+      upstream:'待匹配',
+      systemSeeded:true,
+      status:pending.certNo?'certified':'pending',
+      upstreamFactor:Number(pending.factor||0)||null,
+      downstreamOk:!!pending.certNo,
+      approved:!!pending.certNo
+    });
+  }
+  var nodes=getPath(st,'supplierNodes')||getPath(st,'suppliers')||[];
+  if(Array.isArray(nodes)){
+    nodes.slice(0,3).forEach(function(n,idx){
+      var sid=String((n&&((n.batchId||n.batch_id)||(n.id||('SN'+idx))))||('SN'+idx));
+      var exists=generated.some(function(g){return g&&String(g.id)===sid;});
+      if(exists)return;
+      generated.push({
+        id:sid,
+        product:(n&&(n.productType||n.product||n.materialType||n.material_type))||getPath(st,'company.mainProduct')||'出口产品',
+        qty:Number((n&&(n.qty||n.quantity||n.annualTons||n.annual_tons))||0),
+        date:new Date().toISOString().slice(0,10),
+        dest:firstExportCountry(st),
+        upstream:(n&&(n.sourceName||n.source_name||n.upstream))||'待匹配',
+        systemSeeded:true,
+        status:(String((n&&(n.status||n.supplierStatus||n.supplier_status))||'').toLowerCase()==='submitted')?'verifying':'pending',
+        upstreamFactor:null,
+        downstreamOk:false,
+        approved:false
+      });
+    });
+  }
+  if(!generated.length)return 0;
+  bv.batches=generated;
+  if(typeof st.update==='function')st.update('batchVerification.batches',generated);
+  return generated.length;
+}
+async function hydrateVerificationFromBackendSnapshot(){
+  try{
+    var api=window.API_HUB_OVERVIEW||(typeof hengaiApiOrigin==='function'?(hengaiApiOrigin()+'/api/v1/hub/overview'):null);
+    if(!api)return 0;
+    var headers={Accept:'application/json'};
+    var tk=typeof getToken==='function'?getToken():null;
+    if(tk)headers.Authorization='Bearer '+tk;
+    var res=await fetch(api,{credentials:'include',headers:headers});
+    if(!res.ok)return 0;
+    var raw=await res.json().catch(function(){return null;});
+    if(!raw||typeof raw!=='object')return 0;
+    var sanitized=(typeof window.sanitizeOverviewPayload==='function')?window.sanitizeOverviewPayload(raw):raw;
+    if(window.AppState&&typeof window.replaceAuthoritativeAppStateFromLive==='function'){
+      try{window.replaceAuthoritativeAppStateFromLive(sanitized);}catch(_){}
+    }else if(window.AppState&&typeof window.deepMerge==='function'){
+      window.AppState=Object.assign(window.AppState||{},window.deepMerge(window.AppState||{},sanitized));
+    }
+  }catch(_){}
+  var st=window.AppState||{};
+  return buildBatchesFromOverviewSnapshot(st);
+}
+
+/* ── 步骤门禁：上游完成 → 下游 → 审批 ── */
+function isUpstreamComplete(batch){
+  if(!batch)return false;
+  if(Number(batch.upstreamFactor)>0)return true;
+  var cf=Number(getPath(window.AppState,'factorAuth.confirmedFactor')||0);
+  if(cf>0&&checkUpstreamDeclaration(batch.upstream||''))return true;
+  return false;
+}
+function isDownstreamComplete(batch){
+  return !!(batch&&batch.downstreamOk===true);
+}
+function stepGateReason(n){
+  if(n<=1)return null;
+  if(!currentBatch)return '请先在出货批次列表中选择批次';
+  if(n>=3&&!isUpstreamComplete(currentBatch))return '请先完成上游溯源与因子匹配，再进行下游核验';
+  if(n>=4&&!isDownstreamComplete(currentBatch))return '请先完成下游供应商核验（至少一条已对账结论且无异常标记）';
+  return null;
+}
+function syncStepGateButtons(){
+  var upOk=!!(currentBatch&&isUpstreamComplete(currentBatch));
+  var downOk=!!(currentBatch&&isDownstreamComplete(currentBatch));
+  [['btn-to-step3',upOk,'请先完成上游因子池匹配'],['btn-to-step4',downOk,'请先完成下游核验'],['btn-submit-approval',downOk,'请先完成下游核验']].forEach(function(cfg){
+    var btn=document.getElementById(cfg[0]);if(!btn)return;
+    btn.disabled=!cfg[1];
+    btn.style.opacity=cfg[1]?'1':'0.45';
+    btn.style.cursor=cfg[1]?'pointer':'not-allowed';
+    btn.title=cfg[1]?'':cfg[2];
+  });
+}
+window.syncStepGateButtons=syncStepGateButtons;
+window.isUpstreamComplete=isUpstreamComplete;
+window.isDownstreamComplete=isDownstreamComplete;
+
+/* ── 步骤导航 ── */
+function goStep(n){
+  if(n<1||n>5)return;
+  if(n>1&&!currentBatch){showToast('请先在出货批次列表中选择批次','gold');n=1;}
+  else{
+    var gate=stepGateReason(n);
+    if(gate){showToast(gate,'gold');return;}
+  }
+  currentStep=n;
+  for(var i=1;i<=5;i++){
+    var v=document.getElementById('view-step'+i);
+    var s=document.getElementById('s'+i);
+    if(v)v.style.display=(i===n)?'block':'none';
+    if(s){
+      s.className='step';
+      if(i<n)s.className='step done';
+      else if(i===n)s.className='step active';
+    }
+  }
+  var labels=['选择批次','上游溯源','下游核验','审批流程','签发证书'];
+  setText('current-step-pill', labels[n-1]);
+  if(n===2&&currentBatch)renderUpstream();
+  if(n===3&&currentBatch)renderDownstream();
+  if(n===4&&currentBatch)renderApproval();
+  syncStepGateButtons();
+}
+
+/* ── 批次管理 ── */
+function openNewBatch(){document.getElementById('new-batch-modal').style.opacity='1';document.getElementById('new-batch-modal').style.pointerEvents='all';}
+function closeNewBatch(){document.getElementById('new-batch-modal').style.opacity='0';document.getElementById('new-batch-modal').style.pointerEvents='none';}
+
+function createBatch(){
+  var id=(document.getElementById('nb-id')||{}).value||('2026-Q'+Math.ceil(new Date().getMonth()/3)+'-'+String(Math.floor(Math.random()*900)+100));
+  var product=(document.getElementById('nb-product')||{}).value||'出口产品';
+  var qty=parseFloat((document.getElementById('nb-qty')||{}).value)||0;
+  var date=(document.getElementById('nb-date')||{}).value||new Date().toISOString().slice(0,10);
+  var dest=(document.getElementById('nb-dest')||{}).value||'欧盟';
+  var upstream=(document.getElementById('nb-upstream')||{}).value||'待匹配';
+  var batch={id:id,product:product,qty:qty,date:date,dest:dest,upstream:upstream,status:'pending',upstreamFactor:null,downstreamOk:false,approved:false};
+  if(window.AppState&&typeof AppState.update==='function'){
+    var batches=getPath(AppState,'batchVerification.batches')||[];
+    batches.unshift(batch);
+    AppState.update('batchVerification.batches',batches);
+    AppState.save();
+  }
+  closeNewBatch();
+  renderBatchList(getPath(window.AppState,'batchVerification.batches')||[]);
+  showToast('✓ 批次 '+id+' 已创建，请选择批次开始核验');
+}
+
+function selectBatch(batchId){
+  var batches=getPath(window.AppState,'batchVerification.batches')||[];
+  currentBatch=batches.find(function(b){return b.id===batchId;})||null;
+  window.currentBatch=currentBatch;
+  if(!currentBatch)return;
+  document.querySelectorAll('.batch-card').forEach(function(c){c.classList.remove('active');});
+  var el=document.getElementById('bc-'+batchId);if(el)el.classList.add('active');
+  setTimeout(function(){goStep(2);},300);
+}
+
+function renderBatchList(batches){
+  var el=document.getElementById('batch-list');if(!el)return;
+  setText('batch-count-pill',batches.length+' 个批次');
+  var notice=document.getElementById('batch-prefill-notice');
+  var showPrefill=(batches||[]).some(function(b){return b&&b.systemSeeded&&b.status==='pending';});
+  if(notice)notice.style.display=showPrefill?'block':'none';
+  if(!batches.length){el.innerHTML='<div style="color:var(--ink3);font-size:12px;text-align:center;padding:24px">暂无批次（后端未返回历史批次）<br><span style="font-size:11px">请先在供应链协同完成一次申报/提交，或点击“新建核验批次”</span></div>';return;}
+  var STATUS={pending:{cls:'p-y',txt:'待核验'},verifying:{cls:'p-b',txt:'核验中'},approved:{cls:'p-t',txt:'审批中'},certified:{cls:'p-g',txt:'已签发'}};
+  el.innerHTML=batches.map(function(b){
+    var st=STATUS[b.status]||STATUS.pending;
+    var seedTag=b.systemSeeded?'<span class="pill p-b" style="margin-left:6px;font-size:10px">系统识别 · 待确认</span>':'';
+    return'<div class="batch-card" id="bc-'+b.id+'" data-bid="'+b.id+'" onclick="selectBatch(this.dataset.bid)">'+
+      '<div class="batch-id">批次 '+b.id+seedTag+'</div>'+
+      '<div class="batch-name">'+b.product+'</div>'+
+      '<div class="batch-meta">'+
+        '<span>📦 '+b.qty+'吨</span>'+
+        '<span>📅 '+b.date+'</span>'+
+        '<span>🚢 '+b.dest+'</span>'+
+        '<span class="pill '+st.cls+'" style="margin-left:auto">'+st.txt+'</span>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+/* ── 供应链绑定检查：引用因子前校验是否有申报关系 ── */
+function hasSupplyChainBinding(){
+  if(!currentBatch)return false;
+  /* 来源一（权威）：后端已确认的供应链绑定 */
+  if(hasConfirmedBindingBackend())return true;
+  /* 来源二：批次创建时填写了上游原料来源（演示态弱校验） */
+  if(currentBatch.upstream&&currentBatch.upstream!=='待匹配')return true;
+  /* 来源三：本企业已在原厂的供应链绑定声明中完成认领 */
+  var optIns=getPath(window.AppState,'factorAuth.supplyChainBinding.downstreamOptIns')||[];
+  var myName=getPath(window.AppState,'company.name')||'';
+  return optIns.some(function(o){return o&&(o.companyName===myName);});
+}
+async function declareUpstreamForBatch(){
+  var v=prompt('请申报本批次的上游主要原料来源（如：宝武钢铁 · 武汉钢厂）：','');
+  if(!v||!v.trim())return;
+  currentBatch.upstream=v.trim();
+  if(window.AppState&&typeof AppState.update==='function'){
+    var batches=getPath(AppState,'batchVerification.batches')||[];
+    var idx=batches.findIndex(function(b){return b.id===currentBatch.id;});
+    if(idx>=0){batches[idx].upstream=currentBatch.upstream;AppState.update('batchVerification.batches',batches);AppState.save();}
+  }
+  /* 后端权威申报：写入 supply_chain_bindings，等待原厂确认（双向握手） */
+  try{
+    if(typeof apiFetch==='function'){
+      var resp=await apiFetch('hub/supply-binding/declare',{method:'POST',body:JSON.stringify({originQuery:currentBatch.upstream})});
+      if(resp&&resp.binding){
+        window._myBindings=(window._myBindings||[]).filter(function(b){return b.bindingId!==resp.binding.bindingId;});
+        window._myBindings.push(resp.binding);
+        showToast(resp.message||'✓ 供应链关系已申报');
+        renderUpstream();
+        return;
+      }
+    }
+  }catch(e){/* 后端不可用时退回本地演示链路 */}
+  showToast('✓ 供应链关系已申报，正在重新匹配因子池');
+  renderUpstream();
+}
+
+/* 拉取本企业在后端的绑定申报状态（页面加载/批次切换时刷新） */
+async function refreshMyBindings(){
+  try{
+    if(typeof apiFetch!=='function')return;
+    var resp=await apiFetch('hub/supply-binding/mine',{method:'GET'});
+    if(resp&&Array.isArray(resp.bindings))window._myBindings=resp.bindings;
+  }catch(e){/* 离线演示态忽略 */}
+}
+function hasConfirmedBindingBackend(){
+  return (window._myBindings||[]).some(function(b){return b&&b.status==='confirmed';});
+}
+
+async function persistFactorConsumeToBackend(batch, factor, optedIn){
+  try{
+    if(typeof apiFetch!=='function' || !batch) return null;
+    var payload={
+      batchId:String(batch.id||'').trim()||('BATCH-'+Date.now()),
+      qtyTons:Number(batch.qty)||0,
+      claimMode: optedIn ? 'claimed' : 'anonymous'
+    };
+    return await apiFetch('hub/factor-consume',{method:'POST',body:JSON.stringify(payload)});
+  }catch(_){
+    return null;
+  }
+}
+
+/* 写入原厂消费账本（演示态本地记账；正式版由后端台账 API 下发） */
+function recordFactorConsumption(choice){
+  var st=window.AppState;if(!st)return;
+  if(typeof ensureFactorAuthLedgerShape==='function'){try{ensureFactorAuthLedgerShape(st);}catch(_){}}
+  var fa=st.factorAuth||{};var cl=fa.consumptionLedger;if(!cl)return;
+  var factor=Number(fa.confirmedFactor)||0;
+  var ind=fa.confirmedIndustry||'steel';
+  var indLabel=({steel:'钢铁',aluminum:'铝业',cement:'水泥'})[ind]||ind;
+  var qty=Number(currentBatch.qty)||0;
+  var DEFAULTS={steel:2.1,aluminum:1.82,cement:0.89}; /* data-ghost-ignore · 行业均值 */
+  var defFactor=DEFAULTS[ind]||factor*1.35;
+  var tonnage=qty*factor;
+  var saved=Math.max(0,(defFactor-factor))*qty*75.36; /* €75.36/t CBAM 参考碳价 */
+  cl.total.count=(Number(cl.total.count)||0)+1;
+  cl.total.carbonTonnage=Math.round(((Number(cl.total.carbonTonnage)||0)+tonnage)*100)/100;
+  cl.total.taxSavedEur=Math.round((Number(cl.total.taxSavedEur)||0)+saved);
+  var rowI=cl.byIndustry.find(function(r){return r.industryCode===ind;});
+  if(!rowI){rowI={industryCode:ind,industryLabel:indLabel,count:0,carbonTonnage:0};cl.byIndustry.push(rowI);}
+  rowI.count+=1;rowI.carbonTonnage=Math.round((rowI.carbonTonnage+tonnage)*100)/100;
+  var month=new Date().toISOString().slice(0,7);
+  var rowM=cl.byMonth.find(function(r){return r.month===month;});
+  if(!rowM){rowM={month:month,count:0,carbonTonnage:0,taxSavedEur:0};cl.byMonth.push(rowM);}
+  rowM.count+=1;rowM.carbonTonnage=Math.round((rowM.carbonTonnage+tonnage)*100)/100;rowM.taxSavedEur=Math.round(rowM.taxSavedEur+saved);
+  var co=st.company||{};
+  if(choice==='claimed'){
+    var existed=cl.claimedConsumers.find(function(c){return c.companyName===co.name;});
+    if(existed){existed.refCount=(Number(existed.refCount)||0)+1;}
+    else{cl.claimedConsumers.push({workspaceId:co.creditCode||null,companyName:co.name||'未署名企业',industryCode:co.industryCode||ind,claimedAt:new Date().toISOString(),refCount:1});}
+    var sb=fa.supplyChainBinding;
+    if(sb&&!sb.downstreamOptIns.some(function(o){return o.companyName===co.name;})){
+      sb.downstreamOptIns.push({workspaceId:co.creditCode||null,companyName:co.name||'未署名企业',optInAt:new Date().toISOString()});
+    }
+  }else{
+    cl.anonymousConsumers.push({industryCode:co.industryCode||ind,region:co.exportCountries?String(co.exportCountries).split(/[,，]/)[0]:'华中地区',refAt:new Date().toISOString()});
+  }
+  if(typeof st.update==='function'){st.update('factorAuth.consumptionLedger',cl);if(typeof st.save==='function')st.save();}
+}
+
+/**
+ * 校验上游原料是否已由管理员申报
+ * [CURSOR注意] 此函数是反竞争保护机制的前端实现
+ * 生产环境由后端二次校验，前端仅做本地缓存快速校验
+ */
+function checkUpstreamDeclaration(upstreamInput) {
+  var binding = getPath(window.AppState, 'factorAuth.supplyChainBinding');
+  if (!binding || !binding.upstreamMaterials || !binding.upstreamMaterials.length) {
+    return false;
+  }
+  var input = (upstreamInput || '').toLowerCase();
+  return binding.upstreamMaterials.some(function(m) {
+    return !!(m && m.matchedFromPool && input.length > 0);
+  });
+}
+
+/* ── 上游溯源 ── */
+function renderUpstream() {
+  var el = document.getElementById('upstream-layers');
+  if (!el || !currentBatch) return;
+
+  var confirmedFactor = getPath(window.AppState, 'factorAuth.confirmedFactor');
+  var confirmedInd = getPath(window.AppState, 'factorAuth.confirmedIndustry');
+
+  // [供应链绑定校验 - 反竞争保护核心逻辑]
+  var bindingDeclared = checkUpstreamDeclaration(currentBatch.upstream);
+  try{
+    (typeof emitAppStateEvent==='function'?emitAppStateEvent:EventBus.emit)('SUPPLY_CHAIN_BINDING_CHECK',{
+      batchId:currentBatch.id, upstream:currentBatch.upstream, bindingDeclared:bindingDeclared
+    });
+  }catch(_){}
+  var hasPool = confirmedFactor && confirmedFactor > 0 && bindingDeclared;
+  var upstreamText = currentBatch.upstream || '待匹配';
+
+  el.innerHTML = '<div class="layer-card">'+
+    '<div class="layer-head">'+
+      '<div class="layer-ic" style="background:var(--orange-d);border:1px solid var(--orange-b)">🏭</div>'+
+      '<div class="layer-title">上游原料来源：'+upstreamText+'</div>'+
+      '<span class="pill '+(hasPool?'p-g':'p-o')+'">'+(hasPool?'因子已匹配':'因子待入池')+'</span>'+
+    '</div>'+
+    (hasPool?
+      '<div class="factor-match">'+
+        '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="var(--green)" stroke-width="1.2"/><polyline points="4,7 6.5,9.5 10.5,4.5" stroke="var(--green-l)" stroke-width="1.4" stroke-linecap="round"/></svg>'+
+        '<span style="color:var(--green-l)">已从公共因子核验池匹配：<strong>'+confirmedFactor.toFixed(3)+' tCO₂e/t</strong>（'+(confirmedInd?{steel:'钢铁',aluminum:'铝业',cement:'水泥'}[confirmedInd]:'原厂')+' · Lv.4确权）</span>'+
+      '</div>'
+    :
+      '<div class="factor-missing">'+
+        '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="var(--orange)" stroke-width="1.2"/><line x1="7" y1="4" x2="7" y2="8" stroke="var(--orange-l)" stroke-width="1.4" stroke-linecap="round"/><circle cx="7" cy="10" r=".8" fill="var(--orange-l)"/></svg>'+
+        '<span style="color:var(--orange-l)">'+
+          ((confirmedFactor&&confirmedFactor>0)
+            ? '未通过供应链绑定校验 · 已降级为行业均值（请管理员申报供应链关系）'
+            : '未匹配到确权因子 · 临时使用行业均值（钢铁2.1 / 铝业1.82 / 水泥0.89 tCO₂e/t）')+ /* data-ghost-ignore */
+        '</span>'+
+        '<button onclick="declareUpstreamForBatch()" style="padding:3px 9px;border-radius:6px;border:1px solid var(--orange-b);background:var(--orange-d);color:var(--orange-l);font-size:10px;cursor:pointer;font-family:Noto Sans SC,sans-serif;margin-left:auto;white-space:nowrap">申报上游来源</button>'+
+      '</div>'
+    )+
+    '<div style="margin-top:8px;padding:8px 12px;background:var(--bg4);border-radius:8px;font-size:11px;color:var(--ink3)">上游数据由CL-IVC零知识证明协议确权，原始能耗数据不出域</div>'+
+  '</div>';
+
+  if (currentBatch) {
+    currentBatch.upstreamFactor = hasPool ? confirmedFactor : null;
+    if (window.AppState && typeof AppState.update === 'function') {
+      var batches = getPath(AppState, 'batchVerification.batches') || [];
+      var idx = batches.findIndex(function(b){ return b.id === currentBatch.id; });
+      if (idx >= 0) {
+        batches[idx].upstreamFactor = currentBatch.upstreamFactor;
+        AppState.update('batchVerification.batches', batches);
+      }
+    }
+  }
+  syncStepGateButtons();
+}
+
+/* ── 下游核验（supplierNodes + supplier-conclusion + claim-verify） ── */
+async function renderDownstream(){
+  if(currentBatch&&!isUpstreamComplete(currentBatch)){
+    var blocked=document.getElementById('downstream-layers');
+    if(blocked)blocked.innerHTML='<div style="color:var(--orange-l);font-size:12px;text-align:center;padding:20px;line-height:1.65">🔒 上游溯源尚未完成<br><span style="color:var(--ink3)">请返回 Step 2 完成因子池匹配后再进行下游核验</span></div>';
+    syncStepGateButtons();
+    return;
+  }
+  if(typeof window.hengaiRenderDownstreamVerification==='function'){
+    await window.hengaiRenderDownstreamVerification(currentBatch);
+    return;
+  }
+  var el=document.getElementById('downstream-layers');
+  if(el)el.innerHTML='<div style="color:var(--ink3);font-size:12px;text-align:center;padding:16px">下游核验模块未加载</div>';
+}
+
+function handleRecheck(btn){
+  var nodeId=btn&&btn.getAttribute?btn.getAttribute('data-node-id'):'';
+  var n=btn&&btn.getAttribute?btn.getAttribute('data-sname'):'';
+  if(typeof window.hengaiSendDownstreamRecheck==='function'){
+    window.hengaiSendDownstreamRecheck(nodeId,n);
+    return;
+  }
+  showToast('已向 '+n+' 发送数据复核请求');
+}
+
+/* ── 审批流程 ── */
+function renderApproval(){
+  var el=document.getElementById('approval-track');if(!el||!currentBatch)return;
+  var now=new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  var user=getPath(window.AppState,'user.name')||'合规负责人';
+  el.innerHTML=[
+    {role:'合规操作员：'+user, status:'done', ts:now, desc:'完成上游溯源和下游核验，数据汇总完毕'},
+    {role:'企业管理员（授权审批人）', status:'pending', ts:'待确认', desc:'请管理员登录后对本批次核验结论进行二次确认'},
+    {role:'CL-IVC链上存证', status:'waiting', ts:'审批通过后自动执行', desc:'审批完成后自动触发链上哈希存证，生成不可篡改的合规凭证'},
+  ].map(function(ap){
+    var color=ap.status==='done'?'var(--green)':ap.status==='pending'?'var(--gold)':'var(--ink3)';
+    return'<div class="approval-step">'+
+      '<div class="ap-dot" style="background:'+color+'"></div>'+
+      '<div style="flex:1"><div class="ap-role">'+ap.role+'</div><div style="font-size:11px;color:var(--ink3)">'+ap.desc+'</div></div>'+
+      '<div class="ap-ts">'+ap.ts+'</div>'+
+    '</div>';
+  }).join('');
+
+  var uf=Number(currentBatch.upstreamFactor);
+  setText('asum-batch', currentBatch.id);
+  setText('asum-factor', uf>0?uf.toFixed(3):'—');
+}
+
+function submitApproval(){
+  if(!currentBatch)return;
+  var gate=stepGateReason(4);
+  if(gate){showToast(gate,'gold');return;}
+  if(window.AppState&&typeof AppState.update==='function'){
+    currentBatch.approved=true;
+    var batches=getPath(AppState,'batchVerification.batches')||[];
+    var idx=batches.findIndex(function(b){return b.id===currentBatch.id;});
+    if(idx>=0){batches[idx].status='approved';batches[idx].approved=true;AppState.update('batchVerification.batches',batches);}
+    AppState.save();
+  }
+  showToast('✓ 审批申请已提交 · 管理员将收到确认通知');
+  setTimeout(function(){issueCert();},1200);
+}
+
+/* ── 证书签发 ── */
+function issueCert(){
+  if (!currentBatch) return;
+  // [认领选择弹窗 - 三层可见性模型实现]
+  showOptInDialog(function(optedIn) {
+    doIssueCert(optedIn);
+  });
+}
+
+function showOptInDialog(callback) {
+  var modal = document.getElementById('optin-modal');
+  if (!modal) {
+    callback(false);
+    return;
+  }
+  modal.classList.add('open');
+  window._optInCallback = callback;
+}
+
+function confirmOptIn(optedIn) {
+  var modal = document.getElementById('optin-modal');
+  if (modal) modal.classList.remove('open');
+  if (typeof window._optInCallback === 'function') {
+    window._optInCallback(optedIn);
+  }
+}
+
+async function doIssueCert(optedIn) {
+  if (!currentBatch) return;
+  var gate = stepGateReason(4);
+  if (gate) { showToast(gate, 'gold'); return; }
+  if (!isUpstreamComplete(currentBatch)) { showToast('上游因子未匹配，无法签发证书', 'gold'); return; }
+  var certNo = 'CERT-CL-2026-' + String(certCounter++).padStart(6, '0');
+  var factor = Number(currentBatch.upstreamFactor).toFixed(3);
+  var issueDate = new Date().toLocaleDateString('zh-CN');
+
+  // 计算节税和服务费
+  var euDefaultFactor = 2.1;
+  var qty = Number(currentBatch.qty) || 0;
+  var carbonPrice = 75;
+  var taxSavedEur = Math.round((euDefaultFactor - parseFloat(factor)) * qty * carbonPrice);
+  var serviceFeePct = 0.03;
+  var nursingFundPct = 0.01;
+  var serviceFeeEur = Math.round(taxSavedEur * serviceFeePct);
+  var nursingFundEur = Math.round(taxSavedEur * nursingFundPct);
+  var backendConsume = await persistFactorConsumeToBackend(currentBatch, parseFloat(factor), optedIn);
+  if (backendConsume && backendConsume.success) {
+    if (Number.isFinite(Number(backendConsume.taxSavedEur))) taxSavedEur = Number(backendConsume.taxSavedEur);
+    if (Number.isFinite(Number(backendConsume.serviceFeeEur))) serviceFeeEur = Number(backendConsume.serviceFeeEur);
+    if (Number.isFinite(Number(backendConsume.nursingFundEur))) nursingFundEur = Number(backendConsume.nursingFundEur);
+  }
+
+  // 更新 AppState
+  if (window.AppState && typeof AppState.update === 'function') {
+    var certs = getPath(AppState, 'batchVerification.certificates') || [];
+    certs.unshift({
+      certNo: certNo,
+      batchId: currentBatch.id,
+      factor: parseFloat(factor),
+      dest: currentBatch.dest,
+      issueDate: issueDate,
+      taxSavedEur: taxSavedEur,
+      serviceFeeEur: serviceFeeEur,
+      nursingFundEur: nursingFundEur,
+      userOptedIn: optedIn
+    });
+    AppState.update('batchVerification.certificates', certs);
+
+    var batches = getPath(AppState, 'batchVerification.batches') || [];
+    var idx = batches.findIndex(function(b) { return b.id === currentBatch.id; });
+    if (idx >= 0) {
+      batches[idx].status = 'certified';
+      AppState.update('batchVerification.batches', batches);
+    }
+
+    var usageLog = getPath(AppState, 'batchVerification.factorUsageLog') || [];
+    usageLog.unshift({
+      batchId: currentBatch.id,
+      factoryAnonymousId: 'FAC-' + String(Math.floor(Math.random()*900)+100),
+      industry: getPath(AppState, 'company.industryCode') || 'steel',
+      factorValue: parseFloat(factor),
+      bindingVerified: !!(currentBatch.upstreamFactor),
+      userOptedIn: !!optedIn,
+      taxSavedEur: taxSavedEur,
+      serviceFeePct: serviceFeePct,
+      serviceFeeEur: serviceFeeEur,
+      nursingFundEur: nursingFundEur,
+      timestamp: new Date().toISOString()
+    });
+    AppState.update('batchVerification.factorUsageLog', usageLog);
+
+    // 同步本地消费账本（便于当前会话即时可见；权威口径以后端台账为准）
+    if (typeof ensureFactorAuthLedgerShape === 'function') {
+      try { ensureFactorAuthLedgerShape(AppState); } catch (_) {}
+    }
+    var cl = getPath(AppState, 'factorAuth.consumptionLedger') || {};
+    var tt = cl.total || {};
+    tt.usageCount = (Number(tt.usageCount!=null?tt.usageCount:tt.count)||0) + 1;
+    tt.count = tt.usageCount;
+    tt.carbonTonnageCovered = (Number(tt.carbonTonnageCovered!=null?tt.carbonTonnageCovered:tt.carbonTonnage)||0) + qty;
+    tt.carbonTonnage = tt.carbonTonnageCovered;
+    tt.taxSavedEur = (Number(tt.taxSavedEur)||0) + taxSavedEur;
+    tt.serviceFeeEur = (Number(tt.serviceFeeEur)||0) + serviceFeeEur;
+    tt.nursingFundEur = (Number(tt.nursingFundEur)||0) + nursingFundEur;
+    cl.total = tt;
+    if (optedIn) {
+      var claimed = Array.isArray(cl.claimedConsumers) ? cl.claimedConsumers.slice() : [];
+      var name = getPath(AppState, 'company.name') || '未署名企业';
+      var cidx = claimed.findIndex(function(c){ return c.companyName === name; });
+      if (cidx < 0) {
+        claimed.push({
+          consumerId: 'CLM-' + String(Date.now()).slice(-6),
+          companyName: name,
+          industry: getPath(AppState, 'company.industryLabel') || getPath(AppState, 'company.industryCode') || '未知',
+          region: getPath(AppState, 'company.region') || '未知',
+          usageCount: 1,
+          carbonTonnage: qty,
+          taxSavedEur: taxSavedEur,
+          firstUsedAt: new Date().toISOString().slice(0,10),
+          lastUsedAt: new Date().toISOString().slice(0,10),
+          partnerStatus: 'regular',
+          inviteSent: false
+        });
+      } else {
+        claimed[cidx].usageCount = (Number(claimed[cidx].usageCount)||0) + 1;
+        claimed[cidx].carbonTonnage = (Number(claimed[cidx].carbonTonnage)||0) + qty;
+        claimed[cidx].taxSavedEur = (Number(claimed[cidx].taxSavedEur)||0) + taxSavedEur;
+        claimed[cidx].lastUsedAt = new Date().toISOString().slice(0,10);
+      }
+      cl.claimedConsumers = claimed;
+      var optIns = getPath(AppState, 'factorAuth.supplyChainBinding.downstreamOptIns') || [];
+      if (!optIns.some(function(o){ return o.companyName === name; })) {
+        optIns.push({ consumerId: 'CLM-' + String(Date.now()).slice(-6), companyName: name, optInAt: new Date().toISOString(), status: 'active' });
+        AppState.update('factorAuth.supplyChainBinding.downstreamOptIns', optIns);
+      }
+    } else {
+      var anon = Array.isArray(cl.anonymousRecords) ? cl.anonymousRecords.slice() : [];
+      anon.push({
+        anonymousId: '匿名企业-' + String(Math.floor(Math.random()*900)+100),
+        usageCount: 1,
+        carbonTonnage: qty,
+        taxSavedEur: taxSavedEur,
+        industry: getPath(AppState, 'company.industryLabel') || '未知',
+        inviteSent: false
+      });
+      cl.anonymousRecords = anon;
+      cl.anonymousConsumers = anon;
+    }
+    AppState.update('factorAuth.consumptionLedger', cl);
+    AppState.save();
+
+    // [CURSOR缝合点] 发射 BATCH_CERT_ISSUED 事件（含认领信息）
+    (typeof emitAppStateEvent==='function'?emitAppStateEvent:EventBus.emit)('BATCH_CERT_ISSUED', {
+      certNo: certNo,
+      batchId: currentBatch.id,
+      factor: parseFloat(factor),
+      dest: currentBatch.dest,
+      issueDate: issueDate,
+      taxSavedEur: taxSavedEur,
+      serviceFeeEur: serviceFeeEur,
+      nursingFundEur: nursingFundEur,
+      userOptedIn: optedIn,
+      companyName: optedIn ? (getPath(AppState, 'company.name') || null) : null
+    });
+
+    // [CURSOR缝合点] 发射 CONSUMPTION_LEDGER_UPDATED
+    (typeof emitAppStateEvent==='function'?emitAppStateEvent:EventBus.emit)('CONSUMPTION_LEDGER_UPDATED', {
+      usageCount: 1,
+      carbonTonnage: qty,
+      taxSavedEur: taxSavedEur,
+      serviceFeeEur: serviceFeeEur,
+      nursingFundEur: nursingFundEur,
+      claimedCompanyName: optedIn ? (getPath(AppState, 'company.name') || null) : null,
+      industry: getPath(AppState, 'company.industryLabel') || '未知',
+      region: getPath(AppState, 'company.region') || '未知'
+    });
+  }
+
+  // 更新证书展示
+  setText('cert-no', certNo);
+  setText('cert-factor', factor);
+  setText('cert-batch-id', currentBatch.id);
+  setText('cert-ship-date', currentBatch.date || '—');
+  setText('cert-dest', currentBatch.dest || '—');
+  setText('cert-issue-date', issueDate);
+
+  // 展示节税和服务费信息
+  var feeBlock = document.getElementById('cert-fee-info');
+  if (feeBlock) {
+    feeBlock.style.display = 'block';
+    setText('cert-tax-saved', taxSavedEur > 0 ? '€' + taxSavedEur.toLocaleString() : '—');
+    setText('cert-service-fee', '€' + serviceFeeEur.toLocaleString() + '（3%）');
+    setText('cert-nursing-fund', '€' + nursingFundEur.toLocaleString() + '（1%护航基金）');
+  }
+
+  goStep(5);
+  showToast('✓ 证书 ' + certNo + ' 已签发 · 节税 €' + taxSavedEur.toLocaleString() + ' · 服务费 €' + serviceFeeEur.toLocaleString());
+  try{
+    if(typeof loadOriginLedger==='function') loadOriginLedger();
+  }catch(_){}
+}
+
+function exportCert(){showToast('核验证书 PDF 正在生成...');}
+function sendToCustoms(){
+  /* [CURSOR缝合点-D] 传递证书数据到欧盟海关直连 */
+  if(window.AppState&&typeof AppState.update==='function'&&currentBatch){
+    AppState.update('cbam.pendingDeclaration',{batchId:currentBatch.id,certNo:document.getElementById('cert-no').textContent,factor:parseFloat(document.getElementById('cert-factor').textContent),dest:currentBatch.dest});
+    AppState.save();
+  }
+  showToast('正在跳转欧盟海关直连模块...');
+  setTimeout(function(){nav('HengAI_EU_Customs.html');},1000);
+}
+
+function goToFactory(){nav("HengAI_工业原厂精算.html");}
+function resetFlow(){currentBatch=null;window.currentBatch=null;goStep(1);}
+function showPendingApprovals(){showToast('待审批批次：管理员请登录审批中心确认');}
+
+function renderCertHistory(certs){
+  var el=document.getElementById('cert-history');if(!el)return;
+  setText('hist-count-pill',certs.length+' 张');
+  setText('tb-cert-count','已签发 '+certs.length+' 张证书');
+  if(!certs.length){el.innerHTML='<div style="color:var(--ink3);font-size:12px;text-align:center;padding:16px">暂无历史证书</div>';return;}
+  el.innerHTML=certs.map(function(c){
+    return'<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;margin-bottom:7px">'+
+      '<div style="font-family:DM Mono,monospace;font-size:11px;color:var(--blue-l);width:160px;flex-shrink:0">'+c.certNo+'</div>'+
+      '<div style="flex:1"><span style="font-size:12px;font-weight:600">批次 '+c.batchId+'</span><span style="font-size:10.5px;color:var(--ink3);margin-left:8px">'+c.dest+'</span></div>'+
+      '<span style="font-family:DM Mono,monospace;font-size:11px;color:var(--green-l)">'+c.factor.toFixed(3)+' tCO₂e/t</span>'+
+      '<span class="pill p-g">已签发</span>'+
+    '</div>';
+  }).join('');
+}
+
+function updateModuleUI(state){
+  bindStateNodes(state);
+  var bv=getPath(state,'batchVerification')||{};
+  renderBatchList(bv.batches||[]);
+  renderCertHistory(bv.certificates||[]);
+  var pending=(bv.pendingApprovals||[]).length;
+  setText('pending-badge', pending||'0');
+  syncStepGateButtons();
+}
+
+(function hookBus(){
+  if(!window.EventBus){setTimeout(hookBus,60);return;}
+  EventBus.on('STATE_SYNCED',function(state){updateModuleUI(state);});
+  // [CURSOR缝合点] 监听工业原厂精算模块的因子入池事件
+  // 因子入池后，重新校验当前批次的上游匹配状态
+  EventBus.on('FACTOR_POOL_UPDATED',function(payload){
+    if(currentStep===2&&currentBatch){
+      renderUpstream();
+      showToast('✓ 原厂因子已更新：'+payload.factoryName+' 入池 '+payload.factor.toFixed(3)+' tCO₂e/t，已自动更新匹配');
+    }
+  });
+  EventBus.on('SUPPLIER_DATA_READY',function(payload){
+    if(currentStep===3&&currentBatch){
+      renderDownstream();
+      showToast('✓ 供应商「'+(payload&&payload.supplierName?payload.supplierName:'')+'」数据已就绪，下游核验已刷新');
+    }
+  });
+})();
+
+window.addEventListener('DOMContentLoaded',function(){
+  function bootVerifyPage(){
+    if(typeof initAppState!=='function')return;
+    initAppState(function onReady(state){
+      ensureBatchVerificationShape(window.AppState||state||{});
+      var seeded=buildBatchesFromOverviewSnapshot(window.AppState||state||{});
+      var emitSync=function(){
+        (typeof emitAppStateEvent==='function'?emitAppStateEvent:EventBus.emit)('STATE_SYNCED',window.AppState||state);
+      };
+      if(seeded>0){emitSync();return;}
+      hydrateVerificationFromBackendSnapshot().finally(emitSync);
+    });
+    refreshMyBindings();
+  }
+  if(typeof window.whenHengaiAppStateReady==='function'){
+    window.whenHengaiAppStateReady(bootVerifyPage);
+  }else{
+    bootVerifyPage();
+  }
+});
+</script>
+</body></html>

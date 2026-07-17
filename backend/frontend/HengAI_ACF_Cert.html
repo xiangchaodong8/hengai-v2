@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · ACF 认证 & GEC 交易</title>
+<script>
+/* 嵌入模式：?embed=1 时隐藏原页 chrome (sidebar/topbar)，仅呈现内容模块 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<style>
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .sb,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] .main,
+html[data-embed="1"] .main-wrap { margin-left: 0 !important; }
+html[data-embed="1"] body { padding-left: 0 !important; background: var(--night, #06080f) !important; }
+</style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+:root{--night:#06080f;--dark:#0a0e1a;--panel:#0d1220;--p2:#111827;--b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);--ink:#e8edf5;--ink2:#8a95a8;--ink3:#4a5568;--gold:#c9a84c;--gl:#f0d080;--gd:rgba(201,168,76,0.11);--green:#3b9e4a;--greenl:#7dd98a;--greend:rgba(59,158,74,0.1);--teal:#1d9e75;--teall:#6dd5b0;--teald:rgba(29,158,117,0.09);--blue:#185fa5;--bluel:#93c5fd;--blued:rgba(24,95,165,0.1);--red:#e24b4a;--redl:#fca5a5;--redd:rgba(226,75,74,0.09);--purple:#7f77dd;--purpl:#c4b5fd;--purpd:rgba(127,119,221,0.09);}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--night);color:var(--ink);font-family:'Noto Sans SC',sans-serif;font-size:13px;line-height:1.6;min-height:100vh}
+.sb{width:200px;background:var(--dark);border-right:1px solid var(--b);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50}
+.sb-logo{padding:15px 14px 12px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:9px}
+.sb-li{width:28px;height:28px;border-radius:7px;background:var(--greend);border:1px solid rgba(59,158,74,0.35);display:flex;align-items:center;justify-content:center}
+.sb-tx{font-size:13px;font-weight:700}.sb-sub{font-size:9px;color:var(--ink3);margin-top:1px}
+.nav-s{padding:10px 13px 4px;font-size:9px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;font-weight:600}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 13px;font-size:12px;color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all 0.15s}
+.ni:hover{color:var(--ink);background:rgba(255,255,255,0.04)}
+.ni.on{color:var(--ink);background:rgba(255,255,255,0.06);border-left-color:var(--teal)}
+.nd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-ft{margin-top:auto;padding:11px 13px;border-top:1px solid var(--b)}
+.u-av{width:28px;height:28px;border-radius:50%;background:var(--teald);border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--teall);flex-shrink:0}
+.main{margin-left:200px}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(6,8,15,0.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--b);padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.tl{display:flex;align-items:center;gap:10px}
+.tt{font-size:14px;font-weight:500}
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.pl-g{background:var(--greend);color:var(--greenl);border:1px solid rgba(59,158,74,0.3)}
+.pl-t{background:var(--teald);color:var(--teall);border:1px solid rgba(29,158,117,0.3)}
+.pl-y{background:var(--gd);color:var(--gl);border:1px solid rgba(201,168,76,0.3)}
+.pl-b{background:var(--blued);color:var(--bluel);border:1px solid rgba(24,95,165,0.3)}
+.pl-gray{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--b)}
+.tr{display:flex;align-items:center;gap:8px}
+.tb-btn{padding:5px 13px;border-radius:7px;font-size:11.5px;font-weight:500;border:1px solid var(--b2);background:transparent;color:var(--ink);cursor:pointer;font-family:inherit;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.07)}
+.tb-btn.pri{background:var(--teald);border-color:rgba(29,158,117,0.45);color:var(--teall)}
+.page{padding:24px 28px 72px;max-width:1060px}
+.card{background:var(--panel);border:1px solid var(--b);border-radius:14px;padding:18px 20px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.div{border:none;border-top:1px solid var(--b);margin:14px 0}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-t{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.1px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sh-line{flex:1;height:1px;background:var(--b)}
+.sh-a{font-size:11px;color:var(--teall);cursor:pointer;white-space:nowrap}
+.f-group{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+.f-label{font-size:11.5px;font-weight:500;color:var(--ink)}
+.f-input{background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;transition:border-color 0.2s;width:100%}
+.f-input:focus{border-color:rgba(29,158,117,0.5)}
+.f-select{background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;width:100%;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%234a5568' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu 0.4s ease both}
+.fu1{animation-delay:.05s}.fu2{animation-delay:.12s}.fu3{animation-delay:.18s}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--p2);border:1px solid rgba(29,158,117,0.4);border-radius:11px;padding:11px 16px;display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--teall);z-index:9999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;min-width:240px}
+
+/* ACF specific */
+.acf-hero{background:var(--panel);border:1px solid rgba(29,158,117,0.28);border-radius:16px;overflow:hidden;margin-bottom:18px;position:relative}
+.acf-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(29,158,117,0.65),rgba(59,158,74,0.5),transparent)}
+.ah-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--b);border-top:1px solid var(--b)}
+.ahk{background:rgba(8,12,22,0.95);padding:13px 16px;text-align:center}
+.ahk-v{font-family:'DM Mono',monospace;font-size:19px;font-weight:700;letter-spacing:-0.5px;line-height:1;margin-bottom:3px}
+.ahk-l{font-size:10px;color:var(--ink3)}
+.ahk-s{font-size:9.5px;font-weight:600;margin-top:3px}
+
+/* Factor live display */
+.factor-live{background:rgba(0,0,0,0.3);border:1px solid rgba(29,158,117,0.2);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.fl-left{display:flex;align-items:center;gap:9px}
+.fl-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse 1.5s infinite;flex-shrink:0}
+.fl-label{font-size:12px;color:var(--ink2)}
+.fl-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--teall)}
+.fl-time{font-size:10px;color:var(--ink3)}
+
+/* Steps */
+.step-list{display:flex;flex-direction:column;gap:0;position:relative;padding-left:28px}
+.step-list::before{content:'';position:absolute;left:10px;top:14px;bottom:14px;width:1px;background:var(--b)}
+.step-item{display:flex;gap:14px;padding-bottom:14px;position:relative}
+.step-item:last-child{padding-bottom:0}
+.step-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;z-index:1;position:absolute;left:-28px;top:1px}
+.s-done{background:var(--greend);border:1.5px solid var(--green);color:var(--greenl)}
+.s-active{background:var(--blued);border:1.5px solid var(--bluel);color:var(--bluel)}
+.s-lock{background:rgba(255,255,255,0.03);border:1.5px solid var(--b2);color:var(--ink3)}
+.step-body{flex:1;background:rgba(0,0,0,0.2);border:1px solid var(--b);border-radius:10px;padding:10px 13px}
+.step-title{font-size:12.5px;font-weight:600;margin-bottom:2px}
+.step-desc{font-size:11px;color:var(--ink2);line-height:1.6}
+
+/* Tab */
+.page-tabs{display:flex;gap:0;border-bottom:1px solid var(--b);margin-bottom:18px}
+.pt{padding:10px 18px;font-size:12.5px;font-weight:500;cursor:pointer;transition:all 0.18s;border-bottom:2px solid transparent}
+</style>
+<style id="qa-sidebar-css">
+/* HengAI V2.0 QA · 全站统一侧栏基线
+   设计原则：
+   1. 容器级规则使用 :where() 零特异性 —— 页面自己的 .sidebar{} 原生规则优先
+   2. 内部元素 (.sb-brand/.sb-item/...) 使用普通选择器 —— 提供基线视觉
+   3. 不动 .main —— 每页主区偏移由自家 CSS 决定（不污染 flex 布局）
+*/
+:where(.sidebar#sidebar[data-qa-version="2.0"]){width:200px;background:#0b0f19;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;overflow-y:auto;font-family:inherit}
+.sidebar .sb-brand{padding:17px 15px 13px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sidebar .sb-brand-ic{width:32px;height:32px;border-radius:9px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar .sb-brand-name{font-size:14px;font-weight:700;letter-spacing:.2px;color:#e6e9f2}
+.sidebar .sb-brand-sub{font-size:9.5px;color:#8a92a8;margin-top:1px}
+.sidebar .sb-group-title{font-size:9.5px;text-transform:uppercase;color:#8a92a8;letter-spacing:.6px;padding:14px 18px 6px;font-weight:600}
+.sidebar .sb-item{padding:9px 18px;font-size:12.5px;color:#c3cbdc;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .12s;border-left:2px solid transparent;font-family:inherit;line-height:1.3}
+.sidebar .sb-item:hover{background:rgba(255,255,255,0.03);color:#e6e9f2}
+.sidebar .sb-item.active{background:rgba(16,185,129,0.08);border-left-color:#10b981;color:#e6e9f2;font-weight:600}
+.sidebar .sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* 嵌入模式（?embed=1）：只露内容，侧栏/顶栏/老 .sb 全部隐藏，主区 margin 归零 */
+html[data-embed="1"] .sidebar,html[data-embed="1"] .sb,html[data-embed="1"] .topbar{display:none !important}
+html[data-embed="1"] body{padding-left:0 !important}
+html[data-embed="1"] .main,html[data-embed="1"] .main-wrap,html[data-embed="1"] .main-content{margin-left:0 !important}
+</style>
+</head>
+<body>
+<!-- CANONICAL SIDEBAR — HengAI V2.0 QA 统一版 -->
+<div class="sidebar" id="sidebar" data-qa-version="2.0">
+  <div class="sb-brand">
+    <div class="sb-brand-ic">
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+    </div>
+    <div>
+      <div class="sb-brand-name">HengAI</div>
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+    </div>
+  </div>
+
+  <!-- 逃生舱：返回 HengAI 对话大厅 -->
+  <div style="padding:12px 14px 4px;">
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      返回 HengAI 对话
+    </div>
+  </div>
+
+  <div class="sb-group-title">个人工作台</div>
+  <div class="sb-item" data-page="overview"   onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+  <div class="sb-item" data-page="achieve"    onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+  <div class="sb-item" data-page="calc"       onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+  <div class="sb-item" data-page="resource"   onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+  <div class="sb-item" data-page="knowledge"  onclick="window.location.href='HengAI_法规知识库.html'"><div class="sb-dot" style="background:#c4b5fd"></div>企业法规库</div>
+
+  <div class="sb-group-title">企业工作台</div>
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+  <div class="sb-item" data-page="supply"     onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" style="background:#6dd5b0"></div>供应链协同</div>
+  <div class="sb-item" data-page="report"     onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+  <div class="sb-item" data-page="decision"   onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-group-title">大国重器</div>
+  <div class="sb-item" data-page="honor"      onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+  <div class="sb-item" data-page="gov"        onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:#6dd5b0"></div>生态共治委员会</div>
+
+  <div class="sb-group-title">深潜模块</div>
+  <div class="sb-item" data-page="wallet"     onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+  <div class="sb-item" data-page="eu"         onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:#93c5fd"></div>欧盟海关直连</div>
+  <div class="sb-item" data-page="dld"        onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:#10b981"></div>DLD 绿色信贷</div>
+  <div class="sb-item" data-page="acf"        onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:#6dd5b0"></div>ACF 大湾区认证</div>
+</div>
+<script id="qa-sidebar-active-script">
+/* 基于当前文件名自动高亮对应菜单项（全站共用） */
+(function(){
+  var map = {"全域中心.html":"overview","index.html":"overview","HengAI_星火成就档案.html":"achieve","HengAI_CBAM测算工具.html":"calc","HengAI_算力资源.html":"resource","HengAI_法规知识库.html":"knowledge","HengAI_企业数字档案.html":"enterprise","HengAI_供应链协同.html":"supply","HengAI_全域诊断报告.html":"report","HengAI_决策层呈送包生成器.html":"decision","HengAI_荣誉体系.html":"honor","HengAI_Governance.html":"gov","HengAI_GM_Wallet.html":"wallet","HengAI_EU_Customs.html":"eu","HengAI_DLD_Credit.html":"dld","HengAI_ACF_Cert.html":"acf"};
+  try {
+    var fn = decodeURIComponent((location.pathname.split("/").pop() || "").split("?")[0]);
+    var id = map[fn]; if (!id) return;
+    document.querySelectorAll(".sidebar .sb-item[data-page]").forEach(function(el){
+      if (el.getAttribute("data-page") === id) el.classList.add("active");
+    });
+  } catch(e){}
+})();
+</script>
+
+<div class="main">
+<div class="topbar">
+  <div class="tl">
+    <span class="tt">ACF 大湾区低碳认证 · 自动化流水线</span>
+    <span class="pill pl-t" style="animation:pulse 2s infinite">
+      <span style="width:5px;height:5px;border-radius:50%;background:var(--teall);display:inline-block;margin-right:4px"></span>
+      广东实时因子 API 已接入
+    </span>
+    <span class="pill pl-g">预填完成度 94%</span>
+  </div>
+  <div class="tr">
+    <button class="tb-btn" onclick="showToast('ACF 认证标准文档已打开')">查看标准</button>
+    <button class="tb-btn pri" onclick="submitACF()">一键提交认证申请 →</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="acf-hero fu fu1">
+    <div style="padding:22px 26px 18px;background:linear-gradient(135deg,rgba(29,158,117,0.07) 0%,transparent 60%)">
+      <div style="font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teall);margin-bottom:8px">ACF · Area Carbon Footprint · 大湾区低碳认证</div>
+      <div style="font-size:18px;font-weight:600;margin-bottom:6px">Co2Lion 是帮你拿到 ACF 证书的自动化流水线</div>
+      <div style="font-size:11.5px;color:var(--ink2);line-height:1.75;max-width:640px;margin-bottom:14px">大湾区推行 ACF 认证，使用广东实时碳因子——与我们的动态因子库完全兼容。Co2Lion 主动对接深圳/广东监管局，官方接入 ACF 实时碳因子 API。企业在 Co2Lion 平台上完成数据采集后，<strong style="color:var(--teall)">一键即可提交 ACF 认证申请</strong>，免去 90% 的人工填报工作。</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="pill pl-t">广东监管局官方接口</span>
+        <span class="pill pl-g">与 CBAM 数据源共用</span>
+        <span class="pill pl-y">认证周期从 90 天 → 14 天</span>
+      </div>
+    </div>
+    <div class="ah-kpis">
+      <div class="ahk"><div class="ahk-v" style="color:var(--teall)">94%</div><div class="ahk-l">申请预填完成度</div><div class="ahk-s" style="color:var(--teall)">待确认 2 项</div></div>
+      <div class="ahk"><div class="ahk-v" style="color:var(--gold)">14天</div><div class="ahk-l">预计认证周期</div><div class="ahk-s" style="color:var(--gold)">传统 90 天</div></div>
+      <div class="ahk"><div class="ahk-v" style="color:var(--greenl)">实时</div><div class="ahk-l">广东碳因子更新</div><div class="ahk-s" style="color:var(--greenl)">小时级精度</div></div>
+      <div class="ahk"><div class="ahk-v" style="color:var(--bluel)">¥ 0</div><div class="ahk-l">额外材料费用</div><div class="ahk-s" style="color:var(--bluel)">数据已在链上</div></div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="page-tabs fu fu2">
+    <div class="pt" id="pt-apply" onclick="switchPT('apply')" style="color:var(--ink);border-bottom-color:var(--teal)">ACF 申请流水线</div>
+    <div class="pt" id="pt-factor" onclick="switchPT('factor')" style="color:var(--ink2)">广东实时因子仪表盘</div>
+    <div class="pt" id="pt-compare" onclick="switchPT('compare')" style="color:var(--ink2)">CBAM × ACF 双认证</div>
+  </div>
+
+  <!-- APPLY VIEW -->
+  <div id="pv-apply" class="fu fu2">
+    <div class="g2">
+      <!-- Application form (pre-filled) -->
+      <div>
+        <div class="sh"><div class="sh-t">认证申请表（自动预填）<div class="sh-line"></div></div><span class="sh-a">手动编辑</span></div>
+        <div class="card" style="margin-bottom:12px">
+          <div style="padding:7px 11px;background:var(--greend);border:1px solid rgba(59,158,74,0.2);border-radius:8px;font-size:11px;color:var(--greenl);margin-bottom:12px">
+            ✓ 已从企业档案 + MAT 数据自动预填 23 个字段 · 仅需确认 2 个字段
+          </div>
+          <div class="f-group"><div class="f-label">企业名称（已预填）</div><input class="f-input dyn-input-val dyn-ent-name" id="acf-company-name" value="待完善企业档案" style="color:var(--greenl)"></div>
+          <div class="f-group"><div class="f-label">认证产品类别（已预填）</div><input class="f-input dyn-input-val" id="acf-product-line" value="待确权" style="color:var(--greenl)"></div>
+          <div class="f-group"><div class="f-label">申报年度</div>
+            <select class="f-select"><option>2025年度</option><option selected>2026年度（进行中）</option></select>
+          </div>
+          <div class="f-group"><div class="f-label">碳因子方法论（已预填）</div><input class="f-input dyn-input-val" id="acf-factor-method" value="待确权" style="color:var(--greenl)"></div>
+          <div class="f-group"><div class="f-label">产品碳足迹（tCO₂e/t）（已预填）</div><input class="f-input dyn-input-val" id="acf-intensity" value="待确权" style="color:var(--greenl);font-family:'DM Mono',monospace;font-weight:600"></div>
+          <div class="f-group" style="border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:11px 12px;background:var(--gd)">
+            <div class="f-label" style="color:var(--gl)">⚠ 需确认：主要生产工序所在地</div>
+            <select class="f-select" style="border-color:rgba(201,168,76,0.4)">
+              <option>浙江省绍兴市（工厂主要所在地）</option>
+              <option>广东省深圳市（分支机构）</option>
+            </select>
+            <div style="font-size:10.5px;color:var(--gold);margin-top:4px">此字段影响适用碳因子版本，请确认</div>
+          </div>
+          <div class="f-group" style="border:1px solid rgba(201,168,76,0.3);border-radius:10px;padding:11px 12px;background:var(--gd)">
+            <div class="f-label" style="color:var(--gl)">⚠ 需确认：第三方审核机构选择</div>
+            <select class="f-select" style="border-color:rgba(201,168,76,0.4)">
+              <option>中国质量认证中心（CQC）—— 推荐</option>
+              <option>SGS 通标标准技术</option>
+              <option>TÜV 南德意志集团</option>
+            </select>
+          </div>
+        </div>
+        <button style="width:100%;padding:12px;border-radius:11px;font-size:13px;font-weight:600;border:1px solid rgba(29,158,117,0.4);cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--teal),rgba(29,158,117,0.6));color:#fff;transition:all 0.2s" onclick="submitACF()">一键提交至广东监管局 →</button>
+      </div>
+
+      <!-- Progress steps -->
+      <div>
+        <div class="sh"><div class="sh-t">认证进度 <div class="sh-line"></div></div></div>
+        <div class="step-list" style="margin-bottom:16px">
+          <div class="step-item">
+            <div class="step-dot s-done"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="var(--greenl)" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+            <div class="step-body"><div class="step-title" style="color:var(--greenl)">数据采集完成</div><div class="step-desc">MAT 网关数据 + 供应链 Scope 3 · 覆盖率 94% · 已链上存证</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot s-done"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="var(--greenl)" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+            <div class="step-body"><div class="step-title" style="color:var(--greenl)">广东因子校验通过</div><div class="step-desc">实时碳因子 API 已验证 · 与 CBAM 口径已对齐</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot s-active">3</div>
+            <div class="step-body" style="border-color:rgba(24,95,165,0.35)"><div class="step-title" style="color:var(--bluel)">申请表预填（当前）</div><div class="step-desc">23/25 字段自动预填 · 2 个字段等待用户确认</div></div>
+          </div>
+          <div class="step-item">
+            <div class="step-dot s-lock">4</div>
+            <div class="step-body"><div class="step-title" style="color:var(--ink3)">提交监管局</div><div class="step-desc">一键提交至广东省生态环境厅 ACF 平台</div></div>
+          </div>
+          <div class="step-item" style="padding-bottom:0">
+            <div class="step-dot s-lock">5</div>
+            <div class="step-body"><div class="step-title" style="color:var(--ink3)">获得 ACF 证书</div><div class="step-desc">审核周期约 14 天 · 证书自动导入企业档案</div></div>
+          </div>
+        </div>
+
+        <div style="background:var(--panel);border:1px solid var(--b);border-radius:13px;padding:14px 16px">
+          <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">ACF 认证的商业价值</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:8px;font-size:11.5px"><span style="color:var(--teal);flex-shrink:0">→</span><span style="color:var(--ink2)">大湾区采购商优先采购 ACF 认证供应商，出口溢价可达 3-8%</span></div>
+            <div style="display:flex;gap:8px;font-size:11.5px"><span style="color:var(--teal);flex-shrink:0">→</span><span style="color:var(--ink2)">与 CBAM 数据源共用，ACF 认证不产生额外的数据采集成本</span></div>
+            <div style="display:flex;gap:8px;font-size:11.5px"><span style="color:var(--teal);flex-shrink:0">→</span><span style="color:var(--ink2)">广东省绿色制造补贴申请的前提条件（最高 ¥50万）</span></div>
+            <div style="display:flex;gap:8px;font-size:11.5px"><span style="color:var(--teal);flex-shrink:0">→</span><span style="color:var(--ink2)">证书有效期 2 年，到期系统自动提醒并预填续期申请</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FACTOR VIEW -->
+  <div id="pv-factor" style="display:none" class="fu fu2">
+    <div class="g2">
+      <div>
+        <div class="sh"><div class="sh-t">广东实时碳因子仪表盘 <div class="sh-line"></div></div><span style="font-size:10.5px;color:var(--ink3)">小时级更新 · 官方 API</span></div>
+        <div class="factor-live">
+          <div class="fl-left"><div class="fl-dot"></div><div><div class="fl-label">当前 广东电网碳因子</div><div style="font-size:10px;color:var(--ink3)">2026-04-16 14:00</div></div></div>
+          <div style="text-align:right"><div class="fl-val">0.521 <span style="font-size:12px;font-weight:400;color:var(--ink3)">kgCO₂/kWh</span></div><div style="font-size:10px;color:var(--greenl)">↓ -5.4% vs 月均值 0.551</div></div>
+        </div>
+        <div style="background:rgba(0,0,0,0.25);border:1px solid var(--b);border-radius:11px;overflow:hidden;margin-bottom:12px">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--b);font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">今日24小时碳因子曲线</div>
+          <div style="padding:12px 14px;height:120px;position:relative">
+            <svg width="100%" height="100%" viewBox="0 0 500 96" preserveAspectRatio="none">
+              <polyline points="0,70 20,68 40,72 60,75 80,78 100,76 120,72 140,65 160,58 180,50 200,45 220,42 240,48 260,55 280,52 300,46 320,42 340,38 360,35 380,38 400,42 420,40 440,36 460,32 480,28 500,25"
+                fill="none" stroke="var(--teal)" stroke-width="1.5"/>
+              <polyline points="0,70 20,68 40,72 60,75 80,78 100,76 120,72 140,65 160,58 180,50 200,45 220,42 240,48 260,55 280,52 300,46 320,42 340,38 360,35 380,38 400,42 420,40 440,36 460,32 480,28 500,25 500,96 0,96"
+                fill="rgba(29,158,117,0.07)" stroke="none"/>
+              <!-- Current time marker -->
+              <line x1="280" y1="0" x2="280" y2="96" stroke="rgba(201,168,76,0.4)" stroke-width="1" stroke-dasharray="3 2"/>
+              <circle cx="280" cy="52" r="4" fill="var(--gold)"/>
+            </svg>
+            <div style="position:absolute;bottom:14px;left:14px;font-size:9px;color:var(--ink3)">00:00</div>
+            <div style="position:absolute;bottom:14px;right:14px;font-size:9px;color:var(--ink3)">23:59</div>
+          </div>
+        </div>
+        <div style="padding:11px 14px;background:var(--gd);border:1px solid rgba(201,168,76,0.2);border-radius:9px;font-size:11.5px;color:var(--gl);line-height:1.7">
+          <strong>生产调度建议：</strong>今日 14:00-20:00 碳因子处于低谷（0.48-0.52），建议将高能耗压铸工序安排在这个时段——可降低 Scope 2 排放约 <strong>5.8%</strong>，年累积效果相当于减少 4.2 tCO₂e，并优化 ACF 认证评分。
+        </div>
+      </div>
+      <div>
+        <div class="sh"><div class="sh-t">因子历史与趋势 <div class="sh-line"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:var(--panel);border:1px solid var(--b);border-radius:10px;padding:12px 14px">
+            <div style="font-size:10px;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600">分月均值对比</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:center;gap:10px;font-size:11.5px">
+                <span style="color:var(--ink2);width:60px">2026-04</span>
+                <div style="flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden"><div style="height:100%;width:55%;background:var(--teal);border-radius:3px"></div></div>
+                <span style="font-family:'DM Mono',monospace;color:var(--teall);width:55px;text-align:right">0.521</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:11.5px">
+                <span style="color:var(--ink2);width:60px">2026-03</span>
+                <div style="flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden"><div style="height:100%;width:63%;background:var(--gold);border-radius:3px"></div></div>
+                <span style="font-family:'DM Mono',monospace;color:var(--gl);width:55px;text-align:right">0.551</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:11.5px">
+                <span style="color:var(--ink2);width:60px">2026-02</span>
+                <div style="flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden"><div style="height:100%;width:68%;background:var(--redl);border-radius:3px"></div></div>
+                <span style="font-family:'DM Mono',monospace;color:var(--redl);width:55px;text-align:right">0.571</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:11.5px">
+                <span style="color:var(--ink2);width:60px">2026-01</span>
+                <div style="flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden"><div style="height:100%;width:72%;background:var(--redl);border-radius:3px"></div></div>
+                <span style="font-family:'DM Mono',monospace;color:var(--redl);width:55px;text-align:right">0.584</span>
+              </div>
+            </div>
+            <div style="font-size:10.5px;color:var(--greenl);margin-top:8px">广东碳因子持续下降趋势 · 水电比例提升中</div>
+          </div>
+          <div style="background:var(--panel);border:1px solid var(--b);border-radius:10px;padding:12px 14px">
+            <div style="font-size:10px;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600">对比：CBAM 使用因子 vs ACF 实时因子</div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--ink2)">CBAM 当前使用（华东 0.581）</span><span style="font-family:'DM Mono',monospace;color:var(--ink)">0.581</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--ink2)">ACF 广东实时因子</span><span style="font-family:'DM Mono',monospace;color:var(--greenl)">0.521</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--greenl);font-weight:600">使用广东因子可节省碳税</span><span style="font-family:'DM Mono',monospace;color:var(--greenl);font-weight:700">€ 3,120 / 季</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARE VIEW -->
+  <div id="pv-compare" style="display:none" class="fu fu2">
+    <div style="background:var(--panel);border:1px solid rgba(29,158,117,0.22);border-radius:14px;padding:18px 20px;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px">CBAM × ACF 双认证协同 · 一份数据，两张证书</div>
+      <div style="display:grid;grid-template-columns:1fr 32px 1fr;gap:14px;align-items:center">
+        <div style="background:var(--blued);border:1px solid rgba(24,95,165,0.25);border-radius:12px;padding:14px 16px">
+          <div style="font-size:10px;color:var(--bluel);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">欧盟 CBAM</div>
+          <div style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;color:var(--ink2)">
+            <div>碳边境调节税申报</div><div>面向欧盟进口商</div><div>EU Schema v3.0 XML</div>
+            <div style="color:var(--greenl);font-weight:600;margin-top:4px">✓ 已完成 3 次</div>
+          </div>
+        </div>
+        <div style="text-align:center;color:var(--teal)">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 3L25 9V19L14 25L3 19V9L14 3Z" stroke="var(--teal)" stroke-width="1.2" fill="rgba(29,158,117,0.1)"/><text x="14" y="18" text-anchor="middle" font-size="7.5" fill="var(--teall)" font-family="sans-serif" font-weight="700">共用</text></svg>
+          <div style="font-size:9.5px;color:var(--teal);margin-top:2px">数据</div>
+        </div>
+        <div style="background:var(--teald);border:1px solid rgba(29,158,117,0.25);border-radius:12px;padding:14px 16px">
+          <div style="font-size:10px;color:var(--teall);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">大湾区 ACF</div>
+          <div style="display:flex;flex-direction:column;gap:5px;font-size:11.5px;color:var(--ink2)">
+            <div>区域低碳产品认证</div><div>面向大湾区采购商</div><div>广东省生态环境厅标准</div>
+            <div style="color:var(--bluel);font-weight:600;margin-top:4px">→ 申请中</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:11px 14px;background:rgba(59,158,74,0.07);border:1px solid rgba(59,158,74,0.2);border-radius:9px;font-size:11.5px;color:var(--greenl);line-height:1.7">
+        <strong>核心优势：</strong>CBAM 和 ACF 使用同一套底层数据（MAT 物理采集 + 供应链 Scope 3 + 链上存证）。获得 CBAM 申报认可后，ACF 认证只需额外 2 个字段的确认——这是 Co2Lion 多标准共用数据架构的核心价值。
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div id="toast"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="var(--teall)" stroke-width="1.5" stroke-linecap="round"/></svg><span id="toast-msg"></span></div>
+<script>
+function switchPT(t){
+  ['apply','factor','compare'].forEach(id=>{
+    const tab=document.getElementById('pt-'+id);
+    const view=document.getElementById('pv-'+id);
+    if(tab){tab.style.color=id===t?'var(--ink)':'var(--ink2)';tab.style.borderBottomColor=id===t?'var(--teal)':'transparent';}
+    if(view)view.style.display=id===t?'block':'none';
+  });
+}
+function submitACF(){
+  showToast('ACF 认证申请已提交至广东省生态环境厅 · 预计 14 天内收到结果');
+}
+function showToast(msg){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.style.opacity='1';t.style.transform='translateY(0)';clearTimeout(window._tt);window._tt=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)'},2800);}
+</script>
+<script>
+(function () {
+  function applyAcfPipeline(p) {
+    if (!p) return;
+    var company = p.company || {};
+    var coName = company.name || '待完善企业档案';
+    var impact = p.impact || {};
+    var inp = document.getElementById('acf-company-name');
+    if (inp) inp.value = coName;
+    var product = document.getElementById('acf-product-line');
+    if (product) product.value = String((company.productLine || company.product_line || '待确权'));
+    var method = document.getElementById('acf-factor-method');
+    if (method) method.value = String((company.factorMethod || company.factor_method || '待确权'));
+    var intensity = document.getElementById('acf-intensity');
+    var scopeTotal = Number((impact.scope1 || 0)) + Number((impact.scope2 || 0)) + Number((impact.scope3 || 0));
+    var tons = Number((company.exportTons || company.export_tons || 0));
+    var ratio = tons > 0 ? (scopeTotal / tons) : 0;
+    if (intensity) intensity.value = ratio > 0 ? ratio.toFixed(2) : '待确权';
+  }
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || ev.data.type !== 'HENGAI_HUB_PIPELINE') return;
+    applyAcfPipeline(ev.data.payload);
+  });
+})();
+</script>
+</body>
+</html>

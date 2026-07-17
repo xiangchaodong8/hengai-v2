@@ -1,0 +1,274 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'SF Pro Text',sans-serif;background:transparent;color:var(--color-text-primary)}
+.screen{padding:32px 28px;border-radius:16px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);margin-bottom:16px}
+.muted{color:var(--color-text-secondary)}
+.tiny{font-size:11px;color:var(--color-text-secondary)}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px}
+.bg-blue{background:#e6f1fb;color:#0c447c}
+.bg-green{background:#eaf3de;color:#27500a}
+.bg-amber{background:#faeeda;color:#633806}
+.bg-teal{background:#e1f5ee;color:#085041}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:500;padding:9px 20px;border-radius:9px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);cursor:pointer;transition:background 0.15s}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-primary{background:#185fa5;border-color:#185fa5;color:#fff}
+.btn-primary:hover{background:#0c447c;border-color:#0c447c}
+.btn-lg{font-size:14px;padding:12px 28px;border-radius:10px;width:100%}
+.divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:20px 0}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label{font-size:12px;color:var(--color-text-secondary)}
+.field-val{font-size:13px;font-weight:500;color:var(--color-text-primary);background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:8px;padding:9px 12px}
+.progress-bar{height:4px;background:var(--color-border-tertiary);border-radius:2px;margin-bottom:24px}
+.progress-fill{height:100%;border-radius:2px;background:#185fa5;transition:width 0.4s}
+.asset-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--color-background-secondary);border-radius:8px;margin-bottom:8px}
+.lock-overlay{position:relative}
+.lock-overlay::after{content:'';position:absolute;inset:0;background:var(--color-background-primary);opacity:0.7;border-radius:8px}
+.step-num{width:22px;height:22px;border-radius:50%;background:#e6f1fb;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#0c447c;flex-shrink:0}
+.step-done{background:#eaf3de;color:#27500a}
+</style>
+
+<div style="max-width:580px;margin:0 auto;padding:4px 0">
+
+  <!-- 屏幕指示器 -->
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;padding:0 4px">
+    <div id="dot1" style="width:20px;height:4px;border-radius:2px;background:#185fa5;transition:all 0.3s"></div>
+    <div id="dot2" style="width:8px;height:4px;border-radius:2px;background:var(--color-border-tertiary);transition:all 0.3s"></div>
+    <div id="dot3" style="width:8px;height:4px;border-radius:2px;background:var(--color-border-tertiary);transition:all 0.3s"></div>
+    <span id="screen-label" style="font-size:11px;color:var(--color-text-secondary);margin-left:4px">理解你的处境</span>
+  </div>
+
+  <!-- ── 第一屏：共情 + 邀请来源 ── -->
+  <div id="s1" class="screen">
+
+    <!-- 邀请来源徽章 -->
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--color-background-secondary);border-radius:10px;border:0.5px solid var(--color-border-tertiary);margin-bottom:24px">
+      <div style="width:32px;height:32px;border-radius:8px;background:#e6f1fb;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="3" width="11" height="9" rx="1.5" stroke="#185fa5" stroke-width="1.2"/><path d="M2 6l5.5 3.5L13 6" stroke="#185fa5" stroke-width="1.1"/></svg>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--color-text-primary)">恒达智造（上海）有限公司 邀请你加入</div>
+        <div class="tiny" style="margin-top:2px">他们正在等待你的数据，以完成欧盟 CBAM 申报</div>
+      </div>
+    </div>
+
+    <!-- 核心共情文案 -->
+    <div style="margin-bottom:24px">
+      <div style="font-size:22px;font-weight:500;color:var(--color-text-primary);line-height:1.4;margin-bottom:12px">你可能正被一件<br>看不懂的事催着做</div>
+      <div style="font-size:14px;color:var(--color-text-secondary);line-height:1.8">欧盟碳边境税（CBAM）正在改变供应链的游戏规则。你的合作伙伴需要你填报碳排放数据，但没有人培训你，没有标准模板，也没有人告诉你填错了会怎样。</div>
+    </div>
+
+    <!-- 三个现实 -->
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px">
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;background:var(--color-background-secondary)">
+        <svg width="14" height="14" viewBox="0 0 14 14" style="margin-top:1px;flex-shrink:0" fill="none"><circle cx="7" cy="7" r="6" stroke="#854f0b" stroke-width="1.2"/><line x1="7" y1="4" x2="7" y2="7.5" stroke="#854f0b" stroke-width="1.2"/><circle cx="7" cy="9.5" r="0.7" fill="#854f0b"/></svg>
+        <div style="font-size:12.5px;color:var(--color-text-primary);line-height:1.6">填报不完整，甲方的 CBAM 申报会被卡住，你会成为那个"阻断通道的供应商"</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;background:var(--color-background-secondary)">
+        <svg width="14" height="14" viewBox="0 0 14 14" style="margin-top:1px;flex-shrink:0" fill="none"><circle cx="7" cy="7" r="6" stroke="#854f0b" stroke-width="1.2"/><line x1="7" y1="4" x2="7" y2="7.5" stroke="#854f0b" stroke-width="1.2"/><circle cx="7" cy="9.5" r="0.7" fill="#854f0b"/></svg>
+        <div style="font-size:12.5px;color:var(--color-text-primary);line-height:1.6">你自己的企业也迟早面临同样的合规压力，早晚都要过这道关</div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;background:var(--color-background-secondary)">
+        <svg width="14" height="14" viewBox="0 0 14 14" style="margin-top:1px;flex-shrink:0" fill="none"><circle cx="7" cy="7" r="6" stroke="#3b6d11" stroke-width="1.2"/><polyline points="4,7 6.5,9.5 10,5" stroke="#3b6d11" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>
+        <div style="font-size:12.5px;color:var(--color-text-primary);line-height:1.6">但这件事没有你想的那么难——如果有人帮你把流程理清楚的话</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div class="tiny" style="line-height:1.6">免费注册 · 完成填报 · 获得你自己的碳档案</div>
+      <button class="btn btn-primary" style="white-space:nowrap" onclick="goTo(2)">我想看看 →</button>
+    </div>
+  </div>
+
+  <!-- ── 第二屏：填报任务 ── -->
+  <div id="s2" class="screen" style="display:none">
+
+    <div style="margin-bottom:20px">
+      <div style="font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px">你需要提供什么</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">我们已经从邀请方获取了基础信息，只需要你确认和补充以下内容。HengAI 会全程引导你完成，遇到不懂的词汇可以直接问。</div>
+    </div>
+
+    <!-- 任务进度 -->
+    <div class="progress-bar"><div class="progress-fill" id="pbar" style="width:33%"></div></div>
+
+    <!-- 已预填字段 -->
+    <div style="margin-bottom:6px">
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        已由邀请方预填
+      </div>
+      <div class="field">
+        <label>你的企业名称</label>
+        <div class="field-val">广东 XX 压铸厂</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="field">
+          <label>主要产品类别</label>
+          <div class="field-val">铝压铸零部件</div>
+        </div>
+        <div class="field">
+          <label>本期供货量</label>
+          <div class="field-val">约 480 吨 / 季</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" style="margin:14px 0">
+
+    <!-- 需要填写的字段 -->
+    <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+      <div style="width:8px;height:8px;border-radius:50%;background:#185fa5"></div>
+      需要你补充（3 项核心数据）
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+      <!-- 填报项 1 -->
+      <div style="padding:12px 14px;border-radius:9px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">生产用电量</div>
+          <span class="badge bg-blue" style="font-size:10px">Scope 2</span>
+        </div>
+        <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:10px">你的工厂本季度从电网购入的电量（查电费账单即可）</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="number" placeholder="例：124000" style="flex:1;font-size:13px;padding:7px 10px;border-radius:7px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary)">
+          <span style="font-size:12px;color:var(--color-text-secondary);white-space:nowrap">度 (kWh)</span>
+        </div>
+      </div>
+
+      <!-- 填报项 2 -->
+      <div style="padding:12px 14px;border-radius:9px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">生产用天然气 / 燃煤</div>
+          <span class="badge bg-amber" style="font-size:10px">Scope 1</span>
+        </div>
+        <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:10px">熔炉、烘干等直接燃烧的能源（没有可填 0）</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="number" placeholder="例：0" style="flex:1;font-size:13px;padding:7px 10px;border-radius:7px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary)">
+          <span style="font-size:12px;color:var(--color-text-secondary);white-space:nowrap">立方米</span>
+        </div>
+      </div>
+
+      <!-- 填报项 3 -->
+      <div style="padding:12px 14px;border-radius:9px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">上游原材料来源</div>
+          <span class="badge bg-teal" style="font-size:10px">Scope 3</span>
+        </div>
+        <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:10px">铝锭主要从哪里采购（品牌 / 产地，影响碳因子计算）</div>
+        <input type="text" placeholder="例：中铝集团 · 河南产" style="width:100%;font-size:13px;padding:7px 10px;border-radius:7px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary)">
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn" onclick="goTo(1)" style="font-size:12px;padding:8px 14px">← 返回</button>
+      <button class="btn btn-primary btn-lg" onclick="goTo(3)" style="flex:1">提交数据，查看我的碳档案 →</button>
+    </div>
+
+    <div style="text-align:center;margin-top:12px">
+      <span class="tiny">不确定怎么填？</span>
+      <button class="btn-ghost btn" style="font-size:11px;padding:2px 8px;border:none;color:#185fa5" onclick="sendPrompt('我是压铸厂的，不知道Scope 1/2/3是什么意思，帮我解释一下怎么填这份碳排放数据')">问 HengAI ↗</button>
+    </div>
+  </div>
+
+  <!-- ── 第三屏：资产预告 + 转化 ── -->
+  <div id="s3" class="screen" style="display:none">
+
+    <!-- 完成确认 -->
+    <div style="text-align:center;padding:20px 0 24px">
+      <div style="width:52px;height:52px;border-radius:50%;background:#eaf3de;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+        <svg width="22" height="18" viewBox="0 0 22 18" fill="none"><polyline points="2,9 8,15 20,2" stroke="#3b6d11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="font-size:19px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px">数据已提交</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">恒达智造收到了你的数据，他们的 CBAM 申报通道已解除阻断。<br>同时，你的企业碳档案已经建立。</div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 免费可见的资产 -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        已为你解锁（免费）
+      </div>
+      <div class="asset-row">
+        <div style="width:28px;height:28px;border-radius:7px;background:#eaf3de;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1.5" y="1.5" width="10" height="10" rx="1.5" stroke="#3b6d11" stroke-width="1.1"/><line x1="4" y1="5" x2="9" y2="5" stroke="#3b6d11" stroke-width="1"/><line x1="4" y1="7.5" x2="7" y2="7.5" stroke="#3b6d11" stroke-width="1"/></svg>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">基础碳档案</div>
+          <div class="tiny" style="margin-top:2px">你企业的碳强度初始值，可供对外出示</div>
+        </div>
+        <span class="badge bg-green" style="font-size:10px">已解锁</span>
+      </div>
+      <div class="asset-row">
+        <div style="width:28px;height:28px;border-radius:7px;background:#e6f1fb;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="#185fa5" stroke-width="1.1"/><line x1="6.5" y1="3.5" x2="6.5" y2="6.5" stroke="#185fa5" stroke-width="1"/><line x1="6.5" y1="6.5" x2="9" y2="8.5" stroke="#185fa5" stroke-width="1"/></svg>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">恒达智造对你的评级结果</div>
+          <div class="tiny" style="margin-top:2px">你在他们供应链中的位置与得分</div>
+        </div>
+        <span class="badge bg-green" style="font-size:10px">已解锁</span>
+      </div>
+    </div>
+
+    <!-- 付费可见的资产（模糊预告） -->
+    <div style="margin-bottom:20px">
+      <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><rect x="3" y="4" width="4" height="5" rx="0.8" stroke="#888780" stroke-width="1"/><path d="M4 4V3a1 1 0 012 0v1" stroke="#888780" stroke-width="1"/></svg>
+        成为会员后可见
+      </div>
+
+      <div style="position:relative;border-radius:9px;overflow:hidden">
+        <div class="asset-row" style="margin-bottom:8px;filter:blur(2px);pointer-events:none;user-select:none">
+          <div style="width:28px;height:28px;border-radius:7px;background:#e1f5ee;flex-shrink:0"></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">你在整条产业链中的位置</div><div class="tiny">上游谁在用你的数据，你处于第几层节点</div></div>
+        </div>
+        <div class="asset-row" style="margin-bottom:0;filter:blur(2px);pointer-events:none;user-select:none">
+          <div style="width:28px;height:28px;border-radius:7px;background:#eeedfe;flex-shrink:0"></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">你自己的下游供应商管理</div><div class="tiny">邀请你的供应商，建立你自己的数据护城河</div></div>
+        </div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05)">
+          <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:10px;padding:12px 18px;text-align:center">
+            <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px">你的企业也值得拥有这份资产</div>
+            <div style="font-size:11px;color:var(--color-text-secondary)">个人会员 · 自己可承受的费用</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 转化按钮 -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-primary btn-lg" onclick="sendPrompt('我是供应商工作人员，刚完成了碳数据填报，我想了解HengAI个人会员能帮我解决哪些工作难题，以及如何查看我在产业链中的完整位置')">
+        解锁我的产业链视图 →
+      </button>
+      <button class="btn btn-lg" style="font-size:13px" onclick="sendPrompt('帮我查看恒达智造对我们企业的完整评级结果和评分依据')">
+        先查看甲方给我的评分
+      </button>
+    </div>
+
+    <hr class="divider">
+
+    <!-- 底部种草 -->
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:var(--color-background-secondary);border-radius:9px">
+      <svg width="14" height="14" viewBox="0 0 14 14" style="margin-top:2px;flex-shrink:0" fill="none"><path d="M7 1.5C4 1.5 1.5 4 1.5 7S4 12.5 7 12.5 12.5 10 12.5 7 10 1.5 7 1.5Z" stroke="#185fa5" stroke-width="1.1"/><path d="M5 7.5s.5 1.5 2 1.5 2-1.5 2-1.5" stroke="#185fa5" stroke-width="1" stroke-linecap="round"/><circle cx="5.2" cy="5.8" r="0.7" fill="#185fa5"/><circle cx="8.8" cy="5.8" r="0.7" fill="#185fa5"/></svg>
+      <div style="font-size:12px;color:var(--color-text-secondary);line-height:1.7">你的企业迟早要面对和恒达智造一样的合规压力。你今天建立的这份碳档案，是你将来向自己的客户证明实力的起点。</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function goTo(n){
+  document.getElementById('s1').style.display=n===1?'block':'none';
+  document.getElementById('s2').style.display=n===2?'block':'none';
+  document.getElementById('s3').style.display=n===3?'block':'none';
+  var labels=['','理解你的处境','完成填报任务','你获得了什么'];
+  document.getElementById('screen-label').textContent=labels[n];
+  ['dot1','dot2','dot3'].forEach(function(id,i){
+    var d=document.getElementById(id);
+    d.style.width=(i+1===n)?'20px':'8px';
+    d.style.background=(i+1===n)?'#185fa5':'var(--color-border-tertiary)';
+  });
+}
+</script>

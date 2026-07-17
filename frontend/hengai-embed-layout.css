@@ -1,0 +1,21 @@
+/**
+ * 全域中心 iframe（?embed=1）布局修正
+ * 子页独立打开时 .page / .page-content 有 max-width（1060~1160px），
+ * 嵌入父页宽卡槽后若不解除，右侧会出现大块空白。
+ */
+html[data-embed="1"] .main,
+html[data-embed="1"] .main-wrap,
+html[data-embed="1"] .main-content {
+  max-width: none !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  box-sizing: border-box;
+}
+
+html[data-embed="1"] .page,
+html[data-embed="1"] .page-content,
+html[data-embed="1"] .content {
+  max-width: none !important;
+  width: 100% !important;
+  box-sizing: border-box;
+}

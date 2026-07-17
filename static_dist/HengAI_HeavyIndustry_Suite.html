@@ -1,0 +1,3708 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · 产业主权看板</title>
+<script>
+if (/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<script src="hengai-dev-preview.js"></script>
+<link rel="stylesheet" href="hi-hub-tokens.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="hi-hub-align.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="config-sync.js" onerror="window.APP_CONFIG={}"></script>
+<script src="nhjc-diagnostic-shared.js"></script>
+<script src="hengai-load-appstate.js"></script>
+<script src="hengai-factor-ledger.js"></script>
+<script src="hengai-trust-journey.js"></script>
+<script src="hengai-hub-nav.js"></script>
+<script src="hengai-module-pipeline.js"></script>
+<script src="hengai-embed-boot.js"></script>
+<script src="app.js"></script>
+<style>
+/* 页面局部 · 矩阵已收敛；Hub 对齐见 hi-hub-align.css */
+.hi-body{display:none!important}
+.hi-ind-tabs-spectrum{display:flex;flex-wrap:wrap;gap:6px;max-height:88px;overflow-y:auto;padding-bottom:4px}
+.hi-ind-tabs-spectrum .hi-tab{flex:0 0 auto;font-size:11px;padding:6px 10px;white-space:nowrap}
+.hi-policy-tag{font-size:11px;line-height:1.55;padding:8px 12px;border-radius:8px;margin:8px 0 0}
+.hi-gd-ets{background:var(--blue-d);border:1px solid var(--blue-b);color:var(--blue-l)}
+.hi-gd-sync{background:var(--green-d);border:1px solid var(--green-b);color:var(--green-l)}
+.hi-cbam-warn{background:var(--gold-d);border:1px solid var(--gold-b);color:var(--gold-l)}
+.hi-ind-kpi-strip{display:flex;flex-wrap:wrap;gap:8px;font-size:10.5px;color:var(--ink2);margin-top:6px}
+.hi-ind-kpi-strip span{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 8px}
+.hi-trust-journey{margin:12px 0 0;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:var(--bg3)}
+.hi-trust-badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.hi-gf-title{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.hj-step{display:flex;gap:10px;padding:0 0 12px;position:relative}
+.hj-step:not(.hj-step-last)::before{content:'';position:absolute;left:5px;top:14px;bottom:0;width:1px;background:rgba(16,185,129,.25)}
+.hj-dot{width:11px;height:11px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:3px}
+.hj-date{font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace}
+.hj-text{font-size:12px;color:var(--ink2);line-height:1.55}
+.hj-empty{font-size:12px;color:var(--ink3);text-align:center;padding:8px 0}
+html[data-embed="1"] .hi-bottom{display:none!important}
+html[data-embed="1"] .hi-bottom-panel{display:none!important}
+html[data-embed="1"] .hi-pledge-bar{display:none!important}
+html[data-embed="1"] .hi-foot-min{display:none!important}
+html[data-embed="1"] .hi-pledge-strip{display:none!important}
+html[data-embed="1"] .hi-page-foot{display:none!important}
+html[data-embed="1"] .hi-context-trail{display:none!important}
+html[data-embed="1"] .hi-claim-preview-banner{display:none!important}
+html[data-embed="1"] .hi-res-header{display:none!important}
+.hi-delta.hi-delta-idle{display:none!important}
+.hi-fold{margin:8px 0 0;border:none}
+.hi-fold>summary{list-style:none;cursor:pointer;font-size:11px;color:var(--ink3);padding:6px 0;user-select:none}
+.hi-fold>summary::-webkit-details-marker{display:none}
+.hi-fold>summary::before{content:'▸ ';color:var(--teal-l)}
+.hi-fold[open]>summary::before{content:'▾ '}
+.hi-fold-body{padding:6px 0 0}
+.hi-inf-formula-polish{margin:0;font-size:11px;color:var(--ink3)}
+.hi-inf-signal{font-size:10.5px;color:var(--ink2);background:var(--bg4);border-radius:999px;padding:4px 8px}
+.hi-inf-signal.ready{color:var(--teal-l);background:var(--teal-d)}
+.hi-inf-signal.cert{color:var(--green-l);background:var(--green-d)}
+.hi-dossier-box{max-width:420px;padding:22px 20px 18px;border-color:var(--border2)!important;background:var(--bg3)!important}
+.hi-dossier-box.hi-glass::before{display:none}
+.hi-dossier-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;padding-right:28px}
+.hi-dossier-head h2{margin:0;font-size:16px;font-weight:700;color:var(--ink)}
+.hi-inline-link{background:none;border:none;padding:0;color:var(--teal-l);font:inherit;font-weight:600;text-decoration:underline;cursor:pointer}
+.hi-pending-banner,.hi-claim-preview-banner{padding:10px 14px;font-size:12px;line-height:1.5;margin-bottom:14px;border-radius:12px}
+.hi-cpb-sub{display:none}
+.hi-metric-empty .m-val{opacity:.72;font-size:20px}
+#hi-suite .metric.hi-kpi-empty .m-val{opacity:.72;font-size:20px}
+</style>
+</head>
+<body>
+<div id="hi-suite" class="hi-warroom">
+  <header class="hi-topbar hi-glass" aria-label="产业主权看板顶栏">
+    <div class="hi-brand">
+      <div class="hi-enterprise-mark hi-enterprise-mark-btn" id="hi-enterprise-mark" title="点击查看主权认领档案" role="button" tabindex="0" aria-label="主权认领档案">
+        <span class="hi-enterprise-logo-fb" id="hi-enterprise-logo-fb">企</span>
+      </div>
+      <div>
+        <div class="hi-brand-title">产业主权看板</div>
+        <div class="hi-brand-en">INDUSTRY SOVEREIGNTY OVERVIEW · HUB DASHBOARD</div>
+      </div>
+    </div>
+    <div class="hi-sovereign-pill">
+      <span>🛡️ 数据主权受控模式</span>
+      <span class="hi-pulse-dot" aria-hidden="true"></span>
+      <span class="hi-local-calc">本地计算中</span>
+      <span class="hi-sovereignty-lamp" id="hi-sovereignty-lamp">🟡 检测中</span>
+      <span class="hi-phase-tag" id="hi-phase-tag" title="HengAI 三阶段成长路径">Phase 2 · 工业原厂期</span>
+    </div>
+    <div class="hi-topbar-right">
+      <button type="button" class="hi-bell" title="通知" aria-label="通知"><span class="hi-bell-ico">🔔</span><span class="hi-bell-badge" id="hi-notify-count" hidden>0</span></button>
+      <div class="hi-topbar-user">
+        <span class="hi-uavatar dyn-user-name-initial" data-state-bind="user.name" data-empty="?">?</span>
+        <div>
+          <div class="hi-uname"><span class="dyn-company-name" data-state-bind="company.name" data-empty="企业">企业</span> <span class="dyn-user-name" data-state-bind="user.name" data-empty=""></span></div>
+          <div class="hi-urole">Lv.<span class="dyn-user-level" data-state-bind="user.currentLevel" data-empty="1">1</span> · <span class="dyn-user-tier" data-state-bind="user.tier" data-empty="—">—</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="hi-context-trail hi-glass" id="hi-context-trail" hidden aria-label="产业链操作路径">
+    <button type="button" class="hi-ctx-back" id="hi-ctx-back-supply">← 返回供应链协同</button>
+    <span class="hi-ctx-arrow" aria-hidden="true">→</span>
+    <span class="hi-ctx-here">🛰️ 产业链主权共振 · 产业主权看板</span>
+    <span class="hi-ctx-hint">确权完成后可继续：邀请供应商 · 签发穿透卡片 · 批量协同</span>
+  </nav>
+
+  <div id="hi-warroom-main">
+  <div class="hi-embed-strip" id="hi-embed-strip" aria-label="看板状态">
+    <span class="hi-embed-title">产业主权看板</span>
+    <span class="hi-sovereignty-lamp hi-lamp-amber" id="hi-embed-lamp">🟡 检测中</span>
+    <span class="pill p-gray" id="hi-embed-phase">Phase 2 · 工业原厂期</span>
+  </div>
+  <div class="hi-pending-banner hi-glass" id="hi-pending-banner" hidden role="status">
+    <span>🟡 授权书<strong>审核中</strong>（1–3 工作日）· <button type="button" class="hi-inline-link" id="hi-pending-open-dossier">查看进度</button></span>
+  </div>
+  <div class="hi-claim-preview-banner hi-glass" id="hi-claim-preview-banner" hidden role="status">
+    <div class="hi-cpb-copy">
+      <div class="hi-cpb-title">预览模式 · 完成主权认领后解锁执行能力</div>
+      <div class="hi-cpb-sub">完成<strong>主权认领</strong>（约 3 分钟）后，解锁因子入池、产业链核验签发与完整执行总览。工序精算请前往「原厂因子精算」。</div>
+    </div>
+    <button type="button" class="hi-card-btn hi-card-gold" id="hi-btn-open-claim-wizard">完成主权认领 →</button>
+  </div>
+  <section class="hi-hub-section hi-resonance" aria-label="产业链诉求大盘">
+    <div class="sh">
+      <div class="sh-t">产业链诉求 <div class="sh-line"></div></div>
+      <span class="pill p-gold"><strong class="hi-res-header-count" id="hi-resonance-req-count">0</strong> 家确权请求</span>
+    </div>
+    <div class="hi-res-header" id="hi-res-header" hidden aria-hidden="true">
+      <div class="hi-res-header-kicker">产业链确权诉求总量</div>
+      <div class="hi-res-header-main"><strong>0</strong><span>家</span></div>
+      <div class="hi-res-header-sub">实时汇总来自下游成员的确权请求</div>
+    </div>
+    <div class="hi-res-section-title" id="hi-res-section-title" hidden aria-hidden="true">产业链诉求大盘</div>
+    <div class="g2">
+      <div class="metric" id="hi-kpi-crusade-wrap">
+        <div class="m-lbl">下游诉求</div>
+        <div class="m-val gold"><span id="hi-kpi-crusade-display">0</span><span class="m-unit" id="hi-kpi-crusade-unit">家</span></div>
+        <p class="m-sub" id="hi-kpi-crusade-desc">配套中小企业申请您的碳因子背书</p>
+        <p class="m-sub" id="hi-kpi-crusade-empty" hidden>暂无下游确权诉求</p>
+        <p class="hi-delta" id="hi-delta-crusade">较上月 +<span class="hi-delta-val" id="hi-delta-crusade-val">—</span> 家</p>
+      </div>
+      <div class="metric">
+        <div class="m-lbl">挽回税损</div>
+        <div class="m-val" id="hi-kpi-tax-display">—</div>
+        <p class="m-sub" id="hi-kpi-tax-desc">预计可为全产业链挽回的超额碳税损失（CBAM 欧元口径 · 可切换折算）</p>
+        <p class="hi-delta" id="hi-delta-tax">较上月 <span class="hi-delta-val" id="hi-delta-tax-val">—</span></p>
+      </div>
+    </div>
+    <details class="hi-fold hi-res-fold" id="hi-res-fold">
+      <summary>展开 · 行业分布 · 荣誉</summary>
+      <div class="hi-fold-body hi-res-grid hi-res-grid-extra">
+      <div class="hi-donut-block" id="hi-donut-block">
+        <div class="hi-res-kpi-label">诉求行业分布</div>
+        <div class="hi-donut-wrap">
+          <svg class="hi-donut-svg" viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="44" fill="none" stroke="var(--border)" stroke-width="14"/>
+            <circle id="hi-donut-steel" cx="60" cy="60" r="44" fill="none" stroke="var(--blue-l)" stroke-width="14" stroke-dasharray="0 276" transform="rotate(-90 60 60)"/>
+            <circle id="hi-donut-al" cx="60" cy="60" r="44" fill="none" stroke="var(--gold-l)" stroke-width="14" stroke-dasharray="0 276" transform="rotate(-90 60 60)"/>
+            <circle id="hi-donut-cement" cx="60" cy="60" r="44" fill="none" stroke="var(--teal-l)" stroke-width="14" stroke-dasharray="0 276" transform="rotate(-90 60 60)"/>
+          </svg>
+          <ul class="hi-donut-legend">
+            <li><span class="hi-leg-dot steel"></span>钢铁行业 <strong id="hi-leg-steel">—</strong></li>
+            <li><span class="hi-leg-dot al"></span>铝业行业 <strong id="hi-leg-al">—</strong></li>
+            <li><span class="hi-leg-dot cement"></span>水泥行业 <strong id="hi-leg-cement">—</strong></li>
+          </ul>
+        </div>
+      </div>
+      <div class="hi-honor-block" id="hi-honor-block">
+        <div class="hi-honor-badge" id="hi-honor-badge">
+          <img class="hi-honor-logo hi-logo-clone" src="" alt="" width="44" height="44">
+          <div>
+            <div class="hi-honor-title">CL-Origin 绿色出海先行者</div>
+            <div class="hi-honor-done" id="hi-honor-status">待首次确权解锁</div>
+          </div>
+        </div>
+        <button type="button" class="hi-honor-btn" id="hi-btn-honor-wall">荣誉墙</button>
+      </div>
+      </div>
+    </details>
+  </section>
+
+  <section class="hi-hub-section hi-eb" id="hi-exec-brief" aria-label="执行总览">
+    <div class="ins ins-blue hi-page-ins" id="hi-overview-notice">本页为产业主权驾驶舱：诉求大盘 / 执行总览 / 影响力榜。工序精算请前往「原厂因子精算」；批次签发请前往「产业链核验」。</div>
+    <div class="sh">
+      <div class="sh-t">执行总览 <div class="sh-line"></div></div>
+      <div id="hi-brief-next-action" class="hi-eb-action warn">等待录入首个工序数据</div>
+    </div>
+    <div class="g4">
+      <div class="metric">
+        <div class="m-lbl">工序录入进度</div>
+        <div class="m-val"><span id="hi-brief-filled-steps">0</span>/<span id="hi-brief-total-steps">0</span></div>
+      </div>
+      <div class="metric">
+        <div class="m-lbl">当前碳强度</div>
+        <div class="m-val" style="font-size:16px"><span id="hi-brief-ci">—</span></div>
+      </div>
+      <div class="metric">
+        <div class="m-lbl">可覆盖下游企业</div>
+        <div class="m-val"><span id="hi-brief-coverage">0</span><span class="m-unit">家</span></div>
+      </div>
+      <div class="metric">
+        <div class="m-lbl">状态</div>
+        <div id="hi-brief-cert-status" class="hi-eb-cert">草案态（待官方确权）</div>
+      </div>
+    </div>
+    <div class="prog">
+      <span id="hi-brief-progress" class="prog-fill"></span>
+    </div>
+    <div class="hi-eb-actions">
+      <button type="button" class="act-btn" id="hi-btn-brief-calc">
+        <span class="act-ic">🧮</span><span>去因子精算入池</span><span class="act-arrow">→</span>
+      </button>
+      <button type="button" class="act-btn" id="hi-btn-brief-verify">
+        <span class="act-ic">🧾</span><span>去产业链核验签发</span><span class="act-arrow">→</span>
+      </button>
+      <button type="button" class="act-btn" id="hi-btn-brief-supply">
+        <span class="act-ic">🔗</span><span>去供应链协同补全来源</span><span class="act-arrow">→</span>
+      </button>
+    </div>
+    <p class="ins ins-gray hi-eb-internal-note" id="hi-eb-internal-note">企业内部工作流：CL 平台导出<strong>事实材料</strong>（客观数据附件）；向财务/老板的<strong>呈批请示</strong>请由经办人在「决策层呈送包」自行组稿，二者不可混用。</p>
+    <div class="hi-eb-actions hi-eb-actions-sub">
+      <button type="button" class="act-btn act-btn-sub" id="hi-btn-brief-fact">
+        <span class="act-ic">📎</span><span>导出 CL 事实材料</span>
+      </button>
+      <button type="button" class="act-btn act-btn-sub" id="hi-btn-brief-decision">
+        <span class="act-ic">📋</span><span>去决策层呈送包</span><span class="act-arrow">→</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="hi-hub-section hi-factor-ledger" id="hi-factor-ledger-card" hidden aria-label="因子消费账本">
+    <div class="sh">
+      <div class="sh-t">因子消费账本 <div class="sh-line"></div></div>
+      <span class="pill p-green" id="ledger-usage-pill">引用 0 次</span>
+    </div>
+    <div id="consumption-ledger-card">
+      <div class="g3">
+        <div class="metric"><div class="m-lbl">引用次数</div><div class="m-val" id="ledger-count">0</div></div>
+        <div class="metric"><div class="m-lbl">覆盖碳排放</div><div class="m-val" id="ledger-carbon">0</div></div>
+        <div class="metric"><div class="m-lbl">产业链节税</div><div class="m-val gold" id="ledger-saved">€0</div></div>
+      </div>
+      <div class="ledger-fee-row">
+        服务费（3%）<strong style="color:var(--orange-l)" id="ledger-fee">€0</strong>
+        · 护航基金 <strong id="ledger-nursing">€0</strong>
+        · 运营 <strong id="ledger-ops">€0</strong>
+      </div>
+      <div class="ledger-sub-lbl">下游行业分布</div>
+      <div id="industry-distribution"></div>
+      <div class="ledger-sub-lbl">月度引用趋势</div>
+      <div id="monthly-trend"></div>
+      <button type="button" class="act-btn" style="max-width:220px;margin-top:12px" onclick="exportHengaiFactorLedger()">
+        <span class="act-ic">📥</span><span>导出账本</span>
+      </button>
+    </div>
+    <div class="ledger-cols">
+      <div class="ledger-panel">
+        <div class="sh" style="margin-bottom:10px"><div class="sh-t" style="font-size:10px">已认领下游</div><span class="pill p-teal" id="claimed-count-pill">0 家</span></div>
+        <div id="claimed-list"></div>
+      </div>
+      <div class="ledger-panel">
+        <div class="sh" style="margin-bottom:10px"><div class="sh-t" style="font-size:10px">匿名引用</div><span class="pill p-gold" id="anon-count-pill">0 条</span></div>
+        <div id="anonymous-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hi-hub-section hi-influence" id="hi-influence" aria-label="产业链碳确权影响力排名">
+    <div class="sh">
+      <div class="sh-t">影响力排名 <div class="sh-line"></div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span class="pill p-gray" id="hi-inf-ind-label">钢铁行业榜</span>
+        <span class="pill p-teal" id="hi-inf-data-mode">示意数据</span>
+        <button type="button" class="act-btn" style="flex:0 1 auto;padding:6px 12px;font-size:11px" id="hi-btn-policy-hint">
+          <span class="act-ic" style="width:24px;height:24px;font-size:12px">⚖️</span><span>政策配套</span>
+        </button>
+      </div>
+    </div>
+    <p class="ins ins-gray hi-inf-lead" id="hi-inf-lead">本区展示<strong>同行业其他原厂</strong>的 EIS 榜单（第 1–7 名）。下方「本企业」为单独一行，<strong>不在上方榜单内</strong>，请勿与榜内 #1 混淆。</p>
+    <div class="hi-inf-eis-bar">
+      <span class="hi-inf-eis-def"><abbr title="Ecological Identity Score">EIS</abbr> 生态确权贡献值 = 下游引用 50% + 产业链节税 30% + 数据置信 20%</span>
+    </div>
+    <details class="hi-fold hi-inf-fold" id="hi-inf-fold">
+      <summary>排名规则与计分状态</summary>
+      <div class="hi-fold-body hi-inf-meta-row">
+        <p class="hi-inf-formula hi-inf-formula-polish">正式榜单来自链上行业核验池；示意态以占位原厂展示榜单形态，待贵司完成确权后替换为真实排名。</p>
+        <span class="hi-inf-signal" id="hi-inf-signal-chip">冷启动基准态</span>
+      </div>
+    </details>
+    <div class="hi-inf-board" id="hi-inf-board">
+      <div class="hi-inf-board-label">行业榜单 · 其他原厂</div>
+      <details class="hi-fold hi-inf-podium-fold" open>
+        <summary>第 1–3 名</summary>
+        <div class="hi-inf-podium" id="hi-inf-podium" aria-label="行业榜单第1至3名"></div>
+      </details>
+      <div class="hi-inf-list-wrap">
+        <div class="hi-inf-list-head">第 4–7 名</div>
+        <ol class="hi-inf-list" id="hi-inf-list" aria-label="行业榜单第4至7名"></ol>
+      </div>
+    </div>
+    <div class="hi-inf-me-block" id="hi-inf-me-block">
+      <div class="hi-inf-me-head">
+        <span class="hi-inf-me-head-title">本企业 · 预估榜内表现</span>
+        <span class="hi-inf-me-head-note">非上方榜单条目</span>
+      </div>
+      <div class="hi-inf-body" id="hi-inf-body">
+        <div class="hi-inf-me" id="hi-inf-me" aria-label="本企业预估榜内表现"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="hi-body" id="hi-body-wrap">
+    <div class="hi-calc-deferred-lock" id="hi-calc-deferred-lock" hidden aria-hidden="true">
+      <div class="hi-calc-deferred-inner hi-glass">
+        <div class="hi-calc-deferred-title">工序精算已收敛至「原厂因子精算」</div>
+        <p class="hi-calc-deferred-sub">本看板专注产业链诉求与执行导航。完成主权认领后，请前往因子精算页录入工序并入池。</p>
+        <button type="button" class="hi-tool-btn hi-eb-btn" id="hi-btn-goto-factor-from-lock">前往原厂因子精算 →</button>
+      </div>
+    </div>
+    <div class="hi-center hi-glass">
+      <div class="hi-matrix-head">
+        <div class="hi-ind-tabs hi-ind-tabs-spectrum" role="tablist" aria-label="八大高耗能行业工序精算" id="hi-ind-tabs-host"></div>
+        <div class="hi-matrix-tools">
+          <label class="hi-tool-month">产线编号 <input type="text" id="hi-production-line" class="hi-inp-under" placeholder="L01" maxlength="8" title="用于生成 GTCID 批次核验码"></label>
+          <label class="hi-tool-month">数据周期 <input type="month" id="hi-report-month" class="hi-inp-under hi-inp-month"></label>
+          <button type="button" class="hi-tool-btn" id="hi-btn-import" disabled title="下一阶段开放">导入模板</button>
+          <button type="button" class="hi-tool-btn" id="hi-btn-clear-local">清空本地数据</button>
+        </div>
+      </div>
+      <div id="hi-gd-ets-banner" class="hi-policy-tag hi-gd-ets" hidden>⚖️ 2026 年度广东省重点排放单位监控行业。本工具已对齐 GD-ETS 2026 核算规范。</div>
+      <div id="hi-gd-sync-hint" class="hi-policy-tag hi-gd-sync" hidden>💡 当前算法已对齐《广东省 2026 年度碳配额分配标准》，您的数据可同步用于省厅申报。</div>
+      <div id="hi-cbam-expand-warn" class="hi-policy-tag hi-cbam-warn" hidden>⚠️ 预警：该行业已被欧盟列入 2026-2030 CBAM 拟增补名录，建议提前执行官方确权以规避未来贸易壁垒。</div>
+      <div id="hi-ind-kpi-strip" class="hi-ind-kpi-strip" hidden></div>
+      <div id="hi-matrix-title" class="hi-matrix-title">工序精算矩阵 <span id="hi-matrix-sub">请选择行业加载物理工序模型</span></div>
+
+      <div id="hi-panel-dynamic" class="hi-matrix-panel hi-panel-on" role="tabpanel">
+        <div class="hi-flow" id="hi-flow-dynamic" aria-label="工序流向"></div>
+        <div class="hi-matrix-scroll">
+          <table class="hi-matrix" id="hi-table-dynamic">
+            <thead><tr id="hi-head-dynamic"></tr></thead>
+            <tbody id="hi-body-dynamic"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="hi-pue-readout" class="hi-pue-badge" hidden>PUE 实时核算：—</div>
+
+      <div class="hi-center-foot">
+        <p class="hi-vault-note">🔒 所有原始能耗数据仅保存在本地浏览器（LOCAL_VAULT），不会上传服务器</p>
+        <div class="hi-yoy-inline">
+          <label class="hi-yoy-lbl">上期已确权碳强度 (tCO₂e/t)
+            <input class="hi-inp-under" id="hi-prev-ci" type="number" step="0.0001" placeholder="首次可留空">
+          </label>
+          <span class="hi-yoy-sep">同比</span>
+          <strong id="hi-yoy" class="hi-yoy-val">—</strong>
+          <input type="hidden" id="hi-curr-ci">
+        </div>
+      </div>
+    </div>
+
+    <div class="hi-gauge-col">
+    <aside class="hi-gauge-panel hi-glass" aria-label="精算结果">
+      <div class="hi-gauge-head">精算结果</div>
+      <div class="hi-draft-status" id="hi-draft-status">
+        <span class="hi-draft-badge hi-draft-idle">📝 原始数据草案 / 内部参考</span>
+        <p class="hi-draft-note">ℹ️ 该结果尚未经过 CL-IVC 官方算法校准，暂不具备出口确权与政策申报效力。</p>
+      </div>
+      <div class="hi-ring-unit-label" id="hi-ring-product">单位产品碳强度</div>
+      <div class="hi-ring-wrap">
+        <svg class="hi-ring-svg" viewBox="0 0 160 160" aria-hidden="true">
+          <circle cx="80" cy="80" r="62" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+          <circle id="hi-ring-arc" cx="80" cy="80" r="62" fill="none" stroke="url(#hiRingGrad)" stroke-width="10" stroke-linecap="round" stroke-dasharray="0 390" transform="rotate(-90 80 80)"/>
+          <defs>
+            <linearGradient id="hiRingGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="var(--green)"/>
+              <stop offset="100%" stop-color="var(--gold)"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="hi-ring-center">
+          <span id="hi-ring-val" class="hi-ring-num">—</span>
+          <span class="hi-ring-unit" id="hi-ring-unit-disp">tCO₂e/吨钢</span>
+        </div>
+      </div>
+      <div class="hi-bench">
+        <div class="hi-bench-row">
+          <span class="hi-bench-lbl">行业对标</span>
+          <span class="hi-bench-val" id="hi-bench-industry">2.156</span>
+        </div>
+        <div class="hi-bench-row hi-bench-best">
+          <span class="hi-bench-lbl">优秀水平</span>
+          <span class="hi-bench-val green" id="hi-bench-best">1.650</span>
+        </div>
+      </div>
+      <div class="hi-spark-block">
+        <div class="hi-spark-head">
+          <span>近 6 个月碳强度趋势</span>
+          <strong id="hi-yoy-spark" class="hi-spark-pct">同比增减率 —</strong>
+        </div>
+        <svg class="hi-spark-svg" viewBox="0 0 200 48" preserveAspectRatio="none" aria-hidden="true">
+          <path id="hi-spark-path" d="M0,28 L25,22 L50,26 L75,18 L100,24 L125,16 L150,20 L175,12 L200,14" fill="none" stroke="var(--green-l)" stroke-width="2"/>
+          <path id="hi-spark-fill" d="M0,28 L25,22 L50,26 L75,18 L100,24 L125,16 L150,20 L175,12 L200,14 L200,48 L0,48 Z" fill="url(#hiSparkFill)" opacity="0.35"/>
+          <defs>
+            <linearGradient id="hiSparkFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--green)"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="hi-spark-months" aria-hidden="true">
+          <span>2024-05</span><span>2024-06</span><span>2024-07</span><span>2024-08</span><span>2024-09</span><span>2024-10</span>
+        </div>
+      </div>
+      <div class="hi-struct-block">
+        <div class="hi-struct-head"><span>碳排放结构占比</span></div>
+        <div class="hi-struct-bar" aria-hidden="true">
+          <span class="hi-struct-seg direct" id="hi-struct-direct" style="width:0%"></span>
+          <span class="hi-struct-seg indirect" id="hi-struct-indirect" style="width:0%"></span>
+          <span class="hi-struct-seg process" id="hi-struct-process" style="width:0%"></span>
+        </div>
+        <ul class="hi-struct-legend">
+          <li><span class="dot direct"></span>直接排放 <strong id="hi-struct-pct-d">—</strong></li>
+          <li><span class="dot indirect"></span>间接排放 <strong id="hi-struct-pct-i">—</strong></li>
+          <li><span class="dot process"></span>工艺排放 <strong id="hi-struct-pct-p">—</strong></li>
+        </ul>
+      </div>
+      <div class="hi-audit-log" id="hi-audit-log" aria-label="审核日志">
+        <div class="hi-audit-head hi-audit-head-polish"><span>📜 审核日志</span><span class="hi-audit-chip" id="hi-audit-chip">待启动</span></div>
+        <ul class="hi-audit-list" id="hi-audit-list"></ul>
+      </div>
+    </aside>
+    <div class="hi-policy-card hi-glass" id="hi-policy-card" hidden aria-live="polite">
+      <div class="hi-policy-head">⚖️ 政策环境参考</div>
+      <p class="hi-policy-body">公开政策语境中，产业链因子确权与绿色制造数字化常一并讨论。本提示仅供内部背景参考，<strong>不构成财政承诺、申报建议或补贴比例预测</strong>。</p>
+      <p class="hi-policy-foot">ℹ️ 具体补贴与立项路径以企业主管部门当年细则及贵司财务制度为准；CL 不提供申报代理服务。</p>
+    </div>
+    </div>
+  </div>
+
+  <section class="hi-hub-section hi-bottom-panel" id="hi-bottom-panel" aria-label="辅助操作与合规">
+    <div class="sh">
+      <div class="sh-t">辅助操作 <div class="sh-line"></div></div>
+    </div>
+    <div class="ins ins-blue hi-iso-ins">🔒 原始工序级数据仅存于本地 <code>LOCAL_VAULT</code>，计算结果脱敏后存证，绝不上传服务器。</div>
+    <div class="hi-trust-journey fu" id="hi-trust-journey" hidden aria-label="成长足迹">
+      <div class="hi-trust-badge-row" id="hi-trust-badge-row"></div>
+      <div class="hi-growth-footprint" id="hi-growth-footprint">
+        <div class="hi-gf-title">成长足迹 · Evidence Journey</div>
+        <div id="hi-gf-timeline"></div>
+      </div>
+    </div>
+    <div class="hi-action-row" aria-label="主要操作">
+      <button type="button" class="act-btn" id="hi-btn-budget-report">
+        <span class="act-ic">📎</span><span>导出 CL 事实材料</span>
+      </button>
+      <button type="button" class="act-btn" id="hi-btn-history">
+        <span class="act-ic">🕒</span><span>查看成长足迹</span><span class="act-arrow">→</span>
+      </button>
+      <button type="button" class="hi-card-btn hi-card-gold hi-sovereign-note" id="hi-btn-attest" hidden aria-hidden="true"></button>
+      <button type="button" class="hi-card-btn hi-card-blue" id="hi-btn-goto-factor" hidden aria-hidden="true"></button>
+    </div>
+    <div class="g2 hi-cert-metrics">
+      <div class="metric">
+        <div class="m-lbl">确权编号</div>
+        <div class="m-val gold hi-cert-mono dyn-verified-cert" id="hi-cert-display" data-state-bind="company.verifiedFactorCertId" data-empty="待确权">待确权</div>
+      </div>
+      <div class="metric">
+        <div class="m-lbl">批次核验码</div>
+        <div class="m-val gold hi-cert-mono dyn-verification-code" id="hi-verification-code" data-state-bind="company.verificationCode" data-empty="待生成">待生成</div>
+      </div>
+    </div>
+  </section>
+  <div class="ins ins-gold hi-pledge-bar">
+    <span>⚠️ 操作前需签署《重工业核心数据保密承诺书》</span>
+    <button type="button" class="tb-btn tb-btn-gold" id="hi-btn-pledge-sign">签署承诺书</button>
+  </div>
+  <div class="hi-foot-min">
+    <span>© Co2Lion · HengAI V2.0</span>
+    <span class="hi-foot-cert dyn-verified-cert" data-state-bind="company.verifiedFactorCertId" data-empty="CL-COP 协议体系">CL-COP 协议体系</span>
+  </div>
+  </div>
+
+  <div class="hi-commerce-modal" id="hi-modal-claim-confirm" role="dialog" aria-modal="true" hidden>
+    <div class="hi-commerce-box hi-glass hi-claim-confirm-box">
+      <h2>📋 主权认领 · 信息确认</h2>
+      <p class="hi-claim-confirm-lead">请核对以下信息。提交后授权书将<strong>真实上传至 HengAI 合规存证库</strong>，并由 HEGC 专员<strong>人工审核</strong>（通常 1–3 个工作日）。审核通过前为「待审核」状态。</p>
+      <dl class="hi-claim-confirm-dl">
+        <div><dt>企业全称</dt><dd id="hi-confirm-name">—</dd></div>
+        <div><dt>统一社会信用代码</dt><dd id="hi-confirm-credit">—</dd></div>
+        <div><dt>授权书文件</dt><dd id="hi-confirm-file">—</dd></div>
+      </dl>
+      <div class="hi-claim-confirm-preview" id="hi-confirm-preview-wrap" hidden>
+        <img id="hi-confirm-preview-img" alt="授权书预览">
+      </div>
+      <label class="hi-claim-confirm-check">
+        <input type="checkbox" id="hi-confirm-agree">
+        <span>我已阅读说明，确认上传的是<strong>加盖公章的正式扫描件</strong>（非未盖章 Word/txt 原稿），企业名称与信用代码与表单一致，且不含工序能耗明细</span>
+      </label>
+      <div class="hi-commerce-actions">
+        <button type="button" class="hi-card-btn hi-card-muted" id="hi-modal-confirm-back">返回修改</button>
+        <button type="button" class="hi-card-btn hi-card-gold" id="hi-modal-confirm-submit" disabled>确认提交 · 上传存证</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hi-commerce-modal" id="hi-modal-claim-success" role="dialog" aria-modal="true" hidden>
+    <div class="hi-commerce-box hi-glass hi-claim-success-box">
+      <div class="hi-claim-success-icon" aria-hidden="true">📨</div>
+      <h2>主权认领已提交</h2>
+      <p id="hi-claim-success-msg">授权书已上传至合规存证库，当前状态：<strong>待人工审核</strong>。</p>
+      <ul class="hi-claim-success-steps">
+        <li>✅ 企业信息与授权书已存证</li>
+        <li>⏳ HEGC 合规专员人工核验（1–3 个工作日）</li>
+        <li>🔔 审核结果可在左上角<strong>企业标识</strong>处随时查看</li>
+      </ul>
+      <p class="hi-claim-success-note">💡 AI 预审（如已启用）仅作辅助提示，<strong>不能替代人工审核</strong>。</p>
+      <div class="hi-commerce-actions">
+        <button type="button" class="hi-card-btn hi-card-gold" id="hi-modal-success-ok">进入产业主权看板（待审核模式）</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hi-commerce-modal" id="hi-modal-claim-wizard" role="dialog" aria-modal="true" aria-labelledby="hi-claim-wizard-title" hidden>
+    <div class="hi-commerce-box hi-glass hi-claim-wizard-box">
+      <button type="button" class="hi-modal-close-x" id="hi-claim-wizard-close" aria-label="关闭认领向导">×</button>
+      <div class="hi-claim-inner">
+        <div class="hi-claim-seal" aria-hidden="true">CL-COP</div>
+        <h2 class="hi-claim-title" id="hi-claim-wizard-title">主权认领 · 企业身份关联</h2>
+        <p class="hi-claim-wizard-steps">① 填写企业信息 · ② 上传盖章授权书 · ③ 人工审核（1–3 工作日）</p>
+        <p class="hi-claim-desc">认领证明您有权代表本企业开展因子确权与产业链协同；<strong>驾驶舱预览无需等待审核</strong>，提交后即可进入待审模式。</p>
+
+        <details class="hi-claim-help">
+          <summary>ℹ️ 什么是《主权授权书》？</summary>
+          <div class="hi-claim-help-body">
+            <p><strong>定义：</strong>《CL-COP 产业链数据主权授权书》是企业法定代表人（或授权代理人）签发的<strong>书面授权文件</strong>，用于证明：当前操作人有权代表本企业在 HengAI 平台认领「原厂因子精算」主权节点，并向产业链下游提供经脱敏的碳强度因子背书。</p>
+            <p><strong>与保密承诺书的区别：</strong>底部《重工业核心数据保密承诺书》约束<strong>工序数据不离机</strong>；本授权书约束<strong>谁有权代表企业对外确权</strong>，二者缺一不可。</p>
+            <p><strong>须包含要素（缺一不可）：</strong></p>
+            <ul>
+              <li>企业全称 + 统一社会信用代码（与上方填写一致）</li>
+              <li>被授权人姓名、职务（如能源管理部负责人 / 碳管理经办人）</li>
+              <li>授权范围：因子精算、CL-IVC 官方确权、核验池写入、产业链因子共享</li>
+              <li>数据主权条款：工序级原始能耗仅存本地 LOCAL_VAULT，不上传云端</li>
+              <li>企业公章（或合同专用章）+ 法定代表人/授权代理人签字 + 日期</li>
+            </ul>
+            <p><strong>可接受格式：</strong>盖章扫描件 PDF，或 JPG/PNG 高清照片（需四角完整、文字清晰）。<strong>不接受</strong>未盖章的 Word/txt 电子稿直接上传。</p>
+            <p><strong>常见替代件：</strong>加盖公章的《授权委托书》+ 经办人身份证复印件（可拼在同一 PDF 内）。</p>
+            <p class="hi-claim-help-note">📄 <strong>范本是什么？</strong>一份可直接交给法务审定、<strong>打印后由法定代表人签字并加盖企业公章</strong>的完整授权书草案（含鉴于、授权事项、数据主权条款、签章页），不是空文件或要点摘要。审定盖章后扫描为 PDF 再上传。</p>
+            <p class="hi-claim-help-note">⚖️ 智能预审仅辅助比对名称/代码/签章，<strong>绝不自动通过</strong>；最终审核以 HEGC 人工核验为准。未盖章或涂改的电子稿将被驳回。</p>
+          </div>
+        </details>
+
+        <form class="hi-claim-form" id="hi-claim-form">
+          <label class="hi-claim-field">
+            <span>统一社会信用代码</span>
+            <input type="text" id="hi-claim-credit" class="hi-claim-inp" placeholder="91XXXXXXXXXXXXXXXX" maxlength="18" autocomplete="organization">
+          </label>
+          <label class="hi-claim-field">
+            <span>企业全称</span>
+            <input type="text" id="hi-claim-name" class="hi-claim-inp" placeholder="与营业执照一致" autocomplete="organization">
+          </label>
+          <label class="hi-claim-field">
+            <span>上传《主权授权书》扫描件</span>
+            <input type="file" id="hi-claim-auth" class="hi-claim-file" accept=".pdf,.png,.jpg,.jpeg">
+            <span class="hi-claim-file-hint" id="hi-claim-file-hint">请上传盖章 PDF 或清晰照片 · 仅用于身份核验</span>
+          </label>
+          <button type="button" class="hi-claim-template" id="hi-btn-claim-template-doc">⬇️ 下载 Word 范本（.doc）</button>
+          <button type="button" class="hi-claim-template" id="hi-btn-claim-template-pdf">⬇️ 下载 PDF 范本</button>
+          <button type="button" class="hi-claim-template" id="hi-btn-claim-template">📄 在线预览 / 复制要点给法务</button>
+          <button type="submit" class="hi-card-btn hi-card-gold hi-claim-submit">下一步 · 信息确认</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="hi-commerce-modal" id="hi-modal-sovereignty-dossier" role="dialog" aria-modal="true" aria-labelledby="hi-dossier-title" hidden>
+    <div class="hi-commerce-box hi-glass hi-dossier-box">
+      <button type="button" class="hi-modal-close-x" id="hi-dossier-close-x" aria-label="关闭档案">×</button>
+      <header class="hi-dossier-head">
+        <h2 id="hi-dossier-title">主权认领档案</h2>
+        <div class="hi-dossier-status" id="hi-dossier-status-badge">—</div>
+      </header>
+      <div class="hi-dossier-body">
+        <div class="hi-dossier-row hi-dossier-row-main">
+          <span class="hi-dossier-k">企业</span>
+          <span class="hi-dossier-v" id="hi-dossier-name">—</span>
+        </div>
+        <div class="hi-dossier-row">
+          <span class="hi-dossier-k">信用代码</span>
+          <span class="hi-dossier-v hi-dossier-mono" id="hi-dossier-credit">—</span>
+        </div>
+        <div class="hi-dossier-row hi-dossier-row-split">
+          <div><span class="hi-dossier-k">提交</span><span class="hi-dossier-v" id="hi-dossier-submitted">—</span></div>
+          <div><span class="hi-dossier-k">审核</span><span class="hi-dossier-v" id="hi-dossier-reviewed">—</span></div>
+        </div>
+      </div>
+      <details class="hi-dossier-details" id="hi-dossier-details">
+        <summary>审核详情与附件</summary>
+        <div class="hi-dossier-details-body">
+          <div class="hi-dossier-detail-row">
+            <span class="hi-dossier-detail-k">授权书文件</span>
+            <span id="hi-dossier-file">—</span>
+          </div>
+          <div class="hi-dossier-detail-row" id="hi-dossier-note-row" hidden>
+            <span class="hi-dossier-detail-k">审核意见</span>
+            <span id="hi-dossier-note">—</span>
+          </div>
+          <div class="hi-dossier-detail-row" id="hi-dossier-ai-row" hidden>
+            <span class="hi-dossier-detail-k">AI 预审</span>
+            <span id="hi-dossier-ai">—</span>
+          </div>
+        </div>
+      </details>
+      <div class="hi-commerce-actions hi-dossier-actions">
+        <button type="button" class="hi-card-btn hi-card-gold hi-dossier-primary" id="hi-dossier-close-btn">关闭</button>
+        <button type="button" class="hi-card-btn hi-card-outline" id="hi-dossier-dl-template">下载范本</button>
+        <button type="button" class="hi-card-btn hi-card-outline" id="hi-dossier-view-doc" hidden>查看授权书</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hi-commerce-modal" id="hi-modal-claim-template" role="dialog" aria-modal="true" hidden>
+    <div class="hi-commerce-box hi-glass hi-claim-template-box">
+      <h2>《CL-COP 产业链数据主权授权书》范本要点</h2>
+      <pre class="hi-claim-template-pre" id="hi-claim-template-text">授权方（企业）：________________（统一社会信用代码：________________）
+
+被授权人：________________  职务：________________
+
+授权事项：
+1. 代表本企业在 HengAI 平台认领「原厂因子精算」主权节点；
+2. 开展工序矩阵本地精算、CL-IVC 官方因子确权及核验池存证；
+3. 向产业链下游提供经脱敏的单位产品碳强度及同比增减率。
+
+数据主权声明：
+工序级原始能耗绝对值仅保存在授权方本地终端（LOCAL_VAULT），不上传至 HengAI 云端。
+
+授权期限：自 ____年__月__日起至 ____年__月__日止。
+
+授权方（盖章）：________________
+法定代表人/授权代理人（签字）：________________
+日期：____年__月__日</pre>
+      <p class="hi-claim-template-foot">ℹ️ 以上为要点范本，正式文本请以贵司法务部门审定版本为准。盖章扫描后上传 PDF 或照片即可。</p>
+      <div class="hi-commerce-actions">
+        <button type="button" class="hi-card-btn hi-card-muted" id="hi-modal-template-close">关闭</button>
+        <button type="button" class="hi-card-btn hi-card-gold" id="hi-modal-template-copy">复制范本要点</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hi-commerce-modal hi-hub-modal-overlay" id="hi-modal-policy-brief" role="dialog" aria-modal="true" aria-labelledby="hi-policy-modal-title" hidden>
+    <div class="hi-hub-modal" role="document">
+      <button type="button" class="hi-hub-modal-close" id="hi-policy-modal-close-x" aria-label="关闭">✕</button>
+      <div class="hi-hub-modal-head">
+        <div class="hi-hub-modal-ic" aria-hidden="true">⚖️</div>
+        <div>
+          <h2 id="hi-policy-modal-title" class="hi-hub-modal-title">政策环境参考</h2>
+          <p class="hi-hub-modal-sub">告示性提示 · 非申报建议 · 参考日期 2026-06</p>
+        </div>
+      </div>
+      <div class="ins ins-blue hi-policy-modal-ins">
+        在现行公开政策语境中，<strong>产业链碳因子确权</strong>与<strong>绿色制造数字化转型</strong>常被企业一并纳入合规与技改讨论。本看板仅作背景对照，帮助理解当前事项所处的政策环境。
+      </div>
+      <div class="ins ins-gray hi-policy-modal-ins">
+        <strong>免责声明：</strong>具体财政补贴、申报口径与立项路径以国家及地方主管部门<strong>当年有效细则</strong>为准，且须由贵司财务与行政部门自行判断。Co2Lion / CL-IVC <strong>不提供</strong>政策申报代理、财政背书或补贴比例承诺。政策调整或失效时，以官方发布为准。
+      </div>
+      <div class="hi-hub-modal-actions">
+        <button type="button" class="cta cta-muted" id="hi-policy-modal-ack">我知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hi-commerce-modal" id="hi-modal-convert" role="dialog" aria-modal="true" hidden>
+    <div class="hi-commerce-box hi-glass">
+      <h2>ℹ️ 正式确权确认</h2>
+      <p>正式确权需启动 <strong>CL-IVC 官方认证通道</strong>，费用将包含在「产业链合规赋能专项服务」中。</p>
+      <p class="hi-convert-advice">ℹ️ 启动官方确权前，可导出<strong> CL 事实材料</strong>（下游压力、强度与服务范围等客观数据）留档；若需向公司内部申请立项，请前往<strong>决策层呈送包</strong>由经办人自行撰写呈批请示，事实材料仅作附件。</p>
+      <ul class="hi-commerce-list">
+        <li id="hi-convert-coverage-li">预计覆盖下游企业：<strong id="hi-convert-coverage">0</strong> 家</li>
+        <li id="hi-convert-fee-li">专项服务费（示意）：<strong id="hi-convert-fee">—</strong></li>
+        <li>工序级原始数据仍仅存 LOCAL_VAULT，不上传服务器</li>
+      </ul>
+      <div class="hi-commerce-actions hi-commerce-actions-col">
+        <button type="button" class="hi-card-btn hi-card-budget" id="hi-modal-convert-budget">📎 下载 CL 事实材料（附件）</button>
+        <button type="button" class="hi-card-btn hi-card-blue" id="hi-modal-convert-decision">📋 去决策层呈送包</button>
+        <button type="button" class="hi-card-btn hi-card-gold" id="hi-modal-convert-ok">继续启动认证通道</button>
+        <button type="button" class="hi-card-btn hi-card-muted" id="hi-modal-convert-cancel">稍后再说</button>
+      </div>
+    </div>
+  </div>
+  <div id="hi-press-fx" class="hi-press-fx" aria-hidden="true" hidden>
+    <div class="hi-press-machine">
+      <div class="hi-press-plate"></div>
+      <div class="hi-press-stamp" id="hi-press-stamp">SOVEREIGN<br>SEAL</div>
+    </div>
+  </div>
+
+  <div class="hi-golden-seal-modal" id="hi-golden-seal-modal" role="dialog" aria-modal="true" hidden>
+    <div class="hi-golden-seal-backdrop"></div>
+    <div class="hi-golden-seal-stage">
+      <div class="hi-golden-seal-glow" aria-hidden="true"></div>
+      <div class="hi-golden-seal-coin" id="hi-golden-seal-coin">
+        <div class="hi-golden-seal-ring"></div>
+        <div class="hi-golden-seal-core">
+          <span class="hi-golden-seal-label">CL-COP</span>
+          <strong class="hi-golden-seal-id" id="hi-golden-seal-id">—</strong>
+          <span class="hi-golden-seal-vcode" id="hi-golden-seal-vcode">GTCID —</span>
+          <span class="hi-golden-seal-sub">产业链数据主权 · 官方钢印</span>
+        </div>
+      </div>
+      <h2 class="hi-golden-seal-title">确权合闸 · 钢印加冕</h2>
+      <p class="hi-golden-seal-desc">单位产品碳强度已存入核验池。下游配套企业的惩罚溢价将随刷新同步解除。</p>
+      <button type="button" class="hi-card-btn hi-card-gold" id="hi-golden-seal-ok">完成</button>
+    </div>
+  </div>
+
+  <div class="hi-pledge" id="hi-pledge" role="dialog" aria-modal="true">
+    <div class="hi-pledge-box hi-glass">
+      <h2>《重工业核心数据保密承诺书》</h2>
+      <p>本人/本企业确认：工序级原始能耗绝对值仅保存在本终端 LOCAL_VAULT，不上传至 HengAI 云端。</p>
+      <p>向平台同步的数据仅限于：<strong>单位产品碳强度</strong>、<strong>同比增减率</strong>及行业/product 脱敏标签。</p>
+      <p>本人对数据真实性负责，并授权 HengAI 生成 CL-COP 系列确权编号供产业链引用。</p>
+      <div class="hi-pledge-actions">
+        <button type="button" class="hi-card-btn hi-card-muted" id="hi-pledge-cancel">取消</button>
+        <button type="button" class="hi-card-btn hi-card-gold" id="hi-pledge-ok">我已阅读并承诺</button>
+      </div>
+    </div>
+  </div>
+  <div id="hi-pdf-root"></div>
+</div>
+<script>
+(function () {
+  'use strict';
+
+  const LOCAL_VAULT = {};
+  const VAULT_STORAGE_KEY = 'hengai_hi_local_vault_v1';
+  const PROD_LINE_KEY = 'hengai_hi_production_line';
+
+  function saveLocalVault() {
+    try { sessionStorage.setItem(VAULT_STORAGE_KEY, JSON.stringify(LOCAL_VAULT)); } catch (_) {}
+  }
+
+  function loadLocalVault() {
+    try {
+      var raw = sessionStorage.getItem(VAULT_STORAGE_KEY);
+      if (!raw) return;
+      var parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        Object.keys(parsed).forEach(function (k) { LOCAL_VAULT[k] = parsed[k]; });
+      }
+    } catch (_) {}
+  }
+
+  function getProductionLine() {
+    var el = document.getElementById('hi-production-line');
+    var v = el && el.value ? el.value.trim() : '';
+    if (!v) {
+      try { v = sessionStorage.getItem(PROD_LINE_KEY) || 'L01'; } catch (_) { v = 'L01'; }
+    }
+    return v.toUpperCase();
+  }
+
+  function persistProductionLine() {
+    var el = document.getElementById('hi-production-line');
+    if (!el) return;
+    try { sessionStorage.setItem(PROD_LINE_KEY, getProductionLine()); } catch (_) {}
+  }
+
+  loadLocalVault();
+  const CIRC = 2 * Math.PI * 44;
+  const RING_CIRC = 2 * Math.PI * 62;
+  let ringMax = 3.5;
+
+  function blueprintToMeta(bp) {
+    if (!bp) return null;
+    return {
+      code: bp.code,
+      steps: bp.steps.map(function (s) {
+        return [s.name, s.defaults.ef, s.defaults.energy, s.icon];
+      }),
+      panel: 'hi-panel-dynamic',
+      flow: 'hi-flow-dynamic',
+      head: 'hi-head-dynamic',
+      body: 'hi-body-dynamic',
+      title: bp.title,
+      sub: bp.sub,
+      bench: bp.bench,
+      best: bp.best,
+      ringMax: bp.ringMax,
+      productLabel: bp.productLabel,
+      unitLabel: bp.unitLabel,
+      unitRing: bp.unitRing,
+      calcMode: bp.calcMode || 'standard',
+      coreKpis: bp.coreKpis || [],
+      gdEts: bp.gdEts !== false,
+      cbamExpandWarning: !!bp.cbamExpandWarning,
+      intensityUnit: bp.intensityUnit || 'tCO2e/t',
+      kpi: bp.kpi,
+    };
+  }
+
+  function buildIndustryMetaFromBlueprint() {
+    var bpRoot = window.HI_INDUSTRY_BLUEPRINT || {};
+    var order = window.HI_INDUSTRY_ORDER || Object.keys(bpRoot);
+    var meta = {};
+    order.forEach(function (k) {
+      if (bpRoot[k]) meta[k] = blueprintToMeta(bpRoot[k]);
+    });
+    return meta;
+  }
+
+  function ensureP0AluminumBlueprint() {
+    var bpRoot = window.HI_INDUSTRY_BLUEPRINT || {};
+    if (!bpRoot || typeof bpRoot !== 'object') return;
+    if (!bpRoot.aluminum || typeof bpRoot.aluminum !== 'object') {
+      bpRoot.aluminum = {
+        code: 'aluminum',
+        display: '铝业',
+        shortLabel: '铝业',
+        title: '电解铝 / 铝加工行业碳因子精算',
+        sub: '覆盖氧化铝制备 → 电解铝 → 铸造加工',
+        productLabel: '铝产品',
+        unitLabel: '单位产品碳强度',
+        unitRing: 'tCO₂e/t',
+        intensityUnit: 'tCO2e/t',
+        bench: 12.5,
+        best: 4.0,
+        ringMax: 18.0,
+        gdEts: true,
+        cbamExpandWarning: false,
+        calcMode: 'aluminum_dual',
+        coreKpis: ['电力碳因子', '阳极净耗', 'PFC 过氟化碳排放'],
+        kpi: {
+          penaltyLine: 16.5,
+          industryAvg: 12.5,
+          greenBench: 4.0,
+          unit: 'tCO₂e/t',
+        },
+        subTypes: {
+          primary: {
+            label: '原铝生产（电解铝）',
+            bench: 12.5,
+            ringMax: 18.0,
+            penaltyLine: 16.5,
+          },
+          processing: {
+            label: '铝深加工（压铸/型材/箔）',
+            bench: 1.2,
+            ringMax: 3.0,
+            penaltyLine: 1.62,
+          },
+        },
+        powerSourceConfig: {
+          enabled: true,
+          label: '电力来源结构',
+          hint: '西南水电铝（云南/四川）可显著降低电解工序碳强度',
+          fields: [
+            { id: 'hydro_pct', label: '水电占比', unit: '%', default: 20 },
+            { id: 'wind_pct', label: '风光电占比', unit: '%', default: 5 },
+            { id: 'coal_pct', label: '火电占比', unit: '%', default: 75 },
+          ],
+          emissionFactors: { hydro: 0.004, wind: 0.011, coal: 0.850 },
+        },
+        steps: [
+          { name: '氧化铝制备', icon: '🧱', defaults: { ef: 1.0, energy: 10.5 } },
+          { name: '碳素阳极生产', icon: '🔲', defaults: { ef: 0.5, energy: 3.0 } },
+          { name: '电解铝（直流电耗）', icon: '⚡', defaults: { ef: 11.5, energy: 13000 } },
+          { name: '铝液铸造', icon: '🏭', defaults: { ef: 0.15, energy: 1.5 } },
+          { name: '辅助能耗', icon: '🔧', defaults: { ef: 0.1, energy: 1.0 } },
+        ],
+      };
+    } else {
+      bpRoot.aluminum.bench = 12.5;
+      bpRoot.aluminum.best = 4.0;
+      bpRoot.aluminum.ringMax = 18.0;
+      bpRoot.aluminum.gdEts = true;
+    }
+    window.HI_INDUSTRY_BLUEPRINT = bpRoot;
+    if (!Array.isArray(window.HI_INDUSTRY_ORDER)) {
+      window.HI_INDUSTRY_ORDER = Object.keys(bpRoot);
+    }
+    if (window.HI_INDUSTRY_ORDER.indexOf('aluminum') < 0) {
+      var steelIdx = window.HI_INDUSTRY_ORDER.indexOf('steel');
+      if (steelIdx >= 0) window.HI_INDUSTRY_ORDER.splice(steelIdx + 1, 0, 'aluminum');
+      else window.HI_INDUSTRY_ORDER.unshift('aluminum');
+    }
+  }
+  ensureP0AluminumBlueprint();
+
+  const INDUSTRY_META = buildIndustryMetaFromBlueprint();
+  // 初始值使用默认激活行业 steel；切换行业时会动态更新 ringMax。
+  ringMax = (INDUSTRY_META.steel && INDUSTRY_META.steel.ringMax) || 3.5;
+
+  const INDUSTRY_CODE_MAP = {
+    steel: 'steel', '钢铁': 'steel', steel_mill: 'steel',
+    cement: 'cement', '水泥': 'cement', '水泥业': 'cement',
+    petro: 'petro', petrochemical: 'petro', '石化': 'petro', '化工': 'petro',
+    paper: 'paper', papermaking: 'paper', '造纸': 'paper',
+    aviation: 'aviation', '民航': 'aviation', airline: 'aviation',
+    ceramic: 'ceramic', ceramics: 'ceramic', '陶瓷': 'ceramic',
+    port: 'port', ports: 'port', '港口': 'port', '交通': 'port',
+    idc: 'idc', datacenter: 'idc', '数据中心': 'idc',
+    aluminum: 'aluminum', aluminium: 'aluminum', al: 'aluminum',
+    '铝': 'aluminum', '铝业': 'aluminum', '电解铝': 'aluminum',
+    '铝加工': 'aluminum', '铝压铸': 'aluminum', '铝型材': 'aluminum',
+  };
+  const INDUSTRY_DISPLAY = {};
+  Object.keys(INDUSTRY_META).forEach(function (k) {
+    var bp = (window.HI_INDUSTRY_BLUEPRINT || {})[k];
+    INDUSTRY_DISPLAY[k] = (bp && bp.display) || k;
+  });
+  const INFLUENCE_LABELS = {};
+  Object.keys(INDUSTRY_META).forEach(function (k) {
+    INFLUENCE_LABELS[k] = (INDUSTRY_DISPLAY[k] || k) + '行业榜';
+  });
+
+  function buildIndustryTabs() {
+    var host = document.getElementById('hi-ind-tabs-host');
+    if (!host) return;
+    host.innerHTML = '';
+    var order = window.HI_INDUSTRY_ORDER || Object.keys(INDUSTRY_META);
+    order.forEach(function (key, i) {
+      if (!INDUSTRY_META[key]) return;
+      var bp = (window.HI_INDUSTRY_BLUEPRINT || {})[key] || {};
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'hi-tab' + (i === 0 ? ' on' : '');
+      btn.setAttribute('role', 'tab');
+      btn.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+      btn.setAttribute('data-ind', key);
+      btn.textContent = bp.shortLabel || bp.display || key;
+      btn.title = bp.title || key;
+      host.appendChild(btn);
+    });
+    host.querySelectorAll('.hi-tab').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var ind = btn.getAttribute('data-ind') || 'steel';
+        var scoped = getCompanyIndustryKey();
+        if (scoped && ind !== scoped) return;
+        switchIndustry(ind);
+      });
+    });
+  }
+
+  function isGuangdongEnterprise() {
+    var co = (window.AppState && window.AppState.company) || {};
+    var tag = String(co.regionTag || co.region_tag || '').toLowerCase();
+    if (/gd|guangdong|广东/.test(tag)) return true;
+    return false;
+  }
+
+  function refreshRegionalPolicy() {
+    var gd = isGuangdongEnterprise();
+    var meta = INDUSTRY_META[activeIndustry] || {};
+    var gdBanner = document.getElementById('hi-gd-ets-banner');
+    var gdHint = document.getElementById('hi-gd-sync-hint');
+    if (gdBanner) gdBanner.hidden = !(gd && meta.gdEts);
+    if (gdHint) gdHint.hidden = !gd;
+  }
+
+  function refreshCbamExpandWarning() {
+    var meta = INDUSTRY_META[activeIndustry] || {};
+    var el = document.getElementById('hi-cbam-expand-warn');
+    if (el) el.hidden = !meta.cbamExpandWarning;
+  }
+
+  function refreshIndustryKpiStrip(meta) {
+    meta = meta || INDUSTRY_META[activeIndustry] || {};
+    var strip = document.getElementById('hi-ind-kpi-strip');
+    if (!strip) return;
+    if (!meta.coreKpis || !meta.coreKpis.length) {
+      strip.hidden = true;
+      return;
+    }
+    var kpiExtra = '';
+    if (meta.kpi && typeof meta.kpi === 'object') {
+      var unit = meta.kpi.unit || '';
+      var avgTxt = meta.kpi.industryAvg != null ? ('行业均值 ' + meta.kpi.industryAvg + (unit ? (' ' + unit) : '')) : '';
+      var lineTxt = meta.kpi.penaltyLine != null ? ('惩罚线 ' + meta.kpi.penaltyLine + (unit ? (' ' + unit) : '')) : '';
+      kpiExtra = [avgTxt, lineTxt].filter(Boolean).map(function (txt) { return '<span>行业 KPI · ' + txt + '</span>'; }).join('');
+    } else if (meta.kpi) {
+      kpiExtra = '<span>行业 KPI · ' + meta.kpi + '</span>';
+    }
+    strip.hidden = false;
+    strip.innerHTML = meta.coreKpis.map(function (k) {
+      return '<span>核心 KPI · ' + k + '</span>';
+    }).join('') + kpiExtra;
+  }
+
+  function getMatrixRowDefs(meta) {
+    meta = meta || INDUSTRY_META[activeIndustry] || {};
+    if (meta.calcMode === 'idc') {
+      return [
+        { cls: 'hi-m-out', label: 'IT负载 (MWh)', field: 'output', ph: 'MWh', inp: true },
+        { cls: 'hi-m-energy', label: '辅助能耗系数', field: 'energy', ph: '系数', inp: true, defIdx: 2 },
+        { cls: 'hi-m-ef', label: '电网因子 (tCO₂e/MWh)', field: 'ef', ph: '因子', inp: true, defIdx: 1 },
+        { cls: 'hi-m-emit', label: '碳排放量 (tCO₂e)', field: 'emit', ph: '', inp: false },
+      ];
+    }
+    if (meta.calcMode === 'rtk') {
+      return [
+        { cls: 'hi-m-out', label: '运量 (吨公里 RTK)', field: 'output', ph: 'RTK', inp: true },
+        { cls: 'hi-m-energy', label: '航油消耗 (t/RTK)', field: 'energy', ph: 't/RTK', inp: true, defIdx: 2 },
+        { cls: 'hi-m-ef', label: '排放因子 (tCO₂e/t油)', field: 'ef', ph: '因子', inp: true, defIdx: 1 },
+        { cls: 'hi-m-emit', label: '碳排放量 (tCO₂e)', field: 'emit', ph: '', inp: false },
+      ];
+    }
+    if (meta.calcMode === 'teu') {
+      return [
+        { cls: 'hi-m-out', label: '吞吐量 (TEU)', field: 'output', ph: 'TEU', inp: true },
+        { cls: 'hi-m-energy', label: '单箱能耗 (GJ/TEU)', field: 'energy', ph: 'GJ/TEU', inp: true, defIdx: 2 },
+        { cls: 'hi-m-ef', label: '碳排放因子 (tCO₂e/GJ)', field: 'ef', ph: '因子', inp: true, defIdx: 1 },
+        { cls: 'hi-m-emit', label: '碳排放量 (tCO₂e)', field: 'emit', ph: '', inp: false },
+      ];
+    }
+    if (meta.calcMode === 'area') {
+      return [
+        { cls: 'hi-m-out', label: '产量 (㎡)', field: 'output', ph: '㎡', inp: true },
+        { cls: 'hi-m-energy', label: '单耗 (GJ/㎡)', field: 'energy', ph: 'GJ/㎡', inp: true, defIdx: 2 },
+        { cls: 'hi-m-ef', label: '碳排放因子 (tCO₂e/GJ)', field: 'ef', ph: '因子', inp: true, defIdx: 1 },
+        { cls: 'hi-m-emit', label: '碳排放量 (tCO₂e)', field: 'emit', ph: '', inp: false },
+      ];
+    }
+    return [
+      { cls: 'hi-m-out', label: '产量（吨）', field: 'output', ph: 't', inp: true },
+      { cls: 'hi-m-energy', label: '综合能耗（GJ/吨）', field: 'energy', ph: 'GJ/t', inp: true, defIdx: 2 },
+      { cls: 'hi-m-ef', label: '碳排放因子（tCO₂e/GJ）', field: 'ef', ph: '因子', inp: true, defIdx: 1 },
+      { cls: 'hi-m-emit', label: '碳排放量（tCO₂e）', field: 'emit', ph: '', inp: false },
+    ];
+  }
+
+  const INDUSTRY_CRUSADE_SHARE = {
+    steel: 0.22, cement: 0.12, petro: 0.18, paper: 0.10, aviation: 0.08,
+    ceramic: 0.10, port: 0.08, idc: 0.12,
+  };
+  const INDUSTRY_TAX_SHARE = INDUSTRY_CRUSADE_SHARE;
+  var DEMO_ORIGIN_LABELS = ['示意原厂 A', '示意原厂 B', '示意原厂 C', '示意原厂 D', '示意原厂 E', '示意原厂 F', '示意原厂 G'];
+
+  function formatInfluenceTag(raw, isDemo) {
+    if (isDemo) return '示意 · 待链上汇入';
+    if (!raw) return '实证中';
+    if (typeof window.cityStateLabel === 'function') {
+      var labeled = window.cityStateLabel(raw);
+      if (labeled && labeled !== raw) return labeled;
+    }
+    var map = {
+      evidence_building: '软件实证中',
+      mat_pending: '待建城池',
+      certified: '正式碳城池',
+    };
+    return map[raw] || String(raw);
+  }
+
+  function buildInfluenceBoard(ind) {
+    var st = window.AppState || {};
+    var board = st.resonance && st.resonance.industryBoard;
+    if (Array.isArray(board) && board.length) {
+      return {
+        dataMode: 'live',
+        entries: board.slice(0, 7).map(function (row, i) {
+          var ci = Number(row.carbonIntensity || row.carbon_intensity || 0);
+          var cs = row.cityState || row.city_state || '';
+          return {
+            alias: row.holder || row.productionEntity || ('链上原厂 #' + (i + 1)),
+            tag: formatInfluenceTag(cs, false),
+            empower: Math.max(1, 12 - i * 2),
+            taxSaved: Math.max(0, Math.round(ci * 85000)),
+            confidence: row.pullEligible ? 92 : 78,
+            eis: Math.max(55, 94 - i * 5),
+            isDemo: false,
+          };
+        }),
+      };
+    }
+    var pending = Number(st.resonance && st.resonance.pendingRequestsForIndustry) ||
+      Number(st.metrics && st.metrics.resonanceCount) ||
+      Number(st.metrics && st.metrics.crusadeCount) || 0;
+    var taxBase = Number(st.metrics && st.metrics.totalTaxPenalty) ||
+      Number(st.industryAudit && st.industryAudit.totalTaxPenaltyEur) || 0;
+    if (pending <= 0) {
+      return { dataMode: 'empty', entries: [] };
+    }
+    var out = [];
+    for (var i = 0; i < Math.min(7, pending); i++) {
+      out.push({
+        alias: DEMO_ORIGIN_LABELS[i] || ('示意原厂 ' + String.fromCharCode(65 + i)),
+        tag: formatInfluenceTag(null, true),
+        empower: Math.max(1, Math.round(pending * (0.22 - i * 0.025))),
+        taxSaved: Math.max(0, Math.round(taxBase * (0.18 - i * 0.02))),
+        confidence: Math.max(72, 96 - i * 4),
+        eis: Math.max(55, 92 - i * 5),
+        isDemo: true,
+      });
+    }
+    return { dataMode: 'demo', entries: out };
+  }
+
+  function buildInfluenceEntries(ind) {
+    return buildInfluenceBoard(ind).entries;
+  }
+
+  function formatMyRankLabel(dataMode, certified, pending, userRank) {
+    if (userRank != null && userRank !== '' && !isNaN(Number(userRank))) {
+      return '第 ' + Number(userRank) + ' 名';
+    }
+    if (!certified) {
+      if (dataMode === 'demo') {
+        return pending > 0 ? ('草案态 · 尚未进入上方示意榜（诉求 ' + pending + ' 家）') : '草案态 · 尚未入榜';
+      }
+      return pending > 0 ? ('草案态 · 诉求激活后预计第 ' + (pending + 1) + ' 名') : '草案态 · 尚未入榜';
+    }
+    if (pending > 0) return '第 ' + Math.max(1, pending) + ' 名（官方计分中）';
+    return '已确权 · 等待榜单更新';
+  }
+
+  function getCompanyIndustryKey() {
+    if (sovereigntyMode === 'claim') return null;
+    var co = window.AppState && window.AppState.company || {};
+    var raw = String(
+      co.industryCode || co.industry_code || co.industry || co.industryLabel || 'steel'
+    ).trim().toLowerCase();
+    if (INDUSTRY_CODE_MAP[raw]) return INDUSTRY_CODE_MAP[raw];
+    return INDUSTRY_META[raw] ? raw : 'steel';
+  }
+
+  function industryMetricShare(ind, kind) {
+    var table = kind === 'tax' ? INDUSTRY_TAX_SHARE : INDUSTRY_CRUSADE_SHARE;
+    var scoped = getCompanyIndustryKey();
+    if (scoped && ind !== scoped) return 0;
+    if (scoped) return table[scoped] || 0.33;
+    return table[ind] || 0.33;
+  }
+
+  function resolveWorkspaceIndustryKey() {
+    var co = window.AppState && window.AppState.company || {};
+    var raw = String(
+      co.industryCode || co.industry_code || co.industry || co.industryLabel || 'steel'
+    ).trim().toLowerCase();
+    if (INDUSTRY_CODE_MAP[raw]) return INDUSTRY_CODE_MAP[raw];
+    return INDUSTRY_META[raw] ? raw : 'steel';
+  }
+
+  function applyIndustryScope() {
+    var scoped = getCompanyIndustryKey();
+    var tabsWrap = document.querySelector('#hi-suite .hi-ind-tabs');
+    document.querySelectorAll('#hi-suite .hi-tab').forEach(function (btn) {
+      var ind = btn.getAttribute('data-ind');
+      var show = !scoped || ind === scoped;
+      btn.hidden = !show;
+      btn.style.display = show ? '' : 'none';
+    });
+    if (tabsWrap) tabsWrap.classList.toggle('hi-ind-tabs-single', !!scoped);
+
+    Object.keys(INDUSTRY_META).forEach(function (k) {
+      var p = document.getElementById(INDUSTRY_META[k].panel);
+      if (!p) return;
+      p.hidden = false;
+      p.classList.toggle('hi-panel-on', !scoped || k === scoped);
+    });
+
+    if (scoped && activeIndustry !== scoped) switchIndustry(scoped);
+
+    var tmplHint = document.getElementById('hi-industry-template-hint');
+    if (!tmplHint) {
+      tmplHint = document.createElement('div');
+      tmplHint.id = 'hi-industry-template-hint';
+      tmplHint.style.cssText = 'font-size:10.5px;color:var(--ink2);margin-top:4px;line-height:1.5';
+      var brand = document.querySelector('.hi-brand');
+      if (brand) brand.appendChild(tmplHint);
+    }
+    if (tmplHint) {
+      if (scoped) {
+        var metaT = INDUSTRY_META[scoped] || INDUSTRY_META.steel;
+        tmplHint.textContent = '行业感知：已加载「' + (INDUSTRY_DISPLAY[scoped] || scoped) + '」模板 · ' + metaT.sub;
+      } else {
+        tmplHint.textContent = '八大高耗能行业全光谱 · 切换 Tab 加载物理工序模型（GD-ETS 2026 对齐）';
+      }
+    }
+
+    var resTitle = document.getElementById('hi-res-section-title');
+    if (resTitle) {
+      resTitle.textContent = scoped
+        ? (INDUSTRY_DISPLAY[scoped] || '') + '产业链诉求大盘'
+        : '产业链诉求大盘';
+    }
+    var crusadeDesc = document.getElementById('hi-kpi-crusade-desc');
+    if (crusadeDesc) {
+      crusadeDesc.textContent = scoped
+        ? (INDUSTRY_DISPLAY[scoped] || '本行业') + '配套中小企业申请您的碳因子背书'
+        : '配套中小企业申请您的碳因子背书';
+    }
+    var taxDesc = document.getElementById('hi-kpi-tax-desc');
+    if (taxDesc) {
+      taxDesc.textContent = scoped
+        ? '预计本行业可挽回的超额碳税损失'
+        : '的超额碳税损失';
+    }
+    var taxLead = document.getElementById('hi-kpi-tax-lead');
+    if (taxLead) {
+      taxLead.textContent = scoped ? '预计本行业可挽回' : '预计可为全产业链挽回';
+    }
+
+    document.querySelectorAll('.hi-donut-legend li').forEach(function (li) {
+      var ind = li.getAttribute('data-ind');
+      li.hidden = !!(scoped && ind && ind !== scoped);
+    });
+    var donutBlock = document.getElementById('hi-donut-block');
+    if (donutBlock) donutBlock.hidden = !!scoped;
+
+    var infLabel = document.getElementById('hi-inf-ind-label');
+    if (infLabel && scoped) {
+      infLabel.textContent = (INDUSTRY_DISPLAY[scoped] || scoped) + '行业榜';
+    } else if (infLabel && !scoped) {
+      infLabel.textContent = '钢铁行业榜';
+    }
+  }
+
+  function refreshWarroomPhaseTag() {
+    var el = document.getElementById('hi-phase-tag');
+    if (!el) return;
+    var co = window.AppState && window.AppState.company || {};
+    var st = sovereigntyClaimStatus();
+    var hasEnterprise = !!(co && (co.isComplete || co.is_complete || co.name));
+    if (hasEnterprise || st === 'pending' || st === 'approved' || sovereigntyMode !== 'claim') {
+      if (st === 'pending') {
+        el.textContent = 'Phase 2 · 主权审核中';
+        el.title = '已完成个体启蒙；企业已认领，授权书人工审核中';
+      } else if (st === 'approved' || sovereigntyMode === 'sovereign') {
+        el.textContent = 'Phase 2 · 工业原厂期';
+        el.title = '企业主权已关联，处于工业原厂因子精算阶段';
+      } else {
+        el.textContent = 'Phase 2 · 企业档案期';
+        el.title = '已建立企业空间，可进行因子精算与主权认领';
+      }
+    } else {
+      el.textContent = 'Phase 1 · 个体启蒙期';
+      el.title = '尚未完成企业主权关联；此阶段为个人合规启蒙，不含工业原厂战情室权益';
+    }
+  }
+
+  function hiDoLogout() {
+    if (!confirm('确定退出当前账号吗？退出后可重新登录验证认领流程。')) return;
+    closeCommerceModal('hi-modal-sovereignty-dossier');
+    closeAllHiModals();
+    try { sessionStorage.removeItem('hengai_hi_sovereignty_mode'); } catch (e) { /* ignore */ }
+    try {
+      if (window.parent && window.parent !== window) {
+        if (typeof window.parent.doLogout === 'function') {
+          window.parent.doLogout();
+          return;
+        }
+        if (window.parent.AppState && typeof window.parent.AppState.updateAuth === 'function') {
+          window.parent.AppState.updateAuth(null, null);
+        }
+        if (typeof window.parent.clearToken === 'function') window.parent.clearToken();
+        window.top.location.href = 'index.html';
+        return;
+      }
+    } catch (e) { /* ignore */ }
+    if (window.AppState && typeof window.AppState.updateAuth === 'function') {
+      window.AppState.updateAuth(null, null);
+    }
+    if (typeof clearToken === 'function') clearToken();
+    window.location.href = 'index.html';
+  }
+
+  let activeIndustry = 'steel';
+  let pledgeResolver = null;
+  let pendingAction = null;
+  let pendingConvertCallback = null;
+  let recalcQueued = false;
+  let gaugeAnimHandle = 0;
+  let gaugeDisplayCi = 0;
+  var resonanceServer = null;
+  var lastResonanceKpis = null;
+  var sovereigntyMode = 'pending';
+
+  function patchIndustryCommerce(patch) {
+    if (!window.AppState || typeof window.AppState.patchState !== 'function') return;
+    var ia = Object.assign({}, window.AppState.industryAudit || {}, patch);
+    window.AppState.patchState({ industryAudit: ia });
+  }
+
+  function isOfficialCertified() {
+    var co = window.AppState && window.AppState.company;
+    if (co && co.verifiedFactorCertId) return true;
+    var ia = window.AppState && window.AppState.industryAudit;
+    return !!(ia && ia.hasVerifiedFactor);
+  }
+
+  function pressureCount() {
+    var st = window.AppState || {};
+    var res = st.resonance || {};
+    var pending = Number(res.pendingRequestsForIndustry);
+    if (pending > 0) return pending;
+    var n = Number(st.metrics && st.metrics.resonanceCount);
+    if (n > 0) return n;
+    n = Number(st.metrics && st.metrics.crusadeCount);
+    return n > 0 ? n : 0;
+  }
+
+  function captureResonanceServer(force) {
+    if (resonanceServer && !force) return;
+    var ia = window.AppState && window.AppState.industryAudit;
+    if (ia && ia.resonanceServerCrusade != null) {
+      resonanceServer = {
+        crusadeCount: Number(ia.resonanceServerCrusade) || 0,
+        totalTaxPenalty: Number(ia.resonanceServerTax) || 0,
+      };
+      return;
+    }
+    var m = window.AppState && window.AppState.metrics;
+    if (!m) return;
+    resonanceServer = {
+      crusadeCount: Number(m.crusadeCount) || 0,
+      totalTaxPenalty: Number(m.totalTaxPenalty) || Number(m.total_tax_penalty) || 0,
+    };
+  }
+
+  function fmtCrusadeKpi(n) {
+    n = Number(n) || 0;
+    if (window.F && typeof window.F.crusade === 'function') return window.F.crusade(n);
+    return n.toLocaleString('zh-CN');
+  }
+
+  function fmtTaxKpi(n) {
+    n = Number(n) || 0;
+    if (n <= 0) return '—';
+    if (window.F && typeof window.F.moneyExposureHtml === 'function') return window.F.moneyExposureHtml(n);
+    if (n >= 1e6) return '€ ' + n.toLocaleString('en-US');
+    if (window.F && typeof window.F.eurYi === 'function') return window.F.eurYi(n);
+    if (n >= 1e8) return '€ ' + (n / 1e8).toFixed(2) + '亿';
+    return '€ ' + n.toLocaleString('zh-CN');
+  }
+
+  function prefersReducedMotion() {
+    try { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+    catch (_) { return false; }
+  }
+
+  /** 诉求大盘 · 仅读后端/共振真实数，禁止假 fallback */
+  function resolveResonanceKpis() {
+    captureResonanceServer(true);
+    var st = window.AppState || {};
+    var res = st.resonance || {};
+    var backend = resonanceServer || { crusadeCount: 0, totalTaxPenalty: 0 };
+    var crusade = Number(res.pendingRequestsForIndustry);
+    if (!(crusade > 0)) crusade = Number(backend.crusadeCount) || 0;
+    if (!(crusade > 0)) crusade = Number(st.metrics && st.metrics.resonanceCount) || 0;
+    var tax = Number(backend.totalTaxPenalty) || 0;
+    if (!(tax > 0)) {
+      tax = Number(st.metrics && (st.metrics.totalTaxPenalty || st.metrics.total_tax_penalty)) || 0;
+    }
+    return {
+      crusadeCount: Math.max(0, Math.round(crusade)),
+      totalTaxPenalty: Math.max(0, Math.round(tax)),
+    };
+  }
+
+  function paintResonanceKpis(kpi) {
+    kpi = kpi || resolveResonanceKpis();
+    lastResonanceKpis = kpi;
+    var crusadeEl = document.getElementById('hi-kpi-crusade-display');
+    var taxEl = document.getElementById('hi-kpi-tax-display');
+    var wrap = document.getElementById('hi-kpi-crusade-wrap');
+    var emptyHint = document.getElementById('hi-kpi-crusade-empty');
+    var crusadeTarget = Number(kpi.crusadeCount) || 0;
+    var taxTarget = Number(kpi.totalTaxPenalty) || 0;
+
+    if (crusadeEl) crusadeEl.textContent = crusadeTarget > 0 ? fmtCrusadeKpi(crusadeTarget) : '0';
+    if (taxEl) {
+      if (taxTarget > 0 && window.F && typeof window.F.moneyExposureHtml === 'function') {
+        taxEl.innerHTML = fmtTaxKpi(taxTarget);
+      } else {
+        taxEl.textContent = taxTarget > 0 ? fmtTaxKpi(taxTarget) : '—';
+      }
+      taxEl.classList.toggle('gold', taxTarget > 0);
+      taxEl.classList.toggle('money-kpi-host', taxTarget > 0);
+    }
+    if (wrap) wrap.classList.toggle('hi-kpi-empty', crusadeTarget <= 0);
+    if (emptyHint) emptyHint.hidden = crusadeTarget > 0;
+  }
+
+  function fmtTaxDelta(n) {
+    n = Number(n) || 0;
+    if (n >= 1e6) return '€' + (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e4) return '€' + Math.round(n / 1e4) + '万';
+    return '€' + Math.round(n);
+  }
+
+  function updateResonanceDashboard(ci, totalOut) {
+    paintResonanceKpis(resolveResonanceKpis());
+
+    var deltaCrusade = document.getElementById('hi-delta-crusade-val');
+    var deltaTax = document.getElementById('hi-delta-tax-val');
+    var deltaCrusadeWrap = document.getElementById('hi-delta-crusade');
+    var deltaTaxWrap = document.getElementById('hi-delta-tax');
+
+    if (deltaCrusade) deltaCrusade.textContent = '—';
+    if (deltaTax) deltaTax.textContent = '—';
+    if (deltaCrusadeWrap) deltaCrusadeWrap.classList.add('hi-delta-idle');
+    if (deltaTaxWrap) deltaTaxWrap.classList.add('hi-delta-idle');
+
+    renderAuditLog(ci);
+  }
+
+  function sovereigntyClaimStatus() {
+    var co = window.AppState && window.AppState.company || {};
+    var st = String(co.sovereigntyClaimStatus || co.sovereignty_claim_status || '').toLowerCase();
+    if (st && st !== 'none') return st;
+    try {
+      var cached = sessionStorage.getItem('hengai_hi_sovereignty_mode');
+      if (cached === 'pending' || cached === 'approved') return cached;
+    } catch (e) { /* ignore */ }
+    return 'none';
+  }
+
+  function patchCompanySovereignty(patch) {
+    if (!window.AppState) window.AppState = {};
+    window.AppState.company = Object.assign({}, window.AppState.company || {}, patch || {});
+    var st = patch && (patch.sovereigntyClaimStatus || patch.sovereignty_claim_status);
+    if (st && st !== 'none') {
+      try { sessionStorage.setItem('hengai_hi_sovereignty_mode', st); } catch (e) { /* ignore */ }
+    }
+    if (st === 'rejected' || st === 'none') {
+      try { sessionStorage.removeItem('hengai_hi_sovereignty_mode'); } catch (e) { /* ignore */ }
+    }
+  }
+
+  function closeAllHiModals() {
+    document.querySelectorAll('#hi-suite .hi-commerce-modal').forEach(function (el) {
+      el.hidden = true;
+      el.classList.remove('show');
+    });
+  }
+
+  function forceShowWarRoom() {
+    var main = document.getElementById('hi-warroom-main');
+    closeAllHiModals();
+    closeCommerceModal('hi-modal-claim-wizard');
+    if (main) {
+      main.hidden = false;
+      main.removeAttribute('hidden');
+      main.style.display = '';
+    }
+    sovereigntyMode = 'pending';
+    var suite = document.getElementById('hi-suite');
+    if (suite) {
+      suite.classList.remove('hi-mode-claim');
+      suite.classList.add('hi-mode-pending');
+      suite.classList.remove('hi-mode-sovereign');
+    }
+    var pendingBanner = document.getElementById('hi-pending-banner');
+    if (pendingBanner) pendingBanner.hidden = false;
+    var lamp = document.getElementById('hi-sovereignty-lamp');
+    if (lamp) {
+      lamp.textContent = '🟡 授权书审核中';
+      lamp.className = 'hi-sovereignty-lamp hi-lamp-amber';
+    }
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'HENGAI_DATA_CHANGED', source: 'sovereignty-claim' }, '*');
+      }
+    } catch (e) { /* ignore */ }
+    try { main && main.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e2) { /* ignore */ }
+  }
+
+  function companyIsComplete() {
+    var co = window.AppState && window.AppState.company || {};
+    var st = sovereigntyClaimStatus();
+    if (st === 'approved') return true;
+    if (co.is_complete === true || co.isComplete === true) {
+      var credit = String(co.creditCode || co.credit_code || '').trim();
+      var name = String(co.name || '').trim();
+      if (name && credit && credit.indexOf('TEMP-') !== 0 && st !== 'none' && st !== 'rejected') return true;
+    }
+    var credit = String(co.creditCode || co.credit_code || '').trim();
+    var name = String(co.name || '').trim();
+    return !!(name && credit && credit.indexOf('TEMP-') !== 0 && st === 'approved');
+  }
+
+  function resolveSovereigntyMode() {
+    var st = sovereigntyClaimStatus();
+    if (st === 'none' || st === 'rejected') return 'claim';
+    if (st === 'pending') return 'pending';
+    if (st === 'approved' || isOfficialCertified()) return 'sovereign';
+    return 'pending';
+  }
+
+  function sovereigntyStatusLabel(st) {
+    if (st === 'pending') return '🟡 待人工审核';
+    if (st === 'approved') return '🟢 主权已确权';
+    if (st === 'rejected') return '🔴 审核驳回';
+    return '🔴 待主权认领';
+  }
+
+  function openClaimWizard() {
+    var co = window.AppState && window.AppState.company || {};
+    var st = sovereigntyClaimStatus();
+    var desc = document.querySelector('#hi-modal-claim-wizard .hi-claim-desc');
+    if (desc) {
+      if (st === 'rejected') {
+        var rejNote = co.sovereigntyClaimReviewerNote || co.sovereignty_claim_reviewer_note;
+        desc.innerHTML = rejNote
+          ? ('上次认领被驳回：<strong>' + rejNote + '</strong>。请重新上传符合要求的盖章授权书。')
+          : '上次认领被驳回，请重新上传符合要求的盖章授权书。';
+      } else {
+        desc.innerHTML = '认领证明您有权代表本企业开展因子确权与产业链协同；<strong>驾驶舱预览无需等待审核</strong>，提交后即可进入待审模式。';
+      }
+    }
+    var nameInp = document.getElementById('hi-claim-name');
+    if (nameInp && co.name && !nameInp.value) nameInp.value = co.name;
+    var creditInp = document.getElementById('hi-claim-credit');
+    if (creditInp && (co.creditCode || co.credit_code) && !creditInp.value) {
+      creditInp.value = co.creditCode || co.credit_code;
+    }
+    openCommerceModal('hi-modal-claim-wizard');
+  }
+  window.openHiClaimWizard = openClaimWizard;
+
+  function applySovereigntyGate() {
+    sovereigntyMode = resolveSovereigntyMode();
+    var suite = document.getElementById('hi-suite');
+    var main = document.getElementById('hi-warroom-main');
+    var lamp = document.getElementById('hi-sovereignty-lamp');
+    var mark = document.getElementById('hi-enterprise-mark');
+    var co = window.AppState && window.AppState.company || {};
+    var st = sovereigntyClaimStatus();
+
+    if (main) {
+      main.hidden = false;
+      main.removeAttribute('hidden');
+      main.style.display = '';
+    }
+    var previewBanner = document.getElementById('hi-claim-preview-banner');
+    if (previewBanner) previewBanner.hidden = sovereigntyMode !== 'claim';
+    var calcLock = document.getElementById('hi-calc-deferred-lock');
+    if (calcLock) calcLock.hidden = sovereigntyMode !== 'claim';
+    var pendingBanner = document.getElementById('hi-pending-banner');
+    if (pendingBanner) pendingBanner.hidden = sovereigntyMode !== 'pending';
+    if (suite) {
+      suite.classList.toggle('hi-mode-claim', sovereigntyMode === 'claim');
+      suite.classList.toggle('hi-mode-pending', sovereigntyMode === 'pending');
+      suite.classList.toggle('hi-mode-sovereign', sovereigntyMode === 'sovereign');
+    }
+    if (lamp) {
+      if (sovereigntyMode === 'claim') {
+        lamp.textContent = st === 'rejected' ? '🔴 审核驳回 · 请重提' : '🔴 待主权认领';
+        lamp.className = 'hi-sovereignty-lamp hi-lamp-red';
+      } else if (sovereigntyMode === 'pending') {
+        lamp.textContent = '🟡 授权书审核中';
+        lamp.className = 'hi-sovereignty-lamp hi-lamp-amber';
+      } else {
+        lamp.textContent = '🟢 全功能主权模式';
+        lamp.className = 'hi-sovereignty-lamp hi-lamp-green';
+      }
+    }
+    var embedLamp = document.getElementById('hi-embed-lamp');
+    if (lamp && embedLamp) {
+      embedLamp.textContent = lamp.textContent;
+      embedLamp.className = lamp.className;
+    }
+    var phaseTag = document.getElementById('hi-phase-tag');
+    var embedPhase = document.getElementById('hi-embed-phase');
+    if (phaseTag && embedPhase) embedPhase.textContent = phaseTag.textContent;
+    if (mark) {
+      mark.title = sovereigntyMode === 'claim'
+        ? '点击开始主权认领向导 · ' + sovereigntyStatusLabel(st)
+        : ('点击查看主权认领档案 · ' + sovereigntyStatusLabel(st));
+    }
+    var nameInp = document.getElementById('hi-claim-name');
+    if (nameInp && co.name && !nameInp.value) nameInp.value = co.name;
+    var creditInp = document.getElementById('hi-claim-credit');
+    if (creditInp && (co.creditCode || co.credit_code) && !creditInp.value) {
+      creditInp.value = co.creditCode || co.credit_code;
+    }
+    if (st === 'pending' || st === 'approved') {
+      try { sessionStorage.setItem('hengai_hi_sovereignty_mode', st); } catch (e) { /* ignore */ }
+    }
+    refreshWarroomPhaseTag();
+    applyIndustryScope();
+  }
+
+  var pendingClaimPayload = null;
+
+  function openClaimConfirmModal() {
+    var credit = (document.getElementById('hi-claim-credit').value || '').trim();
+    var name = (document.getElementById('hi-claim-name').value || '').trim();
+    var fileInp = document.getElementById('hi-claim-auth');
+    if (!credit || credit.length < 15) {
+      if (typeof showToast === 'function') showToast('请输入有效的 18 位统一社会信用代码');
+      return;
+    }
+    if (!name) {
+      if (typeof showToast === 'function') showToast('请填写企业全称');
+      return;
+    }
+    if (!fileInp || !fileInp.files || !fileInp.files.length) {
+      if (typeof showToast === 'function') showToast('请上传主权授权书');
+      return;
+    }
+    var file = fileInp.files[0];
+    pendingClaimPayload = { credit: credit, name: name, file: file };
+    document.getElementById('hi-confirm-name').textContent = name;
+    document.getElementById('hi-confirm-credit').textContent = credit;
+    document.getElementById('hi-confirm-file').textContent = file.name + ' (' + Math.max(1, Math.round(file.size / 1024)) + ' KB)';
+    var agree = document.getElementById('hi-confirm-agree');
+    var submitBtn = document.getElementById('hi-modal-confirm-submit');
+    if (agree) { agree.checked = false; }
+    if (submitBtn) submitBtn.disabled = true;
+    var previewWrap = document.getElementById('hi-confirm-preview-wrap');
+    var previewImg = document.getElementById('hi-confirm-preview-img');
+    if (previewWrap && previewImg && file.type && file.type.indexOf('image/') === 0) {
+      previewImg.src = URL.createObjectURL(file);
+      previewWrap.hidden = false;
+    } else if (previewWrap) {
+      previewWrap.hidden = true;
+    }
+    openCommerceModal('hi-modal-claim-confirm');
+  }
+
+  function mergeHubAppState(remote) {
+    if (!remote || typeof remote !== 'object') return;
+    if (!window.AppState) window.AppState = {};
+    if (typeof window.deepMerge === 'function') {
+      Object.assign(window.AppState, window.deepMerge(window.AppState, remote));
+    } else {
+      Object.assign(window.AppState, remote);
+      if (remote.company) {
+        window.AppState.company = Object.assign({}, window.AppState.company || {}, remote.company);
+      }
+    }
+    try {
+      if (typeof saveCachedState === 'function') saveCachedState(window.AppState);
+    } catch (e) { /* ignore */ }
+    if (typeof syncAppState === 'function') syncAppState(undefined, { fromRemote: true, emitStateSynced: false });
+  }
+
+  function enterWarRoomAfterClaim(message) {
+    resonanceServer = null;
+    applySovereigntyGate();
+    forceShowWarRoom();
+    bindAppState();
+    bindEnterpriseLogo();
+    if (typeof showToast === 'function') showToast(message || '已进入产业主权看板 · 授权书人工审核中');
+  }
+
+  async function executeSovereigntyClaimSubmit() {
+    if (!pendingClaimPayload) return;
+    var submitBtn = document.getElementById('hi-modal-confirm-submit');
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '上传存证中…'; }
+    var payloadSnapshot = pendingClaimPayload;
+    try {
+      var fd = new FormData();
+      fd.append('name', payloadSnapshot.name);
+      fd.append('credit_code', payloadSnapshot.credit);
+      fd.append('industry_code', resolveWorkspaceIndustryKey());
+      fd.append('file', payloadSnapshot.file);
+      var t = typeof getToken === 'function' ? getToken() : (localStorage.getItem('hengai_token') || localStorage.getItem('authToken') || '');
+      var headers = t ? { Authorization: 'Bearer ' + t, Accept: 'application/json' } : { Accept: 'application/json' };
+      var res = await fetch(apiBase() + '/api/v1/hub/sovereignty-claim-submit', {
+        method: 'POST',
+        credentials: 'include',
+        headers: headers,
+        body: fd,
+      });
+      var data = await res.json().catch(function () { return {}; });
+      var detail = data.detail;
+      if (Array.isArray(detail)) detail = detail.map(function (x) { return x.msg || String(x); }).join('；');
+      var detailStr = typeof detail === 'string' ? detail : '';
+
+      if (!res.ok) {
+        if (res.status === 409 && /审核中/.test(detailStr)) {
+          patchCompanySovereignty({
+            name: payloadSnapshot.name,
+            creditCode: payloadSnapshot.credit,
+            isComplete: true,
+            is_complete: true,
+            sovereigntyClaimStatus: 'pending',
+            sovereignty_claim_status: 'pending',
+          });
+          pendingClaimPayload = null;
+          enterWarRoomAfterClaim('认领申请已在审核中 · 已进入战情室');
+          return;
+        }
+        throw new Error(detailStr || data.message || res.statusText);
+      }
+
+      patchCompanySovereignty({
+        name: payloadSnapshot.name,
+        creditCode: payloadSnapshot.credit,
+        isComplete: true,
+        is_complete: true,
+        sovereigntyClaimStatus: 'pending',
+        sovereignty_claim_status: 'pending',
+        sovereigntyClaimSubmittedAt: new Date().toISOString(),
+      });
+      var remote = data.appState || data.app_state;
+      if (remote) mergeHubAppState(remote);
+      else if (data.sovereigntyClaimStatus || data.sovereignty_claim_status) {
+        patchCompanySovereignty({
+          sovereigntyClaimStatus: data.sovereigntyClaimStatus || data.sovereignty_claim_status,
+        });
+      }
+      pendingClaimPayload = null;
+      enterWarRoomAfterClaim(data.message || '主权认领已提交 · 已进入战情室（待人工审核）');
+    } catch (e) {
+      var msg = (e && e.message) || '提交失败';
+      if (typeof showToast === 'function') showToast(msg, 'err');
+      else alert(msg);
+    } finally {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '确认提交 · 上传存证'; }
+    }
+  }
+
+  function formatHiDisplayDate(raw) {
+    if (!raw || raw === '—') return '—';
+    var s = String(raw).trim();
+    try {
+      var d = new Date(s);
+      if (!isNaN(d.getTime())) {
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        var hh = String(d.getHours()).padStart(2, '0');
+        var mm = String(d.getMinutes()).padStart(2, '0');
+        return y + '-' + m + '-' + day + ' ' + hh + ':' + mm;
+      }
+    } catch (_) {}
+    return s.length > 19 ? s.slice(0, 19).replace('T', ' ') : s;
+  }
+
+  function renderSovereigntyDossier() {
+    var co = window.AppState && window.AppState.company || {};
+    var st = sovereigntyClaimStatus();
+    var badge = document.getElementById('hi-dossier-status-badge');
+    if (badge) {
+      badge.textContent = sovereigntyStatusLabel(st);
+      badge.className = 'hi-dossier-status hi-dossier-' + st;
+    }
+    var set = function (id, val) { var el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+    set('hi-dossier-name', co.name);
+    var credit = co.creditCode || co.credit_code;
+    set('hi-dossier-credit', credit || '—');
+    set('hi-dossier-submitted', formatHiDisplayDate(co.sovereigntyClaimSubmittedAt || co.sovereignty_claim_submitted_at));
+    set('hi-dossier-reviewed', formatHiDisplayDate(co.sovereigntyClaimReviewedAt || co.sovereignty_claim_reviewed_at));
+    set('hi-dossier-file', co.sovereigntyAuthLetterFilename || co.sovereignty_auth_letter_filename || '—');
+    var noteRow = document.getElementById('hi-dossier-note-row');
+    var note = co.sovereigntyClaimReviewerNote || co.sovereignty_claim_reviewer_note;
+    if (noteRow) noteRow.hidden = !note;
+    set('hi-dossier-note', note);
+    var aiRow = document.getElementById('hi-dossier-ai-row');
+    var ai = co.sovereigntyAiPrescreen || co.sovereignty_ai_prescreen;
+    var hasAiDetail = false;
+    if (aiRow && ai) {
+      hasAiDetail = true;
+      aiRow.hidden = false;
+      var parts = [];
+      if (ai.nameMatch === false) parts.push('名称不一致');
+      else if (ai.nameMatch === true) parts.push('名称匹配');
+      if (ai.creditMatch === false) parts.push('代码不一致');
+      else if (ai.creditMatch === true) parts.push('代码匹配');
+      if (ai.hasSeal === false) parts.push('未见公章');
+      else if (ai.hasSeal === true) parts.push('可见签章');
+      if (ai.isLikelyAuthLetter === false) parts.push('可能非授权书');
+      var aiTxt = parts.length ? parts.join(' · ') : (ai.note || '—');
+      set('hi-dossier-ai', aiTxt + '（最终以人工审核为准）');
+    } else if (aiRow) aiRow.hidden = true;
+    var details = document.getElementById('hi-dossier-details');
+    if (details && (hasAiDetail || note || st === 'pending')) details.open = true;
+    var viewDoc = document.getElementById('hi-dossier-view-doc');
+    if (viewDoc) viewDoc.hidden = !(st === 'pending' || st === 'approved' || st === 'rejected');
+  }
+
+  function claimFormValues() {
+    var co = window.AppState && window.AppState.company || {};
+    return {
+      name: (document.getElementById('hi-claim-name') && document.getElementById('hi-claim-name').value.trim()) || co.name || '',
+      credit: (document.getElementById('hi-claim-credit') && document.getElementById('hi-claim-credit').value.trim()) || co.creditCode || co.credit_code || '',
+    };
+  }
+
+  function triggerBlobDownload(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.rel = 'noopener';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      URL.revokeObjectURL(url);
+      if (a.parentNode) a.parentNode.removeChild(a);
+    }, 800);
+  }
+
+  async function downloadSovereigntyTemplate(format) {
+    format = format || 'doc';
+    var v = claimFormValues();
+    var qs = '?format=' + encodeURIComponent(format === 'pdf' ? 'html' : format);
+    if (v.name) qs += '&name=' + encodeURIComponent(v.name);
+    if (v.credit) qs += '&credit_code=' + encodeURIComponent(v.credit);
+
+    if (format === 'pdf') {
+      await downloadSovereigntyTemplatePdf(v.name, v.credit);
+      return;
+    }
+
+    try {
+      var t = typeof getToken === 'function' ? getToken() : (localStorage.getItem('hengai_token') || localStorage.getItem('authToken') || '');
+      var headers = { Accept: '*/*' };
+      if (t) headers.Authorization = 'Bearer ' + t;
+      var res = await fetch(apiBase() + '/api/v1/hub/sovereignty-claim/template' + qs, { credentials: 'include', headers: headers });
+      var htmlText = res.ok ? await res.text() : '';
+      if (!res.ok || !htmlText || htmlText.length < 200 || htmlText.indexOf('产业链数据主权授权书') < 0) {
+        htmlText = buildSovereigntyLetterHtmlClient(v.name, v.credit);
+      }
+      var blob = new Blob(['\ufeff', htmlText], { type: 'application/msword;charset=utf-8' });
+      if (!blob.size) throw new Error('范本内容为空');
+      triggerBlobDownload(blob, format === 'doc' ? 'CL-COP-sovereignty-auth-letter.doc' : 'CL-COP-sovereignty-auth-letter.html');
+      if (typeof showToast === 'function') showToast('Word 范本已保存 · 请法务审定后打印盖章，再扫描上传', 'warn');
+    } catch (e) {
+      try {
+        var fallback = buildSovereigntyLetterHtmlClient(v.name, v.credit);
+        triggerBlobDownload(new Blob(['\ufeff', fallback], { type: 'application/msword;charset=utf-8' }), 'CL-COP-sovereignty-auth-letter.doc');
+        if (typeof showToast === 'function') showToast('已使用本地范本（离线兜底）· 请打印盖章后上传', 'warn');
+      } catch (e2) {
+        if (typeof showToast === 'function') showToast((e && e.message) || '下载失败', 'err');
+      }
+    }
+  }
+
+  var SOVEREIGNTY_PDF_CSS = [
+    '.hi-tpl-pdf{font-family:SimSun,宋体,STSong,serif;font-size:12pt;line-height:1.75;color:#111;margin:0;padding:0}',
+    '.hi-tpl-pdf h1{text-align:center;font-size:18pt;letter-spacing:4px;margin:0 0 6px;font-weight:700}',
+    '.hi-tpl-pdf .subtitle{text-align:center;font-size:10pt;color:#444;margin:0 0 16px}',
+    '.hi-tpl-pdf .meta{text-align:right;font-size:10pt;color:#444;margin:0 0 14px}',
+    '.hi-tpl-pdf .section{margin:14px 0 6px;font-weight:700;font-size:12pt}',
+    '.hi-tpl-pdf .block{margin:6px 0;text-indent:2em}',
+    '.hi-tpl-pdf .clause{margin:4px 0 4px 2em;text-indent:0}',
+    '.hi-tpl-pdf .field{border-bottom:1px solid #333;padding:0 4px 1px}',
+    '.hi-tpl-pdf .sign{margin-top:24px;line-height:2.2}',
+    '.hi-tpl-pdf .sign-line{border-bottom:1px solid #333;display:inline-block;min-width:180px}',
+    '.hi-tpl-pdf .footer{margin-top:20px;padding:10px 12px;border:1px dashed #666;font-size:9pt;color:#444;line-height:1.6;background:#fafafa}',
+    '.hi-tpl-pdf table{width:100%;border-collapse:collapse;margin:10px 0;font-size:10pt}',
+    '.hi-tpl-pdf th,.hi-tpl-pdf td{border:1px solid #333;padding:6px 8px;text-align:left;vertical-align:top}',
+    '.hi-tpl-pdf th{background:#f0f0f0;width:28%}',
+    '.hi-tpl-pdf table,.hi-tpl-pdf .sign,.hi-tpl-pdf .footer{page-break-inside:avoid}'
+  ].join('');
+
+  async function sovereigntyTemplateHtmlForPdf(name, credit) {
+    var htmlText = '';
+    try {
+      var t = typeof getToken === 'function' ? getToken() : (localStorage.getItem('hengai_token') || localStorage.getItem('authToken') || '');
+      var headers = { Accept: 'text/html,*/*' };
+      if (t) headers.Authorization = 'Bearer ' + t;
+      var qs = '?format=html';
+      if (name) qs += '&name=' + encodeURIComponent(name);
+      if (credit) qs += '&credit_code=' + encodeURIComponent(credit);
+      var res = await fetch(apiBase() + '/api/v1/hub/sovereignty-claim/template' + qs, { credentials: 'include', headers: headers });
+      if (res.ok) htmlText = await res.text();
+    } catch (_) {}
+    if (!htmlText || htmlText.length < 200 || htmlText.indexOf('产业链数据主权授权书') < 0) {
+      htmlText = buildSovereigntyLetterHtmlClient(name, credit);
+    }
+    var bodyHtml = sovereigntyTemplateBodyFromHtml(htmlText);
+    if (!bodyHtml || !bodyHtml.trim()) throw new Error('范本内容为空');
+    return '<style>' + SOVEREIGNTY_PDF_CSS + '</style><div class="hi-tpl-pdf">' + bodyHtml + '</div>';
+  }
+
+  async function downloadSovereigntyTemplatePdf(name, credit) {
+    if (typeof html2pdf === 'undefined') {
+      if (typeof showToast === 'function') showToast('PDF 组件未加载，请使用 Word 范本', 'err');
+      return;
+    }
+    try {
+      if (typeof showToast === 'function') showToast('正在生成 PDF 范本…', 'warn');
+      var pdfHtml = await sovereigntyTemplateHtmlForPdf(name, credit);
+      var ok = await renderPdfToFile(pdfHtml, 'CL-COP-sovereignty-auth-letter.pdf');
+      if (!ok) throw new Error('PDF 渲染失败');
+      if (typeof showToast === 'function') showToast('PDF 范本已保存 · 请打印后签字盖章再扫描上传', 'ok');
+    } catch (e) {
+      if (typeof showToast === 'function') showToast((e && e.message) || 'PDF 生成失败，可先下载 Word 范本', 'err');
+    }
+  }
+
+  function previewSovereigntyTemplate() {
+    var v = claimFormValues();
+    var qs = '?format=html';
+    if (v.name) qs += '&name=' + encodeURIComponent(v.name);
+    if (v.credit) qs += '&credit_code=' + encodeURIComponent(v.credit);
+    window.open(apiBase() + '/api/v1/hub/sovereignty-claim/template' + qs, '_blank', 'noopener');
+  }
+
+  async function submitSovereigntyClaim(ev) {
+    if (ev && ev.preventDefault) ev.preventDefault();
+    openClaimConfirmModal();
+  }
+
+  function renderAuditLog(ci) {
+    var list = document.getElementById('hi-audit-list');
+    if (!list) return;
+    var entries = [];
+    var certified = isOfficialCertified();
+    var filled = countFilledSteps(activeIndustry);
+    var meta = INDUSTRY_META[activeIndustry] || INDUSTRY_META.steel;
+
+    var st = sovereigntyClaimStatus();
+    var co = window.AppState && window.AppState.company || {};
+    if (st === 'pending') {
+      entries.unshift({
+        ts: co.sovereigntyClaimSubmittedAt ? String(co.sovereigntyClaimSubmittedAt).slice(0, 16).replace('T', ' ') : '—',
+        text: '主权授权书已提交 · 等待 HEGC 人工审核',
+        cls: 'wait',
+      });
+    } else if (st === 'approved') {
+      entries.unshift({
+        ts: co.sovereigntyClaimReviewedAt ? String(co.sovereigntyClaimReviewedAt).slice(0, 16).replace('T', ' ') : '—',
+        text: '主权认领人工审核通过 · 企业标识已激活',
+        cls: 'ok',
+      });
+    } else if (st === 'rejected') {
+      entries.unshift({
+        ts: co.sovereigntyClaimReviewedAt ? String(co.sovereigntyClaimReviewedAt).slice(0, 16).replace('T', ' ') : '—',
+        text: '主权认领被驳回 · ' + (co.sovereigntyClaimReviewerNote || '请重新上传授权书'),
+        cls: 'idle',
+      });
+    }
+
+    entries.push({
+      ts: '2026-05-04 14:00',
+      text: 'AI Agent 物理逻辑预审通过',
+      cls: ci > 0 && filled >= meta.steps.length ? 'ok' : 'idle',
+    });
+    if (certified) {
+      entries.push({
+        ts: new Date().toISOString().slice(0, 16).replace('T', ' '),
+        text: 'HEGC 专家组人工核验通过 · 官方因子已确权',
+        cls: 'ok',
+      });
+    } else if (ci > 0 && filled > 0) {
+      entries.push({
+        ts: '2026-05-04 16:30',
+        text: '正在等待 HEGC 专家组人工核验...',
+        cls: 'wait',
+      });
+    } else {
+      entries.push({
+        ts: '—',
+        text: '完成工序录入后将启动 AI 物理逻辑预审',
+        cls: 'idle',
+      });
+    }
+
+    list.innerHTML = entries.map(function (e) {
+      return '<li class="hi-audit-item hi-audit-' + e.cls + '"><span class="hi-audit-ts">' + e.ts + '</span><span class="hi-audit-txt">' + e.text + '</span></li>';
+    }).join('');
+    var chip = document.getElementById('hi-audit-chip');
+    if (chip) {
+      var waitCnt = entries.filter(function (e) { return e.cls === 'wait'; }).length;
+      var okCnt = entries.filter(function (e) { return e.cls === 'ok'; }).length;
+      if (okCnt > 0 && waitCnt === 0) {
+        chip.textContent = '已完成 ' + okCnt + ' 项';
+        chip.className = 'hi-audit-chip ok';
+      } else if (waitCnt > 0) {
+        chip.textContent = '待处理 ' + waitCnt + ' 项';
+        chip.className = 'hi-audit-chip wait';
+      } else {
+        chip.textContent = '待启动';
+        chip.className = 'hi-audit-chip';
+      }
+    }
+  }
+
+  function attestCoverageCount() {
+    return Math.max(0, pressureCount());
+  }
+
+  function refreshResonanceHeader() {
+    var el = document.getElementById('hi-resonance-req-count');
+    if (!el) return;
+    var n = pressureCount();
+    var res = window.AppState && window.AppState.resonance;
+    if (res && Number(res.pendingRequestsForIndustry) > 0) {
+      n = Math.max(n, Number(res.pendingRequestsForIndustry));
+    }
+    el.textContent = String(n);
+  }
+
+  function showGoldenSealCeremony(certId, verificationCode) {
+    var modal = document.getElementById('hi-golden-seal-modal');
+    var idEl = document.getElementById('hi-golden-seal-id');
+    var vcEl = document.getElementById('hi-golden-seal-vcode');
+    if (idEl) idEl.textContent = certId || '—';
+    if (vcEl) vcEl.textContent = verificationCode || '—';
+    if (modal) {
+      modal.hidden = false;
+      modal.classList.add('show');
+    }
+  }
+
+  function closeGoldenSealCeremony() {
+    var modal = document.getElementById('hi-golden-seal-modal');
+    if (modal) {
+      modal.hidden = true;
+      modal.classList.remove('show');
+    }
+  }
+
+  function attestComputeUnits(coverage) {
+    coverage = coverage || attestCoverageCount();
+    return Math.max(80, Math.min(320, Math.round(coverage * 0.282)));
+  }
+
+  function playPressSound() {
+    try {
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      var ctx = new Ctx();
+      var t0 = ctx.currentTime;
+      function thud(at, freq, dur, vol) {
+        var o = ctx.createOscillator();
+        var g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(freq, at);
+        o.frequency.exponentialRampToValueAtTime(freq * 0.4, at + dur);
+        g.gain.setValueAtTime(0.0001, at);
+        g.gain.exponentialRampToValueAtTime(vol, at + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start(at);
+        o.stop(at + dur + 0.02);
+      }
+      thud(t0, 180, 0.22, 0.55);
+      thud(t0 + 0.09, 95, 0.35, 0.7);
+      thud(t0 + 0.2, 60, 0.4, 0.45);
+      setTimeout(function () { ctx.close(); }, 900);
+    } catch (e) { /* optional audio */ }
+  }
+
+  function triggerPressAnimation(done) {
+    var fx = document.getElementById('hi-press-fx');
+    var stamp = document.getElementById('hi-press-stamp');
+    if (!fx || !stamp) {
+      if (typeof done === 'function') done();
+      return;
+    }
+    playPressSound();
+    fx.hidden = false;
+    stamp.classList.remove('hi-press-hit');
+    void stamp.offsetWidth;
+    stamp.classList.add('hi-press-hit');
+    var finished = false;
+    function finish() {
+      if (finished) return;
+      finished = true;
+      fx.hidden = true;
+      stamp.classList.remove('hi-press-hit');
+      if (typeof done === 'function') done();
+    }
+    stamp.addEventListener('animationend', finish, { once: true });
+    setTimeout(finish, 1200);
+  }
+
+  function estimateServiceFee(units) {
+    var amt = Math.round(units * 2800);
+    return '￥' + amt.toLocaleString('zh-CN') + ' 起（示意，以合同为准）';
+  }
+
+  function updateEmpowermentMeta() {
+    var cov = attestCoverageCount();
+    var units = attestComputeUnits(cov);
+    var fee = estimateServiceFee(units);
+    var covInline = document.getElementById('hi-attest-coverage-inline');
+    var covConvert = document.getElementById('hi-convert-coverage');
+    var feeEl = document.getElementById('hi-convert-fee');
+    if (covInline) covInline.textContent = String(cov);
+    if (covConvert) covConvert.textContent = String(cov);
+    if (feeEl) feeEl.textContent = fee;
+    var serial = document.getElementById('hi-note-serial');
+    if (serial) {
+      var cert = window.AppState && window.AppState.company && window.AppState.company.verifiedFactorCertId;
+      serial.textContent = 'NO. ' + (cert ? String(cert).slice(-8).toUpperCase() : 'DRAFT');
+    }
+  }
+
+  function updateDraftStatus(ci) {
+    var el = document.getElementById('hi-draft-status');
+    if (!el) return;
+    if (isOfficialCertified()) {
+      el.innerHTML = '<span class="hi-draft-badge hi-draft-certified">✓ CL-IVC 官方校准因子</span>' +
+        '<p class="hi-draft-note">ℹ️ 该强度指标已存入核验池，具备产业链共享与合规申报效力。</p>';
+    } else if (ci > 0) {
+      el.innerHTML = '<span class="hi-draft-badge">📝 原始数据草案 / 内部参考</span>' +
+        '<p class="hi-draft-note">ℹ️ 该结果尚未经过 CL-IVC 官方算法校准，暂不具备出口确权与政策申报效力。</p>';
+    } else {
+      el.innerHTML = '<span class="hi-draft-badge hi-draft-idle">待录入工序数据</span>' +
+        '<p class="hi-draft-note">ℹ️ 完成工序矩阵本地精算后，可导出 CL 事实材料（客观数据附件）。</p>';
+    }
+  }
+
+  function showPolicyCard(ci) {
+    var card = document.getElementById('hi-policy-card');
+    if (!card) return;
+    if (ci > 0 && !isOfficialCertified()) {
+      card.hidden = false;
+      requestAnimationFrame(function () { card.classList.add('hi-policy-show'); });
+    } else {
+      card.classList.remove('hi-policy-show');
+      if (isOfficialCertified() || !(ci > 0)) card.hidden = true;
+    }
+  }
+
+  function openPolicyBrief() {
+    openCommerceModal('hi-modal-policy-brief');
+  }
+
+  function scrollToPolicyCard() {
+    openPolicyBrief();
+  }
+
+  function benchAdvantage(ci) {
+    if (!ci || ci <= 0) return null;
+    var meta = INDUSTRY_META[activeIndustry] || INDUSTRY_META.steel;
+    var bench = meta.bench;
+    if (window.AppState && window.AppState.metrics &&
+        window.AppState.metrics.benchmarkCarbonIntensity != null) {
+      bench = Number(window.AppState.metrics.benchmarkCarbonIntensity);
+    }
+    if (!bench) return null;
+    return bench - ci;
+  }
+
+  function applyEmpowermentUI() {
+    updateEmpowermentMeta();
+    var ci = parseFloat(document.getElementById('hi-curr-ci').value) || 0;
+    if (!ci && window.AppState && window.AppState.industryAudit) {
+      ci = Number(window.AppState.industryAudit.localCarbonIntensity) || 0;
+    }
+    updateDraftStatus(ci);
+    showPolicyCard(ci);
+    renderInfluenceRank(activeIndustry, false);
+    renderExecutionBrief(ci);
+  }
+
+  function renderExecutionBrief(ciValue) {
+    var ci = Number(ciValue);
+    if (!(ci > 0)) {
+      ci = parseFloat(document.getElementById('hi-curr-ci').value) || 0;
+    }
+    var meta = INDUSTRY_META[activeIndustry] || INDUSTRY_META.steel;
+    var totalSteps = (meta && meta.steps && meta.steps.length) ? meta.steps.length : 0;
+    var filled = countFilledSteps(activeIndustry);
+    var coverage = attestCoverageCount();
+    var certified = isOfficialCertified();
+    var progressPct = totalSteps > 0 ? Math.min(100, Math.round((filled / totalSteps) * 100)) : 0;
+    var ciDecimals = meta.calcMode === 'rtk' ? 6 : (meta.calcMode === 'idc' ? 3 : 3);
+
+    var setTxt = function (id, txt) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = txt;
+    };
+
+    if (sovereigntyMode === 'claim') {
+      setTxt('hi-brief-filled-steps', '—');
+      setTxt('hi-brief-total-steps', '见因子精算');
+      setTxt('hi-brief-coverage', String(coverage));
+      setTxt('hi-brief-ci', ci > 0 ? (ci.toFixed(ciDecimals) + ' ' + (meta.unitRing || 'tCO₂e/t')) : '—');
+      setTxt('hi-brief-cert-status', '预览态 · 待主权认领');
+      var certEl0 = document.getElementById('hi-brief-cert-status');
+      if (certEl0) certEl0.style.color = 'var(--gold-l)';
+      var stClaim = sovereigntyClaimStatus();
+      var nextClaim = stClaim === 'rejected'
+        ? '认领被驳回 · 点击重新提交'
+        : '完成主权认领 · 解锁入池与签发';
+      var actionEl0 = document.getElementById('hi-brief-next-action');
+      if (actionEl0) {
+        actionEl0.textContent = nextClaim;
+        actionEl0.className = 'hi-eb-action warn hi-eb-action-click';
+        actionEl0.title = '打开主权认领向导';
+      }
+      var briefEl0 = document.getElementById('hi-exec-brief');
+      if (briefEl0) briefEl0.className = 'hi-hub-section hi-eb state-draft';
+      var p0 = document.getElementById('hi-brief-progress');
+      if (p0) p0.style.width = '12%';
+      return;
+    }
+
+    setTxt('hi-brief-filled-steps', String(filled));
+    setTxt('hi-brief-total-steps', String(totalSteps));
+    setTxt('hi-brief-coverage', String(coverage));
+    setTxt('hi-brief-ci', ci > 0 ? (ci.toFixed(ciDecimals) + ' ' + (meta.unitRing || 'tCO₂e/t')) : '—');
+    setTxt('hi-brief-cert-status', certified ? '官方认证态（可用于核验签发）' : '草案态（待官方确权）');
+    var certEl = document.getElementById('hi-brief-cert-status');
+    if (certEl) certEl.style.color = certified ? 'var(--green-l)' : 'var(--gold-l)';
+
+    var nextAction = '先完成至少 1 个工序录入';
+    var actionTone = 'warn';
+    var briefState = 'state-draft';
+    if (filled > 0 && !certified) {
+      nextAction = '提交主权认领并等待人工审核';
+      actionTone = 'warn';
+      briefState = 'state-ready';
+    } else if (certified && coverage > 0) {
+      nextAction = '前往核验中心完成批次签发';
+      actionTone = 'ok';
+      briefState = 'state-certified';
+    } else if (certified && coverage <= 0) {
+      nextAction = '前往供应链协同补全上游来源';
+      actionTone = '';
+      briefState = 'state-ready';
+    }
+    var actionEl = document.getElementById('hi-brief-next-action');
+    if (actionEl) {
+      actionEl.textContent = nextAction;
+      actionEl.className = 'hi-eb-action' + (actionTone ? (' ' + actionTone) : '');
+      actionEl.classList.remove('hi-eb-action-click');
+      actionEl.removeAttribute('title');
+    }
+    var briefEl = document.getElementById('hi-exec-brief');
+    if (briefEl) briefEl.className = 'hi-hub-section hi-eb ' + briefState;
+
+    var p = document.getElementById('hi-brief-progress');
+    if (p) p.style.width = progressPct + '%';
+  }
+
+  function openCommerceModal(id) {
+    var el = document.getElementById(id);
+    if (el) { el.hidden = false; el.classList.add('show'); }
+  }
+  function closeCommerceModal(id) {
+    var el = document.getElementById(id);
+    if (el) { el.hidden = true; el.classList.remove('show'); }
+  }
+
+  function closeSovereigntyDossier() {
+    closeCommerceModal('hi-modal-sovereignty-dossier');
+  }
+
+  function wireCommerceModalDismiss() {
+    document.querySelectorAll('#hi-suite .hi-commerce-modal').forEach(function (modal) {
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeCommerceModal(modal.id);
+      });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      var open = document.querySelector('#hi-suite .hi-commerce-modal.show:not([hidden])');
+      if (open) closeCommerceModal(open.id);
+    });
+  }
+
+  function requireOfficialChannel(cb) {
+    if (isOfficialCertified()) {
+      cb();
+      return;
+    }
+    updateEmpowermentMeta();
+    pendingConvertCallback = cb;
+    openCommerceModal('hi-modal-convert');
+  }
+
+  function hiAssetUrl(rel) {
+    try {
+      return new URL(rel, document.baseURI || window.location.href).href;
+    } catch (e) {
+      return rel;
+    }
+  }
+
+  function wireClOriginLogos() {
+    var url = hiAssetUrl('assets/logo.png');
+    document.querySelectorAll('.hi-logo-clone').forEach(function (img) {
+      img.src = url;
+      img.onerror = function () { this.classList.add('hi-logo-missing'); };
+      img.onload = function () { this.classList.remove('hi-logo-missing'); };
+    });
+  }
+
+  var HI_PROV_PREFIX = /^(北京|天津|上海|重庆|河北|山西|辽宁|吉林|黑龙江|江苏|浙江|安徽|福建|江西|山东|河南|湖北|湖南|广东|海南|四川|贵州|云南|陕西|甘肃|青海|台湾|内蒙古|广西|西藏|宁夏|新疆|香港|澳门)/;
+  function deriveEnterpriseMarkText(name) {
+    name = String(name || '').trim();
+    if (!name) return '企';
+    var rest = name.replace(HI_PROV_PREFIX, '').replace(/(有限公司|股份有限公司|有限责任公司|集团|公司)$/g, '').trim();
+    var core = rest || name.replace(/(有限公司|股份有限公司|有限责任公司|集团|公司)$/g, '').trim() || name;
+    return core.slice(0, 1) || name.slice(0, 1) || '企';
+  }
+
+  function bindEnterpriseLogo() {
+    var fb = document.getElementById('hi-enterprise-logo-fb');
+    var co = window.AppState && window.AppState.company;
+    var name = (co && co.name) ? String(co.name).trim() : '';
+    if (fb) {
+      fb.textContent = deriveEnterpriseMarkText(name);
+      fb.style.display = 'flex';
+    }
+  }
+  wireClOriginLogos();
+
+  function apiBase() {
+    if (typeof hengaiApiOrigin === 'function') {
+      var origin = hengaiApiOrigin();
+      if (origin) return String(origin).replace(/\/$/, '');
+    }
+    try {
+      if (window.parent && window.parent !== window && typeof window.parent.hengaiApiOrigin === 'function') {
+        var parentOrigin = window.parent.hengaiApiOrigin();
+        if (parentOrigin) return String(parentOrigin).replace(/\/$/, '');
+      }
+    } catch (_) {}
+    if (window.APP_CONFIG && window.APP_CONFIG.apiBase) return String(window.APP_CONFIG.apiBase).replace(/\/$/, '');
+    if (location && location.origin && location.protocol !== 'file:') return location.origin.replace(/\/$/, '');
+    return 'http://127.0.0.1:8000';
+  }
+
+  function buildSovereigntyLetterHtmlClient(name, credit) {
+    var esc = function (s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    };
+    var n = esc(name) || '________________（请填写企业全称，与营业执照一致）';
+    var c = esc(credit) || '________________（请填写 18 位统一社会信用代码）';
+    var d = new Date();
+    var today = d.getFullYear() + '年' + String(d.getMonth() + 1).padStart(2, '0') + '月' + String(d.getDate()).padStart(2, '0') + '日';
+    return '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>CL-COP 产业链数据主权授权书</title>' +
+      '<style>body{font-family:SimSun,宋体,serif;font-size:14pt;line-height:1.9;color:#111;margin:2.2cm 2.4cm;background:#fff}' +
+      'h1{text-align:center;font-size:22pt;letter-spacing:6px;margin:0 0 8px;font-weight:700}' +
+      '.subtitle{text-align:center;font-size:11pt;color:#444;margin-bottom:28px}' +
+      '.meta{text-align:right;font-size:11pt;color:#444;margin-bottom:20px}' +
+      '.section{margin:18px 0 10px;font-weight:700;font-size:13pt}' +
+      '.block{margin:10px 0;text-indent:2em}.clause{margin:6px 0 6px 2em;text-indent:0}' +
+      '.field{border-bottom:1px solid #333;padding:0 6px 2px}.sign{margin-top:40px;line-height:2.4}' +
+      '.sign-line{border-bottom:1px solid #333;display:inline-block;min-width:200px}' +
+      '.footer{margin-top:32px;padding:14px 16px;border:1px dashed #666;font-size:10.5pt;color:#444;line-height:1.7;background:#fafafa}' +
+      'table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12pt}th,td{border:1px solid #333;padding:8px 10px;text-align:left;vertical-align:top}th{background:#f0f0f0;width:28%}</style></head><body>' +
+      '<div class="meta">CL-COP 协议编号：（提交审核后分配）</div><h1>产业链数据主权授权书</h1>' +
+      '<div class="subtitle">Industrial Origin · Data Sovereignty Authorization · HengAI Platform</div>' +
+      '<p class="block"><strong>授权方（企业）：</strong><span class="field">' + n + '</span></p>' +
+      '<p class="block"><strong>统一社会信用代码：</strong><span class="field">' + c + '</span></p>' +
+      '<p class="block"><strong>法定代表人：</strong><span class="field">________________</span></p>' +
+      '<p class="block"><strong>被授权人：</strong><span class="field">________________</span>　<strong>职务：</strong><span class="field">________________</span></p>' +
+      '<p class="block"><strong>被授权人身份证号：</strong><span class="field">________________</span></p>' +
+      '<div class="section">鉴于</div><p class="block">授权方拟在 HengAI（Co2Lion）平台认领「原厂因子精算」主权节点，开展单位产品碳强度因子本地精算、CL-IVC 官方确权及产业链下游核验服务。</p>' +
+      '<div class="section">一、授权事项</div><p class="clause">1. 在 HengAI 平台完成企业身份关联、主权认领及战情室启用；</p>' +
+      '<p class="clause">2. 开展工序矩阵精算，并申请 CL-IVC 官方因子确权及核验池存证；</p>' +
+      '<p class="clause">3. 向产业链下游提供经脱敏处理的单位产品碳强度摘要；</p>' +
+      '<p class="clause">4. 接收平台审核结论及合规专员联系事项。</p>' +
+      '<div class="section">二、数据主权与保密</div><p class="block">工序级原始能耗绝对值<strong>仅保存在授权方本地终端（LOCAL_VAULT）</strong>，不上传至 HengAI 云端。</p>' +
+      '<div class="section">三、授权期限</div><p class="block">自 ____年__月__日 起至 ____年__月__日 止。</p>' +
+      '<div class="section">四、效力声明</div><p class="block">本授权书经法定代表人签字并加盖企业公章后生效。平台接受<strong>盖章扫描件 PDF 或高清照片</strong>。</p>' +
+      '<table><tr><th>提交核验要素</th><th>要求</th></tr><tr><td>企业名称</td><td>须与营业执照及表单完全一致</td></tr>' +
+      '<tr><td>信用代码</td><td>18 位统一社会信用代码，须清晰可辨</td></tr><tr><td>签章</td><td>企业公章 + 法人/授权代理人签字</td></tr></table>' +
+      '<div class="sign"><p>授权方（公章）：<span class="sign-line">&nbsp;</span></p><p>法定代表人/授权代理人（签字）：<span class="sign-line">&nbsp;</span></p><p>签署日期：' + today + '</p></div>' +
+      '<div class="footer"><strong>【范本说明】</strong> 本文件为 CL-COP 标准完整范本，请法务审定后打印、签字盖章，再扫描为 PDF 上传。</div></body></html>';
+  }
+
+  function sovereigntyTemplateBodyFromHtml(htmlText) {
+    if (!htmlText || !String(htmlText).trim()) return '';
+    var raw = String(htmlText).trim();
+    if (raw.charCodeAt(0) === 0xFEFF) raw = raw.slice(1);
+    if (raw.indexOf('<') < 0) return raw;
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(raw, 'text/html');
+    var bodyHtml = doc.body ? doc.body.innerHTML : '';
+    if (bodyHtml && bodyHtml.trim()) return bodyHtml;
+    return raw.replace(/^[\s\S]*<body[^>]*>/i, '').replace(/<\/body>[\s\S]*$/i, '');
+  }
+
+  function authHeaders() {
+    const t = typeof getToken === 'function' ? getToken() : (localStorage.getItem('hengai_token') || localStorage.getItem('authToken') || '');
+    return t ? { Authorization: 'Bearer ' + t, Accept: 'application/json', 'Content-Type': 'application/json' } : { Accept: 'application/json', 'Content-Type': 'application/json' };
+  }
+
+  function mountFlow(flowId, steps) {
+    const el = document.getElementById(flowId);
+    if (!el) return;
+    const parts = [];
+    steps.forEach(function (s, i) {
+      if (i) parts.push('<div class="hi-p-arrow" aria-hidden="true">→</div>');
+      parts.push('<div class="hi-p-node" title="' + s[0] + '"><span class="hi-p-ico">' + s[3] + '</span><span class="hi-p-name">' + s[0] + '</span></div>');
+    });
+    el.innerHTML = parts.join('');
+  }
+
+  function mountMatrix(key, meta) {
+    const steps = meta.steps;
+    const head = document.getElementById(meta.head);
+    const body = document.getElementById(meta.body);
+    if (!head || !body) return;
+    head.innerHTML = '<th class="hi-m-corner">参数类别</th>' + steps.map(function (s, i) {
+      return '<th class="hi-m-col-h">' + (i + 1) + '·' + s[0] + '</th>';
+    }).join('');
+
+    const rowDefs = getMatrixRowDefs(meta);
+
+    var bodyHtml = rowDefs.map(function (rd) {
+      const cells = steps.map(function (s, i) {
+        if (!rd.inp) {
+          return '<td class="hi-m-emit-val" data-key="' + key + '" data-step="' + i + '" data-field="emit">—</td>';
+        }
+        const val = rd.defIdx != null ? ' value="' + s[rd.defIdx] + '"' : '';
+        var bulb = (rd.defIdx != null && rd.field !== 'output')
+          ? '<button type="button" class="hi-m-bulb" data-bench="' + s[rd.defIdx] + '" data-lbl="' + rd.label + '" title="行业对标参考">💡</button>'
+          : '';
+        return '<td><div class="hi-m-inp-wrap"><input class="hi-inp-under hi-m-inp ' + rd.cls + '" type="number" min="0" step="0.001" data-key="' + key + '" data-step="' + i + '" data-field="' + rd.field + '" placeholder="' + rd.ph + '"' + val + '>' + bulb + '</div></td>';
+      }).join('');
+      return '<tr><th class="hi-m-row-h">' + rd.label + '</th>' + cells + '</tr>';
+    }).join('');
+    var actCells = steps.map(function (s, i) {
+      return '<td><button type="button" class="hi-col-calc" data-key="' + key + '" data-step="' + i + '">自动计算</button></td>';
+    }).join('');
+    bodyHtml += '<tr class="hi-m-row-act"><th class="hi-m-row-h">操作</th>' + actCells + '</tr>';
+    body.innerHTML = bodyHtml;
+  }
+
+  function applyVaultToMatrix(key) {
+    Object.keys(LOCAL_VAULT).forEach(function (vk) {
+      if (vk.indexOf(key + ':') !== 0) return;
+      var step = vk.split(':')[1];
+      var v = LOCAL_VAULT[vk];
+      if (!v) return;
+      ['output', 'energy', 'ef'].forEach(function (field) {
+        var inp = document.querySelector('.hi-m-inp[data-key="' + key + '"][data-step="' + step + '"][data-field="' + field + '"]');
+        if (inp && v[field] != null && v[field] !== 0) inp.value = v[field];
+      });
+    });
+  }
+
+  function switchIndustry(ind) {
+    if (!INDUSTRY_META[ind]) ind = 'steel';
+    var scoped = getCompanyIndustryKey();
+    if (scoped && ind !== scoped) ind = scoped;
+    activeIndustry = ind;
+    const meta = INDUSTRY_META[ind];
+    ringMax = meta.ringMax;
+    document.querySelectorAll('#hi-suite .hi-tab').forEach(function (b) {
+      const on = (b.getAttribute('data-ind') || '') === ind;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    mountFlow(meta.flow, meta.steps);
+    mountMatrix(ind, meta);
+    applyVaultToMatrix(ind);
+    const titleEl = document.getElementById('hi-matrix-title');
+    if (titleEl) titleEl.innerHTML = meta.title + ' <span id="hi-matrix-sub">' + meta.sub + '</span>';
+    const indBench = document.getElementById('hi-bench-industry');
+    const bestBench = document.getElementById('hi-bench-best');
+    if (indBench) indBench.textContent = meta.bench.toFixed(meta.calcMode === 'rtk' ? 6 : 3);
+    if (bestBench) bestBench.textContent = meta.best.toFixed(meta.calcMode === 'rtk' ? 6 : 3);
+    var unitEl = document.getElementById('hi-ring-product');
+    var ringUnit = document.getElementById('hi-ring-unit-disp');
+    if (unitEl) unitEl.textContent = meta.unitLabel || '单位产品碳强度';
+    if (ringUnit) ringUnit.textContent = meta.unitRing || 'tCO₂e/t';
+    var pueEl = document.getElementById('hi-pue-readout');
+    if (pueEl) pueEl.hidden = meta.calcMode !== 'idc';
+    refreshRegionalPolicy();
+    refreshCbamExpandWarning();
+    refreshIndustryKpiStrip(meta);
+    renderInfluenceRank(ind, true);
+    localCalc();
+  }
+
+  function fmtEur(n) {
+    if (window.F && typeof window.F.eurCompact === 'function') return window.F.eurCompact(n);
+    if (n == null || isNaN(n)) return '€ 0';
+    if (n >= 1000000) return '€ ' + (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000) return '€ ' + Math.round(n / 1000) + 'K';
+    return '€ ' + Math.round(n);
+  }
+
+  function fmtMeTax(n) {
+    n = Number(n) || 0;
+    if (n <= 0) return '—';
+    if (window.F && typeof window.F.moneyExposureText === 'function') return window.F.moneyExposureText(n);
+    return fmtEur(n);
+  }
+
+  function meAlias() {
+    var co = window.AppState && window.AppState.company;
+    var cert = (co && co.verifiedFactorCertId) || '';
+    if (cert && cert.length >= 4) return '本企业 · ' + cert.slice(-5).toUpperCase();
+    return '本企业 · 待确权';
+  }
+
+  function meEmpowerCount(ind) {
+    var m = window.AppState && window.AppState.metrics;
+    if (!m) return 0;
+    var base = Number(m.crusadeCount) || 0;
+    return Math.max(0, Math.round(base * industryMetricShare(ind, 'crusade')));
+  }
+
+  function meTaxSaved(ind) {
+    var m = window.AppState && window.AppState.metrics;
+    var total = m && (Number(m.totalTaxPenalty) || Number(m.total_tax_penalty) || 0);
+    if (!total) {
+      var mockShare = { steel: 420000, cement: 210000, petro: 380000, paper: 180000, aviation: 520000, ceramic: 240000, port: 160000, idc: 290000 };
+      return mockShare[ind] || 0;
+    }
+    return Math.round(total * industryMetricShare(ind, 'tax'));
+  }
+
+  function meConfidence() {
+    var ia = window.AppState && window.AppState.industryAudit;
+    if (ia && ia.localCarbonIntensity > 0) return 88;
+    var co = window.AppState && window.AppState.company;
+    if (co && co.verifiedFactor != null) return 82;
+    return 68;
+  }
+
+  function countFilledSteps(ind) {
+    var n = 0;
+    var prefix = ind + ':';
+    Object.keys(LOCAL_VAULT).forEach(function (k) {
+      if (k.indexOf(prefix) !== 0) return;
+      var v = LOCAL_VAULT[k];
+      if (v && v.output > 0) n += 1;
+    });
+    return n;
+  }
+
+  function podiumMedal(rank) {
+    if (rank === 1) return { cls: 'hi-pod-gold', stamp: 'I', label: '冠军' };
+    if (rank === 2) return { cls: 'hi-pod-silver', stamp: 'II', label: '亚军' };
+    return { cls: 'hi-pod-bronze', stamp: 'III', label: '季军' };
+  }
+
+  function renderPodiumCard(entry, rank) {
+    var med = podiumMedal(rank);
+    var peerNote = entry.isDemo ? '示意 · 其他原厂' : '其他原厂';
+    return '<article class="hi-pod-card ' + med.cls + '">' +
+      '<div class="hi-pod-stamp" aria-hidden="true"><span class="hi-pod-stamp-num">' + med.stamp + '</span></div>' +
+      '<div class="hi-pod-rank">第 ' + rank + ' 名</div>' +
+      '<div class="hi-pod-peer">' + peerNote + '</div>' +
+      '<div class="hi-pod-alias">' + entry.alias + ' <span class="hi-pod-tag">' + entry.tag + '</span></div>' +
+      '<div class="hi-pod-eis"><span class="hi-pod-eis-val">' + entry.eis.toFixed(1) + '</span><span class="hi-pod-eis-lbl">EIS</span></div>' +
+      '<div class="hi-pod-metrics">' +
+        '<span>赋能下游 <strong>' + entry.empower + '</strong> 家</span>' +
+        '<span>产业链节税 <strong>' + fmtEur(entry.taxSaved) + '</strong></span>' +
+      '</div>' +
+      '</article>';
+  }
+
+  function renderListRow(entry, rank) {
+    return '<li class="hi-inf-row">' +
+      '<span class="hi-inf-rank-num">第 ' + rank + ' 名</span>' +
+      '<span class="hi-inf-alias">' + entry.alias + ' <em>' + entry.tag + '</em></span>' +
+      '<span class="hi-inf-metric"><span class="hi-inf-m-lbl">赋能</span><strong>' + entry.empower + '</strong></span>' +
+      '<span class="hi-inf-metric"><span class="hi-inf-m-lbl">节税</span><strong>' + fmtEur(entry.taxSaved) + '</strong></span>' +
+      '<span class="hi-inf-eis"><span class="hi-inf-eis-lbl">EIS</span> ' + entry.eis.toFixed(1) + '</span>' +
+      '</li>';
+  }
+
+  function renderInfluenceRank(ind, animate) {
+    ind = ind || activeIndustry;
+    var board = buildInfluenceBoard(ind);
+    var data = board.entries;
+    var labelEl = document.getElementById('hi-inf-ind-label');
+    var modeEl = document.getElementById('hi-inf-data-mode');
+    var podiumEl = document.getElementById('hi-inf-podium');
+    var listEl = document.getElementById('hi-inf-list');
+    var meEl = document.getElementById('hi-inf-me');
+    var bodyEl = document.getElementById('hi-inf-body');
+    var signalEl = document.getElementById('hi-inf-signal-chip');
+    if (!podiumEl || !listEl || !meEl) return;
+
+    if (labelEl) labelEl.textContent = INFLUENCE_LABELS[ind] || '行业榜';
+    if (modeEl) {
+      if (board.dataMode === 'live') {
+        modeEl.textContent = '链上榜单';
+        modeEl.className = 'pill p-green';
+      } else if (board.dataMode === 'demo') {
+        modeEl.textContent = '示意数据';
+        modeEl.className = 'pill p-teal';
+      } else {
+        modeEl.textContent = '待激活';
+        modeEl.className = 'pill p-gray';
+      }
+    }
+
+    if (animate && bodyEl) {
+      bodyEl.classList.remove('hi-inf-flip');
+      void bodyEl.offsetWidth;
+      bodyEl.classList.add('hi-inf-flip');
+      bodyEl.addEventListener('animationend', function onEnd() {
+        bodyEl.classList.remove('hi-inf-flip');
+        bodyEl.removeEventListener('animationend', onEnd);
+      });
+    }
+
+    if (data.length === 0) {
+      podiumEl.innerHTML = '<p class="hi-inf-empty">暂无同行业榜单 · 完成确权并将因子写入核验池后，此处展示其他原厂排名</p>';
+      listEl.innerHTML = '<li class="hi-inf-empty-row">第 4–7 名 · 暂无数据</li>';
+      if (signalEl) {
+        signalEl.textContent = '待激活';
+        signalEl.className = 'hi-inf-signal';
+      }
+    } else {
+      podiumEl.innerHTML = data.slice(0, 3).map(function (e, i) {
+        return renderPodiumCard(e, i + 1);
+      }).join('');
+      var tail = data.slice(3, 7);
+      listEl.innerHTML = tail.length
+        ? tail.map(function (e, i) { return renderListRow(e, i + 4); }).join('')
+        : '<li class="hi-inf-empty-row">第 4–7 名 · 当前仅展示前 ' + data.length + ' 名示意数据</li>';
+      if (signalEl) {
+        if (board.dataMode === 'live') {
+          signalEl.textContent = isOfficialCertified() ? '官方认证计分中' : '链上榜单同步中';
+          signalEl.className = 'hi-inf-signal cert';
+        } else if (isOfficialCertified()) {
+          signalEl.textContent = '官方认证计分中';
+          signalEl.className = 'hi-inf-signal cert';
+        } else {
+          signalEl.textContent = '示意榜 · 待链上替换';
+          signalEl.className = 'hi-inf-signal ready';
+        }
+      }
+    }
+
+    var totalSteps = (INDUSTRY_META[ind] || INDUSTRY_META.steel).steps.length;
+    var filled = countFilledSteps(ind);
+    var st = window.AppState || {};
+    var pending = Number(st.resonance && st.resonance.pendingRequestsForIndustry) ||
+      Number(st.metrics && st.metrics.resonanceCount) || 0;
+    var userRank = st.resonance && st.resonance.userRank;
+    var projected = filled >= totalSteps ? Math.max(1, (Number(userRank) || pending + 1) - 2) : '—';
+    var empower = meEmpowerCount(ind);
+    var tax = meTaxSaved(ind);
+    var conf = meConfidence();
+    var certified = isOfficialCertified();
+    var rankLabel = formatMyRankLabel(board.dataMode, certified, pending, userRank);
+    var certifyMark = certified
+      ? '<span class="hi-inf-leader-badge">官方认证因子</span>'
+      : '<span class="hi-inf-soft-badge">ℹ️ 本地草案</span>';
+    var tip = '';
+    var mainTip = (filled < totalSteps)
+      ? '<p class="hi-inf-tip">💡 完成 1-' + totalSteps + ' 号工序精算，预估榜内名次可升至第 <strong>' + projected + '</strong> 名</p>'
+      : '<p class="hi-inf-tip hi-inf-tip-ready">✓ 数据已齐备：可导出 CL 事实材料，或在决策层呈送包中组稿呈批</p>';
+    var policyTip = (!certified)
+      ? '<p class="hi-inf-tip hi-inf-tip-audit">💡 完成官方确权后，本企业 EIS 将按完整权重计入行业影响力榜</p>'
+      : '';
+    tip = mainTip + policyTip;
+
+    meEl.innerHTML =
+      '<div class="hi-inf-me-main">' +
+        '<span class="hi-inf-me-badge">本企业</span>' +
+        certifyMark +
+        '<span class="hi-inf-me-rank">预估榜内名次：<strong>' + rankLabel + '</strong></span>' +
+        '<span class="hi-inf-me-alias">' + meAlias() + '</span>' +
+        '<span class="hi-inf-me-metric">已赋能下游 <strong>' + empower + '</strong> 家</span>' +
+        '<span class="hi-inf-me-metric">已挽回碳税 <strong>' + fmtMeTax(tax) + '</strong></span>' +
+        '<span class="hi-inf-me-metric">数据置信度 <strong>' + conf + '%</strong></span>' +
+      '</div>' + tip;
+
+  }
+
+  function readMatrix(key, steps) {
+    const meta = INDUSTRY_META[key] || {};
+    const rows = {};
+    let totalOut = 0;
+    let totalEmit = 0;
+    document.querySelectorAll('.hi-m-inp[data-key="' + key + '"]').forEach(function (inp) {
+      const step = inp.getAttribute('data-step');
+      const field = inp.getAttribute('data-field');
+      if (!rows[step]) {
+        rows[step] = { name: steps[Number(step)][0], output: 0, energy: steps[Number(step)][2], ef: steps[Number(step)][1] };
+      }
+      rows[step][field] = parseFloat(inp.value) || 0;
+    });
+
+    var itMwh = (rows['0'] && rows['0'].output) || 0;
+    var facilityMwh = 0;
+    var pue = 0;
+
+    Object.keys(rows).forEach(function (k) {
+      const r = rows[k];
+      const idx = Number(k);
+      var emit = 0;
+      var stepOut = r.output;
+
+      if (meta.calcMode === 'idc') {
+        var stepMwh = idx === 0 ? r.output : (itMwh > 0 ? itMwh * r.energy : r.output);
+        if (idx > 0 && r.output > 0) stepMwh = r.output;
+        emit = stepMwh * r.ef;
+        facilityMwh += stepMwh;
+        if (idx === 0) totalOut = r.output;
+      } else {
+        emit = r.output > 0 ? r.output * r.energy * r.ef : 0;
+        if (r.output > 0) {
+          totalOut += r.output;
+        }
+      }
+
+      LOCAL_VAULT[key + ':' + k] = { output: r.output, energy: r.energy, ef: r.ef, emit: emit };
+      const emitEl = document.querySelector('.hi-m-emit-val[data-key="' + key + '"][data-step="' + k + '"]');
+      if (emitEl) emitEl.textContent = emit > 0 ? emit.toFixed(meta.calcMode === 'rtk' ? 4 : 2) : '—';
+      totalEmit += emit;
+    });
+
+    if (meta.calcMode === 'idc' && itMwh > 0) {
+      pue = facilityMwh / itMwh;
+    }
+
+    var ci = 0;
+    if (meta.calcMode === 'idc') {
+      ci = pue > 0 ? pue : 0;
+    } else {
+      ci = totalOut > 0 ? totalEmit / totalOut : 0;
+    }
+
+    updateStructureBar(key, steps);
+    saveLocalVault();
+
+    var pueEl = document.getElementById('hi-pue-readout');
+    if (pueEl && meta.calcMode === 'idc') {
+      pueEl.hidden = false;
+      pueEl.textContent = 'PUE 实时核算：' + (pue > 0 ? pue.toFixed(3) : '—') +
+        (totalEmit > 0 && itMwh > 0 ? ' · 算力碳强度 ' + (totalEmit / itMwh).toFixed(4) + ' tCO₂e/MWh' : '');
+    }
+
+    return { ci: ci, totalOut: totalOut, totalEmit: totalEmit, rows: rows, pue: pue };
+  }
+
+  function updateStructureBar(key, steps) {
+    var d = 0, ind = 0, proc = 0;
+    var n = steps.length;
+    Object.keys(LOCAL_VAULT).forEach(function (vk) {
+      if (vk.indexOf(key + ':') !== 0) return;
+      var idx = Number(vk.split(':')[1]);
+      var emit = (LOCAL_VAULT[vk] && LOCAL_VAULT[vk].emit) || 0;
+      if (!emit) return;
+      if (idx < Math.ceil(n / 3)) d += emit;
+      else if (idx < Math.ceil(2 * n / 3)) ind += emit;
+      else proc += emit;
+    });
+    var total = d + ind + proc;
+    var pct = function (v) { return total > 0 ? Math.round((v / total) * 100) : 0; };
+    var pd = pct(d), pi = pct(ind), pp = pct(proc);
+    var elD = document.getElementById('hi-struct-direct');
+    var elI = document.getElementById('hi-struct-indirect');
+    var elP = document.getElementById('hi-struct-process');
+    if (elD) elD.style.width = pd + '%';
+    if (elI) elI.style.width = pi + '%';
+    if (elP) elP.style.width = pp + '%';
+    document.getElementById('hi-struct-pct-d').textContent = total ? pd + '%' : '—';
+    document.getElementById('hi-struct-pct-i').textContent = total ? pi + '%' : '—';
+    document.getElementById('hi-struct-pct-p').textContent = total ? pp + '%' : '—';
+  }
+
+  function updateDonut() {
+    var counts = {};
+    Object.keys(INDUSTRY_META).forEach(function (k) { counts[k] = 0; });
+    Object.keys(LOCAL_VAULT).forEach(function (k) {
+      const ind = k.split(':')[0];
+      const v = LOCAL_VAULT[k];
+      if (v && v.output > 0 && counts[ind] != null) counts[ind] += 1;
+    });
+    var total = Object.keys(counts).reduce(function (s, k) { return s + counts[k]; }, 0);
+    if (!total && window.AppState && window.AppState.metrics) {
+      const cc = Number(window.AppState.metrics.crusadeCount) || 0;
+      if (cc > 0) {
+        Object.keys(INDUSTRY_CRUSADE_SHARE).forEach(function (k) {
+          counts[k] = Math.round(cc * (INDUSTRY_CRUSADE_SHARE[k] || 0));
+        });
+        total = cc;
+      }
+    }
+    var sorted = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; });
+    var top3 = sorted.filter(function (k) { return counts[k] > 0; }).slice(0, 3);
+    if (top3.length < 3) {
+      var fill = (window.HI_INDUSTRY_ORDER || Object.keys(INDUSTRY_META)).slice();
+      fill.forEach(function (k) {
+        if (top3.length >= 3) return;
+        if (top3.indexOf(k) < 0) top3.push(k);
+      });
+      top3 = top3.slice(0, 3);
+    }
+    const pct = function (n) { return total ? Math.round((n / total) * 100) : 0; };
+    var segPcts = top3.map(function (k) { return pct(counts[k] || 0); });
+    var legend = document.querySelector('.hi-donut-legend');
+    var dotCls = ['steel', 'al', 'cement'];
+    if (legend) {
+      legend.innerHTML = top3.map(function (k, i) {
+        return '<li data-ind="' + k + '"><span class="hi-leg-dot ' + dotCls[i] + '"></span>' +
+          (INDUSTRY_DISPLAY[k] || k) + ' <strong>' + segPcts[i] + '%</strong></li>';
+      }).join('');
+    }
+    const cols = ['hi-donut-steel', 'hi-donut-al', 'hi-donut-cement'];
+    let angle = -90;
+    segPcts.forEach(function (p, i) {
+      const el = document.getElementById(cols[i]);
+      if (!el) return;
+      const len = (p / 100) * CIRC;
+      el.setAttribute('stroke-dasharray', len + ' ' + (CIRC - len));
+      el.setAttribute('transform', 'rotate(' + angle + ' 60 60)');
+      angle += (p / 100) * 360;
+    });
+  }
+
+  function paintGaugeFrame(ci, meta, decimals) {
+    const ringVal = document.getElementById('hi-ring-val');
+    const arc = document.getElementById('hi-ring-arc');
+    if (ringVal) ringVal.textContent = ci > 0 ? ci.toFixed(decimals) : '—';
+    if (arc) {
+      const frac = Math.min(ci / ringMax, 1);
+      const len = frac * RING_CIRC;
+      arc.setAttribute('stroke-dasharray', len + ' ' + (RING_CIRC - len));
+    }
+    const indEl = document.getElementById('hi-bench-industry');
+    const bestEl = document.getElementById('hi-bench-best');
+    if (indEl) indEl.textContent = meta.bench.toFixed(3);
+    if (bestEl) bestEl.textContent = meta.best.toFixed(3);
+    if (activeIndustry === 'steel' && window.AppState && window.AppState.metrics &&
+        window.AppState.metrics.benchmarkCarbonIntensity != null) {
+      if (indEl) indEl.textContent = Number(window.AppState.metrics.benchmarkCarbonIntensity).toFixed(3);
+    }
+  }
+
+  function updateGauge(ci) {
+    const meta = INDUSTRY_META[activeIndustry] || INDUSTRY_META.steel;
+    var decimals = meta.calcMode === 'rtk' ? 6 : (meta.calcMode === 'idc' ? 3 : 3);
+    var target = Number(ci) > 0 ? Number(ci) : 0;
+    if (prefersReducedMotion()) {
+      gaugeDisplayCi = target;
+      paintGaugeFrame(target, meta, decimals);
+      updateDraftStatus(target);
+      showPolicyCard(target);
+      return;
+    }
+    if (gaugeAnimHandle) cancelAnimationFrame(gaugeAnimHandle);
+    var from = Math.max(0, gaugeDisplayCi || 0);
+    var delta = Math.abs(target - from);
+    var duration = Math.min(900, Math.max(260, 260 + delta * 220));
+    var start = performance.now();
+    var tick = function (now) {
+      var t = Math.min(1, (now - start) / duration);
+      var e = 1 - Math.pow(1 - t, 3);
+      var cur = from + (target - from) * e;
+      gaugeDisplayCi = cur;
+      paintGaugeFrame(cur, meta, decimals);
+      if (t < 1) gaugeAnimHandle = requestAnimationFrame(tick);
+      else {
+        gaugeDisplayCi = target;
+        paintGaugeFrame(target, meta, decimals);
+      }
+    };
+    gaugeAnimHandle = requestAnimationFrame(tick);
+    updateDraftStatus(target);
+    showPolicyCard(target);
+  }
+
+  function updateSpark(pct) {
+    const el = document.getElementById('hi-yoy-spark');
+    const path = document.getElementById('hi-spark-path');
+    const fill = document.getElementById('hi-spark-fill');
+    if (!el) return;
+    if (pct == null || !Number.isFinite(pct)) {
+      el.textContent = '同比增减率 —';
+      el.className = 'hi-spark-pct';
+      return;
+    }
+    const txt = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+    el.textContent = '同比增减率 ' + txt;
+    el.className = 'hi-spark-pct ' + (pct < 0 ? 'green' : 'warn');
+    const base = 28;
+    const amp = Math.min(Math.abs(pct) * 0.8, 14);
+    const pts = [];
+    for (let i = 0; i <= 8; i++) {
+      const x = i * 25;
+      const y = base + Math.sin(i * 0.9 + pct * 0.05) * amp * (pct < 0 ? -1 : 1);
+      pts.push((i ? 'L' : 'M') + x + ',' + y.toFixed(1));
+    }
+    const d = pts.join(' ');
+    if (path) path.setAttribute('d', d);
+    if (fill) fill.setAttribute('d', d + ' L200,48 L0,48 Z');
+  }
+
+  function updateYoy(ci) {
+    const prev = parseFloat(document.getElementById('hi-prev-ci').value);
+    const yoyEl = document.getElementById('hi-yoy');
+    if (!Number.isFinite(prev) || prev <= 0 || !ci) {
+      yoyEl.textContent = '—';
+      updateSpark(null);
+      return null;
+    }
+    const pct = ((ci - prev) / prev) * 100;
+    yoyEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+    yoyEl.className = 'hi-yoy-val ' + (pct < 0 ? 'green' : 'warn');
+    updateSpark(pct);
+    return pct;
+  }
+
+  function localCalc() {
+    const meta = INDUSTRY_META[activeIndustry];
+    const res = readMatrix(activeIndustry, meta.steps);
+    document.getElementById('hi-curr-ci').value = res.ci > 0 ? res.ci.toFixed(4) : '';
+    const yoyPct = updateYoy(res.ci);
+    updateGauge(res.ci);
+    updateDonut();
+    if (window.AppState && typeof window.AppState.patchState === 'function') {
+      window.AppState.patchState({
+        industryAudit: Object.assign({}, window.AppState.industryAudit || {}, {
+          localCarbonIntensity: res.ci,
+          lastIndustry: activeIndustry,
+          verifiedFactorYoyPct: yoyPct != null ? yoyPct : (window.AppState.industryAudit && window.AppState.industryAudit.verifiedFactorYoyPct),
+        }),
+      }, { emitStateSynced: false });
+    }
+    updateResonanceDashboard(res.ci, res.totalOut);
+    renderInfluenceRank(activeIndustry, false);
+    renderExecutionBrief(res.ci);
+    return res.ci;
+  }
+
+  function queueRecalc() {
+    if (recalcQueued) return;
+    recalcQueued = true;
+    requestAnimationFrame(function () {
+      recalcQueued = false;
+      localCalc();
+    });
+  }
+
+  document.getElementById('hi-suite').addEventListener('input', function (e) {
+    if (e.target && e.target.classList && e.target.classList.contains('hi-m-inp')) queueRecalc();
+  });
+  document.getElementById('hi-suite').addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('.hi-m-bulb') : null;
+    if (!b) return;
+    var v = b.getAttribute('data-bench');
+    var lbl = b.getAttribute('data-lbl') || '该项';
+    var txt = '💡 ' + lbl + ' 行业参考值：' + (v == null ? '—' : v);
+    if (typeof showToast === 'function') showToast(txt);
+  });
+  document.getElementById('hi-prev-ci').addEventListener('input', function () {
+    updateYoy(parseFloat(document.getElementById('hi-curr-ci').value) || 0);
+  });
+
+  function requirePledge() {
+    return new Promise(function (resolve) {
+      pledgeResolver = resolve;
+      document.getElementById('hi-pledge').classList.add('show');
+    });
+  }
+
+  document.getElementById('hi-pledge-cancel').addEventListener('click', function () {
+    document.getElementById('hi-pledge').classList.remove('show');
+    if (pledgeResolver) pledgeResolver(false);
+    pledgeResolver = null;
+  });
+  document.getElementById('hi-pledge-ok').addEventListener('click', function () {
+    document.getElementById('hi-pledge').classList.remove('show');
+    if (pledgeResolver) pledgeResolver(true);
+    pledgeResolver = null;
+    if (pendingAction) {
+      const fn = pendingAction;
+      pendingAction = null;
+      fn();
+    }
+  });
+
+  function triggerGoldenBadge() {
+    const flash = document.createElement('div');
+    flash.className = 'hi-golden-flash';
+    document.body.appendChild(flash);
+    flash.addEventListener('animationend', function () { flash.remove(); });
+    const toast = document.createElement('div');
+    toast.className = 'hi-badge-toast show';
+    toast.textContent = '🏅 CL-Origin 绿色出海先行者 · 已写入荣誉体系';
+    document.body.appendChild(toast);
+    toast.addEventListener('animationend', function () { toast.remove(); });
+    if (window.AppState && typeof window.AppState.patchState === 'function') {
+      var badges = (window.AppState.badges || []).slice();
+      var code = 'CL-ORIGIN-PIONEER';
+      if (!badges.some(function (b) { return (b.badgeCode || b.badge_code) === code; })) {
+        badges.push({ badgeCode: code, badgeName: 'CL-Origin 绿色出海先行者' });
+        window.AppState.patchState({ badges: badges });
+      }
+    }
+    if (window.EventBus && typeof window.EventBus.emit === 'function') {
+      window.EventBus.emit('BADGE_AWARDED', { code: 'CL-ORIGIN-PIONEER', name: 'CL-Origin 绿色出海先行者' });
+    }
+  }
+
+  async function attestToPool() {
+    const ci = localCalc();
+    if (!ci || ci <= 0) {
+      if (typeof showToast === 'function') showToast('请先完成工序矩阵录入');
+      else alert('请先完成工序矩阵录入');
+      return;
+    }
+    const yoy = updateYoy(ci);
+    const metaAtt = INDUSTRY_META[activeIndustry] || INDUSTRY_META.steel;
+    const body = {
+      carbonIntensity: ci,
+      yoyChangePct: yoy != null ? yoy : undefined,
+      industryCode: activeIndustry,
+      productLabel: metaAtt.productLabel,
+      productionLine: getProductionLine(),
+      intensityUnit: metaAtt.intensityUnit || 'tCO2e/t',
+    };
+    /* 物理隔离：仅脱敏系数落库，禁止携带 LOCAL_VAULT 工序绝对值 */
+    persistProductionLine();
+    try {
+      let data;
+      if (window.AppState && typeof window.AppState.commit === 'function') {
+        data = await window.AppState.commit('industryAudit', body);
+      } else {
+        const res = await fetch(apiBase() + '/api/v1/hub/industry-factor-attest', {
+          method: 'POST',
+          credentials: 'include',
+          headers: authHeaders(),
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error((await res.json().catch(function () { return {}; })).detail || res.statusText);
+        data = await res.json();
+        if (data.appState && typeof syncAppState === 'function') syncAppState(data.appState);
+      }
+      const cert = data.certId || data.cert_id || (data.appState && data.appState.company && data.appState.company.verifiedFactorCertId);
+      const vcode = data.verificationCode || data.verification_code ||
+        (data.appState && data.appState.company && (data.appState.company.verificationCode || data.appState.company.verification_code));
+      if (cert) document.getElementById('hi-cert-display').textContent = cert;
+      if (vcode) {
+        var vcEl = document.getElementById('hi-verification-code');
+        if (vcEl) vcEl.textContent = vcode;
+      }
+      if (data.badgeAwarded || data.badge_awarded) {
+        triggerGoldenBadge();
+        bindHonorBadge();
+      }
+      patchIndustryCommerce({ hasVerifiedFactor: true });
+      applyEmpowermentUI();
+      refreshResonanceHeader();
+      if (cert) showGoldenSealCeremony(cert, vcode);
+      if (typeof showToast === 'function') showToast((data.message || '因子已确权') + (vcode ? ' · 核验码 ' + vcode : ''));
+      else if (typeof pulseHubAfterDataSync === 'function') pulseHubAfterDataSync(window.AppState);
+    } catch (e) {
+      const msg = (e && e.message) || '确权失败';
+      if (typeof showToast === 'function') showToast(msg);
+      else alert(msg);
+    }
+  }
+
+  function buildClIvcSealSvg(size, line1, line2, line3, gold) {
+    var s = size || 120;
+    var stroke = gold ? '#c9a84c' : '#9ca3af';
+    var fill = gold ? '#8b6914' : '#4b5563';
+    var r = s / 2 - 4;
+    var cx = s / 2;
+    var fs1 = Math.round(s * 0.11);
+    var fs2 = Math.round(s * 0.09);
+    var fs3 = Math.round(s * 0.065);
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + s + '" height="' + s + '" viewBox="0 0 ' + s + ' ' + s + '">' +
+      '<circle cx="' + cx + '" cy="' + cx + '" r="' + r + '" fill="none" stroke="' + stroke + '" stroke-width="3"/>' +
+      '<circle cx="' + cx + '" cy="' + cx + '" r="' + (r - 8) + '" fill="none" stroke="' + stroke + '" stroke-width="1.5"/>' +
+      '<text x="' + cx + '" y="' + (cx - fs1 * 0.3) + '" text-anchor="middle" font-family="SimSun,serif" font-size="' + fs1 + '" font-weight="bold" fill="' + fill + '">CL-IVC</text>' +
+      '<text x="' + cx + '" y="' + (cx + fs2 * 0.9) + '" text-anchor="middle" font-family="SimSun,serif" font-size="' + fs2 + '" font-weight="bold" fill="' + fill + '">' + line1 + '</text>' +
+      (line2 ? '<text x="' + cx + '" y="' + (cx + fs2 * 2.1) + '" text-anchor="middle" font-family="SimSun,serif" font-size="' + fs3 + '" fill="#666">' + line2 + '</text>' : '') +
+      (line3 ? '<text x="' + cx + '" y="' + (cx + fs2 * 3.0) + '" text-anchor="middle" font-family="SimSun,serif" font-size="' + fs3 + '" fill="#888">' + line3 + '</text>' : '') +
+      '</svg>';
+  }
+
+  function pdfShell(inner, minHeight) {
+    return '<div style="position:relative;width:714px;min-height:' + (minHeight || 980) + 'px;padding:40px 44px;background:#ffffff;color:#111111;font-family:SimSun,serif;box-sizing:border-box;overflow:visible">' +
+      inner + '</div>';
+  }
+
+  function buildCisaPdfHtml() {
+    const co = (window.AppState && window.AppState.company) || {};
+    const ia = (window.AppState && window.AppState.industryAudit) || {};
+    const name = co.name || '企业';
+    const cert = co.verifiedFactorCertId || document.getElementById('hi-cert-display').textContent || '—';
+    const vcode = co.verificationCode || co.verification_code ||
+      (document.getElementById('hi-verification-code') && document.getElementById('hi-verification-code').textContent) || '—';
+    var ciRaw = resolveCiForExport();
+    var ci = ciRaw > 0 ? ciRaw.toFixed(3) : (ia.verifiedFactor != null ? Number(ia.verifiedFactor).toFixed(3) : '—');
+    const certified = isOfficialCertified();
+    const period = new Date().toISOString().slice(0, 7);
+    const sealSub = certified ? '已确权' : '官方钢印版';
+    const sealNote = certified ? '' : '<p style="margin:8px 0 0;font-size:10px;color:#8b6914">ℹ️ 正式启动 CL-IVC 认证通道后，钢印编号将与核验池同步</p>';
+    const cornerSeal = buildClIvcSealSvg(128, '官方钢印', sealSub, period, true);
+    const wmSeal = buildClIvcSealSvg(220, 'CL-IVC', '合规月报', period, true);
+    const body =
+      '<div style="position:absolute;left:0;right:0;top:300px;text-align:center;opacity:0.13;z-index:0;pointer-events:none">' + wmSeal + '</div>' +
+      '<div style="position:absolute;top:28px;right:28px;z-index:2;text-align:center">' + cornerSeal + sealNote + '</div>' +
+      '<div style="position:relative;z-index:1">' +
+      '<h1 style="text-align:center;font-size:20px;margin:0 0 6px">中国钢铁工业协会（CISA）风格 · 碳排放统计月报</h1>' +
+      '<p style="text-align:center;font-size:11px;color:#666;margin:0 0 28px">带 CL-IVC 官方钢印 · ' + period + '</p>' +
+      '<p style="margin-top:24px">企业名称：' + name + '</p>' +
+      '<p>确权编号：' + cert + '</p>' +
+      '<p>批次核验码：' + vcode + '</p>' +
+      '<p>单位产品碳强度：' + ci + ' tCO₂e/t</p>' +
+      '<p>报告期：' + period + '</p>' +
+      '<div style="margin-top:48px;padding:14px 16px;border:2px double #c9a84c;border-radius:8px;text-align:center;background:rgba(201,168,76,0.06)">' +
+      '<div style="display:inline-block">' + buildClIvcSealSvg(96, '钢印核验', certified ? '有效' : '待通道激活', '', true) + '</div>' +
+      '<p style="margin:10px 0 0;font-size:11px;color:#8b6914;font-weight:bold">CL-IVC · 产业链合规赋能专项 · 官方钢印</p>' +
+      '</div>' +
+      '<p style="margin-top:40px;font-size:11px;color:#666">本报告仅含脱敏强度指标；工序绝对能耗未离机存储。HengAI · Co2Lion CL-IVC</p></div>';
+    return pdfShell(body, 980);
+  }
+
+  function buildComplianceFactBriefHtml() {
+    var co = (window.AppState && window.AppState.company) || {};
+    var name = co.name || '贵司';
+    var ci = resolveCiForExport();
+    var adv = benchAdvantage(ci);
+    var advTxt = adv != null && adv > 0 ? adv.toFixed(3) + ' tCO₂e/t（低于行业基准）' : (ci > 0 ? ci.toFixed(3) + ' tCO₂e/t' : '—');
+    var downstream = pressureCount();
+    var cov = attestCoverageCount();
+    var units = attestComputeUnits(cov);
+    var fee = estimateServiceFee(units);
+    var meta = INDUSTRY_META[activeIndustry] || INDUSTRY_META.steel;
+    var today = new Date().toISOString().slice(0, 10);
+    var footerSeal = buildClIvcSealSvg(88, 'CL-IVC', '事实材料', '', false);
+    return pdfShell(
+      '<div style="position:relative;z-index:1;line-height:1.65;color:#222">' +
+      '<h1 style="text-align:center;font-size:18px;margin:0 0 8px">产业链合规压力与 CL-IVC 确权服务说明</h1>' +
+      '<p style="text-align:center;font-size:11px;color:#666;margin:0 0 8px">CL 平台事实材料 · 供企业内部参考 · ' + today + '</p>' +
+      '<p style="text-align:center;font-size:10px;color:#888;margin:0 0 28px">本文件为客观数据附件，<strong>非</strong>向财务/管理层的呈批请示；呈批文书请由合规经办人在决策层呈送包中自行撰写。</p>' +
+      '<h2 style="font-size:14px;border-left:4px solid #10b981;padding-left:8px">一、下游合规压力（平台测算）</h2>' +
+      '<p>经平台行为画像与产业链穿透测算，<strong>' + name + '</strong> 当前关联下游供应商约 <strong>' +
+      downstream.toLocaleString('zh-CN') + '</strong> 家，正面临 CBAM / 国内绿证与出口合规双重压力。本次精算覆盖其中约 <strong>' +
+      cov + '</strong> 家核心链路企业，亟需原厂级因子确权以降低传导风险。</p>' +
+      '<h2 style="font-size:14px;border-left:4px solid #10b981;padding-left:8px;margin-top:22px">二、碳强度现状（数据附件）</h2>' +
+      '<p>基于 1-' + meta.steps.length + ' 号工序精算结果（因子页入池或本地精算），当前单位产品碳强度为 <strong>' +
+      (ci > 0 ? ci.toFixed(3) : '—') + ' tCO₂e/t</strong>。相较行业对标基准，测算差异约 <strong>' + advTxt + '</strong>。</p>' +
+      '<p style="font-size:11px;color:#666">ℹ️ 上述为平台侧客观记录；正式出口确权须完成 CL-IVC 官方算法校准。</p>' +
+      '<h2 style="font-size:14px;border-left:4px solid #c9a84c;padding-left:8px;margin-top:22px">三、CL-IVC 官方确权服务范围与费用依据</h2>' +
+      '<p>若启动产业链合规赋能专项服务（含 CL-IVC 官方认证通道、核验池写入与算力包 <strong>' + units +
+      '</strong> 单元），平台预估技术服务费为 <strong>' + fee + '</strong>。此金额为 CL 服务报价依据，<strong>不含</strong>任何财政补贴测算或财务科目建议。</p>' +
+      '<p style="font-size:11px;color:#666;margin-top:12px">政策环境附注：公开政策中常将绿色制造数字化与合规投入一并讨论；具体财政支持以主管部门当年细则为准，CL 不提供申报代理。</p>' +
+      '<div style="margin-top:28px;padding:12px;border:1px dashed #9ca3af;border-radius:8px;text-align:center">' +
+        footerSeal +
+        '<p style="margin:8px 0 0;font-size:10px;color:#4b5563">CL-IVC 事实材料专用 · 非呈批专用章</p></div>' +
+      '<p style="margin-top:16px;font-size:10px;color:#888;border-top:1px solid #ddd;padding-top:12px">本材料由 HengAI 产业主权看板自动生成 · 工序绝对能耗未离机 · Co2Lion CL-IVC</p></div>',
+      1100);
+  }
+
+  /** @deprecated 保留别名，避免外部脚本引用断裂 */
+  function buildBudgetReportHtml() { return buildComplianceFactBriefHtml(); }
+
+  function resolveCiForExport() {
+    var el = document.getElementById('hi-curr-ci');
+    var local = el ? parseFloat(el.value) : NaN;
+    if (local > 0) return local;
+    var st = window.AppState || {};
+    var ia = st.industryAudit || {};
+    var co = st.company || {};
+    var fromState = Number(ia.verifiedFactor != null ? ia.verifiedFactor : co.verifiedFactor);
+    return fromState > 0 ? fromState : 0;
+  }
+
+  async function renderPdfToFile(html, filename) {
+    if (typeof html2pdf === 'undefined') {
+      if (typeof showToast === 'function') showToast('PDF 组件未加载');
+      return false;
+    }
+    if (!html || !String(html).trim()) {
+      if (typeof showToast === 'function') showToast('导出内容为空');
+      return false;
+    }
+    var prevScroll = window.scrollY || 0;
+    window.scrollTo(0, 0);
+
+    var host = document.createElement('div');
+    host.className = 'hi-pdf-export-host';
+    host.setAttribute('aria-hidden', 'true');
+    host.style.cssText = 'position:fixed;left:0;top:0;width:794px;max-width:794px;margin:0;padding:0;background:#ffffff;color:#111111;z-index:2147483647;opacity:1;pointer-events:none;overflow:visible;box-sizing:border-box;transform:translateX(-120vw);';
+    host.innerHTML = html;
+    document.body.appendChild(host);
+
+    await new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); });
+    await new Promise(function (r) { setTimeout(r, 450); });
+
+    var contentH = Math.max(host.scrollHeight, host.offsetHeight, host.getBoundingClientRect().height, 1123);
+    try {
+      await html2pdf().set({
+        margin: [12, 12, 14, 12],
+        filename: filename,
+        html2canvas: {
+          scale: 2,
+          backgroundColor: '#ffffff',
+          logging: false,
+          useCORS: true,
+          allowTaint: true,
+          scrollY: 0,
+          scrollX: 0,
+          windowWidth: 794,
+          width: 794,
+          height: contentH,
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'], avoid: ['tr', '.sign'] },
+      }).from(host).save();
+      return true;
+    } catch (err) {
+      console.error('PDF export failed', err);
+      if (typeof showToast === 'function') showToast('PDF 生成失败：' + (err && err.message ? err.message : '请重试'));
+      return false;
+    } finally {
+      if (host.parentNode) host.parentNode.removeChild(host);
+      window.scrollTo(0, prevScroll);
+    }
+  }
+
+  async function exportComplianceFactBriefPdf() {
+    var ci = resolveCiForExport();
+    if (!ci || ci <= 0) {
+      if (typeof showToast === 'function') showToast('暂无碳强度：请先在「原厂因子精算」入池后再导出事实材料', 'gold');
+      return;
+    }
+    var ok = await renderPdfToFile(
+      buildComplianceFactBriefHtml(),
+      'CL-IVC-Compliance-Fact-Brief-' + (new Date().toISOString().slice(0, 10)) + '.pdf'
+    );
+    if (!ok) return;
+    patchIndustryCommerce({ budgetReportExportedAt: new Date().toISOString() });
+    if (typeof showToast === 'function') showToast('CL 事实材料已导出 · 可作呈批附件，非呈批正文');
+  }
+
+  /** @deprecated */
+  async function exportBudgetReportPdf() { return exportComplianceFactBriefPdf(); }
+
+  function routeDecisionBrief() {
+    jumpToExecutionBoard('decision', 'HengAI_决策层呈送包生成器.html');
+    if (typeof showToast === 'function') showToast('已切换至决策层呈送包：请由经办人自行撰写向财务/老板的请示');
+  }
+
+  async function exportPdf() {
+    var ok = await renderPdfToFile(
+      buildCisaPdfHtml(),
+      'CISA-Carbon-Monthly-Sealed-' + (new Date().toISOString().slice(0, 7)) + '.pdf'
+    );
+    if (ok && typeof showToast === 'function') showToast('带钢印合规月报已导出 · 请查看 PDF 右上角与页内钢印区');
+  }
+
+  function showHistory() {
+    var wrap = document.getElementById('hi-trust-journey');
+    if (typeof syncTrustJourneyUi === 'function') {
+      syncTrustJourneyUi({ state: window.AppState });
+    }
+    if (wrap) {
+      wrap.hidden = false;
+      wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (typeof showToast === 'function') showToast('成长足迹 · 基于 cbam.evidence.history 只增不减留痕');
+      return;
+    }
+    if (typeof showToast === 'function') showToast('暂无历程数据');
+  }
+  function jumpToExecutionBoard(pageId, fallbackUrl) {
+    try {
+      if (window.parent && window.parent !== window) {
+        if (typeof window.parent.hengaiSwitchHubPage === 'function') {
+          window.parent.hengaiSwitchHubPage(pageId);
+          return true;
+        }
+        if (typeof window.parent.navTo === 'function') {
+          var nav = window.parent.document && (window.parent.document.getElementById('nav-' + pageId) || window.parent.document.getElementById('n-' + pageId));
+          window.parent.navTo(pageId, nav || null);
+          return true;
+        }
+        window.parent.postMessage({ type: 'HENGAI_HUB_NAV', pageId: pageId }, '*');
+        return true;
+      }
+    } catch (_) {}
+    try {
+      if (typeof window.hengaiSwitchHubPage === 'function') {
+        window.hengaiSwitchHubPage(pageId);
+        return true;
+      }
+    } catch (_) {}
+    window.location.href = fallbackUrl;
+    return true;
+  }
+  function routeAttestExecution(evt) {
+    if (evt && evt.altKey) {
+      requireOfficialChannel(function () {
+        pendingAction = function () {
+          triggerPressAnimation(function () { attestToPool(); });
+        };
+        requirePledge().then(function (ok) { if (!ok) pendingAction = null; });
+      });
+      return;
+    }
+    jumpToExecutionBoard('batch-verify', 'HengAI_核验.html');
+    if (typeof showToast === 'function') showToast('已切换到产业链核验：请在批次流中完成审批与签发');
+  }
+  function routeFactorExecution(evt) {
+    if (evt && evt.altKey) {
+      requireOfficialChannel(function () {
+        pendingAction = exportPdf;
+        requirePledge().then(function (ok) { if (!ok) pendingAction = null; });
+      });
+      return;
+    }
+    jumpToExecutionBoard('factor-auth', 'HengAI_工业原厂精算.html');
+    if (typeof showToast === 'function') showToast('已切换到原厂因子精算：请在该页执行入池发布');
+  }
+
+  document.getElementById('hi-btn-budget-report').addEventListener('click', exportComplianceFactBriefPdf);
+  document.getElementById('hi-btn-attest').addEventListener('click', routeAttestExecution);
+  document.getElementById('hi-btn-goto-factor').addEventListener('click', routeFactorExecution);
+  var briefFactBtn = document.getElementById('hi-btn-brief-fact');
+  if (briefFactBtn) briefFactBtn.addEventListener('click', exportComplianceFactBriefPdf);
+  var briefDecisionBtn = document.getElementById('hi-btn-brief-decision');
+  if (briefDecisionBtn) briefDecisionBtn.addEventListener('click', routeDecisionBrief);
+  var briefCalcBtn = document.getElementById('hi-btn-brief-calc');
+  if (briefCalcBtn) briefCalcBtn.addEventListener('click', function () {
+    jumpToExecutionBoard('factor-auth', 'HengAI_工业原厂精算.html');
+  });
+  var briefVerifyBtn = document.getElementById('hi-btn-brief-verify');
+  if (briefVerifyBtn) briefVerifyBtn.addEventListener('click', function () {
+    jumpToExecutionBoard('batch-verify', 'HengAI_核验.html');
+  });
+  var briefSupplyBtn = document.getElementById('hi-btn-brief-supply');
+  if (briefSupplyBtn) briefSupplyBtn.addEventListener('click', function () {
+    jumpToExecutionBoard('supply', 'HengAI_供应链协同.html');
+  });
+  document.getElementById('hi-modal-convert-cancel').addEventListener('click', function () {
+    closeCommerceModal('hi-modal-convert');
+    pendingConvertCallback = null;
+  });
+  document.getElementById('hi-modal-convert-budget').addEventListener('click', function () {
+    closeCommerceModal('hi-modal-convert');
+    pendingConvertCallback = null;
+    exportComplianceFactBriefPdf();
+  });
+  var convertDecisionBtn = document.getElementById('hi-modal-convert-decision');
+  if (convertDecisionBtn) convertDecisionBtn.addEventListener('click', function () {
+    closeCommerceModal('hi-modal-convert');
+    pendingConvertCallback = null;
+    routeDecisionBrief();
+  });
+  document.getElementById('hi-modal-convert-ok').addEventListener('click', function () {
+    closeCommerceModal('hi-modal-convert');
+    if (pendingConvertCallback) {
+      var cb = pendingConvertCallback;
+      pendingConvertCallback = null;
+      cb();
+    }
+  });
+  var policyHintBtn = document.getElementById('hi-btn-policy-hint');
+  if (policyHintBtn) policyHintBtn.addEventListener('click', openPolicyBrief);
+  var policyModalAck = document.getElementById('hi-policy-modal-ack');
+  if (policyModalAck) policyModalAck.addEventListener('click', function () { closeCommerceModal('hi-modal-policy-brief'); });
+  var policyModalCloseX = document.getElementById('hi-policy-modal-close-x');
+  if (policyModalCloseX) policyModalCloseX.addEventListener('click', function () { closeCommerceModal('hi-modal-policy-brief'); });
+  document.getElementById('hi-btn-history').addEventListener('click', showHistory);
+
+  function bindHonorBadge() {
+    var show = false;
+    if (window.AppState && window.AppState.badges) {
+      show = window.AppState.badges.some(function (b) {
+        return (b.badgeCode || b.badge_code || '') === 'CL-ORIGIN-PIONEER';
+      });
+    }
+    var st = document.getElementById('hi-honor-status');
+    var badge = document.getElementById('hi-honor-badge');
+    if (st) st.textContent = show ? '首次确权完成' : '待首次确权解锁';
+    if (badge) badge.classList.toggle('hi-honor-on', show);
+  }
+
+  async function loadOriginLedger() {
+    try {
+      var token = localStorage.getItem('hengai_token') || localStorage.getItem('authToken');
+      if (!token) return;
+      var base = '';
+      if (typeof window.hengaiApiOrigin === 'function') base = window.hengaiApiOrigin();
+      else if (window.API_ROOT) base = String(window.API_ROOT);
+      else if (typeof location !== 'undefined') base = location.origin;
+      base = base.replace(/\/+$/, '');
+      var resp = await fetch(base + '/api/v1/hub/origin-factor-ledger', {
+        method: 'GET',
+        headers: { Accept: 'application/json', Authorization: 'Bearer ' + token },
+      });
+      if (!resp.ok) return;
+      var data = await resp.json();
+      if (!data || !data.consumptionLedger) return;
+      if (!window.AppState) window.AppState = {};
+      if (!window.AppState.factorAuth || typeof window.AppState.factorAuth !== 'object') {
+        window.AppState.factorAuth = {};
+      }
+      window.AppState.factorAuth.consumptionLedger = data.consumptionLedger;
+      if (typeof saveCachedState === 'function') {
+        try { saveCachedState(window.AppState); } catch (_) { /* ignore */ }
+      }
+      if (typeof renderHengaiFactorLedger === 'function') {
+        renderHengaiFactorLedger(data.consumptionLedger);
+      }
+    } catch (_) { /* 非原厂(403)或离线 → 保持 AppState 展示 */ }
+  }
+  window.loadOriginLedger = loadOriginLedger;
+
+  function bindAppState(fromRemote) {
+    if (fromRemote) {
+      resonanceServer = null;
+      var m = window.AppState && window.AppState.metrics;
+      if (m && window.AppState.patchState) {
+        window.AppState.patchState({
+          industryAudit: Object.assign({}, window.AppState.industryAudit || {}, {
+            resonanceServerCrusade: Number(m.crusadeCount) || 0,
+            resonanceServerTax: Number(m.totalTaxPenalty) || Number(m.total_tax_penalty) || 0,
+          }),
+        }, { emitStateSynced: false });
+      }
+    }
+    if (typeof syncAppState === 'function' && window.AppState) {
+      syncAppState(window.AppState, { emitStateSynced: false });
+    }
+    captureResonanceServer(true);
+    const co = window.AppState && window.AppState.company;
+    if (co && co.verifiedFactor != null) {
+      var prevCiEl = document.getElementById('hi-prev-ci');
+      if (prevCiEl) prevCiEl.value = co.verifiedFactor;
+    }
+    const ia = window.AppState && window.AppState.industryAudit;
+    if (ia && ia.localCarbonIntensity > 0) updateGauge(ia.localCarbonIntensity);
+    var res = readMatrix(activeIndustry, (INDUSTRY_META[activeIndustry] || INDUSTRY_META.steel).steps);
+    updateResonanceDashboard(res.ci, res.totalOut);
+    applySovereigntyGate();
+    applyIndustryScope();
+    refreshRegionalPolicy();
+    bindHonorBadge();
+    bindEnterpriseLogo();
+    refreshResonanceHeader();
+    updateDonut();
+    renderInfluenceRank(activeIndustry, false);
+    applyEmpowermentUI();
+    if (typeof syncTrustJourneyUi === 'function') {
+      syncTrustJourneyUi({ state: window.AppState });
+    }
+    if (typeof renderHengaiFactorLedger === 'function') {
+      var faLedger = (window.AppState && window.AppState.factorAuth && window.AppState.factorAuth.consumptionLedger) || {};
+      renderHengaiFactorLedger(faLedger);
+    }
+    loadOriginLedger();
+  }
+
+  function clearLocalIndustry() {
+    var prefix = activeIndustry + ':';
+    Object.keys(LOCAL_VAULT).forEach(function (k) {
+      if (k.indexOf(prefix) === 0) delete LOCAL_VAULT[k];
+    });
+    mountMatrix(activeIndustry, INDUSTRY_META[activeIndustry]);
+    localCalc();
+    updateResonanceDashboard(0, 0);
+    saveLocalVault();
+    if (typeof showToast === 'function') showToast('已清空当前行业 LOCAL_VAULT');
+  }
+
+  document.getElementById('hi-btn-clear-local').addEventListener('click', clearLocalIndustry);
+  document.getElementById('hi-btn-pledge-sign').addEventListener('click', function () {
+    document.getElementById('hi-pledge').classList.add('show');
+  });
+  var honorWallBtn = document.getElementById('hi-btn-honor-wall');
+  if (honorWallBtn) honorWallBtn.addEventListener('click', function () {
+    jumpToExecutionBoard('honor', 'HengAI_荣誉体系.html');
+  });
+  document.getElementById('hi-suite').addEventListener('click', function (e) {
+    var btn = e.target && e.target.closest && e.target.closest('.hi-col-calc');
+    if (btn) localCalc();
+  });
+
+  var monthInp = document.getElementById('hi-report-month');
+  if (monthInp) monthInp.value = new Date().toISOString().slice(0, 7);
+
+  var claimForm = document.getElementById('hi-claim-form');
+  if (claimForm) claimForm.addEventListener('submit', submitSovereigntyClaim);
+  var claimTplDoc = document.getElementById('hi-btn-claim-template-doc');
+  if (claimTplDoc) claimTplDoc.addEventListener('click', function () { downloadSovereigntyTemplate('doc'); });
+  var claimTplPdf = document.getElementById('hi-btn-claim-template-pdf');
+  if (claimTplPdf) claimTplPdf.addEventListener('click', function () { downloadSovereigntyTemplate('pdf'); });
+  var claimTplBtn = document.getElementById('hi-btn-claim-template');
+  if (claimTplBtn) {
+    claimTplBtn.addEventListener('click', function () {
+      previewSovereigntyTemplate();
+    });
+  }
+  var confirmBack = document.getElementById('hi-modal-confirm-back');
+  if (confirmBack) confirmBack.addEventListener('click', function () { closeCommerceModal('hi-modal-claim-confirm'); });
+  var confirmAgree = document.getElementById('hi-confirm-agree');
+  var confirmSubmit = document.getElementById('hi-modal-confirm-submit');
+  if (confirmAgree && confirmSubmit) {
+    confirmAgree.addEventListener('change', function () { confirmSubmit.disabled = !confirmAgree.checked; });
+    confirmSubmit.addEventListener('click', executeSovereigntyClaimSubmit);
+  }
+  var successOk = document.getElementById('hi-modal-success-ok');
+  if (successOk) successOk.addEventListener('click', function () {
+    enterWarRoomAfterClaim();
+  });
+  var entMark = document.getElementById('hi-enterprise-mark');
+  if (entMark) {
+    entMark.addEventListener('click', function () {
+      if (sovereigntyMode === 'claim') {
+        openClaimWizard();
+        return;
+      }
+      renderSovereigntyDossier();
+      openCommerceModal('hi-modal-sovereignty-dossier');
+    });
+    entMark.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (sovereigntyMode === 'claim') {
+          openClaimWizard();
+          return;
+        }
+        renderSovereigntyDossier();
+        openCommerceModal('hi-modal-sovereignty-dossier');
+      }
+    });
+  }
+  var openClaimBtn = document.getElementById('hi-btn-open-claim-wizard');
+  if (openClaimBtn) openClaimBtn.addEventListener('click', openClaimWizard);
+  var claimWizardClose = document.getElementById('hi-claim-wizard-close');
+  if (claimWizardClose) claimWizardClose.addEventListener('click', function () {
+    closeCommerceModal('hi-modal-claim-wizard');
+  });
+  var gotoFactorLock = document.getElementById('hi-btn-goto-factor-from-lock');
+  if (gotoFactorLock) gotoFactorLock.addEventListener('click', function () {
+    jumpToExecutionBoard('factor-auth', 'HengAI_工业原厂精算.html');
+  });
+  var briefAction = document.getElementById('hi-brief-next-action');
+  if (briefAction) {
+    briefAction.addEventListener('click', function () {
+      if (sovereigntyMode === 'claim') openClaimWizard();
+    });
+  }
+  var dossierCloseBtn = document.getElementById('hi-dossier-close-btn');
+  if (dossierCloseBtn) dossierCloseBtn.addEventListener('click', closeSovereigntyDossier);
+  var dossierCloseX = document.getElementById('hi-dossier-close-x');
+  if (dossierCloseX) dossierCloseX.addEventListener('click', closeSovereigntyDossier);
+  var pendingOpenDossier = document.getElementById('hi-pending-open-dossier');
+  if (pendingOpenDossier) pendingOpenDossier.addEventListener('click', function () {
+    renderSovereigntyDossier();
+    openCommerceModal('hi-modal-sovereignty-dossier');
+  });
+  var goldenSealOk = document.getElementById('hi-golden-seal-ok');
+  if (goldenSealOk) goldenSealOk.addEventListener('click', closeGoldenSealCeremony);
+  wireCommerceModalDismiss();
+  var dossierTpl = document.getElementById('hi-dossier-dl-template');
+  if (dossierTpl) dossierTpl.addEventListener('click', function () { downloadSovereigntyTemplate('doc'); });
+  var dossierView = document.getElementById('hi-dossier-view-doc');
+  if (dossierView) {
+    dossierView.addEventListener('click', async function () {
+      try {
+        var t = typeof getToken === 'function' ? getToken() : (localStorage.getItem('hengai_token') || '');
+        var headers = t ? { Authorization: 'Bearer ' + t } : {};
+        var res = await fetch(apiBase() + '/api/v1/hub/sovereignty-claim/document', { credentials: 'include', headers: headers });
+        if (!res.ok) throw new Error('无法获取文件');
+        var blob = await res.blob();
+        var url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      } catch (err) {
+        if (typeof showToast === 'function') showToast((err && err.message) || '打开失败');
+      }
+    });
+  }
+  var tplClose = document.getElementById('hi-modal-template-close');
+  if (tplClose) tplClose.addEventListener('click', function () { closeCommerceModal('hi-modal-claim-template'); });
+  var tplCopy = document.getElementById('hi-modal-template-copy');
+  if (tplCopy) {
+    tplCopy.addEventListener('click', function () {
+      var pre = document.getElementById('hi-claim-template-text');
+      var txt = pre ? pre.textContent : '';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(function () {
+          if (typeof showToast === 'function') showToast('范本要点已复制 · 可粘贴至 Word 给法务排版');
+        });
+      } else if (typeof showToast === 'function') showToast('请手动选中范本文本复制');
+    });
+  }
+  var claimFile = document.getElementById('hi-claim-auth');
+  if (claimFile) {
+    claimFile.addEventListener('change', function () {
+      var hint = document.getElementById('hi-claim-file-hint');
+      if (hint && claimFile.files && claimFile.files[0]) {
+        hint.textContent = '✓ 已选择：' + claimFile.files[0].name;
+      }
+    });
+  }
+
+  if (window.EventBus && typeof window.EventBus.on === 'function') {
+    window.EventBus.on('STATE_SYNCED', function () { bindAppState(true); });
+    window.EventBus.on('STATE_UPDATED', function () {
+      paintResonanceKpis(resolveResonanceKpis());
+      refreshResonanceHeader();
+    });
+    window.EventBus.on('UI_PREFS_CHANGED', function () {
+      if (typeof window.__hengaiRefreshMoneyDisplay === 'function') window.__hengaiRefreshMoneyDisplay();
+    });
+  }
+  window.__hengaiRefreshMoneyDisplay = function () {
+    paintResonanceKpis(lastResonanceKpis || resolveResonanceKpis());
+    if (typeof renderInfluenceRank === 'function') renderInfluenceRank(activeIndustry, false);
+    var fa = window.AppState && window.AppState.factorAuth;
+    if (typeof renderHengaiFactorLedger === 'function' && fa && fa.consumptionLedger) {
+      renderHengaiFactorLedger(fa.consumptionLedger);
+    }
+  };
+  function refreshHiContextTrail() {
+    var trail = document.getElementById('hi-context-trail');
+    var backBtn = document.getElementById('hi-ctx-back-supply');
+    if (!trail || !backBtn) return;
+    var fromSupply = false;
+    try {
+      var params = new URLSearchParams(location.search);
+      if (params.get('from') === 'supply') fromSupply = true;
+      if (sessionStorage.getItem('hengai_resonance_from') === 'supply') fromSupply = true;
+    } catch (_) {}
+    trail.hidden = !fromSupply;
+  }
+
+  function initHiContextTrail() {
+    var backBtn = document.getElementById('hi-ctx-back-supply');
+    if (!backBtn || backBtn.__bound) return;
+    backBtn.__bound = true;
+    refreshHiContextTrail();
+    backBtn.addEventListener('click', function () {
+      if (typeof window.returnToSupplyFromResonance === 'function') {
+        window.returnToSupplyFromResonance();
+        return;
+      }
+      try { sessionStorage.removeItem('hengai_resonance_from'); } catch (_) {}
+      if (window.parent && window.parent !== window && typeof window.parent.navTo === 'function') {
+        var nav = window.parent.document.getElementById('nav-supply');
+        window.parent.navTo('supply', nav);
+        return;
+      }
+      window.location.href = typeof window.hengaiPage === 'function'
+        ? window.hengaiPage('HengAI_供应链协同.html')
+        : 'HengAI_供应链协同.html';
+    });
+    window.addEventListener('message', function (e) {
+      if (e.data && e.data.type === 'HENGAI_RESONANCE_FROM_SUPPLY') refreshHiContextTrail();
+    });
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) refreshHiContextTrail();
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof window.applyHengaiDevPreviewIfNeeded === 'function') window.applyHengaiDevPreviewIfNeeded();
+    if (typeof window.guardOriginFactoryPage === 'function') window.guardOriginFactoryPage();
+    function bootHiSuitePage() {
+      initHiContextTrail();
+      var plEl = document.getElementById('hi-production-line');
+      if (plEl) {
+        try {
+          var savedLine = sessionStorage.getItem(PROD_LINE_KEY);
+          if (savedLine) plEl.value = savedLine;
+        } catch (_) {}
+        plEl.addEventListener('change', persistProductionLine);
+        plEl.addEventListener('blur', persistProductionLine);
+      }
+      buildIndustryTabs();
+      var initInd = getCompanyIndustryKey() ||
+        ((window.HI_INDUSTRY_ORDER && window.HI_INDUSTRY_ORDER[0]) || 'steel');
+      switchIndustry(initInd);
+      refreshRegionalPolicy();
+      bindEnterpriseLogo();
+      applySovereigntyGate();
+      renderAuditLog(0);
+      bindAppState(false);
+      updateDonut();
+      renderInfluenceRank('steel', false);
+      applyEmpowermentUI();
+      paintResonanceKpis(resolveResonanceKpis());
+    }
+    if (typeof initAppState === 'function') {
+      var afterOverview = function () {
+        if (typeof window.whenHengaiAppStateReady === 'function') {
+          window.whenHengaiAppStateReady(bootHiSuitePage);
+        } else {
+          bootHiSuitePage();
+        }
+      };
+      initAppState(function () {
+        afterOverview();
+        if (window.EventBus) {
+          EventBus.on('STATE_SYNCED', function () {
+            bindAppState(true);
+            paintResonanceKpis(resolveResonanceKpis());
+            renderInfluenceRank(getCompanyIndustryKey() || 'steel', false);
+          });
+        }
+      });
+    } else if (typeof window.whenHengaiAppStateReady === 'function') {
+      window.whenHengaiAppStateReady(bootHiSuitePage);
+    } else {
+      bootHiSuitePage();
+    }
+  });
+  if (window.AppState) {
+    applySovereigntyGate();
+    bindAppState(false);
+  } else {
+    applySovereigntyGate();
+    applyEmpowermentUI();
+  }
+  window.refreshResonanceHeader = refreshResonanceHeader;
+  window.updateResonanceDashboard = updateResonanceDashboard;
+})();
+</script>
+</body>
+</html>

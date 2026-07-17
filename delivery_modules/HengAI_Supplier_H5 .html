@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="format-detection" content="telephone=no">
+<title>HengAI · 供应商碳数据填报</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg0:#06080f;--bg1:#0a0d16;--bg2:#0e1220;--bg3:rgba(255,255,255,.05);--bg4:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.16);
+  --ink:#e2e8f4;--ink2:#8896aa;--ink3:#44556a;
+  --green:#10b981;--green-l:#6ee7b7;--green-d:rgba(16,185,129,.14);--green-b:rgba(16,185,129,.32);
+  --gold:#c9a84c;--gold-l:#f0d080;--gold-d:rgba(201,168,76,.14);--gold-b:rgba(201,168,76,.32);
+  --blue:#3b82f6;--blue-l:#93c5fd;--blue-d:rgba(59,130,246,.14);--blue-b:rgba(59,130,246,.32);
+  --teal:#14b8a6;--teal-l:#5eead4;--teal-d:rgba(20,184,166,.14);--teal-b:rgba(20,184,166,.32);
+  --red:#ef4444;--red-l:#fca5a5;--red-d:rgba(239,68,68,.13);--red-b:rgba(239,68,68,.30);
+  --orange:#f97316;--orange-l:#fdba74;
+  --ol:var(--orange);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;background:var(--bg0)}
+body{min-height:100%;background:var(--bg0);color:var(--ink);font-family:"Noto Sans SC",sans-serif;font-size:14px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+/* SCREENS */
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+/* HEADER */
+.s-header{padding:16px 18px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg1)}
+.s-logo{width:30px;height:30px;border-radius:8px;background:var(--green-d);border:1px solid var(--green-b);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.s-brand-name{font-size:15px;font-weight:700}
+.s-brand-sub{font-size:10px;color:var(--ink3);margin-top:1px}
+/* STEP BAR */
+.step-bar{display:flex;gap:4px;padding:12px 18px;background:var(--bg1);border-bottom:1px solid var(--border);flex-shrink:0}
+.sb-dot{flex:1;height:4px;border-radius:999px;background:var(--bg4);transition:background .3s}
+.sb-dot.done{background:var(--green)}
+.sb-dot.active{background:var(--teal)}
+/* CONTENT */
+.s-content{flex:1;overflow-y:auto;padding:18px}
+.s-title{font-size:18px;font-weight:700;margin-bottom:4px;letter-spacing:-.3px}
+.s-sub{font-size:12.5px;color:var(--ink2);margin-bottom:18px;line-height:1.65}
+/* CARDS & FORM */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
+.f-grp{margin-bottom:14px}
+.f-lbl{display:block;font-size:11px;color:var(--ink3);font-weight:500;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between}
+.f-lbl-hint{font-size:10px;color:var(--teal-l);cursor:pointer;padding:1px 6px;border-radius:4px;background:var(--teal-d);border:1px solid var(--teal-b)}
+.f-inp{width:100%;padding:11px 13px;background:var(--bg1);border:1.5px solid var(--border2);border-radius:10px;color:var(--ink);font-size:14px;outline:none;transition:border-color .15s;font-family:"Noto Sans SC",sans-serif;-webkit-appearance:none}
+.f-inp:focus{border-color:var(--teal-b)}
+.f-sel{width:100%;padding:11px 13px;background:var(--bg1);border:1.5px solid var(--border2);border-radius:10px;color:var(--ink);font-size:14px;outline:none;font-family:"Noto Sans SC",sans-serif;-webkit-appearance:none}
+.f-hint{font-size:11px;color:var(--ink3);margin-top:5px;line-height:1.55;padding:7px 10px;background:rgba(0,0,0,.2);border-radius:7px;border-left:2px solid var(--teal-b);display:none}
+.f-hint.open{display:block}
+.f-row{display:flex;gap:10px}
+.f-row .f-grp{flex:1}
+.radio-group{display:flex;gap:8px;flex-wrap:wrap}
+.radio-btn{flex:1;min-width:80px;padding:9px 10px;border:1.5px solid var(--border2);border-radius:9px;background:var(--bg3);color:var(--ink2);font-size:12.5px;cursor:pointer;transition:all .14s;text-align:center;font-family:"Noto Sans SC",sans-serif;-webkit-appearance:none;outline:none}
+.radio-btn.selected{background:var(--teal-d);border-color:var(--teal-b);color:var(--teal-l)}
+/* INSIGHT */
+.ins{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:11px;font-size:12.5px;line-height:1.7;margin-bottom:14px}
+.ins-teal{background:var(--teal-d);border:1px solid var(--teal-b);color:var(--teal-l)}
+.ins-green{background:var(--green-d);border:1px solid var(--green-b);color:var(--green-l)}
+.ins-gold{background:var(--gold-d);border:1px solid var(--gold-b);color:var(--gold-l)}
+/* BOTTOM STICKY */
+.s-footer{padding:14px 18px;border-top:1px solid var(--border);background:var(--bg1);flex-shrink:0}
+.next-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--teal) 0%,var(--green) 100%);color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;transition:opacity .15s;letter-spacing:.2px;font-family:"Noto Sans SC",sans-serif}
+.next-btn:hover{opacity:.88}
+.next-btn:disabled{opacity:.45;cursor:not-allowed}
+.back-link{display:block;text-align:center;font-size:12px;color:var(--ink3);margin-top:10px;cursor:pointer}
+/* RADAR */
+.radar-container{display:flex;align-items:flex-start;gap:14px;margin-top:12px}
+.rs-list{flex:1;display:flex;flex-direction:column;gap:7px}
+.rs-item{display:flex;align-items:center;gap:8px}
+.rs-lbl{font-size:11px;color:var(--ink2);width:60px;flex-shrink:0}
+.rs-bar-w{flex:1;height:5px;background:var(--bg4);border-radius:999px;overflow:hidden}
+.rs-bar{height:100%;border-radius:999px;transition:width .7s cubic-bezier(.22,.97,.65,1)}
+.rs-val{font-family:"DM Mono",monospace;font-size:10.5px;width:24px;text-align:right;flex-shrink:0}
+/* GRADE BADGE */
+.grade-badge{text-align:center;margin:16px 0}
+.grade-letter{font-family:"DM Mono",monospace;font-size:64px;font-weight:700;line-height:1}
+.grade-name{font-size:16px;font-weight:700;margin-top:4px}
+.grade-intensity{font-family:"DM Mono",monospace;font-size:22px;font-weight:700;margin-top:8px}
+.grade-sub{font-size:11.5px;color:var(--ink2);margin-top:3px}
+/* BENCH BAR */
+.bench-bar-wrap{margin:14px 0;background:linear-gradient(90deg,var(--green-d),var(--gold-d),var(--red-d));border-radius:6px;height:10px;position:relative}
+.bench-marker{position:absolute;top:-4px;width:3px;height:18px;border-radius:2px;background:var(--ink);transition:left .5s ease}
+.bench-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);margin-top:4px}
+/* UPLOAD AREA */
+.upload-area{border:1.5px dashed var(--border2);border-radius:11px;padding:20px;text-align:center;cursor:pointer;transition:all .15s;position:relative}
+.upload-area:hover{border-color:var(--teal-b);background:var(--teal-d)}
+.upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-ic{font-size:28px;margin-bottom:8px}
+.upload-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.upload-sub{font-size:11.5px;color:var(--ink3)}
+/* ENCRYPT OVERLAY */
+.enc-overlay{position:fixed;inset:0;background:rgba(6,8,15,.95);z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.enc-overlay.active{display:flex}
+.enc-title{font-size:16px;font-weight:700;color:var(--teal-l)}
+.enc-sub{font-size:12px;color:var(--ink2)}
+.enc-prog-wrap{width:240px;height:4px;background:var(--bg4);border-radius:999px;overflow:hidden;margin-top:4px}
+.enc-prog-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--green));border-radius:999px;transition:width .4s ease;width:0%}
+.enc-steps{display:flex;flex-direction:column;gap:7px;margin-top:8px;width:260px}
+.eps{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink3);transition:color .2s}
+.eps.active{color:var(--teal-l)}
+.eps.done{color:var(--green-l)}
+.eps-dot{width:7px;height:7px;border-radius:50%;background:var(--bg4);flex-shrink:0;transition:background .2s}
+.eps.active .eps-dot{background:var(--teal);animation:pulse 1s infinite}
+.eps.done .eps-dot{background:var(--green)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.anim-in{animation:fadeUp .4s ease both}
+.d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);z-index:9999;padding:10px 18px;border-radius:13px;background:rgba(20,184,166,.16);border:1px solid rgba(20,184,166,.4);color:var(--teal-l);font-size:13px;font-weight:500;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;display:flex;align-items:center;gap:8px}
+</style>
+</head>
+<body>
+
+<!-- ══ SCREEN 1: 欢迎页 ══ -->
+<div class="screen active" id="screen1">
+  <div class="s-header">
+    <div class="s-logo">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z" stroke="var(--green)" stroke-width="1.2" fill="var(--green-d)"/>
+        <polyline points="5,8 7.5,10.5 11.5,6.5" stroke="var(--green-l)" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="s-brand-name">HengAI · Co2Lion</div>
+      <div class="s-brand-sub">供应商碳数据极速填报</div>
+    </div>
+  </div>
+
+  <div class="s-content">
+    <div style="margin-bottom:20px">
+      <div style="font-size:11px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">来自您合作伙伴的邀请</div>
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:16px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--teal) 50%,transparent 95%)"></div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px" id="inv-sender">合作企业</div>
+        <div style="font-size:12px;color:var(--ink2);margin-bottom:10px">邀请您配合完成 CBAM 碳数据填报</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span style="background:var(--teal-d);color:var(--teal-l);border:1px solid var(--teal-b);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">约 3 分钟完成</span>
+          <span style="background:var(--green-d);color:var(--green-l);border:1px solid var(--green-b);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">链上存证</span>
+          <span style="background:var(--gold-d);color:var(--gold-l);border:1px solid var(--gold-b);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600">免费获取碳评级报告</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ins ins-teal anim-in d1">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;margin-top:1px">
+        <circle cx="7.5" cy="7.5" r="6.5" stroke="var(--teal-l)" stroke-width="1"/>
+        <line x1="7.5" y1="4.5" x2="7.5" y2="7.5" stroke="var(--teal-l)" stroke-width="1.1"/>
+        <circle cx="7.5" cy="9.5" r=".7" fill="var(--teal-l)"/>
+      </svg>
+      <div>填报只需要您手头的<strong style="color:var(--teal-l)">电费账单</strong>，不需要专业碳排放知识。完成后您将免费获得一份<strong style="color:var(--teal-l)">企业碳评级报告</strong>，可用于客户资质审核。</div>
+    </div>
+
+    <div class="card anim-in d2">
+      <div style="font-size:12px;font-weight:700;margin-bottom:12px;color:var(--ink2);text-transform:uppercase;letter-spacing:.5px">填报后您将获得</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:32px;height:32px;border-radius:9px;background:var(--green-d);border:1px solid var(--green-b);display:flex;align-items:center;justify-content:center;flex-shrink:0">📊</div>
+          <div><div style="font-size:13px;font-weight:600">企业碳强度评级报告</div><div style="font-size:11.5px;color:var(--ink2);margin-top:1px">A/B/C 三级评定，可直接对外出示</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:32px;height:32px;border-radius:9px;background:var(--teal-d);border:1px solid var(--teal-b);display:flex;align-items:center;justify-content:center;flex-shrink:0">🔗</div>
+          <div><div style="font-size:13px;font-weight:600">链上存证凭证</div><div style="font-size:11.5px;color:var(--ink2);margin-top:1px">数据永久存储于 CL-IVC 区块链，可追溯</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:32px;height:32px;border-radius:9px;background:var(--gold-d);border:1px solid var(--gold-b);display:flex;align-items:center;justify-content:center;flex-shrink:0">💰</div>
+          <div><div style="font-size:13px;font-weight:600">碳税减免建议方案</div><div style="font-size:11.5px;color:var(--ink2);margin-top:1px">AI 自动生成 3 条可落地的降本路径</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 安全提示 -->
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 13px;background:rgba(0,0,0,.25);border-radius:9px;border:1px solid var(--border);font-size:11.5px;color:var(--ink3);line-height:1.65;margin-bottom:14px">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="flex-shrink:0;margin-top:1px">
+        <path d="M6.5 1L12 3.5V8C12 10.5 9.5 12.5 6.5 13C3.5 12.5 1 10.5 1 8V3.5L6.5 1Z" stroke="var(--ink3)" stroke-width=".9"/>
+        <polyline points="4,6.5 6,8.5 9.5,5" stroke="var(--ink3)" stroke-width="1.1" stroke-linecap="round"/>
+      </svg>
+      <span><strong style="color:var(--ink2)">CL-IVC 隐私誓言：</strong>你的碳数据属于你。Co2Lion 仅用于合规计算，永不出售，永不授权第三方分析。</span>
+    </div>
+  </div>
+
+  <div class="s-footer">
+    <button class="next-btn" onclick="goScreen(2)">开始极速填报 · 约 3 分钟 →</button>
+    <div class="back-link" onclick="showToast('如有疑问请联系您的合作方')">了解更多</div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 2: 数据填报 ══ -->
+<div class="screen" id="screen2">
+  <div class="s-header">
+    <div class="s-logo">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z" stroke="var(--green)" stroke-width="1.2" fill="var(--green-d)"/>
+        <polyline points="5,8 7.5,10.5 11.5,6.5" stroke="var(--green-l)" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="s-brand-name">Step 2 · 填写能源数据</div>
+      <div class="s-brand-sub">数据来源：电费账单 + 生产记录</div>
+    </div>
+  </div>
+  <div class="step-bar">
+    <div class="sb-dot done" id="sbd1"></div>
+    <div class="sb-dot active" id="sbd2"></div>
+    <div class="sb-dot" id="sbd3"></div>
+  </div>
+
+  <div class="s-content">
+    <div class="s-title">填写您的能源消耗数据</div>
+    <div class="s-sub">只需要一张电费账单，其他字段均有默认值，5 分钟内完成。</div>
+
+    <div class="card">
+      <div class="f-grp">
+        <label class="f-lbl">
+          所属行业
+        </label>
+        <select class="f-sel" id="industry-select" onchange="updateBenchmark()">
+          <option value="aluminum" selected>铝压铸 / 铝型材加工</option>
+          <option value="steel">钢铁 / 钢材加工</option>
+          <option value="cement">水泥 / 建材</option>
+          <option value="fertilizer">化肥 / 化工</option>
+          <option value="machinery">机械制造 / 装备</option>
+          <option value="electronics">电子 / 零部件</option>
+        </select>
+      </div>
+      <div class="f-grp">
+        <label class="f-lbl">
+          年总用电量（度）
+          <span class="f-lbl-hint" onclick="toggleHint('h-elec')">哪里找？</span>
+        </label>
+        <input class="f-inp" type="number" inputmode="decimal" id="f-elec" placeholder="例：124000"
+               oninput="onElecInput(this)">
+        <div class="f-hint" id="h-elec">查看电费账单上"本期用电量"，将全年12个月相加。财务部门通常有年度汇总。</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:5px" id="ref-range"></div>
+      </div>
+      <div class="f-grp">
+        <label class="f-lbl">是否已购买绿电证书（GEC）？</label>
+        <div class="radio-group">
+          <button class="radio-btn" id="gec-yes-btn" onclick="selectGec(true)">✓ 已购买</button>
+          <button class="radio-btn selected" id="gec-no-btn" onclick="selectGec(false)">✗ 未购买</button>
+        </div>
+        <div class="f-hint open" id="gec-hint" style="margin-top:8px">绿电证书可将您的电力排放因子降低约 80%，是最经济的减碳手段之一。</div>
+      </div>
+    </div>
+
+    <!-- 电单上传（OCR 模拟） -->
+    <div class="upload-area" id="ocr-upload-area" onclick="triggerOCR()">
+      <input type="file" accept="image/*,.pdf" id="ocr-file-input" style="display:none" onchange="handleOCR(this)">
+      <div class="upload-ic">📄</div>
+      <div class="upload-title" id="ocr-upload-title">上传电费账单（可选）</div>
+      <div class="upload-sub" id="ocr-upload-sub">拍照上传，AI 自动识别用电量 · 支持 JPG/PDF</div>
+    </div>
+
+    <div class="ins ins-gold" style="margin-top:14px">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px">
+        <path d="M7 1L13 4V10L7 13L1 10V4L7 1Z" stroke="var(--gold-l)" stroke-width="1" fill="var(--gold-d)"/>
+        <line x1="7" y1="4" x2="7" y2="8" stroke="var(--gold-l)" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="7" cy="9.5" r=".7" fill="var(--gold-l)"/>
+      </svg>
+      <div>如果您不确定用电量，可以用这个公式估算：<strong style="color:var(--gold-l)">年产量(吨) × 行业参考值</strong>。铝压铸约 300 kWh/吨，钢材加工约 500 kWh/吨。</div>
+    </div>
+  </div>
+
+  <div class="s-footer">
+    <button class="next-btn" id="s2-next-btn" onclick="goScreen2()">下一步：获取碳评级 →</button>
+    <div class="back-link" onclick="goScreen(1)">← 返回</div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 3: 结果 ══ -->
+<div class="screen" id="screen3">
+  <div class="s-header">
+    <div class="s-logo">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z" stroke="var(--green)" stroke-width="1.2" fill="var(--green-d)"/>
+        <polyline points="5,8 7.5,10.5 11.5,6.5" stroke="var(--green-l)" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="s-brand-name">碳评级报告</div>
+      <div class="s-brand-sub">数据提交成功 · 链上存证 <span style="font-family:'DM Mono',monospace" id="chain-hash">#GN-S-0000</span></div>
+    </div>
+  </div>
+  <div class="step-bar">
+    <div class="sb-dot done"></div>
+    <div class="sb-dot done"></div>
+    <div class="sb-dot done"></div>
+  </div>
+
+  <div class="s-content">
+    <!-- 等级展示 -->
+    <div class="card" style="text-align:center;border-color:var(--border2);position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--teal) 50%,transparent 95%)"></div>
+      <div class="grade-badge">
+        <div class="grade-letter" id="grade-letter" style="color:var(--orange)">B</div>
+        <div class="grade-name" id="grade-name" style="color:var(--orange)">待改进</div>
+        <div class="grade-intensity" id="result-intensity" style="color:var(--ink)">-- tCO₂e/t</div>
+        <div class="grade-sub" id="result-sub">综合碳强度指数</div>
+      </div>
+      <!-- 行业基准条 -->
+      <div style="font-size:10.5px;color:var(--ink3);margin-bottom:6px;text-align:left" id="s3-radar-benchmark-hint">行业基准参考</div>
+      <div class="bench-bar-wrap">
+        <div class="bench-marker" id="bench-marker" style="left:50%"></div>
+      </div>
+      <div class="bench-labels">
+        <span id="bench-best">最优</span>
+        <span id="dynamic-benchmark-text">行业均值</span>
+        <span id="bench-worst">最差</span>
+      </div>
+      <!-- 与您数据对比 -->
+      <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:11.5px">
+        <span style="color:var(--ink3)">您的碳强度</span>
+        <span style="font-family:'DM Mono',monospace;font-weight:700" id="ct-your-intensity">--</span>
+      </div>
+    </div>
+
+    <!-- 雷达图 -->
+    <div class="card">
+      <div style="font-size:11px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">六维碳合规雷达</div>
+      <div class="radar-container">
+        <svg width="160" height="160" viewBox="0 0 200 200">
+          <polygon points="100,28 158,64 158,136 100,172 42,136 42,64" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+          <polygon points="100,46 142,70 142,130 100,154 58,130 58,70" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+          <polygon points="100,64 126,78 126,122 100,136 74,122 74,78" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+          <line x1="100" y1="100" x2="100" y2="20" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+          <line x1="100" y1="100" x2="164" y2="60" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+          <line x1="100" y1="100" x2="164" y2="140" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+          <line x1="100" y1="100" x2="100" y2="180" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+          <line x1="100" y1="100" x2="36" y2="140" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+          <line x1="100" y1="100" x2="36" y2="60" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+          <polygon id="dynamic-radar-polygon" points="100,100 100,100 100,100 100,100 100,100 100,100"
+            fill="rgba(249,115,22,.18)" stroke="var(--orange)" stroke-width="1.5"/>
+          <g id="radar-vertex-dots"></g>
+          <text x="100" y="13" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.4)">碳强度</text>
+          <text x="170" y="57" text-anchor="start" font-size="8" fill="rgba(255,255,255,.4)">绿电</text>
+          <text x="170" y="145" text-anchor="start" font-size="8" fill="rgba(255,255,255,.4)">置信度</text>
+          <text x="100" y="194" text-anchor="middle" font-size="8" fill="rgba(255,255,255,.4)">响应</text>
+          <text x="30" y="145" text-anchor="end" font-size="8" fill="rgba(255,255,255,.4)">减排</text>
+          <text x="30" y="57" text-anchor="end" font-size="8" fill="rgba(255,255,255,.4)">协同</text>
+        </svg>
+        <div class="rs-list" id="radar-score-list-s3"><!-- JS 渲染 --></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">
+        <span style="font-size:11.5px;color:var(--ink2)">综合得分</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;width:80px;height:5px;background:var(--bg4);border-radius:999px;overflow:hidden">
+            <div id="radar-total-bar" style="height:100%;border-radius:999px;background:var(--orange);transition:width .7s ease"></div>
+          </div>
+          <span style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700" id="radar-total-val">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 风险提示 -->
+    <div id="risk-tips"></div>
+
+    <!-- 三步减碳路径 -->
+    <div class="card">
+      <div style="font-size:11px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">AI 推荐减碳路径</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--green-d);border:1px solid var(--green-b);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--green-l);flex-shrink:0">1</div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:2px">引入绿电 GEC 证书</div><div style="font-size:11.5px;color:var(--ink2)">可将电力排放因子降低 80%，是最经济的减碳手段，成本约 ¥0.08/度</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--teal-d);border:1px solid var(--teal-b);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--teal-l);flex-shrink:0">2</div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:2px">接入 MAT 网关认证</div><div style="font-size:11.5px;color:var(--ink2)">提升数据置信度至 Lv.4，消除申报惩罚溢价，节税约 15-35%</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div style="width:22px;height:22px;border-radius:50%;background:var(--gold-d);border:1px solid var(--gold-b);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--gold-l);flex-shrink:0">3</div>
+          <div><div style="font-size:13px;font-weight:600;margin-bottom:2px">加入 HengAI 供应链协同体系</div><div style="font-size:11.5px;color:var(--ink2)">与核心客户共享碳数据，获取每次填报积分，可兑换碳税减免优惠</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="s-footer">
+    <button class="next-btn" onclick="openRegistration()">注册 HengAI 账户 · 永久保存报告</button>
+    <div class="back-link" onclick="handleDownload()">下载 PDF 报告</div>
+  </div>
+</div>
+
+<!-- 注册 Modal -->
+<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:200;display:none;align-items:flex-end" id="reg-mask" onclick="closeRegistration()">
+  <div id="registration-panel" style="background:var(--bg2);border:1px solid var(--border2);border-radius:18px 18px 0 0;padding:22px;width:100%;max-height:80vh;overflow-y:auto" onclick="event.stopPropagation()">
+    <div style="width:40px;height:4px;border-radius:2px;background:var(--border2);margin:0 auto 18px"></div>
+    <div style="font-size:15px;font-weight:700;margin-bottom:4px">注册 HengAI 企业账户</div>
+    <div style="font-size:12px;color:var(--ink2);margin-bottom:16px">永久保存碳评级报告，获取持续的碳合规支持</div>
+    <div class="f-grp">
+      <label class="f-lbl">企业名称</label>
+      <input class="f-inp" id="reg-name" placeholder="---">
+    </div>
+    <div class="f-grp">
+      <label class="f-lbl">手机号</label>
+      <div style="display:flex;gap:8px">
+        <input class="f-inp" style="flex:1" id="reg-phone" type="tel" inputmode="tel" placeholder="13xxxxxxxxx">
+        <button id="reg-code-btn" onclick="sendVerifyCode()"
+          style="padding:0 14px;border-radius:10px;border:1px solid var(--teal-b);background:var(--teal-d);color:var(--teal-l);font-size:12px;cursor:pointer;white-space:nowrap;font-family:'Noto Sans SC',sans-serif">
+          发送验证码
+        </button>
+      </div>
+    </div>
+    <div class="f-grp">
+      <label class="f-lbl">验证码</label>
+      <input class="f-inp" id="reg-code" type="number" inputmode="numeric" placeholder="6 位验证码">
+    </div>
+    <button class="next-btn" id="reg-submit-btn" onclick="submitRegistration()" style="margin-top:4px">
+      确认认领 · 建立企业官方碳档案
+    </button>
+    <div style="font-size:11px;color:var(--ink3);text-align:center;margin-top:10px;line-height:1.6">
+      注册即表示同意《用户协议》和《隐私政策》<br>你的碳数据永远属于你
+    </div>
+  </div>
+</div>
+
+<!-- 加密提交动画 -->
+<div class="enc-overlay" id="enc-overlay">
+  <div style="width:48px;height:48px;border-radius:14px;background:var(--teal-d);border:1px solid var(--teal-b);display:flex;align-items:center;justify-content:center;margin-bottom:4px">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2L22 7V14C22 19 17.5 23 12 24C6.5 23 2 19 2 14V7L12 2Z" fill="var(--teal-d)" stroke="var(--teal)" stroke-width="1.4"/>
+      <polyline points="7,12 10.5,15.5 17,9" stroke="var(--teal-l)" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="enc-title">正在加密提交至区块链</div>
+  <div class="enc-sub">请勿关闭页面...</div>
+  <div class="enc-prog-wrap"><div class="enc-prog-fill" id="enc-fill"></div></div>
+  <div class="enc-steps" id="enc-steps">
+    <div class="eps" id="eps1"><div class="eps-dot"></div>数据完整性校验</div>
+    <div class="eps" id="eps2"><div class="eps-dot"></div>SHA-256 哈希签名</div>
+    <div class="eps" id="eps3"><div class="eps-dot"></div>端对端加密传输</div>
+    <div class="eps" id="eps4"><div class="eps-dot"></div>加密提交至区块链节点</div>
+    <div class="eps" id="eps5"><div class="eps-dot"></div>链上存证确认</div>
+  </div>
+</div>
+
+<div id="toast">
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="var(--teal-l)" stroke-width="1.5" stroke-linecap="round"/></svg>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   供应商 H5 · 极速碳填报
+   独立运行 - 不依赖 appstate.js
+   ══════════════════════════════════════════════ */
+
+/* ── 行业基准数据 ── */
+var CBAM_BENCHMARKS = {
+  aluminum:    { best:0.48, avg:1.82, worst:4.20, material:9.5, unit:'铝制品' },
+  steel:       { best:0.90, avg:2.10, worst:5.80, material:1.85, unit:'钢铁制品' },
+  cement:      { best:0.55, avg:0.89, worst:1.40, material:0.0,  unit:'水泥' },
+  fertilizer:  { best:1.20, avg:2.30, worst:4.50, material:0.0,  unit:'化肥' },
+  machinery:   { best:0.30, avg:0.85, worst:2.20, material:0.0,  unit:'机械制品' },
+  electronics: { best:0.10, avg:0.40, worst:1.20, material:0.0,  unit:'电子产品' },
+};
+
+var gecSelected = false;
+var currentScreen = 1;
+
+/* ── 屏幕切换 ── */
+function goScreen(n) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  var next = document.getElementById('screen' + n);
+  if (next) next.classList.add('active');
+  currentScreen = n;
+  window.scrollTo(0, 0);
+}
+
+function goScreen2() {
+  var elec = parseFloat(document.getElementById('f-elec').value);
+  if (!elec || elec <= 0) { showToast('请填写年总用电量'); return; }
+  startEncryption();
+}
+
+/* ── GEC 选择 ── */
+function selectGec(val) {
+  gecSelected = val;
+  var yBtn = document.getElementById('gec-yes-btn');
+  var nBtn = document.getElementById('gec-no-btn');
+  var hint = document.getElementById('gec-hint');
+  if (yBtn) yBtn.className = 'radio-btn' + (val ? ' selected' : '');
+  if (nBtn) nBtn.className = 'radio-btn' + (!val ? ' selected' : '');
+  if (hint) hint.textContent = val
+    ? '✓ 已计入绿电抵扣，您的电力排放因子将降低约 80%'
+    : '接入绿电证书可显著降低您的碳强度评级，推荐了解。';
+}
+
+/* ── 行业切换 ── */
+function updateBenchmark() {
+  var bm  = getSelectedBenchmark();
+  var rr  = document.getElementById('ref-range');
+  if (rr) rr.textContent = '行业参考值：' + bm.best.toFixed(2) + '~' + bm.worst.toFixed(2) + ' tCO₂e/t · 均值 ' + bm.avg.toFixed(2);
+}
+function getSelectedBenchmark() {
+  var sel = document.getElementById('industry-select');
+  return CBAM_BENCHMARKS[sel ? sel.value : 'aluminum'] || CBAM_BENCHMARKS.aluminum;
+}
+
+/* ── 实时参考值 ── */
+function onElecInput(inp) {
+  var v  = parseFloat(inp.value);
+  var bm = getSelectedBenchmark();
+  var rr = document.getElementById('ref-range');
+  if (rr && !isNaN(v) && v > 0) {
+    var est = ((v / 1000 * 0.581) + bm.material).toFixed(2);
+    rr.textContent = '估算碳强度约：' + est + ' tCO₂e/t（含原材料 Scope 3）';
+  }
+}
+
+/* ── OCR 上传 ── */
+function triggerOCR() {
+  document.getElementById('ocr-file-input').click();
+}
+function handleOCR(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var inp   = document.getElementById('f-elec');
+  var title = document.getElementById('ocr-upload-title');
+  var sub   = document.getElementById('ocr-upload-sub');
+  if (title) title.textContent = '正在识别中...';
+  if (sub)   sub.textContent   = '请稍候';
+  setTimeout(function() {
+    var recognized = 12400 + Math.floor(Math.random() * 900);
+    if (inp) { inp.value = recognized; onElecInput(inp); }
+    if (title) title.textContent = '✓ 识别成功';
+    if (sub)   sub.textContent   = '已自动填入用电量：' + recognized.toLocaleString() + ' kWh';
+    showToast('账单识别成功：' + recognized.toLocaleString() + ' kWh');
+  }, 1400);
+}
+
+/* ── 加密动画 → 计算结果 ── */
+function startEncryption() {
+  var overlay = document.getElementById('enc-overlay');
+  var fill    = document.getElementById('enc-fill');
+  if (!overlay) return;
+  overlay.classList.add('active');
+  var steps  = ['eps1','eps2','eps3','eps4','eps5'];
+  var pcts   = [18, 36, 58, 80, 100];
+  var delays = [0, 400, 800, 1200, 1700];
+  steps.forEach(function(id) { var el = document.getElementById(id); if (el) el.className = 'eps'; });
+  steps.forEach(function(id, i) {
+    setTimeout(function() {
+      if (i > 0) { var prev = document.getElementById(steps[i-1]); if (prev) prev.className = 'eps done'; }
+      var cur = document.getElementById(id); if (cur) cur.className = 'eps active';
+      if (fill) fill.style.width = pcts[i] + '%';
+    }, delays[i]);
+  });
+  setTimeout(function() {
+    var last = document.getElementById(steps[4]); if (last) last.className = 'eps done';
+    overlay.classList.remove('active');
+    computeResult();
+    goScreen(3);
+  }, 2400);
+}
+
+/* ── 核心计算 ── */
+function computeResult() {
+  var elecRaw = parseFloat(document.getElementById('f-elec').value) || 0;
+  var bm      = getSelectedBenchmark();
+  var gf      = 0.581;
+  var gridAdj = gecSelected ? gf * 0.2 : gf;
+  var intensity;
+  if (elecRaw > 0) {
+    intensity = (elecRaw / 1000 * gridAdj) + bm.material;
+  } else {
+    intensity = bm.avg;
+  }
+
+  /* 等级判定 */
+  var grade, gradeName, gradeColor, gradeRisk;
+  if (intensity <= bm.best * 1.1) {
+    grade = 'A'; gradeName = '行业领先'; gradeColor = '#10b981';
+    gradeRisk = '您的碳强度处于行业前列，已具备 CBAM 申报的优势条件。';
+  } else if (intensity <= bm.avg) {
+    grade = 'B+'; gradeName = '良好'; gradeColor = '#3b82f6';
+    gradeRisk = '您的碳强度低于行业均值，但仍有优化空间。引入绿电证书可进一步提升至 A 级。';
+  } else if (intensity <= bm.avg * 1.5) {
+    grade = 'B'; gradeName = '待改进'; gradeColor = '#f97316';
+    gradeRisk = '当前碳强度接近欧盟默认参考值，需要结构化优化以提升竞争力。';
+  } else {
+    grade = 'C'; gradeName = '高风险'; gradeColor = '#ef4444';
+    gradeRisk = '碳强度明显偏高，面临较大 CBAM 税收压力，建议尽快启动减碳方案。';
+  }
+
+  /* 渲染 */
+  setTxt('grade-letter', grade, gradeColor);
+  setTxt('grade-name',   gradeName, gradeColor);
+  setTxt('result-intensity', intensity.toFixed(2) + ' tCO₂e/t');
+  setTxt('ct-your-intensity', intensity.toFixed(2) + ' tCO₂e/t');
+
+  /* 基准标记 */
+  var worstSafe = bm.worst <= 0 ? 1 : bm.worst;
+  var pct = Math.max(4, Math.min(94, (intensity / worstSafe) * 100));
+  var marker = document.getElementById('bench-marker');
+  if (marker) { setTimeout(function() { marker.style.left = pct.toFixed(1) + '%'; }, 300); }
+  setTxt('bench-best',  '最优 ' + bm.best.toFixed(2));
+  setTxt('bench-worst', '最差 ' + bm.worst.toFixed(2));
+  var dynTxt = document.getElementById('dynamic-benchmark-text');
+  if (dynTxt) dynTxt.textContent = '行业均值 ' + bm.avg.toFixed(2);
+
+  /* 链上哈希 */
+  var hashEl = document.getElementById('chain-hash');
+  if (hashEl) hashEl.textContent = '#GN-S-' + Date.now().toString(36).slice(-6).toUpperCase();
+
+  /* 风险提示 */
+  var riskEl = document.getElementById('risk-tips');
+  if (riskEl) {
+    riskEl.innerHTML = '<div style="background:' + (grade==='A'?'var(--green-d)':grade.startsWith('B')?'var(--gold-d)':'var(--red-d)') +
+      ';border:1px solid ' + (grade==='A'?'var(--green-b)':grade.startsWith('B')?'var(--gold-b)':'var(--red-b)') +
+      ';border-radius:11px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;line-height:1.7;color:' + gradeColor + '">' +
+      gradeRisk + '</div>';
+  }
+
+  /* 雷达图 */
+  var scores = calculateRadarScores(intensity, bm, gecSelected);
+  renderRadarS3(scores, gradeColor);
+  updateRadarScoreList(scores, gradeColor);
+}
+
+function calculateRadarScores(intensity, bm, hasGEC) {
+  var span  = bm.worst - bm.best;
+  var ratio = span <= 0 ? 0 : (intensity - bm.best) / span;
+  var carbon     = Math.max(20, Math.min(95, Math.round(95 - ratio * 75)));
+  var green      = hasGEC ? 90 : 15;
+  var confidence = 40;
+  var response   = 85;
+  var process    = Math.max(20, Math.min(90, Math.round(carbon * 0.85)));
+  var collab     = 60;
+  return [carbon, green, confidence, response, process, collab];
+}
+
+function renderRadarS3(scores, colorHex) {
+  var cx = 100, cy = 100, R = 75;
+  var pts = scores.map(function(s, i) {
+    var angle = (-90 + i * 60) * Math.PI / 180;
+    var dist  = (Math.max(0, Math.min(100, s)) / 100) * R;
+    return { x: cx + dist * Math.cos(angle), y: cy + dist * Math.sin(angle) };
+  });
+  var poly = document.getElementById('dynamic-radar-polygon');
+  if (!poly) return;
+  var t0 = performance.now(), DUR = 950;
+  var start = Array(6).fill(null).map(function() { return {x: cx, y: cy}; });
+  (function frame(now) {
+    var t = Math.min(1, (now - t0) / DUR);
+    var e = 1 - Math.pow(1 - t, 3);
+    var cur = start.map(function(s, i) {
+      return { x: s.x + (pts[i].x - s.x) * e, y: s.y + (pts[i].y - s.y) * e };
+    });
+    poly.setAttribute('points', cur.map(function(p) { return p.x.toFixed(2) + ',' + p.y.toFixed(2); }).join(' '));
+    poly.setAttribute('fill', hexToRgba(colorHex, 0.18));
+    poly.setAttribute('stroke', colorHex);
+    if (t < 1) requestAnimationFrame(frame);
+    else {
+      var dotsG = document.getElementById('radar-vertex-dots');
+      if (dotsG) {
+        dotsG.innerHTML = pts.map(function(p) {
+          return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="3" fill="' + colorHex + '" opacity=".9"/>';
+        }).join('');
+      }
+    }
+  })(t0);
+}
+
+function updateRadarScoreList(scores, colorHex) {
+  var labels = ['碳强度','绿电','置信度','响应时效','减排路径','协同深度'];
+  var total  = scores.reduce(function(a, b) { return a + b; }, 0);
+  var avg    = Math.round(total / scores.length);
+  var listEl = document.getElementById('radar-score-list-s3');
+  if (listEl) {
+    listEl.innerHTML = scores.map(function(s, i) {
+      return '<div class="rs-item">' +
+        '<div class="rs-lbl">' + labels[i] + '</div>' +
+        '<div class="rs-bar-w"><div class="rs-bar" style="width:' + s + '%;background:' + colorHex + '"></div></div>' +
+        '<div class="rs-val" style="color:' + colorHex + '">' + s + '</div>' +
+      '</div>';
+    }).join('');
+  }
+  var tb = document.getElementById('radar-total-bar');
+  var tv = document.getElementById('radar-total-val');
+  if (tb) { setTimeout(function() { tb.style.width = avg + '%'; tb.style.background = colorHex; }, 300); }
+  if (tv) tv.textContent = avg + '/100';
+}
+
+function hexToRgba(hex, alpha) {
+  var h = String(hex || '').replace('#','');
+  if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  var r = parseInt(h.substr(0,2),16);
+  var g = parseInt(h.substr(2,2),16);
+  var b = parseInt(h.substr(4,2),16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
+/* ── 注册 ── */
+function openRegistration() {
+  var mask  = document.getElementById('reg-mask');
+  var panel = document.getElementById('registration-panel');
+  if (mask)  mask.style.display  = 'flex';
+  if (panel) panel.style.transform = 'translateY(0)';
+  var nameInput = document.getElementById('reg-name');
+  if (nameInput && !nameInput.value) { nameInput.focus(); }
+}
+function closeRegistration() {
+  var mask = document.getElementById('reg-mask');
+  if (mask) mask.style.display = 'none';
+}
+
+var regCodeTimer = null;
+function sendVerifyCode() {
+  var phone = (document.getElementById('reg-phone').value || '').trim();
+  if (!/^1[3-9]\d{9}$/.test(phone)) { showToast('请输入正确的手机号'); return; }
+  var btn  = document.getElementById('reg-code-btn');
+  var left = 60;
+  if (btn) { btn.disabled = true; btn.textContent = left + 's'; }
+  showToast('验证码已发送至 ' + phone);
+  regCodeTimer = setInterval(function() {
+    left--;
+    if (btn) btn.textContent = left + 's';
+    if (left <= 0) {
+      clearInterval(regCodeTimer);
+      if (btn) { btn.disabled = false; btn.textContent = '重新发送'; }
+    }
+  }, 1000);
+}
+
+function submitRegistration() {
+  var name  = (document.getElementById('reg-name').value  || '').trim();
+  var phone = (document.getElementById('reg-phone').value || '').trim();
+  var code  = (document.getElementById('reg-code').value  || '').trim();
+  if (!name)  { showToast('请填写企业名称'); return; }
+  if (!/^1[3-9]\d{9}$/.test(phone)) { showToast('请输入正确的手机号'); return; }
+  if (!code || code.length < 4)      { showToast('请填写验证码'); return; }
+  closeRegistration();
+  showToast('✓ 注册成功！碳档案已建立，欢迎加入 Co2Lion');
+}
+
+function handleDownload() {
+  showToast('PDF 报告正在生成，请稍候...');
+  setTimeout(function() { showToast('✓ 报告已生成，请在通知栏下载'); }, 1800);
+}
+
+/* ── 工具 ── */
+function setTxt(id, val, color) {
+  var el = document.getElementById(id);
+  if (el) { el.textContent = val; if (color) el.style.color = color; }
+}
+function toggleHint(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  var m = document.getElementById('toast-msg');
+  if (!t || !m) return;
+  m.textContent = msg;
+  t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(window._tt);
+  window._tt = setTimeout(function() {
+    t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(16px)';
+  }, 2800);
+}
+
+/* ── 初始化 ── */
+(function init() {
+  /* 解析邀请参数 */
+  var params = new URLSearchParams(window.location.search);
+  var ref    = params.get('ref') || '';
+  var invEl  = document.getElementById('inv-sender');
+  if (invEl && ref) invEl.textContent = ref + ' 的合作企业';
+
+  /* 设置截止日期默认值 */
+  updateBenchmark();
+  selectGec(false);
+})();
+</script>
+</body>
+</html>

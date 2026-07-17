@@ -1,0 +1,94 @@
+🏗️ 《HengAI 前后端状态管理与数据字典规范 V1.0》
+第一部分：数据字典规范（底层记账法则）
+核心原则：数据所有权必须将“打工人（Users）”与“企业（Workspaces）”彻底解耦。
+1. Users (用户个人护照表)
+无论员工怎么跳槽，以下数据永远跟着他走。
+user_id: 唯一标识符
+account_tier: 账户级别枚举
+GUEST (免费白嫖，随时面临计费墙)
+PRO (已掏腰包 ¥99，解锁计算限制)
+gm_balance: GreenMark 生态积分余额（用于解锁个人成就）
+champion_level: 个人专业认证等级（Lv.1 ~ Lv.5）
+current_workspace_id: 当前正在操作的空间ID（可切换）
+2. Workspaces (空间/企业金库表)
+数据的物理归属地，决定了谁能看什么。
+workspace_id: 空间唯一标识
+workspace_type: 空间状态枚举
+SANDBOX (打工人的临时沙盒，未付费，随时提示风险)
+CERTIFIED (官方企业金库，老板已付 ¥29800，受法律与防篡改保护)
+owner_id: 最高权限者（认证前是打工人，认证后移交给老板）
+3. Action_Ledger (绿印行为流水表 —— 极度重要)
+这是系统“让人沉溺”的多巴胺引擎，绝不能只用本地存储（localStorage）。
+log_id: 流水号
+user_id: 行为触发者
+action_type: 行为类型（如 UPLOAD_BILL, INVITE_SUPPLIER, GENERATE_CFO_REPORT）
+gm_earned: 本次行为赚取的积分
+created_at: 时间戳
+第二部分：UI 状态机规范（情绪与商业控制阀）
+核心原则：前端 UI 不是静态的，它必须根据 account_tier 和 workspace_type 动态渲染，拿捏用户心理。
+🟡 状态 A：游客破冰期 (Guest + Sandbox)
+用户画像：焦头烂额的外贸专员，刚进来。
+UI 渲染准则：
+聊天流：允许畅聊前 5 轮，展现 HengAI 的专业度。
+报告产出：生成图表时，核心数字清晰，但高级图表背景高斯模糊，打上 🔒 图标。
+阻断逻辑 (Paywall)：
+当触发“下载报表”或“第 6 轮对话”时，触发 Paywall_Trigger。
+UI 表现：全屏模态框拦截：“您的测算已触及专业深度边界。一键升级专业版（¥99），保住您的出口订单并解锁全部模糊数据。”
+🟢 状态 B：新大陆沉溺期 (Pro + Sandbox)
+用户画像：一咬牙付了 ¥99，发现各种神仙功能，开始疯狂赚取 GM。
+UI 渲染准则：
+全域解封：高斯模糊全部消失，图表呈现顶级赛博尊贵质感。
+徽章常驻：顶部出现 [数据推动者] 金色入口，随时可点击查看自己的 champion_level。
+微反馈 (Micro-toast) 激活：每做一件事（发个邀请、算个公式），右上角必须弹出绿色胶囊动效：“✅ 操作成功，+50 GM”。
+阻断逻辑 (Upsell 2B)：
+当打工人试图修改底层脱碳路径（如接入绿电），弹出拦截：“此操作需企业级物理网关（MAT）支持。一键生成向老板的升级请示报告。”
+🔵 状态 C：企业共治期 (Pro/Advisor + Certified)
+用户画像：老板已买单 ¥29800，打工人晋升内部合规官。
+UI 渲染准则：
+空间升维：左上角的沙盒标识变成绿色的 [企业官方金库]。
+功能分化：出现【全供应链协同看板】等重型 2B 功能模块。
+个人升华：打工人的称号强制锁定为最高级 Lv.5 官方智库顾问，系统不再用“办卡”打扰他，而是给他推送高阶研报。
+第三部分：事件总线与拦截器规范（给前端的死命令）
+核心原则：所有点击不能直接调接口，必须通过统一的 EventBus（事件总线），方便埋点和加特效。
+任何需要触发“沉溺感”的核心业务动作，必须遵守以下标准的 4 步生命周期：
+code
+JavaScript
+// 伪代码标准示范 (供 Cursor 学习)
+function handleUserAction(actionType, payload) {
+    // Step 1: 权限校验拦截 (Paywall Check)
+    if (!AuthGuard.checkPermission(actionType)) {
+        return UI.showPaywallModal(actionType);
+    }
+    
+    // Step 2: 算力动画包装 (Aha Moment)
+    UI.showLoadingArtifact('正在调用 Co2Lion 底座引擎解析...');
+    
+    // Step 3: 后端真实请求
+    API.executeAction(actionType, payload).then(response => {
+        // Step 4: 多巴胺释放引擎 (Rewards & UI Update)
+        UI.removeLoadingArtifact();
+        UI.renderWidget(response.data); // 渲染精美图表
+        
+        if (response.gm_earned > 0) {
+            UI.showGMRewardToast(response.gm_earned); // 弹出发光积分动效
+            AppState.updateGM(response.gm_balance);
+        }
+    });
+}
+
+第四部分：系统 UI 空间感知与用户引导法案（室内导航地图）
+核心原则：系统运行于「HengAI V2.0 前店后厂」架构中。任何复杂业务引导必须指向【全域中心（Global Hub）】，严禁虚构不存在的 UI 方位。
+
+1. 当用户需要【上传电费单、建立真实碳账本】时，必须使用以下话术：
+“💡 请点击右上角的 `[全域中心]` 进入您的专属控制台，在左侧的 `[企业数字档案]` 中上传您的电费单，我将为您核算真实的排碳量，大幅降低罚款敞口。”
+
+2. 当用户需要【计算多类别产品碳税、生成 ROI 报告】时，必须使用以下话术：
+“💡 粗测误差较大。请点击右上角 `[全域中心]`，进入左侧的 `[CBAM 测算工具]`，进行包含 Scope 3 溯源的精准测算。”
+
+3. 当用户抱怨【供应商不配合、缺乏上游数据】时，必须使用以下话术：
+“💡 缺省数据将导致 35% 惩罚溢价。请前往 `[全域中心]` -> `[供应链协同]`，一键向您的供应商签发【穿透填报卡片】。”
+
+4. 当系统完成风险预警时，可在回复末尾追加以下 HTML 引导（前端支持拦截解析）：
+“👉 <a href="HengAI_全域中心.html" style="color:#10B981; text-decoration:underline;">点击此处，立即进入全域中心解决此风险</a>”
+
+【禁令】：绝对禁止在任何回复中提及“右侧面板”、“右侧资产库”、“拖拽到右边”等与全域中心架构不符的方位词。

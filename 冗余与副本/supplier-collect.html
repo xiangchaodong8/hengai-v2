@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>订单碳数据合规申报 | Co2Lion</title>
+    <style>
+        :root {
+            --bg-dark: #0a0c10;
+            --brand-green: #2ecc71;
+            --brand-green-glow: rgba(46, 204, 113, 0.4);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f0f2f5;
+            --text-dim: #8b949e;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); overflow-x: hidden; }
+        
+        /* 背景光晕 */
+        .bg-aura { position: fixed; top: -10vh; right: -20vw; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(46,204,113,0.15), transparent 70%); border-radius: 50%; z-index: -1; filter: blur(40px); }
+        .bg-aura-2 { position: fixed; bottom: -10vh; left: -20vw; width: 70vw; height: 70vw; background: radial-gradient(circle, rgba(139,92,246,0.1), transparent 70%); border-radius: 50%; z-index: -1; filter: blur(40px); }
+
+        .container { min-height: 100vh; padding: 24px 20px; display: flex; flex-direction: column; }
+        
+        /* 顶部权威背书 */
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; padding-bottom: 16px; border-bottom: 1px solid var(--glass-border); }
+        .logos { display: flex; align-items: center; gap: 12px; }
+        .corp-logo { width: 36px; height: 36px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #333; font-size: 12px; }
+        .co2-logo { color: var(--brand-green); font-weight: 800; font-size: 16px; display: flex; align-items: center; gap: 4px; }
+        
+        /* 页面切换逻辑 */
+        .step-view { display: none; animation: slideUp 0.4s ease forwards; flex: 1; }
+        .step-view.active { display: flex; flex-direction: column; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 卡片样式 */
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; margin-bottom: 20px; }
+        .title { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; line-height: 1.4; }
+        .subtitle { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 20px; line-height: 1.5; }
+        
+        /* 隐私保护框 */
+        .privacy-box { background: rgba(46, 204, 113, 0.05); border: 1px solid rgba(46, 204, 113, 0.2); border-radius: 12px; padding: 16px; display: flex; gap: 12px; align-items: flex-start; }
+        .privacy-box .icon { font-size: 20px; }
+        .privacy-text p { font-size: 0.8rem; margin-bottom: 6px; }
+        .privacy-text p:last-child { margin-bottom: 0; color: var(--brand-green); font-weight: 600; }
+
+        /* 按钮 */
+        .btn { width: 100%; padding: 16px; border-radius: 16px; border: none; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: var(--brand-green); color: #000; margin-top: auto; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: var(--text-main); margin-bottom: 12px; }
+        
+        /* 输入表单 */
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 8px; }
+        .input-group input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 12px; padding: 14px; color: white; font-size: 1rem; outline: none; transition: border 0.2s; }
+        .input-group input:focus { border-color: var(--brand-green); }
+
+        /* 零知识证明加载动效 */
+        .zkp-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 40vh; }
+        .shield-icon { font-size: 60px; margin-bottom: 20px; position: relative; }
+        .shield-icon::after { content: ''; position: absolute; inset: -20px; border-radius: 50%; border: 2px dashed var(--brand-green); animation: rotate 4s linear infinite; }
+        @keyframes rotate { 100% { transform: rotate(360deg); } }
+        .code-stream { font-family: monospace; font-size: 0.75rem; color: var(--brand-green); opacity: 0.7; height: 60px; overflow: hidden; text-align: center; margin-top: 20px; line-height: 1.4; }
+
+        /* 成功与裂变页 */
+        .success-icon { width: 80px; height: 80px; background: rgba(46, 204, 113, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--brand-green); margin: 0 auto 20px; }
+        .data-card { text-align: center; padding: 24px; border-radius: 16px; background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(46,204,113,0.1)); border: 1px solid var(--brand-green); margin-bottom: 24px; }
+        .data-value { font-size: 2.5rem; font-weight: 800; color: var(--brand-green); margin: 10px 0; }
+        
+        .fission-box { background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 16px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
+        .fission-box h3 { font-size: 1.1rem; color: #b08aff; margin-bottom: 10px; }
+        .fission-box p { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 16px; }
+        .btn-fission { background: linear-gradient(90deg, #8b5cf6, #3b82f6); color: white; border: none; }
+    </style>
+</head>
+<body>
+    <div class="bg-aura"></div><div class="bg-aura-2"></div>
+
+    <div class="container">
+        <!-- 公共头部背书 -->
+        <header class="header">
+            <div class="logos">
+                <div class="corp-logo">大众<br>汽配</div>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                <div class="co2-logo"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg> HengAI</div>
+            </div>
+        </header>
+
+        <!-- 第 1 步：破冰与隐私宣誓 -->
+        <div class="step-view active" id="step1">
+            <div class="glass-card">
+                <h1 class="title">大众汽配 邀请您完成<br>【高强度螺栓】碳合规填报</h1>
+                <p class="subtitle">为响应欧盟 2026 碳关税（CBAM）硬性海关要求，需核算本批次采购订单的底层碳排放数据。</p>
+                
+                <div class="privacy-box">
+                    <div class="icon">🔒</div>
+                    <div class="privacy-text">
+                        <p>基于 <strong>CL-IVC 工业隐私计算协议</strong>：</p>
+                        <p>1. 您的BOM配方、电价成本将被完全加密本地处理。</p>
+                        <p>2. 采购方仅能收到最终的“每吨碳排放系数”。</p>
+                        <p>🛡️ 您的商业机密，采购方绝对不可见。</p>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="nextStep('step2')">✓ 我已了解，开始授权填报</button>
+        </div>
+
+        <!-- 第 2 步：极简 OCR 数据采集 (消除填表恐惧) -->
+        <div class="step-view" id="step2">
+            <div class="glass-card">
+                <h2 class="title" style="font-size: 1.1rem;">生产本批次（20吨）高强度螺栓，大约消耗了多少度电？</h2>
+                <p class="subtitle" style="margin-bottom: 24px;">（HengAI 将自动为您换算碳排放标准）</p>
+                
+                <button class="btn btn-outline" onclick="simulateOCR()">
+                    <span style="font-size: 1.2rem;">📸</span> 拍一张上月电费单 (AI自动识别)
+                </button>
+                
+                <div style="text-align: center; color: var(--text-dim); margin: 16px 0; font-size: 0.8rem;">或手动输入</div>
+                
+                <div class="input-group">
+                    <label>本批次生产耗电量 (度/kWh)</label>
+                    <input type="number" id="kwhInput" placeholder="例如: 5000">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="startZKP()">🛡️ 加密计算并生成溯源凭证</button>
+        </div>
+
+        <!-- 第 3 步：零知识证明动效 (秀肌肉，给足安全感) -->
+        <div class="step-view" id="step3">
+            <div class="zkp-loader">
+                <div class="shield-icon">🛡️</div>
+                <h3 style="margin-bottom: 8px;">CL-IVC 零知识计算中</h3>
+                <p style="font-size: 0.8rem; color: var(--text-dim);">正在将原始成本数据进行本地脱敏分离...</p>
+                <div class="code-stream" id="codeStream"></div>
+            </div>
+        </div>
+
+       <!-- 第 4 步：情绪释放 -> 商业震撼 -> 克制拦截 (终极缝合版) -->
+        <div class="step-view" id="step4">
+            
+            <!-- 【第一层：情绪释放】(保留用户的成就感与安全感) -->
+            <div class="success-icon" style="margin-bottom: 12px;">✓</div>
+            <h2 class="title" style="text-align: center; font-size: 1.4rem;">数据已安全送达</h2>
+            <p class="subtitle" style="text-align: center; margin-bottom: 24px;">大众汽配已收到合规凭证，您的机密配方已被物理隔离。</p>
+
+            <!-- 【第二层：骄傲感建立】(保留核心评价，确立优质产能定位) -->
+            <div class="data-card" style="margin-bottom: 24px; padding: 20px;">
+                <div style="font-size: 0.85rem; color: var(--text-dim);">本批次产品碳强度核算结果</div>
+                <div class="data-value" style="font-size: 2.2rem;">1.82 <span style="font-size: 1rem;">tCO2e/t</span></div>
+                <div style="font-size: 0.85rem; color: var(--brand-green); font-weight: 600; background: rgba(46,204,113,0.1); display: inline-block; padding: 4px 12px; border-radius: 40px;">
+                    💡 极优异！击败全国 82% 同行产能
+                </div>
+            </div>
+
+            <!-- 分割线，暗示接下来的内容是额外赠送的“大礼” -->
+            <div style="height: 1px; background: linear-gradient(90deg, transparent, var(--glass-border), transparent); margin: 24px 0; position: relative;">
+                <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--bg-dark); padding: 0 12px; font-size: 0.75rem; color: var(--text-dim);">附加商业价值评估</span>
+            </div>
+
+            <!-- 【第三层：商业震撼】(欧盟海关级“小黄纸”通关预演底稿) -->
+            <div class="certificate-preview" style="background: #fdfbf7; border: 1px solid #d1d5db; border-radius: 4px; padding: 24px; position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin: 24px 0; color: #111; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+                
+                <!-- 法律规避：合法的水印与非正式声明 -->
+                <div style="position: absolute; top: 35%; left: -20%; width: 140%; text-align: center; font-size: 38px; color: rgba(0,0,0,0.04); transform: rotate(-30deg); font-weight: 900; letter-spacing: 10px; pointer-events: none;">
+                    PRELIMINARY DRAFT ONLY
+                </div>
+                
+                <!-- 顶部：伪海关公文头部 -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1e3a8a; padding-bottom: 12px; margin-bottom: 16px;">
+                    <div>
+                        <div style="font-size: 0.65rem; color: #1e3a8a; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">EU CBAM Transitional Registry</div>
+                        <h3 style="font-size: 1.1rem; color: #111; margin: 4px 0 0 0; font-weight: 900;">DECLARATION DRAFT</h3>
+                        <div style="font-size: 0.65rem; color: #666; margin-top: 2px;">(欧盟碳边境调节机制·通关申报预演底稿)</div>
+                    </div>
+                    <!-- 机打条形码视觉效果 (纯 CSS 模拟，增强真实感) -->
+                    <div style="text-align: right;">
+                        <div style="display: inline-flex; height: 28px; gap: 2px; align-items: flex-end; opacity: 0.8;">
+                            <div style="width: 2px; height: 100%; background: #000;"></div><div style="width: 4px; height: 100%; background: #000;"></div><div style="width: 1px; height: 100%; background: #000;"></div><div style="width: 3px; height: 100%; background: #000;"></div><div style="width: 2px; height: 100%; background: #000;"></div><div style="width: 4px; height: 100%; background: #000;"></div><div style="width: 1px; height: 100%; background: #000;"></div><div style="width: 5px; height: 100%; background: #000;"></div>
+                        </div>
+                        <div style="font-family: monospace; font-size: 0.6rem; color: #333; margin-top: 4px;">REF: PRJ-2026-X89B</div>
+                    </div>
+                </div>
+
+                <!-- 核心数据区：密集、冷酷的表格排版 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; border-bottom: 1px solid #e5e7eb; padding-bottom: 16px;">
+                    <div>
+                        <div style="font-size: 0.55rem; color: #666; text-transform: uppercase;">1. Goods Category / 商品大类</div>
+                        <div style="font-size: 0.85rem; font-weight: 700; font-family: monospace;">IRON & STEEL (钢铁)</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.55rem; color: #666; text-transform: uppercase;">2. CN Code / 欧盟海关编码</div>
+                        <div style="font-size: 0.85rem; font-weight: 700; font-family: monospace;">7318 15 68</div>
+                    </div>
+                </div>
+
+                <!-- 最震撼的核算结果 (SEE) -->
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 12px; margin-bottom: 16px;">
+                    <div style="font-size: 0.6rem; color: #166534; text-transform: uppercase; margin-bottom: 4px; font-weight: 700;">
+                        3. Specific Embedded Emissions (SEE) / 特定隐含排放量
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <span style="font-size: 1.8rem; font-weight: 900; color: #14532d; font-family: monospace;">1.82</span>
+                        <span style="font-size: 0.75rem; color: #166534; font-weight: 600;">tCO2e / tonne</span>
+                    </div>
+                    <!-- 商业转化锚点：省钱提示 -->
+                    <div style="margin-top: 8px; font-size: 0.65rem; color: #b45309; background: #fef3c7; padding: 6px; border-radius: 4px; display: flex; align-items: center; gap: 6px;">
+                        <span>💰</span>
+                        <span>vs 欧盟违约默认值：预估免除碳税罚金 <strong style="font-size: 0.8rem;">€4,500.00</strong></span>
+                    </div>
+                </div>
+
+                <!-- 埋下 MAT 硬件的伏笔：合规状态印章 -->
+                <div style="display: flex; align-items: flex-start; gap: 12px; background: #fff; border: 1px dashed #dc2626; padding: 10px; border-radius: 4px;">
+                    <div style="color: #dc2626; font-size: 20px; font-weight: bold; border: 2px solid #dc2626; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; transform: rotate(-15deg); flex-shrink: 0;">!</div>
+                    <div>
+                        <div style="font-size: 0.65rem; color: #dc2626; font-weight: 800; text-transform: uppercase; margin-bottom: 2px;">Status: MRV Dynamic Anchor Required</div>
+                        <div style="font-size: 0.6rem; color: #666; line-height: 1.4;">
+                            *This draft is based on static historical data. Official clearance requires real-time mapping via <strong>MAT Edge Gateway</strong> (时空动态映射).
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 【第四层：损失厌恶与截留】(递上救生圈) -->
+            <div class="fission-box" style="background: transparent; border: 1px solid rgba(255, 82, 82, 0.3); padding: 18px; margin-top: 16px; border-radius: 8px;">
+                
+                <!-- 刺眼的倒计时警报 -->
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; color: #ff5252;">
+                    <span style="font-size: 1.2rem; animation: pulse 1s infinite;">⏱️</span>
+                    <strong>安全机制：本底稿将在 <span id="countdown">03:00</span> 后物理销毁</strong>
+                </div>
+                
+                <p style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 16px; text-align: left; line-height: 1.6;">
+                    基于 CL-IVC 工业隐私协议，含企业敏感能耗的合规底稿不可在公网滞留。若需将此底稿<strong>生成高清无水印 PDF</strong> 用于商务呈送，或永久归档：
+                </p>
+                
+                <!-- 终极转化按钮 (点击即转化为 co2lion 注册用户) -->
+                <button class="btn btn-outline" style="background: rgba(46,204,113,0.1); border-color: var(--brand-green); color: var(--brand-green); font-weight: bold; width: 100%; box-shadow: 0 4px 15px rgba(46,204,113,0.15);" onclick="alert('拦截成功！即将跳转至 Co2Lion 企业护照注册页...')">
+                    📥 免费激活企业保险箱并存档
+                </button>
+            </div>
+            
+            <!-- 极度自信的“关门”选项 (欲擒故纵) -->
+            <div style="text-align: center; margin-top: 20px;">
+                <button style="background: transparent; border: none; color: #666; font-size: 0.75rem; text-decoration: underline; cursor: pointer;" onclick="executeDestruct()">
+                    不需要存档，直接关闭销毁
+                </button>
+            </div>
+        </div>
+
+        <!-- 动效与倒计时执行脚本 -->
+        <style>@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }</style>
+        <script>
+            // 此函数需在上一部的动效结束时（例如 startZKP 函数的最后）被调用： startDestructTimer();
+            let destructTimer = null;
+            
+            function startDestructTimer() {
+                let timeLeft = 180; // 180秒 = 3分钟
+                const timerEl = document.getElementById('countdown');
+                
+                destructTimer = setInterval(() => {
+                    timeLeft--;
+                    const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                    const s = (timeLeft % 60).toString().padStart(2, '0');
+                    timerEl.textContent = `${m}:${s}`;
+                    
+                    // 倒计时最后 10 秒，增加视觉压迫感
+                    if (timeLeft <= 10) {
+                        timerEl.style.color = '#ff0000';
+                        timerEl.style.fontWeight = '900';
+                        timerEl.style.transform = 'scale(1.1)';
+                        timerEl.style.display = 'inline-block';
+                        timerEl.style.transition = 'transform 0.1s';
+                    }
+                    
+                    if (timeLeft <= 0) {
+                        executeDestruct();
+                    }
+                }, 1000);
+            }
+
+            // 执行物理销毁的纯前端模拟
+            function executeDestruct() {
+                if(destructTimer) clearInterval(destructTimer);
+                // 用一个极简、冷酷的黑屏锁死页面，断绝后路
+                document.body.innerHTML = `
+                    <div style="height: 100vh; background: #05070c; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+                        <div style="font-size: 50px; margin-bottom: 20px; filter: grayscale(100%);">🔒</div>
+                        <h2 style="color: #fff; margin-bottom: 12px; font-size: 1.2rem;">数据已安全销毁</h2>
+                        <p style="color: #666; font-size: 0.85rem; line-height: 1.5; margin-bottom: 30px;">
+                            基于零知识证明协议，您的底层能耗数据已被清除。<br>感谢您对全球碳合规的配合。
+                        </p>
+                        <button style="background: transparent; border: 1px solid #333; color: #888; padding: 10px 20px; border-radius: 8px; font-size: 0.8rem;" onclick="window.close()">关闭页面</button>
+                    </div>
+                `;
+            }
+        </script>
+
+    <script>
+        // 页面流转控制
+        function nextStep(stepId) {
+            document.querySelectorAll('.step-view').forEach(el => el.classList.remove('active'));
+            document.getElementById(stepId).classList.add('active');
+        }
+
+        // 模拟 OCR 拍照功能
+        function simulateOCR() {
+            const btn = document.querySelector('.btn-outline');
+            btn.innerHTML = '🔄 AI 视觉识别中...';
+            btn.style.borderColor = 'var(--brand-green)';
+            btn.style.color = 'var(--brand-green)';
+            setTimeout(() => {
+                document.getElementById('kwhInput').value = '5240';
+                btn.innerHTML = '✅ 电费单识别成功';
+            }, 1500);
+        }
+
+        // 模拟零知识证明加载动效
+        function startZKP() {
+            const val = document.getElementById('kwhInput').value;
+            if (!val) { alert('请输入或识别耗电量'); return; }
+            
+            nextStep('step3');
+            
+            // 生成赛博朋克风的加密代码流
+            const codeStream = document.getElementById('codeStream');
+            let codes = [
+                "[CL-IVC] Hash init: 0x8a9b3c...",
+                "Isolating BOM cost data...",
+                "Applying ISO14067 Grid Factor...",
+                "Generating Zero-Knowledge Proof...",
+                "Verifying hash signature...",
+                "Encrypting payload via SHA-256..."
+            ];
+            let i = 0;
+            const interval = setInterval(() => {
+                codeStream.innerHTML += codes[i] + '<br>';
+                codeStream.scrollTop = codeStream.scrollHeight;
+                i++;
+                if (i >= codes.length) {
+                    clearInterval(interval);
+                    setTimeout(() => nextStep('step4'), 800);
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>

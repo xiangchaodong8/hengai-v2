@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · 供应链协同 · 碳资产确权</title>
+<script>
+/* 嵌入模式：?embed=1 时隐藏原页 chrome (sidebar/topbar)，仅呈现内容模块 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<style>
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .sb,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] .main,
+html[data-embed="1"] .main-wrap { margin-left: 0 !important; }
+html[data-embed="1"] body { padding-left: 0 !important; background: var(--night, #06080f) !important; overflow: hidden !important; height: 100% !important; }
+html[data-embed="1"] .app { height: 100% !important; min-height: 0 !important; overflow: hidden !important; }
+html[data-embed="1"] .main-wrap { flex: 1; min-height: 0 !important; overflow: hidden !important; display: flex !important; flex-direction: column !important; }
+html[data-embed="1"] .main-scroll { flex: 1; min-height: 0 !important; overflow-y: auto !important; overflow-x: hidden !important; }
+</style>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+:root {
+  --bg0:#06080f;--bg1:#0a0d16;--bg2:#0e1220;--bg3:rgba(255,255,255,.04);--bg4:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--border3:rgba(255,255,255,.2);
+  --ink:#e2e8f4;--ink2:#8896aa;--ink3:#44556a;
+  --green:#10b981;--green-l:#6ee7b7;--green-d:rgba(16,185,129,.13);--green-b:rgba(16,185,129,.30);
+  --gold:#c9a84c;--gold-l:#f0d080;--gold-d:rgba(201,168,76,.13);--gold-b:rgba(201,168,76,.30);
+  --blue:#3b82f6;--blue-l:#93c5fd;--blue-d:rgba(59,130,246,.13);--blue-b:rgba(59,130,246,.30);
+  --purple:#8b5cf6;--purple-l:#c4b5fd;--purple-d:rgba(139,92,246,.13);--purple-b:rgba(139,92,246,.30);
+  --red:#ef4444;--red-l:#fca5a5;--red-d:rgba(239,68,68,.13);--red-b:rgba(239,68,68,.30);
+  --teal:#14b8a6;--teal-l:#5eead4;--teal-d:rgba(20,184,166,.13);--teal-b:rgba(20,184,166,.30);
+  --orange:#f97316;--orange-l:#fdba74;--orange-d:rgba(249,115,22,.13);--orange-b:rgba(249,115,22,.30);
+  --sb-w:220px;--tb-h:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg0);color:var(--ink);font-family:"Noto Sans SC",sans-serif;font-size:13px;line-height:1.6;overflow:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+select,input,textarea{font-family:inherit}
+.app{display:flex;height:100vh}
+/* SIDEBAR */
+.sidebar{width:var(--sb-w);flex-shrink:0;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sb-brand{padding:17px 15px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sb-brand-ic{width:32px;height:32px;border-radius:9px;background:var(--green-d);border:1px solid var(--green-b);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-brand-name{font-size:14px;font-weight:700}
+.sb-brand-sub{font-size:9.5px;color:var(--ink3);margin-top:1px}
+.sb-group-title{padding:10px 14px 3px;font-size:9px;color:var(--ink3);letter-spacing:1.4px;text-transform:uppercase;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:12.5px;color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all .14s}
+.sb-item:hover{color:var(--ink);background:var(--bg4)}
+.sb-item.active{color:var(--ink);background:rgba(255,255,255,.07);border-left-color:var(--green)}
+.sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--border);flex-shrink:0}
+.sb-user{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--teal-d);border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--teal-l);flex-shrink:0}
+.sb-uname{font-size:12.5px;font-weight:500}
+.sb-urole{font-size:10px;color:var(--ink3);margin-top:1px}
+.sb-gm-row{display:flex;align-items:center;gap:6px;padding:6px 9px;background:var(--gold-d);border:1px solid var(--gold-b);border-radius:8px;cursor:pointer}
+.sb-gm-val{font-family:"DM Mono",monospace;font-size:13px;font-weight:700;color:var(--gold-l)}
+/* TOPBAR */
+.main-wrap{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:var(--tb-h);flex-shrink:0;background:rgba(6,8,15,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.tb-left{display:flex;align-items:center;gap:12px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-title{font-size:15px;font-weight:600}
+.tb-pill{font-size:9.5px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.6px;text-transform:uppercase}
+.gm-chip{display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;background:var(--gold-d);border:1px solid var(--gold-b);cursor:pointer;transition:background .2s}
+.gm-chip:hover{background:rgba(201,168,76,.22)}
+.gm-chip-lbl{font-size:10px;color:var(--gold);font-weight:500}
+.gm-chip-val{font-family:"DM Mono",monospace;font-size:14px;font-weight:700;color:var(--gold-l);letter-spacing:-.3px}
+.tb-btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;border:1px solid var(--border2);background:transparent;color:var(--ink);transition:background .15s}
+.tb-btn:hover{background:var(--bg4)}
+.tb-btn-primary{background:var(--green-d);border-color:var(--green-b);color:var(--green-l)}
+.tb-btn-primary:hover{background:rgba(16,185,129,.22)}
+/* SCROLL AREA */
+.main-scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.main-scroll::-webkit-scrollbar{width:4px}
+.main-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.main-pad{padding:24px 28px 72px}
+/* CARDS */
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:18px 20px;backdrop-filter:blur(8px)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+/* PILLS */
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;white-space:nowrap}
+.p-green{background:var(--green-d);color:var(--green-l);border:1px solid var(--green-b)}
+.p-gold{background:var(--gold-d);color:var(--gold-l);border:1px solid var(--gold-b)}
+.p-blue{background:var(--blue-d);color:var(--blue-l);border:1px solid var(--blue-b)}
+.p-purple{background:var(--purple-d);color:var(--purple-l);border:1px solid var(--purple-b)}
+.p-red{background:var(--red-d);color:var(--red-l);border:1px solid var(--red-b)}
+.p-teal{background:var(--teal-d);color:var(--teal-l);border:1px solid var(--teal-b)}
+.p-orange{background:var(--orange-d);color:var(--orange-l);border:1px solid var(--orange-b)}
+.p-gray{background:rgba(255,255,255,.05);color:var(--ink2);border:1px solid var(--border)}
+/* SECTION HEADER */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-t{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.2px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sh-line{flex:1;height:1px;background:var(--border)}
+.sh-a{font-size:11.5px;color:var(--green-l);cursor:pointer;white-space:nowrap}
+.sh-a:hover{text-decoration:underline}
+/* DIVIDER */
+.hr{border:none;border-top:1px solid var(--border);margin:14px 0}
+/* METRIC */
+.metric{background:rgba(0,0,0,.28);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.m-lbl{font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.m-val{font-family:"DM Mono",monospace;font-size:24px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.m-unit{font-size:12px;font-weight:400;margin-left:2px;opacity:.7}
+.m-sub{font-size:11px;color:var(--ink2);margin-top:4px}
+/* INSIGHT */
+.ins{padding:11px 14px;border-radius:10px;font-size:12px;line-height:1.7;display:flex;gap:9px;align-items:flex-start;margin-bottom:14px}
+.ins-green{background:var(--green-d);border:1px solid var(--green-b);color:var(--green-l)}
+.ins-gold{background:var(--gold-d);border:1px solid var(--gold-b);color:var(--gold-l)}
+.ins-red{background:var(--red-d);border:1px solid var(--red-b);color:var(--red-l)}
+.ins-blue{background:var(--blue-d);border:1px solid var(--blue-b);color:var(--blue-l)}
+.ins-purple{background:var(--purple-d);border:1px solid var(--purple-b);color:var(--purple-l)}
+.ins svg{flex-shrink:0;margin-top:2px}
+/* PROGRESS */
+.prog{height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .8s ease}
+/* FORM */
+.f-grp{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.f-lbl{font-size:12px;font-weight:500;color:var(--ink)}
+.f-hint{font-size:10.5px;color:var(--ink3)}
+.f-inp,.f-sel{background:rgba(0,0,0,.4);border:1px solid var(--border2);border-radius:9px;padding:10px 13px;color:var(--ink);outline:none;width:100%;transition:border-color .2s;font-size:13px}
+.f-inp{font-family:"DM Mono",monospace}
+.f-inp:focus,.f-sel:focus{border-color:var(--green-b)}
+.f-inp::placeholder{color:var(--ink3);font-family:"Noto Sans SC",sans-serif;font-size:12px}
+.f-sel{font-family:"Noto Sans SC",sans-serif;font-size:12.5px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23475569' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+/* CTA */
+.cta{padding:11px 22px;border-radius:10px;font-size:13px;font-weight:600;border:none;transition:all .2s}
+.cta-green{background:linear-gradient(135deg,#0ea472,#10b981);color:#fff}
+.cta-green:hover{opacity:.9;transform:translateY(-1px)}
+.cta-gold{background:linear-gradient(135deg,#b8860b,#c9a84c 40%,#f0d080 80%,#c9a84c);color:#000}
+.cta-gold:hover{opacity:.9;transform:translateY(-1px)}
+.cta-outline{background:transparent;border:1px solid var(--border2);color:var(--ink)}
+.cta-outline:hover{background:var(--bg4)}
+/* ACT-BTN */
+.act-btn{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:11px;border:1px solid var(--border2);background:rgba(0,0,0,.28);cursor:pointer;transition:all .18s;font-size:12.5px;color:var(--ink);text-decoration:none}
+.act-btn:hover{background:var(--bg4);transform:translateY(-1px)}
+.act-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* FADE IN */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .4s ease both}
+.d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}.d4{animation-delay:.26s}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(8,12,22,.97);border:1px solid var(--green-b);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--green-l);min-width:260px;max-width:380px;opacity:0;transform:translateY(14px);transition:all .36s cubic-bezier(.34,1.56,.64,1);pointer-events:none;backdrop-filter:blur(18px)}
+#toast.show{opacity:1;transform:translateY(0);pointer-events:auto}
+
+
+.sup-hero{background:var(--bg3);border:1px solid rgba(20,184,166,.25);border-radius:16px;padding:0;overflow:hidden;margin-bottom:18px;position:relative}
+.sup-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--teal-l) 40%,var(--green) 70%,transparent 95%)}
+.sh-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border)}
+.shk{background:rgba(8,12,22,.95);padding:13px 16px;text-align:center}
+.shk-v{font-family:"DM Mono",monospace;font-size:19px;font-weight:700;letter-spacing:-.5px;line-height:1;margin-bottom:3px}
+.shk-l{font-size:10px;color:var(--ink3)}
+.shk-s{font-size:9.5px;font-weight:600;margin-top:3px}
+/* Funnel */
+.funnel-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;padding:16px 20px}
+.funnel-stage{border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;transition:all .2s;cursor:default;font-size:12.5px}
+.funnel-stage:hover{filter:brightness(1.1)}
+/* Supplier table */
+.sup-table{width:100%;border-collapse:collapse}
+.sup-table th{font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--border);text-align:left}
+.sup-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12.5px;vertical-align:middle}
+.sup-table tr:last-child td{border-bottom:none}
+.sup-table tr:hover td{background:rgba(255,255,255,.02)}
+.status-chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px}
+.sc-done{background:var(--green-d);color:var(--green-l);border:1px solid var(--green-b)}
+.sc-partial{background:var(--gold-d);color:var(--gold-l);border:1px solid var(--gold-b)}
+.sc-missing{background:var(--red-d);color:var(--red-l);border:1px solid var(--red-b)}
+.sc-invite{background:rgba(255,255,255,.05);color:var(--ink2);border:1px solid var(--border)}
+.priority-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:9px;font-weight:700;flex-shrink:0}
+.pb-high{background:var(--red-d);color:var(--red-l);border:1px solid var(--red-b)}
+.pb-mid{background:var(--gold-d);color:var(--gold-l);border:1px solid var(--gold-b)}
+.pb-low{background:rgba(255,255,255,.05);color:var(--ink3);border:1px solid var(--border)}
+/* Invite modal */
+.invite-btn{padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;border:1px solid var(--green-b);background:var(--green-d);color:var(--green-l);cursor:pointer;transition:all .15s}
+.invite-btn:hover{background:rgba(16,185,129,.22)}
+.invite-btn-secondary{border-color:var(--gold-b);background:var(--gold-d);color:var(--gold-l)}
+.invite-btn-secondary:hover{background:rgba(201,168,76,.22)}
+.invite-sent{padding:5px 12px;border-radius:8px;font-size:11px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--ink3)}
+#sup-invite-success-banner{display:none;position:sticky;top:0;z-index:150;margin:0 0 12px;padding:12px 16px;border-radius:10px;font-size:12.5px;font-weight:600;line-height:1.5;color:var(--gold-l);background:linear-gradient(90deg,rgba(201,168,76,.18),rgba(16,185,129,.08));border:1px solid var(--gold-b);box-shadow:0 4px 24px rgba(201,168,76,.15)}
+#sup-invite-success-banner.show{display:block;animation:supBannerIn .35s ease}
+@keyframes supBannerIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1050;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:rgba(14,18,32,.98);border:1px solid var(--border2);border-radius:18px;padding:24px 26px;max-width:420px;width:92%;position:relative}
+.modal-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--ink3);font-size:18px;cursor:pointer}
+.modal-title{font-size:15px;font-weight:600;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--ink2);margin-bottom:16px;line-height:1.6}
+.send-btn{width:100%;padding:11px;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:var(--green-d);border:1px solid var(--green-b);color:var(--green-l);transition:all .2s}
+.send-btn:hover{background:rgba(16,185,129,.22)}
+/* Network SVG card */
+.network-card{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.network-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+.ns-box{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center}
+.ns-v{font-size:19px;font-weight:700;font-family:"DM Mono",monospace;line-height:1;margin-bottom:3px}
+.ns-l{font-size:10px;color:var(--ink3)}
+/* 供应链协同 · 碳资产确权 · 城池成长面板 */
+#fortress-panel{background:linear-gradient(135deg,rgba(201,168,76,.12) 0%,rgba(8,12,22,.95) 55%);border:1px solid rgba(201,168,76,.35);border-radius:16px;padding:18px 20px;margin-bottom:18px;position:relative;overflow:hidden}
+#fortress-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--gold-l) 45%,var(--gold) 70%,transparent 95%)}
+.fortress-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
+.fortress-title{font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold-l);margin-bottom:4px}
+.fortress-level{font-size:20px;font-weight:700;color:var(--gold-l);font-family:"DM Mono",monospace}
+.fortress-sub{font-size:11.5px;color:var(--ink2);line-height:1.6;max-width:420px}
+.fortress-body{display:grid;grid-template-columns:200px 1fr;gap:18px;align-items:center}
+.fortress-radar-wrap{background:rgba(0,0,0,.28);border:1px solid var(--border);border-radius:12px;padding:10px}
+.fortress-dims{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fortress-dim{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:9px;padding:8px 10px}
+.fort-dim-lbl{font-size:9.5px;color:var(--ink3);margin-bottom:2px}
+.fort-dim-val{font-family:"DM Mono",monospace;font-size:15px;font-weight:700;color:var(--gold-l)}
+/* 数据可见性 */
+.data-vis-cell{max-width:140px}
+.data-vis-lock{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--gold-l);cursor:help;position:relative}
+.data-vis-lock:hover::after,.data-vis-lock:focus::after{content:attr(title);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:max(220px,18vw);max-width:280px;padding:10px 12px;font-size:10.5px;line-height:1.55;color:var(--ink);background:#0f1320;border:1px solid var(--gold-b);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.45);z-index:50;pointer-events:none;white-space:normal}
+/* 确权凭证按钮与弹窗 */
+.cert-gen-btn{padding:5px 10px;border-radius:8px;font-size:10.5px;font-weight:600;border:1px solid var(--gold-b);background:var(--gold-d);color:var(--gold-l);cursor:pointer;transition:all .15s;white-space:nowrap}
+.cert-gen-btn:hover{background:rgba(201,168,76,.28);transform:translateY(-1px)}
+.cert-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1100;align-items:center;justify-content:center;padding:20px}
+.cert-modal-bg.open{display:flex}
+#claim-l0-nudge-overlay{display:none;position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.55);align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+#claim-l0-nudge-overlay.show{display:flex;animation:claimOverlayIn .22s ease}
+#claim-l0-nudge-overlay .claim-l0-nudge-panel{max-width:440px;width:100%;padding:16px 18px;border-radius:14px;background:linear-gradient(135deg,rgba(59,130,246,.98),rgba(16,185,129,.92));border:1px solid rgba(255,255,255,.3);box-shadow:0 20px 60px rgba(0,0,0,.45);color:#fff;font-size:13px;line-height:1.6}
+@keyframes claimOverlayIn{from{opacity:0}to{opacity:1}}
+.cert-gold-card{background:linear-gradient(145deg,#1a1408 0%,#2a2010 35%,#1a1408 100%);border:2px solid var(--gold);border-radius:18px;padding:26px 28px;max-width:440px;width:100%;box-shadow:0 24px 80px rgba(201,168,76,.25),inset 0 1px 0 rgba(240,208,128,.15);position:relative}
+.cert-gold-card::before{content:'';position:absolute;inset:8px;border:1px solid rgba(201,168,76,.25);border-radius:12px;pointer-events:none}
+.cert-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.cert-title{font-size:18px;font-weight:700;color:var(--gold-l);margin-bottom:16px}
+.cert-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid rgba(201,168,76,.15);font-size:12.5px}
+.cert-row:last-of-type{border-bottom:none}
+.cert-lbl{color:var(--ink2)}
+.cert-val{font-family:"DM Mono",monospace;color:var(--gold-l);text-align:right;word-break:break-all}
+.cert-sovereignty{margin-top:14px;padding:10px 12px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);border-radius:9px;font-size:11.5px;color:var(--gold-l);line-height:1.65}
+.cert-close-btn{margin-top:16px;width:100%;padding:10px;border-radius:10px;font-size:12.5px;font-weight:600;border:1px solid var(--gold-b);background:var(--gold-d);color:var(--gold-l);cursor:pointer}
+.empty-state{padding:28px 20px;text-align:center;color:var(--ink2);font-size:13px;line-height:1.75;background:rgba(0,0,0,.2);border-radius:10px}
+/* L0 认领核验 · 引导微动效（内联在目标卡内，避免被页面底部遮挡） */
+#claim-workbench-card{position:relative}
+.claim-l0-decoy-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed rgba(59,130,246,.22)}
+.claim-l0-decoy-inp{flex:1;min-width:200px;background:rgba(0,0,0,.22)!important;border-color:rgba(59,130,246,.28)!important;color:var(--ink2)}
+.claim-l0-decoy-inp::placeholder{color:var(--ink3)}
+.claim-l0-decoy-btn{opacity:.72;cursor:pointer}
+.claim-l0-goal-pulse{animation:claimGoalPulse .58s ease}
+@keyframes claimGoalPulse{0%,100%{transform:scale(1);box-shadow:none}35%{transform:scale(1.012);box-shadow:0 0 0 3px rgba(59,130,246,.38)}70%{transform:scale(1);box-shadow:0 0 0 7px rgba(59,130,246,.1)}}
+.claim-l0-nudge-inline{display:none;margin-top:10px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,rgba(59,130,246,.96),rgba(16,185,129,.9));border:1px solid rgba(255,255,255,.28);box-shadow:0 10px 32px rgba(59,130,246,.32);color:#fff;font-size:12.5px;line-height:1.55}
+.claim-l0-nudge-inline.show{display:flex;align-items:flex-start;gap:10px;animation:claimNudgeInlineIn .42s cubic-bezier(.34,1.56,.64,1)}
+.claim-l0-nudge-icon{font-size:18px;line-height:1;flex-shrink:0;animation:claimNudgeIcon .75s ease infinite alternate}
+.claim-l0-nudge-sub{margin:4px 0 0;font-size:11px;opacity:.93}
+@keyframes claimNudgeInlineIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes claimNudgeIcon{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+.sup-gen-sync{margin-bottom:6px;padding:6px 10px;border-radius:8px;font-size:10.5px;line-height:1.5;border:1px solid var(--border);background:rgba(0,0,0,.22)}
+.sup-gen-sync.live{color:var(--green-l);border-color:var(--green-b);background:var(--green-d)}
+.sup-gen-sync.stale{color:var(--gold-l);border-color:var(--gold-b);background:var(--gold-d)}
+.sup-gen-sync.syncing{color:var(--ink3)}
+.sup-gen-sync.empty{color:var(--ink3)}
+
+</style>
+<script src="hengai-hub-nav.js"></script>
+<script src="hengai-embed-boot.js"></script>
+</head>
+<body>
+<div class="app">
+
+<div class="sidebar" id="sidebar" data-qa-version="2.0">
+  <div class="sb-brand">
+    <div class="sb-brand-ic">
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+    </div>
+    <div>
+      <div class="sb-brand-name">HengAI</div>
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+    </div>
+  </div>
+
+  <!-- 逃生舱：返回 HengAI 对话大厅 -->
+  <div style="padding:12px 14px 4px;">
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      返回 HengAI 对话
+    </div>
+  </div>
+
+  <div class="sb-group-title">个人工作台</div>
+  <div class="sb-item" data-page="overview"   onclick="switchHubPage('overview')"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+  <div class="sb-item" data-page="achieve"    onclick="switchHubPage('achieve')"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+  <div class="sb-item" data-page="calc"       onclick="switchHubPage('calc')"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+  <div class="sb-item" data-page="resource"   onclick="switchHubPage('resource')"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+  <div class="sb-item" data-page="knowledge"  onclick="switchHubPage('knowledge')"><div class="sb-dot" style="background:#c4b5fd"></div>企业法规库</div>
+
+  <div class="sb-group-title">企业工作台</div>
+  <div class="sb-item" data-page="enterprise" onclick="switchHubPage('enterprise')"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+  <div class="sb-item" data-page="supply"     onclick="switchHubPage('supply')"><div class="sb-dot" style="background:#6dd5b0"></div>供应链协同 · 碳资产确权</div>
+  <div class="sb-item" data-page="report"     onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+  <div class="sb-item" data-page="decision"   onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-group-title">大国重器</div>
+  <div class="sb-item" data-page="honor"      onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+  <div class="sb-item" data-page="gov"        onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:#6dd5b0"></div>生态共治委员会</div>
+
+  <div class="sb-group-title">深潜模块</div>
+  <div class="sb-item" data-page="wallet"     onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+  <div class="sb-item" data-page="eu"         onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:#93c5fd"></div>欧盟海关直连</div>
+  <div class="sb-item" data-page="dld"        onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:#10b981"></div>DLD 绿色信贷</div>
+  <div class="sb-item" data-page="acf"        onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:#6dd5b0"></div>ACF 大湾区认证</div>
+</div>
+<div class="main-wrap">
+  <div class="topbar">
+    <div class="tb-left">
+      <span class="tb-title">供应链协同 · 碳资产确权</span>
+      <span class="tb-pill" style="background:var(--red-d);color:var(--red-l);border:1px solid var(--red-b)">覆盖率 <span class="dyn-sup-pct">待测算</span> → 80%</span>
+    </div>
+    <div class="tb-right">
+      <div class="gm-chip" onclick="window.location.href='HengAI_GM_Wallet.html'">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L11 3.8V8.2L6 11L1 8.2V3.8L6 1Z" stroke="#c9a84c" stroke-width=".9" fill="rgba(201,168,76,.15)"/></svg>
+        <span class="gm-chip-lbl">GM</span>
+        <span class="gm-chip-val"><span class="dyn-gm-balance">--</span></span>
+      </div>
+      <button class="tb-btn" onclick="hengaiOpenImportSuppliers()">导入名录</button>
+      <button class="tb-btn tb-btn-primary" onclick="hengaiOpenBatchInviteModal()">批量邀请 →</button>
+    </div>
+  </div>
+  <div class="main-scroll">
+    <div class="main-pad">
+
+<!-- 城池成长面板 -->
+<div id="fortress-panel" class="fu">
+  <div class="fortress-head">
+    <div>
+      <div class="fortress-title">碳信用城池 · 成长面板</div>
+      <div class="fortress-level">城池等级：<span data-state-bind="fortress.levelLabel" data-empty="...">...</span></div>
+      <div class="fortress-sub">综合穿透覆盖、资产确权、代际网络与信任存证四维指标，动态评估您的供应链碳资产确权基础设施成熟度。</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:10px;color:var(--ink3);margin-bottom:4px">综合得分</div>
+      <div style="font-family:'DM Mono',monospace;font-size:28px;font-weight:700;color:var(--gold-l)"><span data-state-bind="fortress.avgScore" data-empty="...">...</span></div>
+    </div>
+  </div>
+  <div class="fortress-body">
+    <div class="fortress-radar-wrap">
+      <svg width="180" height="180" viewBox="0 0 180 180" aria-label="城池四维雷达图">
+        <polygon points="90,28 152,90 90,152 28,90" fill="none" stroke="rgba(201,168,76,.2)" stroke-width="1"/>
+        <polygon points="90,48 132,90 90,132 48,90" fill="none" stroke="rgba(201,168,76,.12)" stroke-width="1"/>
+        <line x1="90" y1="28" x2="90" y2="152" stroke="rgba(201,168,76,.15)" stroke-width="1"/>
+        <line x1="28" y1="90" x2="152" y2="90" stroke="rgba(201,168,76,.15)" stroke-width="1"/>
+        <polygon id="fortress-radar-poly" points="90,90 90,90 90,90 90,90" fill="rgba(201,168,76,.35)" stroke="var(--gold-l)" stroke-width="1.5"/>
+        <text x="90" y="20" text-anchor="middle" font-size="8" fill="var(--gold-l)" font-family="sans-serif">穿透</text>
+        <text x="162" y="93" text-anchor="start" font-size="8" fill="var(--gold-l)" font-family="sans-serif">主权</text>
+        <text x="90" y="168" text-anchor="middle" font-size="8" fill="var(--gold-l)" font-family="sans-serif">网络</text>
+        <text x="8" y="93" text-anchor="start" font-size="8" fill="var(--gold-l)" font-family="sans-serif">信任</text>
+      </svg>
+    </div>
+    <div class="fortress-dims">
+      <div class="fortress-dim"><div class="fort-dim-lbl">穿透覆盖</div><div class="fort-dim-val" data-fortress-dim="0" data-state-bind="fortress.dimCoverage" data-empty="...">...</div></div>
+      <div class="fortress-dim"><div class="fort-dim-lbl">主权确权</div><div class="fort-dim-val" data-fortress-dim="1" data-state-bind="fortress.dimSovereignty" data-empty="...">...</div></div>
+      <div class="fortress-dim"><div class="fort-dim-lbl">代际网络</div><div class="fort-dim-val" data-fortress-dim="2" data-state-bind="fortress.dimNetwork" data-empty="...">...</div></div>
+      <div class="fortress-dim"><div class="fort-dim-lbl">信任存证</div><div class="fort-dim-val" data-fortress-dim="3" data-state-bind="fortress.dimTrust" data-empty="...">...</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="sup-invite-success-banner" role="status" aria-live="polite"></div>
+
+<!-- Hero -->
+<div class="sup-hero fu">
+  <div style="padding:20px 22px;display:flex;align-items:flex-start;gap:16px;background:linear-gradient(135deg,rgba(20,184,166,.07) 0%,transparent 60%)">
+    <div style="flex:1">
+      <div style="font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--teal-l);margin-bottom:7px">CL-IVC · 碳资产确权协同</div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:5px">供应链协同系统 (CL-IVC 资产确权版)</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:10px">基于物理底座的实时协同，每一次填报都在为您铸造不可篡改的碳资产凭证。</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="pill p-red">覆盖率仅 <span class="dyn-sup-pct">待测算</span></span>
+        <span class="pill p-gold">目标 80% 解锁对冲方案</span>
+      </div>
+    </div>
+  </div>
+  <div class="sh-kpis">
+    <div class="shk"><div class="shk-v" style="color:var(--green-l)"><span id="sup-count-val" class="dyn-sup-count">0</span> / <span class="dyn-sup-total">0</span></div><div class="shk-l">已完整填报</div><div class="shk-s" style="color:var(--green-l)"><span id="sup-coverage-pct-dup" class="dyn-sup-pct">待测算</span>覆盖率</div></div>
+    <div class="shk"><div class="shk-v" style="color:var(--gold)" id="sup-kpi-partial">0</div><div class="shk-l">部分填报</div><div class="shk-s" style="color:var(--gold)">待补全</div></div>
+    <div class="shk"><div class="shk-v" style="color:var(--red-l)"><span id="sup-pending-val" class="dyn-sup-pending">0</span></div><div class="shk-l">已签发·待填报</div><div class="shk-s" style="color:var(--red-l)">穿透卡片已发出 <span class="dyn-sup-pending">0</span> 家</div></div>
+    <div class="shk"><div class="shk-v" style="color:var(--ink3)" id="sup-kpi-uninvited">0</div><div class="shk-l">待邀请</div><div class="shk-s" style="color:var(--ink3)">CBAM 占位节点 · 需您签发</div></div>
+  </div>
+</div>
+
+<!-- Progress funnel -->
+<div class="g2 fu d1" style="margin-bottom:16px">
+  <div class="card">
+    <div class="sh"><div class="sh-t">填报漏斗 <div class="sh-line"></div></div></div>
+    <div class="funnel-wrap">
+      <div class="funnel-stage" style="width:100%;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);color:var(--blue-l)">
+        <span>全部供应商</span><span style="font-family:'DM Mono',monospace;font-weight:700"><span class="dyn-sup-total">0</span> 家</span>
+      </div>
+      <div style="width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:7px solid rgba(255,255,255,.1)"></div>
+      <div class="funnel-stage" style="width:88%;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);color:var(--gold-l)">
+        <span>已签发邀请</span><span id="sup-funnel-invited" style="font-family:'DM Mono',monospace;font-weight:700">0 家</span>
+      </div>
+      <div style="width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:7px solid rgba(255,255,255,.1)"></div>
+      <div class="funnel-stage" style="width:70%;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);color:var(--orange-l)">
+        <span>已响应</span><span id="sup-funnel-responded" style="font-family:'DM Mono',monospace;font-weight:700">0 家</span>
+      </div>
+      <div style="width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:7px solid rgba(255,255,255,.1)"></div>
+      <div class="funnel-stage" id="sup-funnel-complete" style="width:0%;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.28);color:var(--green-l)">
+        <span>完整填报</span><span style="font-family:'DM Mono',monospace;font-weight:700"><span class="dyn-sup-count">0</span> 家</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sh"><div class="sh-t">代际收益追踪 <div class="sh-line"></div></div></div>
+    <div id="sup-gen-sync" class="sup-gen-sync syncing" style="display:none" aria-live="polite"></div>
+    <div id="sup-gen-events" style="display:flex;flex-direction:column;gap:8px"><!-- 由 renderGenerationalIncome(AppState) 动态灌注 -->
+      <div style="padding:10px 12px;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:9px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span style="color:var(--ink2)">加载中…</span><span style="color:var(--ink3);font-weight:700;font-family:'DM Mono',monospace">—</span></div>
+        <div style="font-size:10.5px;color:var(--ink3)">等待全域中心同步 GM 流水</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding:10px 12px;background:var(--gold-d);border:1px solid var(--gold-b);border-radius:9px;font-size:11.5px;color:var(--gold-l)">
+      <strong>目标：</strong>完成供应商协同后解锁徽章与 GM（以系统核算为准）
+    </div>
+  </div>
+</div>
+
+<!-- Network visualization -->
+<div class="fu d2" style="margin-bottom:16px">
+  <div class="sh"><div class="sh-t">影响力节点地图 <div class="sh-line"></div></div><span class="sh-a" onclick="exportSupplyNetworkPanorama()">导出全景图 →</span></div>
+  <div class="network-card">
+    <svg width="100%" height="200" viewBox="0 0 700 200" style="display:block">
+      <defs><radialGradient id="ng" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="rgba(201,168,76,.15)"/><stop offset="100%" stop-color="rgba(201,168,76,0)"/></radialGradient></defs>
+      <circle cx="350" cy="100" r="55" fill="url(#ng)"/>
+      <!-- Connections -->
+      <line x1="350" y1="100" x2="180" y2="55" stroke="rgba(16,185,129,.4)" stroke-width="1.5"/>
+      <line x1="350" y1="100" x2="140" y2="130" stroke="rgba(201,168,76,.3)" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="350" y1="100" x2="190" y2="165" stroke="rgba(239,68,68,.35)" stroke-width="1.5"/>
+      <line x1="350" y1="100" x2="520" y2="55" stroke="rgba(16,185,129,.4)" stroke-width="1.5"/>
+      <line x1="350" y1="100" x2="555" y2="130" stroke="rgba(201,168,76,.3)" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="350" y1="100" x2="530" y2="170" stroke="rgba(74,85,104,.3)" stroke-width="1" stroke-dasharray="4 3"/>
+      <line x1="180" y1="55" x2="90" y2="28" stroke="rgba(20,184,166,.35)" stroke-width="1" stroke-dasharray="3 2"/>
+      <line x1="180" y1="55" x2="80" y2="75" stroke="rgba(20,184,166,.25)" stroke-width="1" stroke-dasharray="3 2"/>
+      <line x1="520" y1="55" x2="610" y2="28" stroke="rgba(16,185,129,.3)" stroke-width="1" stroke-dasharray="3 2"/>
+      <!-- Center: User -->
+      <circle cx="350" cy="100" r="28" fill="rgba(13,18,32,.95)" stroke="var(--gold)" stroke-width="1.8"/>
+      <text x="350" y="96" text-anchor="middle" font-size="10" font-weight="700" fill="var(--gold)" font-family="sans-serif" class="dyn-user-name"></text>
+      <text x="350" y="108" text-anchor="middle" font-size="7.5" fill="rgba(201,168,76,.6)" font-family="sans-serif">Lv.3 · <tspan class="dyn-gm-balance">0</tspan>GM</text>
+      <!-- Done nodes -->
+      <circle cx="180" cy="55" r="20" fill="rgba(13,18,32,.9)" stroke="var(--green)" stroke-width="1.5"/>
+      <text x="180" y="51" text-anchor="middle" font-size="8" font-weight="600" fill="var(--green-l)" font-family="sans-serif">---</text>
+      <text x="180" y="62" text-anchor="middle" font-size="7" fill="rgba(110,231,183,.6)" font-family="sans-serif">✓ 已填报</text>
+      <circle cx="520" cy="55" r="20" fill="rgba(13,18,32,.9)" stroke="var(--green)" stroke-width="1.5"/>
+      <text x="520" y="51" text-anchor="middle" font-size="8" font-weight="600" fill="var(--green-l)" font-family="sans-serif">---</text>
+      <text x="520" y="62" text-anchor="middle" font-size="7" fill="rgba(110,231,183,.6)" font-family="sans-serif">⚡ 部分</text>
+      <!-- Risk node -->
+      <circle cx="190" cy="165" r="18" fill="rgba(13,18,32,.9)" stroke="var(--red)" stroke-width="1.5"/>
+      <text x="190" y="161" text-anchor="middle" font-size="7.5" font-weight="600" fill="var(--red-l)" font-family="sans-serif">---</text>
+      <text x="190" y="171" text-anchor="middle" font-size="7" fill="rgba(252,165,165,.6)" font-family="sans-serif">✗ 缺口</text>
+      <!-- Pending -->
+      <circle cx="140" cy="130" r="16" fill="rgba(13,18,32,.85)" stroke="rgba(74,85,104,.6)" stroke-width="1.2" stroke-dasharray="3 2"/>
+      <text x="140" y="127" text-anchor="middle" font-size="7" fill="rgba(160,174,192,.7)" font-family="sans-serif">山东锻造</text>
+      <text x="140" y="136" text-anchor="middle" font-size="7" fill="rgba(74,85,104,.8)" font-family="sans-serif">○ 已邀请</text>
+      <circle cx="555" cy="130" r="16" fill="rgba(13,18,32,.85)" stroke="rgba(74,85,104,.6)" stroke-width="1.2" stroke-dasharray="3 2"/>
+      <text x="555" y="127" text-anchor="middle" font-size="7" fill="rgba(160,174,192,.7)" font-family="sans-serif">江苏橡胶</text>
+      <text x="555" y="136" text-anchor="middle" font-size="7" fill="rgba(74,85,104,.8)" font-family="sans-serif">○ 已邀请</text>
+      <circle cx="530" cy="170" r="16" fill="rgba(13,18,32,.85)" stroke="rgba(74,85,104,.6)" stroke-width="1.2" stroke-dasharray="3 2"/>
+      <text x="530" y="166" text-anchor="middle" font-size="7" fill="rgba(160,174,192,.7)" font-family="sans-serif">其他×12</text>
+      <text x="530" y="175" text-anchor="middle" font-size="7" fill="rgba(74,85,104,.8)" font-family="sans-serif">○ 待邀请</text>
+      <!-- Tier2 -->
+      <circle cx="90" cy="28" r="13" fill="rgba(13,18,32,.85)" stroke="rgba(20,184,166,.5)" stroke-width="1.1"/>
+      <text x="90" y="25" text-anchor="middle" font-size="7" fill="rgba(94,234,212,.7)" font-family="sans-serif">二级节点</text>
+      <text x="90" y="34" text-anchor="middle" font-size="6.5" fill="rgba(94,234,212,.5)" font-family="sans-serif">+40GM代际</text>
+      <circle cx="80" cy="75" r="13" fill="rgba(13,18,32,.85)" stroke="rgba(20,184,166,.4)" stroke-width="1.1"/>
+      <text x="80" y="72" text-anchor="middle" font-size="7" fill="rgba(94,234,212,.6)" font-family="sans-serif">二级节点</text>
+      <text x="80" y="81" text-anchor="middle" font-size="6.5" fill="rgba(94,234,212,.4)" font-family="sans-serif">待激活</text>
+      <circle cx="610" cy="28" r="13" fill="rgba(13,18,32,.85)" stroke="rgba(16,185,129,.4)" stroke-width="1.1"/>
+      <text x="610" y="25" text-anchor="middle" font-size="7" fill="rgba(110,231,183,.6)" font-family="sans-serif">二级节点</text>
+      <text x="610" y="34" text-anchor="middle" font-size="6.5" fill="rgba(110,231,183,.4)" font-family="sans-serif">待激活</text>
+    </svg>
+    <div class="network-stats">
+      <div class="ns-box"><div class="ns-v" id="sup-net-direct" style="color:var(--green-l)">0</div><div class="ns-l">直接供应商</div></div>
+      <div class="ns-box"><div class="ns-v" id="sup-net-tier2" style="color:var(--teal-l)">0</div><div class="ns-l">二级节点</div></div>
+      <div class="ns-box"><div class="ns-v dyn-sup-pct" style="color:var(--gold)">待测算</div><div class="ns-l">覆盖率</div></div>
+      <div class="ns-box"><div class="ns-v" id="sup-net-gm-pending" style="color:var(--purple-l)">0</div><div class="ns-l">待获GM</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Supplier Table -->
+<div class="fu d3">
+  <div class="sh"><div class="sh-t">供应商管理台 <div class="sh-line"></div></div>
+    <div style="display:flex;gap:6px">
+      <button class="tb-btn" onclick="hengaiOpenImportSuppliers()">导入名录</button>
+      <button class="tb-btn" onclick="hengaiReconcileNodesUi()">整理重复节点</button>
+      <button class="tb-btn" onclick="hengaiOpenBatchInviteModal()">批量邀请</button>
+      <button class="tb-btn tb-btn-primary" onclick="openCbamSyncFromSupply()">CBAM 同步</button>
+    </div>
+  </div>
+  <div class="card" id="claim-workbench-card" style="margin:0 0 12px;padding:10px 12px">
+    <div id="claim-workbench-search-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input id="claim-cert-search-input" class="f-inp" style="flex:1;min-width:220px" placeholder="按凭证号搜索（例：CL-CLAIM-AB12CD34）">
+      <button id="claim-cert-search-btn" class="tb-btn tb-btn-primary" type="button" onclick="searchClaimCertDetail()">搜索认领凭证</button>
+    </div>
+    <div id="claim-workbench-hint" style="margin-top:8px;font-size:11px;color:var(--ink3)">可粘贴供应商分享的认领凭证号，实时核验联系人、确权时间与碳强度。</div>
+    <div id="claim-search-live-hint" style="display:none;margin-top:6px;padding:8px 10px;border-radius:8px;font-size:11.5px;line-height:1.55;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.28);color:var(--gold-l)"></div>
+    <div id="claim-workbench-goal-card" style="display:none;margin-top:8px;padding:10px 12px;border-radius:9px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);font-size:12px;color:var(--bl);line-height:1.7"></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table class="sup-table">
+      <thead><tr><th>供应商</th><th>填报状态</th><th>数据可见性</th><th>碳强度指数</th><th>操作</th></tr></thead>
+      <tbody id="supplier-table-body">
+        <tr><td colspan="5" style="padding:18px;text-align:center;color:var(--ink3);font-size:12.5px">正在从企业底座同步供应商节点…</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div id="supplier-table-fold-tools" class="card" style="margin-top:8px;padding:10px 12px;display:none">
+    <div id="supplier-table-fold-meta" style="font-size:11px;color:var(--ink3);margin-bottom:8px">—</div>
+    <button id="supplier-table-fold-btn" class="tb-btn" type="button" onclick="toggleSupplierTableExpand()">展开全部节点</button>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+<div class="cert-modal-bg" id="claim-cert-detail-modal">
+  <div class="cert-gold-card" style="max-width:520px">
+    <div class="cert-badge">🔎 CL-IVC · 认领凭证核验</div>
+    <div class="cert-title">工厂碳管家账号认领详情</div>
+    <div class="cert-row"><span class="cert-lbl">凭证编号</span><span class="cert-val" id="claim-detail-id">—</span></div>
+    <div class="cert-row"><span class="cert-lbl">供应商</span><span class="cert-val" id="claim-detail-supplier">—</span></div>
+    <div class="cert-row"><span class="cert-lbl">认领联系人</span><span class="cert-val" id="claim-detail-contact">—</span></div>
+    <div class="cert-row"><span class="cert-lbl">联系方式</span><span class="cert-val" id="claim-detail-phone">—</span></div>
+    <div class="cert-row"><span class="cert-lbl">产品碳强度</span><span class="cert-val" id="claim-detail-intensity">—</span></div>
+    <div class="cert-row"><span class="cert-lbl">委托链主</span><span class="cert-val" id="claim-detail-workspace">—</span></div>
+    <div class="cert-row"><span class="cert-lbl">认领时间</span><span class="cert-val" id="claim-detail-time">—</span></div>
+    <div class="cert-sovereignty" id="claim-detail-msg">—</div>
+    <button class="cert-close-btn" type="button" onclick="closeClaimCertDetailModal()">关闭</button>
+  </div>
+</div>
+
+<!-- 碳贡献确权凭证弹窗 -->
+<div class="cert-modal-bg" id="carbon-sovereignty-cert-modal">
+  <div class="cert-gold-card">
+    <div class="cert-badge">🛡️ CL-IVC · 碳资产确权凭证</div>
+    <div class="cert-title">碳贡献确权凭证</div>
+    <div class="cert-row"><span class="cert-lbl">企业名称</span><span class="cert-val" data-state-bind="cert.enterpriseName" data-empty="...">...</span></div>
+    <div class="cert-row"><span class="cert-lbl">确权时间</span><span class="cert-val" data-state-bind="cert.issuedAt" data-empty="...">...</span></div>
+    <div class="cert-row"><span class="cert-lbl">碳强度</span><span class="cert-val" data-state-bind="cert.carbonIntensity" data-empty="...">...</span></div>
+    <div class="cert-row"><span class="cert-lbl">CL-IVC 哈希</span><span class="cert-val" data-state-bind="cert.clIvcHash" data-empty="...">...</span></div>
+    <div class="cert-sovereignty">此凭证属于供应商，数据资产主权已确权。原始工艺与能耗数据保留在供应商主权节点，下游仅可见经 CL-IVC 核验的碳强度摘要。</div>
+    <button class="cert-close-btn" type="button" onclick="closeCarbonSovereigntyCertModal()">关闭凭证</button>
+  </div>
+</div>
+
+<!-- Invite Modal -->
+<div class="modal-bg" id="invite-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeInvite()">✕</button>
+    <div style="display:flex;align-items:center;gap:11px;margin-bottom:14px">
+      <div style="width:38px;height:38px;border-radius:10px;background:var(--teal-d);border:1px solid var(--teal-b);display:flex;align-items:center;justify-content:center"><svg width="17" height="17" viewBox="0 0 17 17" fill="none"><rect x="1.5" y="3.5" width="14" height="10" rx="1.8" stroke="var(--teal-l)" stroke-width="1.1"/><path d="M1.5 7l7 4.5 7-4.5" stroke="var(--teal-l)" stroke-width="1"/></svg></div>
+      <div><div class="modal-title">发送供应链穿透卡片</div><div class="modal-sub" id="invite-to-name">向供应商发送 CBAM 数据填报邀请</div></div>
+    </div>
+    <div class="f-grp"><label class="f-lbl">供应商联系人姓名</label><input class="f-inp" placeholder="例：张经理" id="invite-name" style="font-family:'Noto Sans SC',sans-serif;font-size:13px"></div>
+    <div class="f-grp"><label class="f-lbl">手机号 / 微信</label><input class="f-inp" placeholder="13xxxxxxxxx" id="invite-phone"></div>
+    <div style="padding:10px 12px;background:var(--teal-d);border:1px solid var(--teal-b);border-radius:9px;font-size:11.5px;color:var(--teal-l);line-height:1.7;margin-bottom:14px">
+      对方将收到一个 H5 链接，填报后您将自动获得 <strong>+200 GM</strong>，并自动更新供应链穿透率。
+    </div>
+    <button class="send-btn" onclick="sendInvite()">发送穿透卡片 →</button>
+  </div>
+</div>
+
+<!-- 批量邀请：待邀请节点清单（非单节点误开） -->
+<div class="modal-bg" id="batch-invite-modal">
+  <div class="modal" style="max-width:480px">
+    <button class="modal-close" onclick="hengaiCloseBatchInviteModal()">✕</button>
+    <div class="modal-title">批量签发穿透邀请</div>
+    <div class="modal-sub" id="batch-invite-summary">从待邀请节点中勾选，系统将逐家签发专属 H5 链接（每家独立 invite_id）。</div>
+    <div id="batch-invite-list" style="max-height:220px;overflow:auto;margin:12px 0;border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:12px"></div>
+    <div style="display:flex;gap:8px">
+      <button type="button" class="tb-btn" style="flex:1" onclick="hengaiBatchInviteSelectAll(true)">全选</button>
+      <button type="button" class="tb-btn" style="flex:1" onclick="hengaiBatchInviteSelectAll(false)">全不选</button>
+    </div>
+    <button class="send-btn" style="margin-top:12px" onclick="hengaiRunBatchInvite()">为所选节点签发邀请</button>
+  </div>
+</div>
+
+</div>
+<div id="claim-l0-nudge-overlay" aria-hidden="true" role="dialog" aria-labelledby="claim-l0-nudge-title">
+  <div class="claim-l0-nudge-panel">
+    <div style="display:flex;align-items:flex-start;gap:10px">
+      <span style="font-size:20px;line-height:1">🎯</span>
+      <div>
+        <strong id="claim-l0-nudge-title">先推进认领目标，再开放核验</strong>
+        <p id="claim-l0-nudge-sub" class="claim-l0-nudge-sub" style="margin-top:6px;font-size:11.5px;opacity:.94"></p>
+        <button type="button" class="tb-btn tb-btn-primary" style="margin-top:12px;width:100%" onclick="closeClaimL0NudgeOverlay()">我知道了，先去推进认领</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polyline points="2,7 5.5,10.5 12,4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span id="toast-msg"></span></div>
+<script>
+
+function openCbamSyncFromSupply() {
+  if (typeof switchHubPage === 'function') {
+    switchHubPage('calc');
+    return;
+  }
+  try {
+    if (window.parent && window.parent !== window && typeof window.parent.navTo === 'function') {
+      var nav = window.parent.document.getElementById('nav-calc');
+      window.parent.navTo('calc', nav);
+      return;
+    }
+  } catch (_) {}
+  if (typeof navigateToHub === 'function') {
+    navigateToHub('calc');
+    return;
+  }
+  window.location.href = (typeof hengaiPage === 'function') ? hengaiPage('全域中心.html') + '#calc' : '全域中心.html#calc';
+}
+
+function showToast(msg,type){
+  if (typeof window.hengaiEmbedToast === 'function' && window.hengaiEmbedToast(msg, type)) return;
+  var t=document.getElementById('toast');
+  if (t && t.parentElement !== document.body) {
+    try { document.body.appendChild(t); } catch (_) {}
+  }
+  var m=document.getElementById('toast-msg');
+  if(!t||!m)return;
+  m.textContent=msg;
+  if(type==='error'){t.style.borderColor='var(--red-b)';t.style.color='var(--red-l)';}
+  else if(type==='gold'){t.style.borderColor='var(--gold-b)';t.style.color='var(--gold-l)';}
+  else{t.style.borderColor='var(--green-b)';t.style.color='var(--green-l)';}
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt=setTimeout(function(){t.classList.remove('show');},2800);
+}
+window.__hengaiSupplyToast = showToast;
+
+function supplyShowDialog(payload) {
+  if (typeof window.hengaiEmbedDialog === 'function' && window.hengaiEmbedDialog(payload)) return true;
+  return false;
+}
+
+function updateClaimSearchLiveHint(raw) {
+  var el = document.getElementById('claim-search-live-hint');
+  if (!el) return;
+  var v = String(raw || '').trim();
+  if (!v) {
+    el.style.display = 'none';
+    el.textContent = '';
+    return;
+  }
+  el.style.display = 'block';
+  if ((window.__claimWorkbenchTier || 0) < 1) {
+    el.textContent = '🔒 认领核验未解锁：输入凭证号不会发起搜索，请先完成认领推进目标。';
+    el.style.color = 'var(--ink3)';
+    el.style.background = 'rgba(59,130,246,.08)';
+    el.style.borderColor = 'rgba(59,130,246,.25)';
+    return;
+  }
+  el.style.color = 'var(--gold-l)';
+  el.style.background = 'rgba(201,168,76,.1)';
+  el.style.borderColor = 'rgba(201,168,76,.28)';
+  if (/^CL-CLAIM-/i.test(v)) {
+    el.textContent = '✓ 格式正确 · 按 Enter 或点「搜索认领凭证」核验';
+  } else if (/^CL-/i.test(v)) {
+    el.textContent = '凭证号通常以 CL-CLAIM- 开头，请核对后搜索';
+  } else {
+    el.textContent = '正在录入：' + v.toUpperCase() + ' · 完整凭证号形如 CL-CLAIM-XXXXXXXX';
+  }
+}
+
+function wireClaimSearchInputFeedback() {
+  if (window.__claimSearchInputWired) return;
+  window.__claimSearchInputWired = true;
+  document.addEventListener('input', function (e) {
+    if (!e.target || e.target.id !== 'claim-cert-search-input') return;
+    updateClaimSearchLiveHint(e.target.value);
+    if ((window.__claimWorkbenchTier || 0) < 1 && String(e.target.value || '').trim()) {
+      claimL0NudgeFromHint();
+    }
+  }, true);
+  document.addEventListener('focusin', function (e) {
+    if (!e.target || e.target.id !== 'claim-cert-search-input') return;
+    updateClaimSearchLiveHint(e.target.value);
+  }, true);
+}
+
+function setClaimDetail(id, txt) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = txt != null && txt !== '' ? String(txt) : '—';
+}
+
+window.__claimWorkbenchTier = 0;
+window.__claimL0NudgeTimer = null;
+window.__claimL0NudgeLastAt = 0;
+
+function ensureClaimL0NudgeOverlay() {
+  var ov = document.getElementById('claim-l0-nudge-overlay');
+  if (!ov) return null;
+  if (ov.parentElement !== document.body) {
+    try { document.body.appendChild(ov); } catch (_) {}
+  }
+  return ov;
+}
+
+function closeClaimL0NudgeOverlay() {
+  var ov = document.getElementById('claim-l0-nudge-overlay');
+  if (ov) {
+    ov.classList.remove('show');
+    ov.setAttribute('aria-hidden', 'true');
+  }
+  clearTimeout(window.__claimL0NudgeTimer);
+}
+
+function showClaimL0Nudge(subtext) {
+  if ((window.__claimWorkbenchTier || 0) >= 1) return;
+  var now = Date.now();
+  if (now - (window.__claimL0NudgeLastAt || 0) < 600) return;
+  window.__claimL0NudgeLastAt = now;
+
+  var hintText = subtext || '达到 5 家认领 + 覆盖率 20% 后自动解锁凭证搜索。';
+  if (typeof window.hengaiEmbedDialog === 'function' && window.hengaiEmbedDialog({
+    kind: 'claim-l0',
+    title: '先推进认领目标，再开放核验',
+    sub: hintText,
+    btn: '我知道了，先去推进认领'
+  })) {
+    if (typeof window.hengaiEmbedToast === 'function') {
+      window.hengaiEmbedToast('认领核验未解锁：请先完成认领推进目标', 'gold');
+    }
+    return;
+  }
+
+  var goalCard = document.getElementById('claim-workbench-goal-card');
+  var subEl = document.getElementById('claim-l0-nudge-sub');
+  if (subEl) subEl.textContent = hintText;
+
+  if (goalCard) {
+    goalCard.classList.remove('claim-l0-goal-pulse');
+    void goalCard.offsetWidth;
+    goalCard.classList.add('claim-l0-goal-pulse');
+  }
+
+  var ov = ensureClaimL0NudgeOverlay();
+  if (ov) {
+    ov.classList.add('show');
+    ov.setAttribute('aria-hidden', 'false');
+    clearTimeout(window.__claimL0NudgeTimer);
+    window.__claimL0NudgeTimer = setTimeout(closeClaimL0NudgeOverlay, 8000);
+  }
+  if (typeof showToast === 'function') {
+    showToast('认领核验未解锁：请先完成认领推进目标', 'gold');
+  }
+}
+
+function isClaimL0LockedTarget(el) {
+  if (!el || !el.id) return false;
+  return el.id === 'claim-l0-decoy-input'
+    || el.id === 'claim-cert-search-input'
+    || el.id === 'claim-l0-decoy-btn'
+    || el.id === 'claim-cert-search-btn';
+}
+
+function claimL0NudgeFromHint() {
+  var hint = document.getElementById('claim-workbench-hint');
+  showClaimL0Nudge(hint ? hint.textContent : '');
+}
+
+function wireClaimL0NudgeEvents() {
+  if (window.__claimL0NudgeWired) return;
+  window.__claimL0NudgeWired = true;
+  ensureClaimL0NudgeOverlay();
+
+  document.addEventListener('focusin', function (e) {
+    if ((window.__claimWorkbenchTier || 0) >= 1) return;
+    if (!isClaimL0LockedTarget(e.target)) return;
+    claimL0NudgeFromHint();
+  }, true);
+
+  document.addEventListener('input', function (e) {
+    if ((window.__claimWorkbenchTier || 0) >= 1) return;
+    var t = e.target;
+    if (!isClaimL0LockedTarget(t)) return;
+    if (String(t.value || '').trim()) claimL0NudgeFromHint();
+  }, true);
+
+  document.addEventListener('keydown', function (e) {
+    if ((window.__claimWorkbenchTier || 0) >= 1) return;
+    if (e.key !== 'Enter') return;
+    if (!isClaimL0LockedTarget(e.target)) return;
+    e.preventDefault();
+    claimL0NudgeFromHint();
+  }, true);
+
+  document.addEventListener('click', function (e) {
+    if ((window.__claimWorkbenchTier || 0) >= 1) return;
+    var id = e.target && e.target.id;
+    if (id === 'claim-l0-decoy-btn' || id === 'claim-cert-search-btn') {
+      e.preventDefault();
+      claimL0NudgeFromHint();
+    }
+    var ov = document.getElementById('claim-l0-nudge-overlay');
+    if (ov && ov.classList.contains('show') && e.target === ov) closeClaimL0NudgeOverlay();
+  }, true);
+
+  document.addEventListener('paste', function (e) {
+    if ((window.__claimWorkbenchTier || 0) >= 1) return;
+    if (!isClaimL0LockedTarget(e.target)) return;
+    setTimeout(claimL0NudgeFromHint, 0);
+  }, true);
+}
+
+function updateClaimWorkbenchAccess(state) {
+  var s = state || hengaiResolveAppState() || {};
+  var m = s.metrics || {};
+  var submitted = Number(
+    m.supplierSubmittedCount != null ? m.supplierSubmittedCount : m.supplierSubmitted
+  ) || 0;
+  var covRaw = Number(m.supplyChainCoverage != null ? m.supplyChainCoverage : m.scope3Coverage);
+  var covPct = Number.isFinite(covRaw) ? (covRaw <= 1 ? covRaw * 100 : covRaw) : 0;
+
+  var tier = 0;
+  if (submitted >= 20 || covPct >= 50) tier = 2;
+  else if (submitted >= 5 && covPct >= 20) tier = 1;
+  window.__claimWorkbenchTier = tier;
+
+  var inp = document.getElementById('claim-cert-search-input');
+  var btn = document.getElementById('claim-cert-search-btn');
+  var hint = document.getElementById('claim-workbench-hint');
+  var searchRow = document.getElementById('claim-workbench-search-row');
+  var goalCard = document.getElementById('claim-workbench-goal-card');
+
+  if (hint) {
+    if (tier >= 2) {
+      hint.textContent = '已开放全量认领核验能力：可按凭证号快速稽核联系人、确权时间与碳强度。';
+      hint.style.color = 'var(--green-l)';
+    } else if (tier === 1) {
+      var gap2Count = Math.max(0, 20 - submitted);
+      var gap2Cov = Math.max(0, 50 - covPct);
+      hint.textContent = '基础核验已开放。继续推进可升级全量工作台：还差 ' + gap2Count + ' 家认领或覆盖率 +' + gap2Cov.toFixed(1) + '%。';
+      hint.style.color = 'var(--gold-l)';
+    } else {
+      var gapCount = Math.max(0, 5 - submitted);
+      var gapCov = Math.max(0, 20 - covPct);
+      hint.textContent = '认领核验工作台待解锁：先完成至少 5 家认领且覆盖率 ≥20%（当前还差 ' + gapCount + ' 家 / +' + gapCov.toFixed(1) + '%）。';
+      hint.style.color = 'var(--ink3)';
+    }
+  }
+  if (searchRow) searchRow.style.display = 'flex';
+  if (inp) {
+    inp.disabled = false;
+    inp.readOnly = false;
+    inp.placeholder = tier < 1
+      ? 'L0 未解锁：输入凭证号将提示解锁条件（CL-CLAIM-…）'
+      : '按凭证号搜索（例：CL-CLAIM-AB12CD34）';
+    inp.style.cursor = tier < 1 ? 'text' : '';
+  }
+  if (btn) {
+    btn.disabled = false;
+    btn.title = tier < 1 ? '需达到 5 家认领 + 覆盖率 20%' : '';
+    btn.style.opacity = tier < 1 ? '0.82' : '1';
+  }
+  if (goalCard) {
+    if (tier < 1) {
+      goalCard.style.display = 'block';
+      var gapCount2 = Math.max(0, 5 - submitted);
+      var gapCov2 = Math.max(0, 20 - covPct);
+      goalCard.innerHTML = '🎯 <strong>认领推进目标卡</strong><br>当前阶段先专注推动认领，凭证搜索框已锁定。<br>达到 <strong>5 家认领 + 覆盖率 20%</strong> 即自动解锁。<br>当前还差：<strong>' + gapCount2 + ' 家</strong> / <strong>+' + gapCov2.toFixed(1) + '%</strong>。'
+        + '<div class="claim-l0-decoy-row" style="display:none">'
+        + '<input id="claim-l0-decoy-input" class="f-inp claim-l0-decoy-inp" type="text" placeholder="备用">'
+        + '<button id="claim-l0-decoy-btn" type="button" class="tb-btn tb-btn-primary claim-l0-decoy-btn">搜索认领凭证</button>'
+        + '</div>';
+    } else {
+      goalCard.style.display = 'none';
+      goalCard.innerHTML = '';
+    }
+  }
+}
+
+function closeClaimCertDetailModal() {
+  var m = document.getElementById('claim-cert-detail-modal');
+  if (m) m.classList.remove('open');
+}
+
+function mountSupplyOverlayToBody(id) {
+  var el = document.getElementById(id);
+  if (el && el.parentElement !== document.body) {
+    try { document.body.appendChild(el); } catch (_) {}
+  }
+}
+
+function openClaimCertDetailModal(data) {
+  if (!data) return;
+  if (typeof window.hengaiEmbedDialog === 'function' && window.hengaiEmbedDialog({
+    kind: 'claim-detail',
+    data: data
+  })) return;
+  mountSupplyOverlayToBody('claim-cert-detail-modal');
+  setClaimDetail('claim-detail-id', data.claim_certificate_id || data.claimCertificateId);
+  setClaimDetail('claim-detail-supplier', data.supplier_name || data.supplierName);
+  setClaimDetail('claim-detail-contact', data.contact_name || data.contactName);
+  setClaimDetail('claim-detail-phone', data.contact_phone_masked || data.contactPhoneMasked || data.contact_email_masked || data.contactEmailMasked);
+  var ci = data.carbon_intensity != null ? Number(data.carbon_intensity) : (data.carbonIntensity != null ? Number(data.carbonIntensity) : null);
+  setClaimDetail('claim-detail-intensity', (ci != null && Number.isFinite(ci) && ci > 0) ? ci.toFixed(2) + ' tCO₂e/t' : '待回填');
+  setClaimDetail('claim-detail-workspace', data.workspace_name || data.workspaceName);
+  setClaimDetail('claim-detail-time', data.claim_confirmed_at || data.claimConfirmedAt);
+  setClaimDetail('claim-detail-msg', data.message || '凭证有效');
+  var m = document.getElementById('claim-cert-detail-modal');
+  if (m) m.classList.add('open');
+}
+
+async function searchClaimCertDetail() {
+  if ((window.__claimWorkbenchTier || 0) < 1) {
+    var hint = document.getElementById('claim-workbench-hint');
+    showClaimL0Nudge(hint ? hint.textContent : '');
+    return;
+  }
+  var inp = document.getElementById('claim-cert-search-input');
+  var raw = inp ? String(inp.value || '').trim() : '';
+  if (!raw) {
+    updateClaimSearchLiveHint('');
+    if (!supplyShowDialog({ kind: 'claim-search-error', title: '请输入凭证号', sub: '凭证号形如 CL-CLAIM-XXXXXXXX，请粘贴供应商分享的认领凭证。' })) {
+      showToast('请输入凭证号', 'error');
+    }
+    return;
+  }
+  var certId = raw.toUpperCase();
+  updateClaimSearchLiveHint(certId);
+  try {
+    var res = await fetch((window.API_BASE || location.origin) + '/api/v1/eco/claim-verify/' + encodeURIComponent(certId), {
+      headers: { Accept: 'application/json' }
+    });
+    var data = await res.json().catch(function () { return null; });
+    if (!res.ok || !data || !data.valid) {
+      var errMsg = (data && data.message) || '凭证不存在或无效';
+      if (!supplyShowDialog({ kind: 'claim-search-error', title: '未找到该凭证', sub: errMsg })) {
+        showToast(errMsg, 'error');
+      }
+      return;
+    }
+    if (inp) inp.value = certId;
+    openClaimCertDetailModal(data);
+  } catch (e) {
+    var failMsg = '查询失败：' + (e && e.message ? e.message : e);
+    if (!supplyShowDialog({ kind: 'claim-search-error', title: '核验请求失败', sub: failMsg })) {
+      showToast(failMsg, 'error');
+    }
+  }
+}
+
+
+var inviteName = "";
+var inviteNodeId = "";
+function openInvite(name, nodeId){
+  mountSupplyOverlayToBody('invite-modal');
+  inviteName = name || "";
+  inviteNodeId = nodeId ? String(nodeId) : "";
+  var modal = document.getElementById("invite-modal");
+  var label = document.getElementById("invite-to-name");
+  if(label) {
+    var slot = (inviteName.match(/节点\s*(\d+)/) || [])[1];
+    label.textContent = slot
+      ? ("向「" + inviteName + "」（第 " + slot + " 号节点）发送穿透填报邀请")
+      : ("向「" + inviteName + "」发送穿透填报邀请");
+  }
+  if(modal) modal.classList.add("open");
+}
+function closeInvite(){
+  var modal = document.getElementById("invite-modal");
+  if(modal) modal.classList.remove("open");
+}
+async function sendInvite(){
+  var nameInp = document.getElementById("invite-name");
+  var phoneInp = document.getElementById("invite-phone");
+  var contactName = nameInp ? String(nameInp.value || "").trim() : "";
+  var phone = phoneInp ? String(phoneInp.value || "").trim() : "";
+  var supplierName = String(inviteName || "").trim();
+  if (!supplierName || supplierName === "---") {
+    showToast("请先选择或填写供应商名称", "error");
+    return;
+  }
+  closeInvite();
+  var AS = (window.parent && window.parent.AppState) || window.AppState;
+  if (!AS || typeof AS.commit !== "function") {
+    showToast("AppState.commit 不可用，请从首页或全域中心打开本模块", "error");
+    return;
+  }
+  try {
+    var commitPayload = {
+      supplierName: supplierName,
+      contactPersonName: contactName || undefined,
+      contactPhone: phone || undefined,
+    };
+    if (inviteNodeId) commitPayload.supplierNodeId = inviteNodeId;
+    var resp = await AS.commit("supply", commitPayload, { optimistic: false });
+    if (typeof window.hengaiRememberInviteFromResponse === 'function') {
+      window.hengaiRememberInviteFromResponse(resp);
+    } else {
+      var tok = resp.submissionToken || resp.submission_token;
+      var code = resp.inviteCode || resp.invite_code;
+      if (tok) window.__hengaiSubmissionToken = tok;
+      if (code) window.__hengaiInviteCode = code;
+    }
+    var st = AS;
+    if (typeof window.hengaiRefreshSupplyConsole === 'function') {
+      window.hengaiRefreshSupplyConsole(st);
+    } else {
+      if (typeof window.refreshSupplyChainUi === "function") window.refreshSupplyChainUi(st);
+      if (typeof window.renderHengaiSupplierTable === "function") window.renderHengaiSupplierTable(st);
+    }
+    if (typeof window.hengaiNotifySupplyInviteSuccess === 'function') {
+      window.hengaiNotifySupplyInviteSuccess(resp, supplierName);
+    }
+    setTimeout(function(){ if (typeof openH5ShareModal === 'function') openH5ShareModal(); }, 400);
+  } catch (e) {
+    showToast("落库失败：" + (e && e.message ? e.message : e), "error");
+  }
+}
+
+</script>
+
+<!-- ═══════════════════════════════════════════
+     H5 裂变二维码弹窗 · 客户端 qr-lib.js 渲染 · V2.0 QA
+═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="h5-share-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); z-index:99999; align-items:center; justify-content:center;">
+  <div style="background:#0f1320; border:1px solid #7f77dd; border-radius:16px; padding:24px; width:340px; text-align:center; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(127,119,221,0.25); color:#e6e9f2; font-family:inherit;">
+    <button onclick="document.getElementById('h5-share-modal').style.display='none'" style="position:absolute; top:12px; right:16px; background:none; border:none; color:#8a92a8; font-size:18px; cursor:pointer; line-height:1; font-family:inherit;">✕</button>
+    <div style="font-size:14px; font-weight:bold; color:#e6e9f2; margin-bottom:8px;">邀请供应商完成 CL-IVC 极速填报</div>
+    <div style="font-size:11px; color:#8a92a8; margin-bottom:16px; line-height:1.5;">对方扫码打开移动端安全页面，BOM 数据保留本地，仅向您反馈最终碳强度。</div>
+    <div id="h5-qr-container" style="width:160px; height:160px; background:#fff; border-radius:12px; margin:0 auto 16px; display:flex; align-items:center; justify-content:center; border:4px solid #7f77dd; overflow:hidden; padding:4px;"><div style="font-size:10px;color:#444">加载中...</div></div>
+    <div id="h5-invite-url" style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; font-size:11px; color:#93c5fd; word-break:break-all; margin-bottom:10px; font-family:ui-monospace,Consolas,monospace;">…</div>
+    <div id="h5-invite-tip" style="font-size:10px; color:#f0c96b; margin-bottom:14px; line-height:1.5; display:none; text-align:left; background:rgba(240,201,107,0.08); border:1px solid rgba(240,201,107,0.25); border-radius:6px; padding:8px 10px;"></div>
+    <button id="h5-copy-btn" style="width:100%; background:#7f77dd; color:#fff; border:none; border-radius:8px; padding:11px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s;" onmouseenter="this.style.transform='translateY(-1px)'" onmouseleave="this.style.transform='translateY(0)'" onclick="copyH5InviteLink()">复制专属邀请链接</button>
+  </div>
+</div>
+<script src="hengai-supplier-invite.js"></script>
+<script src="qr-lib.js"></script>
+<script>
+function hengaiGetUninvitedNodes() {
+  var nodes = typeof window.hengaiSortSupplierNodes === 'function'
+    ? window.hengaiSortSupplierNodes(hengaiGetSupplierNodes())
+    : hengaiGetSupplierNodes();
+  return nodes.filter(function (n) {
+    if (typeof window.supplierInviteIssued === 'function' && window.supplierInviteIssued(n)) return false;
+    var st = String((n && (n.status || n.supplierStatus)) || '').toLowerCase();
+    return st !== 'submitted' && st !== 'confirmed';
+  });
+}
+
+function hengaiOpenImportSuppliers() {
+  var AS = (window.parent && window.parent.AppState) || window.AppState;
+  if (window.HengAI && window.HengAI.act && typeof window.HengAI.act.importSuppliers === 'function') {
+    window.HengAI.act.importSuppliers();
+    return;
+  }
+  if (AS && typeof AS.importSuppliers === 'function') {
+    AS.importSuppliers();
+    return;
+  }
+  showToast('导入功能未加载，请刷新页面', 'error');
+}
+
+function hengaiOpenBatchInviteModal() {
+  var list = hengaiGetUninvitedNodes();
+  var modal = document.getElementById('batch-invite-modal');
+  var box = document.getElementById('batch-invite-list');
+  var sum = document.getElementById('batch-invite-summary');
+  if (!modal || !box) return;
+  if (!list.length) {
+    showToast('暂无「待邀请」节点。已签发的请用表格「复制邀请链接」；已确权无需再邀。', 'gold');
+    return;
+  }
+  if (sum) sum.textContent = '共 ' + list.length + ' 家待邀请（CBAM 占位节点需您亲手签发，系统不会自动邀请）';
+  box.innerHTML = list.map(function (n, i) {
+    var name = String(n.supplierName || n.supplier_name || ('节点' + (i + 1)));
+    var nid = n.id != null ? String(n.id) : '';
+    return '<label style="display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer">'
+      + '<input type="checkbox" class="batch-invite-cb" data-node-id="' + nid + '" data-name="' + name.replace(/"/g, '&quot;') + '" checked/>'
+      + '<span>' + name + '</span></label>';
+  }).join('');
+  modal.classList.add('open');
+}
+
+function hengaiCloseBatchInviteModal() {
+  var modal = document.getElementById('batch-invite-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function hengaiBatchInviteSelectAll(on) {
+  document.querySelectorAll('.batch-invite-cb').forEach(function (cb) { cb.checked = !!on; });
+}
+
+async function hengaiRunBatchInvite() {
+  var cbs = Array.prototype.slice.call(document.querySelectorAll('.batch-invite-cb:checked'));
+  if (!cbs.length) {
+    showToast('请至少勾选一家待邀请供应商', 'error');
+    return;
+  }
+  hengaiCloseBatchInviteModal();
+  var AS = (window.parent && window.parent.AppState) || window.AppState;
+  if (!AS || typeof AS.commit !== 'function') {
+    showToast('AppState 不可用', 'error');
+    return;
+  }
+  var ok = 0;
+  for (var i = 0; i < cbs.length; i++) {
+    var cb = cbs[i];
+    var name = cb.getAttribute('data-name') || '';
+    var nodeId = cb.getAttribute('data-node-id') || '';
+    try {
+      var payload = { supplierName: name };
+      if (nodeId) payload.supplierNodeId = nodeId;
+      var resp = await AS.commit('supply', payload, { optimistic: false });
+      if (typeof window.hengaiRememberInviteFromResponse === 'function') {
+        window.hengaiRememberInviteFromResponse(resp);
+      }
+      ok++;
+    } catch (e) {
+      showToast('「' + name + '」签发失败：' + (e && e.message ? e.message : e), 'error');
+    }
+  }
+  if (typeof window.hengaiRefreshSupplyConsole === 'function') window.hengaiRefreshSupplyConsole(AS);
+  if (typeof window.hengaiNotifySupplyInviteSuccess === 'function') {
+    window.hengaiNotifySupplyInviteSuccess({ message: '已为 ' + ok + ' 家节点签发邀请' }, ok + ' 家');
+  } else {
+    showToast('✓ 已为 ' + ok + ' 家签发穿透邀请', 'gold');
+  }
+  if (ok === 1 && cbs[0]) {
+    openInvite(cbs[0].getAttribute('data-name'), cbs[0].getAttribute('data-node-id'));
+    setTimeout(function () { if (typeof openH5ShareModal === 'function') openH5ShareModal(); }, 300);
+  }
+}
+
+function hengaiPromptSupplierInviteFirst() {
+  hengaiOpenBatchInviteModal();
+}
+
+async function hengaiReconcileNodesUi() {
+  if (typeof window.hengaiReconcileSupplierNodes !== 'function') {
+    showToast('整理功能未加载，请刷新页面', 'error');
+    return;
+  }
+  try {
+    var data = await window.hengaiReconcileSupplierNodes();
+    showToast((data && data.message) ? data.message : '✓ 节点槽位已整理', 'gold');
+  } catch (e) {
+    showToast('整理失败：' + (e && e.message ? e.message : e), 'error');
+  }
+}
+(function(){
+  function buildInviteUrl(){
+    if (typeof window.hengaiBuildSupplierH5InviteUrl === 'function') {
+      return window.hengaiBuildSupplierH5InviteUrl();
+    }
+    return { url: location.origin + '/static/HengAI_Supplier_H5.html', ready: false, needsInvite: true, isFile: false };
+  }
+  function renderQR(container, url){
+    container.innerHTML = '';
+    if (typeof qrcode !== 'function') {
+      container.innerHTML = '<div style="padding:12px;font-size:10px;color:#444;text-align:center;line-height:1.5;">QR 库未加载<br/>请用链接手动分享</div>';
+      return;
+    }
+    try {
+      var qr = qrcode(0, 'M');
+      qr.addData(url);
+      qr.make();
+      // 使用 SVG 而非 img，完全本地化渲染
+      var cellSize = 4, margin = 0;
+      container.innerHTML = qr.createSvgTag({cellSize: cellSize, margin: margin, scalable: true});
+      var svg = container.querySelector('svg');
+      if (svg) { svg.setAttribute('width', '148'); svg.setAttribute('height', '148'); svg.style.display = 'block'; }
+    } catch(e) {
+      container.innerHTML = '<div style="padding:12px;font-size:10px;color:#b00;text-align:center;line-height:1.5;">二维码生成失败<br/>'+ (e && e.message ? e.message : '') +'</div>';
+    }
+  }
+  window.openH5ShareModal = function(){
+    var modal = document.getElementById('h5-share-modal');
+    if (!modal) return;
+    var info = buildInviteUrl();
+    var container = document.getElementById('h5-qr-container');
+    if (container) renderQR(container, info.url);
+    var linkEl = document.getElementById('h5-invite-url');
+    if (linkEl) linkEl.textContent = info.url;
+    var tipEl = document.getElementById('h5-invite-tip');
+    if (tipEl){
+      var tips = [];
+      if (info.needsInvite) {
+        tips.push('⚠️ 请先点击「发送穿透卡片」完成邀请落库，再复制链接。未落库的链接无法提交碳数据。');
+      }
+      if (info.isFile){
+        tips.push('⚠️ 当前为 <code style="color:#7f77dd">file://</code> 模式，手机扫码后无法访问本地文件。请用 <code style="color:#7f77dd">http://localhost:8000</code> 或局域网 IP 访问。');
+      }
+      if (tips.length) {
+        tipEl.innerHTML = tips.join('<br/>');
+        tipEl.style.display = 'block';
+      } else {
+        tipEl.style.display = 'none';
+      }
+    }
+    modal.style.display = 'flex';
+  };
+  window.copyH5InviteLink = function(){
+    var info = buildInviteUrl();
+    if (!info.ready) {
+      if (typeof showToast === 'function') showToast('请先发穿透卡片落库，链接须含 invite_id 或 submission_token', 'error');
+      else alert('请先在供应链协同中点击「发送穿透卡片」完成落库，再复制带参数的邀请链接。');
+      return;
+    }
+    var linkEl = document.getElementById('h5-invite-url');
+    var url = info.url || (linkEl ? linkEl.textContent : '');
+    if (!url || url === '…') return;
+    if (url.indexOf('?') < 0) {
+      if (typeof showToast === 'function') showToast('链接无效：缺少邀请参数，请重新发送穿透卡片', 'error');
+      return;
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).then(
+        function(){ alert('✓ 链接已复制！请发送给供应商。'); },
+        function(){ window.prompt('请手动复制链接：', url); }
+      );
+    } else {
+      window.prompt('请手动复制链接：', url);
+    }
+  };
+})();
+</script>
+<!-- ═════════ END H5 MODAL ═════════ -->
+
+<script src="AppState.js"></script>
+<script>
+(function () {
+  if (typeof window.__hengaiSupplyToast === 'function') {
+    window.showToast = window.__hengaiSupplyToast;
+  }
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+
+  function hengaiEsc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function hengaiFmtNum(v, digits) {
+    var n = Number(v);
+    if (!Number.isFinite(n)) return '---';
+    return n.toFixed(digits == null ? 2 : digits);
+  }
+
+  function hengaiFmtDt(iso) {
+    if (!iso) return '—';
+    try {
+      var d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return String(iso).slice(0, 19).replace('T', ' ');
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') + ' ' +
+        String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    } catch (_) {
+      return String(iso).slice(0, 19);
+    }
+  }
+
+  function hengaiResolveAppState(input) {
+    var root = null;
+    try {
+      if (window.parent && window.parent !== window && window.parent.AppState) {
+        root = window.parent.AppState;
+      }
+    } catch (_) {}
+    if (!root && window.AppState) root = window.AppState;
+    if (input && (input.supplierNodes || input.suppliers || input.user || input.metrics)) {
+      var hasLedger = Array.isArray(input.gmLedger)
+        || (input.user && (Array.isArray(input.user.gm_ledger) || Array.isArray(input.user.gmLedger)));
+      if (!hasLedger && root) return root;
+      return input;
+    }
+    return root || input || null;
+  }
+
+  window.hengaiGetSupplierNodes = function hengaiGetSupplierNodes(state) {
+    var s = hengaiResolveAppState(state);
+    if (!s) return [];
+    if (Array.isArray(s.supplierNodes) && s.supplierNodes.length) return s.supplierNodes;
+    if (Array.isArray(s.suppliers) && s.suppliers.length) return s.suppliers;
+    return [];
+  };
+
+  function hengaiSupplierStatusUi(st, node) {
+    if (typeof window._supplierStatusLabel === 'function') {
+      return window._supplierStatusLabel(st, node);
+    }
+    var s = String(st || '').toLowerCase();
+    if (s === 'submitted' || s === 'confirmed') {
+      return { text: '已确权', cls: 'sc-done', done: true };
+    }
+    return { text: '待邀请', cls: 'sc-missing', done: false, needsInvite: true };
+  }
+
+  function hengaiComputeClIvcHash(name, isoTime, intensity) {
+    if (typeof window.computeClIvcHash === 'function') {
+      return window.computeClIvcHash(name, isoTime, intensity);
+    }
+    var raw = String(name || '') + '|' + String(isoTime || '') + '|' + String(intensity || '');
+    var h = 2166136261;
+    for (var i = 0; i < raw.length; i++) {
+      h ^= raw.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return 'CL-IVC-' + (h >>> 0).toString(16).toUpperCase().padStart(8, '0') + '-' + Date.now().toString(36).toUpperCase().slice(-6);
+  }
+
+  window.exportSupplyNetworkPanorama = function exportSupplyNetworkPanorama() {
+    var svg = document.querySelector('.network-card svg');
+    if (!svg) {
+      showToast('未找到节点地图', 'error');
+      return;
+    }
+    var xml = new XMLSerializer().serializeToString(svg);
+    var blob = new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n', xml], { type: 'image/svg+xml;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'HengAI-供应链穿透全景-' + new Date().toISOString().slice(0, 10) + '.svg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('✓ 供应链穿透全景图已导出为 SVG', 'gold');
+  };
+
+  function applySupplyPipeline(p) {
+    if (!p) return;
+    var user = p.user || {};
+    var metrics = p.metrics || {};
+    var company = p.company || {};
+    var gm = Number(user.gmBalance != null ? user.gmBalance : user.gm_balance != null ? user.gm_balance : 0);
+    var scope = Number(company.scope3Rate != null ? company.scope3Rate : metrics.scope3Rate != null ? metrics.scope3Rate : 0);
+    if (!Number.isFinite(scope)) scope = 0;
+    var total = Number(metrics.supplierCount != null ? metrics.supplierCount : (p.supplierNodes || []).length);
+    if (!Number.isFinite(total) || total < 0) total = 0;
+    var done = Number(metrics.supplierSubmittedCount != null ? metrics.supplierSubmittedCount : metrics.supplierSubmitted != null ? metrics.supplierSubmitted : metrics.supplierCountSubmitted);
+    if (!Number.isFinite(done) || done < 0) done = 0;
+    var pending = Number(metrics.supplierPendingCount != null ? metrics.supplierPendingCount : metrics.supplierCountPending);
+    if (!Number.isFinite(pending) || pending < 0) pending = 0;
+    var partial = Math.max(0, total - done - pending);
+    var covPct = scope > 0 ? scope : (total > 0 ? (done / total) * 100 : 0);
+    var covStr = total > 0 || covPct > 0 ? (Number(covPct).toFixed(1) + '%') : '待测算';
+
+    var el;
+    if ((el = document.getElementById('sup-coverage-pct'))) {
+      el.textContent = covStr;
+      el.style.color = covPct > 0 && covPct < 80 ? 'var(--red-l)' : 'var(--green-l)';
+    }
+    if ((el = document.getElementById('sup-coverage-pct-dup'))) el.textContent = covStr;
+    if ((el = document.getElementById('sup-count-val'))) el.textContent = String(done);
+    if ((el = document.getElementById('sup-pending-val'))) el.textContent = String(pending);
+    if ((el = document.getElementById('sup-kpi-partial'))) el.textContent = String(partial);
+    if ((el = document.getElementById('sup-kpi-uninvited'))) el.textContent = String(Math.max(0, total - done - pending - partial));
+    if ((el = document.getElementById('sup-funnel-invited'))) el.textContent = total + ' 家';
+    if ((el = document.getElementById('sup-funnel-responded'))) el.textContent = (done + partial) + ' 家';
+    if ((el = document.getElementById('sup-net-direct'))) el.textContent = String(done);
+    if ((el = document.getElementById('sup-net-tier2'))) el.textContent = String(partial);
+    if ((el = document.getElementById('sup-net-gm-pending'))) el.textContent = String(Math.max(0, pending * 200));
+
+    document.querySelectorAll('.dyn-sup-pct').forEach(function (n) { n.textContent = covStr; });
+    document.querySelectorAll('.dyn-sup-count').forEach(function (n) { n.textContent = String(done); });
+    document.querySelectorAll('.dyn-sup-total').forEach(function (n) { n.textContent = String(total); });
+    document.querySelectorAll('.dyn-sup-pending').forEach(function (n) { n.textContent = String(pending); });
+    document.querySelectorAll('.dyn-gm-balance').forEach(function (n) { n.textContent = gm.toLocaleString(); });
+
+    var funnel = document.getElementById('sup-funnel-complete');
+    if (funnel) {
+      var pct = total > 0 ? Math.max(8, Math.min(100, (done / total) * 100)) : 0;
+      funnel.style.width = pct + '%';
+    }
+
+    var chip = document.querySelector('.gm-chip-val');
+    if (chip) chip.textContent = gm.toLocaleString();
+
+    var AS = hengaiResolveAppState(p);
+    if (AS && p.supplierNodes) AS.supplierNodes = p.supplierNodes;
+    if (typeof window.renderHengaiSupplierTable === 'function') window.renderHengaiSupplierTable(AS || p);
+    if (typeof window.updateFortressRadar === 'function') window.updateFortressRadar(AS || p);
+    else if (typeof window.renderFortressPanel === 'function') window.renderFortressPanel(AS || p);
+    if (typeof window.renderGenerationalIncome === 'function') {
+      window.renderGenerationalIncome(AS || p, { source: 'pipeline', input: p });
+    }
+    updateClaimWorkbenchAccess(AS || p);
+    if (typeof window.hengaiApplyStandardPipeline === 'function') {
+      try { window.hengaiApplyStandardPipeline(p); } catch (_) {}
+    }
+    if (typeof window.__hengaiSupplyToast === 'function') {
+      window.showToast = window.__hengaiSupplyToast;
+    }
+  }
+
+  window.applySupplyPipeline = applySupplyPipeline;
+
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || ev.data.type !== 'HENGAI_HUB_PIPELINE') return;
+    var p = ev.data.payload;
+    try {
+      if (typeof window.mergePipelineIntoAppState === 'function' && window.AppState) {
+        window.mergePipelineIntoAppState(p);
+      } else if (window.parent && typeof window.parent.mergePipelineIntoAppState === 'function' && window.parent.AppState) {
+        window.parent.mergePipelineIntoAppState(p);
+        if (p.supplierNodes) window.parent.AppState.supplierNodes = p.supplierNodes;
+      }
+    } catch (_) {}
+    applySupplyPipeline(p);
+  });
+
+  function bootSupplyConsole() {
+    var AS = hengaiResolveAppState();
+    if (AS && typeof window.dispatchHengaiModulePipelines === 'function' && typeof window.buildHubPipelinePayload === 'function') {
+      try {
+        applySupplyPipeline(window.buildHubPipelinePayload(AS));
+        return;
+      } catch (_) {}
+    }
+    if (AS) {
+      if (typeof window.refreshSupplyChainUi === 'function') window.refreshSupplyChainUi(AS);
+      else {
+        if (typeof window.renderHengaiSupplierTable === 'function') window.renderHengaiSupplierTable(AS);
+        if (typeof window.updateFortressRadar === 'function') window.updateFortressRadar(AS);
+        if (typeof window.renderGenerationalIncome === 'function') window.renderGenerationalIncome(AS);
+      }
+      updateClaimWorkbenchAccess(AS);
+    }
+  }
+
+  var _supplyPollTimer = null;
+  var _lastSubmitSeen = '';
+  function startSupplyLivePoll() {
+    if (_supplyPollTimer) return;
+    _supplyPollTimer = setInterval(function () {
+      if (document.hidden) return;
+      var raw = '';
+      try { raw = localStorage.getItem('hengai_supplier_submitted') || ''; } catch (_) {}
+      if (!raw || raw === _lastSubmitSeen) return;
+      _lastSubmitSeen = raw;
+      if (typeof window.hengaiOnSupplierSubmitted === 'function') {
+        try { window.hengaiOnSupplierSubmitted(JSON.parse(raw)); } catch (_) {
+          window.hengaiOnSupplierSubmitted();
+        }
+      }
+    }, 4000);
+  }
+
+  function wireSupplyEventRefresh() {
+    if (window.__hengaiSupplyEventWired) return;
+    window.__hengaiSupplyEventWired = true;
+    if (typeof EventBus !== 'undefined' && EventBus.on) {
+      EventBus.on('supply:saved', function () {
+        if (typeof window.hengaiRefreshSupplyConsole === 'function') {
+          window.hengaiRefreshSupplyConsole();
+        } else bootSupplyConsole();
+      });
+      EventBus.on('STATE_COMMIT', function (info) {
+        if (info && info.domain === 'supply') {
+          if (typeof window.hengaiRefreshSupplyConsole === 'function') {
+            window.hengaiRefreshSupplyConsole();
+          } else bootSupplyConsole();
+        }
+      });
+      EventBus.on('SUPPLY_INVITE_SENT', function () {
+        if (typeof window.hengaiRefreshSupplyConsole === 'function') {
+          window.hengaiRefreshSupplyConsole();
+        }
+      });
+    }
+    window.addEventListener('message', function (ev) {
+      if (!ev.data || ev.data.type !== 'HENGAI_HUB_PIPELINE') return;
+      var p = ev.data.payload;
+      if (p && p.supplierNodes) {
+        setTimeout(bootSupplyConsole, 0);
+      }
+    });
+  }
+
+  function mountAllSupplyOverlays() {
+    ['claim-cert-detail-modal', 'carbon-sovereignty-cert-modal', 'invite-modal', 'batch-invite-modal', 'claim-l0-nudge-overlay', 'toast']
+      .forEach(function (id) { mountSupplyOverlayToBody(id); });
+  }
+
+  function enforceSupplyToastBridge() {
+    if (typeof window.__hengaiSupplyToast === 'function') {
+      window.showToast = window.__hengaiSupplyToast;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    mountAllSupplyOverlays();
+    enforceSupplyToastBridge();
+    wireClaimSearchInputFeedback();
+    wireClaimL0NudgeEvents();
+    wireSupplyEventRefresh();
+    (typeof window.hengaiReconcileSupplierNodes === 'function'
+      ? window.hengaiReconcileSupplierNodes().catch(function () {})
+      : Promise.resolve()
+    ).finally(bootSupplyConsole);
+    startSupplyLivePoll();
+  });
+  if (document.readyState !== 'loading') {
+    mountAllSupplyOverlays();
+    enforceSupplyToastBridge();
+    wireClaimSearchInputFeedback();
+    wireClaimL0NudgeEvents();
+    wireSupplyEventRefresh();
+    (typeof window.hengaiReconcileSupplierNodes === 'function'
+      ? window.hengaiReconcileSupplierNodes().catch(function () {})
+      : Promise.resolve()
+    ).finally(function () { setTimeout(bootSupplyConsole, 0); });
+    startSupplyLivePoll();
+  }
+})();
+</script>
+<script src="hengai-module-pipeline.js"></script>
+</body>
+</html>

@@ -1,0 +1,703 @@
+/**
+ * 产业主权看板 · 全域中心 UI 对齐层
+ * 依赖 hi-hub-tokens.css + style.css (#hi-suite 基座)
+ */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+
+/* ── Hub 共享组件（scoped #hi-suite） ── */
+#hi-suite .sh {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+#hi-suite .sh-t {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink3);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+#hi-suite .sh-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  min-width: 24px;
+}
+#hi-suite .pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+#hi-suite .p-green  { background: var(--green-d);  color: var(--green-l);  border-color: var(--green-b); }
+#hi-suite .p-gold   { background: var(--gold-d);   color: var(--gold-l);   border-color: var(--gold-b); }
+#hi-suite .p-blue   { background: var(--blue-d);   color: var(--blue-l);   border-color: var(--blue-b); }
+#hi-suite .p-teal   { background: var(--teal-d);   color: var(--teal-l);   border-color: var(--teal-b); }
+#hi-suite .p-gray   { background: rgba(255,255,255,.05); color: var(--ink2); border-color: var(--border); }
+
+#hi-suite .hi-hub-section {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin: 0 0 14px;
+  backdrop-filter: blur(8px);
+  position: relative;
+}
+#hi-suite .hi-hub-section::before { display: none; }
+
+#hi-suite .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+#hi-suite .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+#hi-suite .g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+#hi-suite .metric {
+  background: rgba(0, 0, 0, .28);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+#hi-suite .m-lbl {
+  font-size: 10px;
+  color: var(--ink3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 6px;
+}
+#hi-suite .m-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -.5px;
+  line-height: 1;
+  color: var(--ink);
+}
+#hi-suite .m-val.gold { color: var(--gold-l); }
+#hi-suite .m-unit { font-size: 12px; font-weight: 400; margin-left: 2px; opacity: .7; font-family: 'Noto Sans SC', sans-serif; }
+#hi-suite .m-sub { font-size: 11px; color: var(--ink2); margin-top: 6px; line-height: 1.45; }
+
+#hi-suite .ins {
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.7;
+  margin-bottom: 14px;
+}
+#hi-suite .ins-blue  { background: var(--blue-d);  border: 1px solid var(--blue-b);  color: var(--blue-l); }
+#hi-suite .ins-green { background: var(--green-d); border: 1px solid var(--green-b); color: var(--green-l); }
+#hi-suite .ins-gold  { background: var(--gold-d);  border: 1px solid var(--gold-b);  color: var(--gold-l); }
+
+#hi-suite .prog {
+  height: 6px;
+  background: rgba(255, 255, 255, .07);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+#hi-suite .prog-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--teal), var(--green));
+  transition: width .22s ease;
+}
+
+#hi-suite .act-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 14px;
+  border-radius: 11px;
+  border: 1px solid var(--border2);
+  background: rgba(0, 0, 0, .28);
+  cursor: pointer;
+  transition: all .18s;
+  font-size: 12.5px;
+  color: var(--ink);
+  font-family: inherit;
+  text-align: left;
+  flex: 1 1 200px;
+  min-width: 0;
+}
+#hi-suite .act-btn:hover {
+  background: var(--bg4);
+  border-color: var(--border2);
+  transform: translateY(-1px);
+}
+#hi-suite .act-ic {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  background: var(--bg4);
+}
+#hi-suite .act-btn .act-arrow {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--ink3);
+}
+#hi-suite .hi-eb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+#hi-suite .hi-eb-actions-sub { margin-top: 10px; }
+#hi-suite .act-btn-sub {
+  flex: 0 1 auto;
+  padding: 6px 12px;
+  font-size: 11px;
+}
+#hi-suite .hi-eb-internal-note {
+  margin: 12px 0 0;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+#hi-suite .ins-gray {
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid var(--border);
+  color: var(--ink2);
+}
+
+#hi-suite .hi-eb-action {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--gold-b);
+  background: var(--gold-d);
+  color: var(--gold-l);
+}
+#hi-suite .hi-eb-action.warn { border-color: var(--gold-b); background: var(--gold-d); color: var(--gold-l); }
+#hi-suite .hi-eb-action.ok   { border-color: var(--green-b); background: var(--green-d); color: var(--green-l); }
+
+#hi-suite .hi-eb-cert { font-size: 12px; font-weight: 600; color: var(--gold-l); font-family: 'Noto Sans SC', sans-serif; }
+
+#hi-suite #hi-warroom-main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px 28px 48px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+#hi-suite #hi-warroom-main::-webkit-scrollbar { width: 4px; }
+#hi-suite #hi-warroom-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* embed：藏子页顶栏，用轻量状态条 */
+html[data-embed="1"] #hi-suite .hi-topbar { display: none !important; }
+html[data-embed="1"] #hi-suite #hi-warroom-main { padding: 20px 28px 40px; }
+html[data-embed="1"] #hi-suite .hi-embed-strip { display: flex !important; }
+
+#hi-suite .hi-embed-strip {
+  display: none;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  font-size: 11px;
+}
+#hi-suite .hi-embed-strip .hi-embed-title {
+  font-weight: 700;
+  color: var(--ink);
+  margin-right: auto;
+}
+
+/* 减 glow：诉求区与影响力（覆盖 style.css #hi-suite 旧 margin/flex） */
+#hi-suite .hi-resonance.hi-hub-section,
+#hi-suite .hi-influence.hi-hub-section,
+#hi-suite .hi-factor-ledger.hi-hub-section {
+  flex: none !important;
+  margin: 0 0 14px !important;
+  padding: 18px 20px !important;
+  overflow: visible !important;
+  border-top: none !important;
+  box-shadow: none !important;
+  min-height: 0 !important;
+  max-height: none !important;
+}
+#hi-suite .hi-eb.hi-hub-section.state-ready   { border-color: rgba(16, 185, 129, .35); }
+#hi-suite .hi-eb.hi-hub-section.state-draft  { border-color: rgba(245, 158, 11, .35); }
+#hi-suite .hi-eb.hi-hub-section.state-certified { border-color: rgba(34, 197, 94, .4); }
+
+#hi-suite .hi-delta { font-size: 10.5px; color: var(--ink3); margin-top: 6px; }
+#hi-suite .hi-delta-val { font-family: 'DM Mono', monospace; font-weight: 600; color: var(--green-l); }
+
+/* 账本 */
+#hi-suite #hi-factor-ledger-card .ledger-fee-row {
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, .22);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin: 12px 0;
+  font-size: 11.5px;
+  color: var(--ink2);
+}
+#hi-suite #hi-factor-ledger-card .ledger-sub-lbl {
+  font-size: 10.5px;
+  color: var(--ink3);
+  font-weight: 600;
+  margin: 10px 0 8px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+#hi-suite .ledger-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+#hi-suite .ledger-panel {
+  background: rgba(0, 0, 0, .22);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+/* 影响力榜 · podium 降权至 fold */
+#hi-suite .hi-inf-podium-fold > summary { font-size: 11px; color: var(--ink3); cursor: pointer; padding: 6px 0; }
+#hi-suite .hi-inf-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+#hi-suite .hi-inf-body.hi-inf-flip { grid-template-columns: 1fr !important; }
+#hi-suite .hi-inf-podium { opacity: .92; }
+#hi-suite .hi-inf-meta-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+#hi-suite .hi-inf-lead {
+  margin: 0 0 10px;
+  font-size: 11.5px;
+  line-height: 1.65;
+}
+#hi-suite .hi-inf-eis-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, .18);
+  border: 1px solid var(--border);
+}
+#hi-suite .hi-inf-eis-def {
+  font-size: 11px;
+  color: var(--ink2);
+  line-height: 1.55;
+}
+#hi-suite .hi-inf-eis-def abbr {
+  text-decoration: none;
+  font-weight: 700;
+  color: var(--gold-l);
+}
+#hi-suite .hi-inf-board {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, .12);
+  border: 1px solid var(--border);
+}
+#hi-suite .hi-inf-board-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink3);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+#hi-suite .hi-inf-list-wrap { margin-top: 10px; }
+#hi-suite .hi-inf-list-head {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink2);
+  margin-bottom: 8px;
+}
+/* 名次列加宽：「第 N 名」不可在 28px 旧格内换行 */
+#hi-suite .hi-inf-row {
+  grid-template-columns: minmax(54px, auto) minmax(0, 1fr) auto auto minmax(52px, auto);
+  gap: 6px 10px;
+}
+#hi-suite .hi-inf-rank-num {
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 54px;
+}
+#hi-suite .hi-inf-eis {
+  white-space: nowrap;
+  min-width: 0;
+}
+#hi-suite .hi-inf-empty-row {
+  list-style: none;
+  font-size: 11px;
+  color: var(--ink3);
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, .15);
+  border: 1px dashed var(--border);
+}
+#hi-suite .hi-inf-me-block {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+#hi-suite .hi-inf-me-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-bottom: 8px;
+}
+#hi-suite .hi-inf-me-head-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: .3px;
+}
+#hi-suite .hi-inf-me-head-note {
+  font-size: 10px;
+  color: var(--ink3);
+}
+#hi-suite .hi-pod-peer {
+  font-size: 9px;
+  color: var(--ink3);
+  margin-top: 2px;
+  letter-spacing: .2px;
+}
+#hi-suite .hi-inf-eis-lbl {
+  font-size: 9px;
+  color: var(--ink3);
+  margin-right: 2px;
+}
+#hi-suite .hi-inf-me-rank strong {
+  color: var(--gold-l);
+  font-weight: 600;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 11px;
+}
+
+/* CBAM 敞口 · 双币种（决策级 KPI） */
+.money-exposure,
+#hi-suite .money-exposure {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  line-height: 1.2;
+  vertical-align: middle;
+}
+.money-primary,
+#hi-suite .money-primary {
+  font-family: 'DM Mono', monospace;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.money-secondary,
+#hi-suite .money-secondary {
+  font-size: 10px;
+  color: var(--ink3);
+  font-weight: 400;
+  line-height: 1.45;
+}
+.money-fx-note { opacity: 0.85; }
+#hi-suite .money-kpi-host .money-primary,
+#hi-suite .m-val.money-kpi-host .money-primary {
+  font-size: inherit;
+  color: inherit;
+}
+#hi-suite .metric .m-val.money-kpi-host {
+  line-height: 1.15;
+  font-size: 20px;
+}
+
+/* 本企业状态条 · 对齐 Hub metric，去掉 legacy 金色外发光 */
+#hi-suite .hi-inf-me {
+  grid-column: 1 / -1;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, .22);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+#hi-suite.hi-leader-pending .hi-inf-me {
+  background: rgba(0, 0, 0, .22);
+  border-color: var(--border);
+  box-shadow: none;
+}
+#hi-suite.hi-leader-audited .hi-inf-me {
+  background: rgba(0, 0, 0, .22);
+  border-color: rgba(201, 168, 76, .28);
+  border-left: 3px solid rgba(201, 168, 76, .45);
+  box-shadow: none;
+}
+#hi-suite .hi-inf-me-badge {
+  background: var(--gold-d);
+  border: 1px solid var(--gold-b);
+  box-shadow: none;
+}
+#hi-suite .hi-inf-leader-badge {
+  box-shadow: none;
+}
+#hi-suite .hi-inf-tip {
+  margin: 10px 0 0;
+  padding: 8px 10px 0;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--ink2);
+  line-height: 1.55;
+}
+#hi-suite .hi-inf-tip + .hi-inf-tip {
+  margin-top: 6px;
+  padding-top: 0;
+  border-top: none;
+}
+#hi-suite .hi-inf-tip strong {
+  color: var(--gold-l);
+  font-weight: 600;
+}
+#hi-suite .hi-inf-tip-ready { color: var(--green-l); }
+#hi-suite .hi-inf-tip-audit { color: var(--ink2); }
+
+#hi-suite .ins-gold  { background: var(--gold-d);  border: 1px solid var(--gold-b);  color: var(--gold-l); }
+#hi-suite .hi-iso-ins { margin-bottom: 0; }
+
+/* Hub 模态（对齐供应链 modal-bg / modal） */
+#hi-suite .hi-hub-modal-overlay {
+  background: rgba(0, 0, 0, .65) !important;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 10050;
+}
+#hi-suite .hi-hub-modal {
+  position: relative;
+  background: rgba(14, 18, 32, .98);
+  border: 1px solid var(--border2);
+  border-radius: 18px;
+  padding: 24px 26px;
+  max-width: 440px;
+  width: 92%;
+  box-shadow: none;
+}
+#hi-suite .hi-hub-modal::before { display: none !important; }
+#hi-suite .hi-hub-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--ink3);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+  font-family: inherit;
+  transition: color .15s;
+}
+#hi-suite .hi-hub-modal-close:hover { color: var(--ink); }
+#hi-suite .hi-hub-modal-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-right: 28px;
+}
+#hi-suite .hi-hub-modal-ic {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--blue-d);
+  border: 1px solid var(--blue-b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+#hi-suite .hi-hub-modal-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+#hi-suite .hi-hub-modal-sub {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--ink2);
+  line-height: 1.5;
+}
+#hi-suite .hi-policy-modal-ins {
+  margin-bottom: 10px;
+  font-size: 12px;
+  line-height: 1.65;
+}
+#hi-suite .hi-hub-modal-actions { margin-top: 4px; }
+#hi-suite .cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 11px 22px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity .2s, transform .2s;
+}
+#hi-suite .cta-green {
+  background: linear-gradient(135deg, var(--green), rgba(16, 185, 129, .55));
+  color: #fff;
+}
+#hi-suite .cta-green:hover {
+  opacity: .92;
+  transform: translateY(-1px);
+}
+#hi-suite .cta-muted {
+  background: var(--bg4);
+  border: 1px solid var(--border2);
+  color: var(--ink2);
+}
+#hi-suite .cta-muted:hover {
+  background: rgba(255, 255, 255, .06);
+  color: var(--ink);
+}
+
+#hi-suite .tb-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+#hi-suite .tb-btn:hover { background: var(--bg4); }
+#hi-suite .tb-btn-gold {
+  background: var(--gold-d);
+  border-color: var(--gold-b);
+  color: var(--gold-l);
+}
+#hi-suite .tb-btn-gold:hover { background: rgba(201, 168, 76, .22); }
+
+/* standalone 底部 · 与 main-pad 同宽（禁止 style.css 蓝边/14px 缩进） */
+#hi-suite .hi-bottom-panel.hi-hub-section {
+  margin: 0 0 14px !important;
+  padding: 18px 20px !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
+  background: var(--bg3) !important;
+  backdrop-filter: blur(8px);
+}
+#hi-suite .hi-sovereignty.hi-hub-section,
+#hi-suite footer.hi-sovereignty {
+  margin: 0 0 14px !important;
+  padding: 18px 20px !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
+  background: var(--bg3) !important;
+}
+#hi-suite .hi-bottom,
+#hi-suite .hi-bottom-compact {
+  padding: 0;
+  margin: 0;
+}
+#hi-suite .hi-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+#hi-suite .hi-cert-metrics { margin-top: 14px; }
+#hi-suite .hi-cert-metrics .metric { padding: 12px 14px; }
+#hi-suite .hi-cert-metrics .m-val.hi-cert-mono {
+  font-size: 12px;
+  letter-spacing: 0;
+  word-break: break-all;
+}
+#hi-suite .hi-pledge-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+}
+#hi-suite .hi-foot-min {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--ink3);
+  padding: 10px 0 4px;
+  border-top: 1px solid var(--border);
+}
+#hi-suite .hi-foot-min .hi-foot-cert {
+  font-family: 'DM Mono', monospace;
+  color: var(--gold-l);
+  font-size: 10px;
+}
+#hi-suite #hi-warroom-main > .hi-trust-journey,
+#hi-suite .hi-bottom-panel .hi-trust-journey {
+  margin: 12px 0 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, .22);
+}
+/* 旧底部组件在 standalone 隐藏 */
+#hi-suite .hi-pledge-strip,
+#hi-suite .hi-page-foot,
+#hi-suite .hi-iso-banner,
+#hi-suite .hi-iso-meta,
+#hi-suite .hi-iso-meta-compact { display: none !important; }
+
+@media (max-width: 1000px) {
+  #hi-suite .hi-inf-row {
+    grid-template-columns: minmax(54px, auto) minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+  }
+  #hi-suite .hi-inf-rank-num {
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+  #hi-suite .hi-inf-eis {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+}
+
+@media (max-width: 900px) {
+  #hi-suite .g4 { grid-template-columns: 1fr 1fr; }
+  #hi-suite .g3 { grid-template-columns: 1fr; }
+  #hi-suite .ledger-cols { grid-template-columns: 1fr; }
+  #hi-suite .hi-cert-metrics.g2 { grid-template-columns: 1fr; }
+  #hi-suite #hi-warroom-main { padding: 18px 16px 40px; }
+  html[data-embed="1"] #hi-suite #hi-warroom-main { padding: 16px 16px 32px; }
+}

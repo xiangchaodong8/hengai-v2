@@ -1,0 +1,1257 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · 星火成就档案</title>
+<script>
+/* 当通过 ?embed=1 被父页(全域中心) 以 iframe 嵌入时，把原页侧栏与顶栏消隐，仅保留内容模块 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<!-- ════ HengAI · AppState 唯一真理引擎（最先加载，所有 dyn-* 节点的灌注源） ════ -->
+<script src="hengai-load-appstate.js"></script>
+<script>
+  window.HengAI = window.HengAI || {};
+  if (!window.HengAI.init) window.HengAI.init = window.initAppState;
+  document.addEventListener('DOMContentLoaded', function () {
+    if (/[?&]embed=1/.test(location.search)) return;
+    if (typeof window.initAppState === 'function') {
+      try { window.initAppState(); } catch (e) { console.warn('[AppState] init err:', e); }
+    }
+  });
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,400&display=swap');
+
+/* 嵌入模式（?embed=1 触发）：隐藏原页侧栏/顶栏，只露内容 */
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] .main { margin-left: 0 !important; }
+html[data-embed="1"] body { background: var(--night); }
+
+:root{
+  --night:#06080f;--dark:#0a0e1a;--panel:#0d1220;--panel2:#111827;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --ink:#e8edf5;--ink2:#8a95a8;--ink3:#4a5568;--ink4:#2d3748;
+  --gold:#c9a84c;--gold-l:#f0d080;--gold-d:rgba(201,168,76,0.12);--gold-d2:rgba(201,168,76,0.06);
+  --green:#3b9e4a;--green-l:#7dd98a;--green-d:rgba(59,158,74,0.11);
+  --teal:#1d9e75;--teal-l:#6dd5b0;--teal-d:rgba(29,158,117,0.1);
+  --blue:#185fa5;--blue-l:#93c5fd;--blue-d:rgba(24,95,165,0.12);
+  --red:#e24b4a;--red-l:#fca5a5;--red-d:rgba(226,75,74,0.1);
+  --purple:#7f77dd;--purple-l:#c4b5fd;--purple-d:rgba(127,119,221,0.1);
+  --amber:#c9a84c;--amber-l:#fcd34d;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--night);color:var(--ink);
+  font-family:'Noto Sans SC',sans-serif;font-size:13px;line-height:1.6;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{width:200px;background:var(--dark);border-right:1px solid var(--border);
+  position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50}
+.logo-area{padding:16px 14px 12px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:9px}
+.logo-ic{width:28px;height:28px;border-radius:7px;background:var(--green-d);
+  border:1px solid rgba(59,158,74,0.35);display:flex;align-items:center;justify-content:center}
+.logo-tx{font-size:13px;font-weight:700}
+.logo-sub{font-size:9px;color:var(--ink3);margin-top:1px}
+.nav-s{padding:10px 13px 4px;font-size:9px;color:var(--ink3);letter-spacing:1px;
+  text-transform:uppercase;font-weight:600}
+.nav-i{display:flex;align-items:center;gap:8px;padding:7px 13px;font-size:12px;
+  color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all 0.15s}
+.nav-i:hover{color:var(--ink);background:rgba(255,255,255,0.04)}
+.nav-i.active{color:var(--ink);background:rgba(255,255,255,0.06);border-left-color:var(--gold)}
+.nav-d{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sf{margin-top:auto;padding:11px 13px;border-top:1px solid var(--border)}
+.u-av{width:28px;height:28px;border-radius:50%;background:var(--teal-d);
+  border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:var(--teal-l);flex-shrink:0}
+
+/* ── MAIN ── */
+.main{margin-left:200px;min-height:100vh}
+
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:40;
+  background:rgba(6,8,15,0.94);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;height:50px;
+  display:flex;align-items:center;justify-content:space-between}
+.tb-l{display:flex;align-items:center;gap:11px}
+.tb-title{font-size:14px;font-weight:500}
+.gm-chip{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;
+  background:var(--gold-d);border:1px solid rgba(201,168,76,0.3);cursor:default}
+.gm-chip-val{font-size:13px;font-weight:700;color:var(--gold);font-family:'DM Mono',monospace}
+.tb-btn{padding:5px 13px;border-radius:7px;font-size:11.5px;font-weight:500;
+  border:1px solid var(--border2);background:transparent;color:var(--ink);
+  cursor:pointer;font-family:inherit;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.07)}
+.tb-btn.primary{background:var(--gold-d);border-color:rgba(201,168,76,0.4);color:var(--gold-l)}
+
+/* ── CONTENT ── */
+.content{padding:0 0 72px}
+
+/* ═══════════════════════════════════════
+   ① HERO SECTION
+═══════════════════════════════════════ */
+.hero{
+  background:var(--dark);
+  border-bottom:1px solid var(--border);
+  padding:32px 28px 28px;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent 5%,var(--gold) 40%,var(--teal) 70%,transparent 95%);
+}
+.hero::after{
+  content:'';position:absolute;bottom:0;right:0;
+  width:340px;height:340px;border-radius:50%;
+  background:radial-gradient(circle,rgba(201,168,76,0.05) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+.hero-inner{display:flex;align-items:flex-start;gap:24px;position:relative;z-index:1}
+.hero-av-wrap{flex-shrink:0;position:relative}
+.hero-av{
+  width:80px;height:80px;border-radius:50%;
+  background:var(--teal-d);border:2.5px solid var(--teal);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:700;color:var(--teal-l);
+  position:relative;
+}
+.hero-av-ring{
+  position:absolute;inset:-5px;border-radius:50%;
+  border:1px solid rgba(201,168,76,0.25);
+}
+.hero-av-dot{position:absolute;bottom:3px;right:3px;
+  width:13px;height:13px;border-radius:50%;
+  background:var(--green);border:2.5px solid var(--dark)}
+
+.hero-info{flex:1;min-width:0}
+.hero-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:6px}
+.hero-name{font-size:28px;font-weight:700;color:var(--ink);line-height:1.1;margin-bottom:4px;
+  letter-spacing:-0.5px}
+.hero-org{font-size:13px;color:var(--ink2);margin-bottom:12px}
+.hero-tags{display:flex;gap:6px;flex-wrap:wrap}
+.h-tag{font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap}
+
+.hero-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:14px}
+.shield-hero{display:flex;flex-direction:column;align-items:center;gap:4px}
+.sh-body{width:70px;height:79px;position:relative;display:flex;align-items:center;justify-content:center}
+.sh-body svg{position:absolute;inset:0;width:100%;height:100%}
+.sh-num{position:relative;z-index:1;font-size:28px;font-weight:700;
+  font-family:'DM Mono',monospace;letter-spacing:-1px}
+.sh-en{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+
+/* Hero stats row */
+.hero-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  margin-top:24px;
+  background:var(--border);border-radius:14px;overflow:hidden;
+}
+.hs-box{
+  background:rgba(10,14,26,0.8);
+  padding:16px 18px;text-align:center;
+}
+.hs-val{font-family:'DM Mono',monospace;font-size:26px;font-weight:700;
+  letter-spacing:-1px;line-height:1;margin-bottom:4px}
+.hs-unit{font-size:11px;font-weight:400;opacity:0.7;margin-left:2px}
+.hs-label{font-size:10px;color:var(--ink3);line-height:1.4}
+.hs-delta{font-size:10px;font-weight:600;margin-top:4px}
+
+/* ═══════════════════════════════════════
+   SECTION COMMON
+═══════════════════════════════════════ */
+.section{padding:24px 28px 0}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-title{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.2px;
+  text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sec-title-line{flex:1;height:1px;background:var(--border)}
+.sec-action{font-size:11px;color:var(--teal-l);cursor:pointer;white-space:nowrap}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+
+/* ═══════════════════════════════════════
+   ② BADGE WALL
+═══════════════════════════════════════ */
+.badge-wall{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.badge-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:14px;padding:16px 14px;
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;gap:8px;
+  transition:all 0.2s;cursor:default;position:relative;overflow:hidden;
+}
+.badge-card.earned{border-color:var(--gold-border-c,rgba(201,168,76,0.35))}
+.badge-card.earned::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--gold-top,var(--gold));opacity:0.7;
+}
+.badge-card.locked{opacity:0.45}
+.badge-card.locked::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(
+    -45deg,transparent,transparent 6px,rgba(255,255,255,0.015) 6px,rgba(255,255,255,0.015) 12px
+  );
+}
+.badge-icon{width:54px;height:54px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.badge-name{font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.3}
+.badge-desc{font-size:10.5px;color:var(--ink2);line-height:1.5}
+.badge-date{font-size:9.5px;color:var(--ink3);font-family:'DM Mono',monospace}
+.badge-gm{font-size:10.5px;font-weight:700;font-family:'DM Mono',monospace}
+.lock-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:9.5px;color:var(--ink3);
+  padding:2px 8px;border-radius:20px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border)
+}
+
+/* ═══════════════════════════════════════
+   ③ GREENMARK PANEL
+═══════════════════════════════════════ */
+.gm-hero{
+  display:flex;align-items:center;gap:18px;
+  padding:20px 22px;
+  background:var(--panel);border:1px solid rgba(201,168,76,0.25);
+  border-radius:14px;margin-bottom:14px;position:relative;overflow:hidden;
+}
+.gm-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,0.6),transparent)}
+.gm-coin{
+  width:64px;height:64px;border-radius:50%;flex-shrink:0;
+  background:var(--gold-d);border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+}
+.gm-big{font-family:'DM Mono',monospace;font-size:38px;font-weight:700;
+  color:var(--gold);letter-spacing:-1.5px;line-height:1}
+.gm-unit{font-size:14px;font-weight:400;color:rgba(201,168,76,0.6);margin-left:4px}
+.gm-sub{font-size:11.5px;color:var(--ink2);margin-top:5px}
+.gm-bar-wrap{flex:1}
+.gm-lvs{display:flex;justify-content:space-between;font-size:9.5px;color:var(--ink3);margin-bottom:5px}
+.gm-track{height:7px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden}
+.gm-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold),rgba(201,168,76,0.5))}
+.gm-next{font-size:10.5px;color:var(--gold);margin-top:5px;font-weight:500}
+
+/* Distribution donut */
+.donut-wrap{position:relative;width:100px;height:100px;flex-shrink:0}
+.donut-wrap svg{width:100%;height:100%}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-val{font-size:16px;font-weight:700;font-family:'DM Mono',monospace;line-height:1}
+.donut-lbl{font-size:9px;color:var(--ink3)}
+
+/* GM event list */
+.gm-ev-list{display:flex;flex-direction:column;gap:7px}
+.gm-ev{display:flex;align-items:center;justify-content:space-between;
+  padding:9px 12px;background:rgba(0,0,0,0.25);border-radius:9px;border:1px solid var(--border)}
+.gm-ev-l{display:flex;align-items:center;gap:9px}
+.gm-ev-ic{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.gm-ev-title{font-size:12px;color:var(--ink)}
+.gm-ev-time{font-size:10px;color:var(--ink3);margin-top:1px;font-family:'DM Mono',monospace}
+.gm-ev-val{font-size:12.5px;font-weight:700;font-family:'DM Mono',monospace}
+
+/* ═══════════════════════════════════════
+   ④ ACTION TIMELINE
+═══════════════════════════════════════ */
+.timeline{display:flex;flex-direction:column;gap:0;padding-left:0}
+.tl-group{margin-bottom:20px}
+.tl-month{font-size:10px;font-weight:700;color:var(--ink3);letter-spacing:1px;
+  text-transform:uppercase;padding:6px 0 10px;
+  display:flex;align-items:center;gap:10px}
+.tl-month::after{content:'';flex:1;height:1px;background:var(--border)}
+.tl-items{display:flex;flex-direction:column;gap:0;position:relative;padding-left:28px}
+.tl-items::before{content:'';position:absolute;left:10px;top:8px;bottom:8px;
+  width:1px;background:var(--border)}
+.tl-item{display:flex;gap:14px;padding-bottom:14px;position:relative}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;z-index:1;
+  position:absolute;left:-28px;top:1px}
+.tl-body{flex:1;background:rgba(0,0,0,0.2);border:1px solid var(--border);
+  border-radius:10px;padding:10px 13px;
+  transition:border-color 0.2s}
+.tl-body:hover{border-color:var(--border2)}
+.tl-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:3px}
+.tl-action{font-size:12.5px;font-weight:600;color:var(--ink)}
+.tl-time{font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace;flex-shrink:0}
+.tl-desc{font-size:11.5px;color:var(--ink2);line-height:1.6}
+.tl-gm{font-size:10.5px;font-weight:700;margin-top:5px;display:inline-flex;
+  align-items:center;gap:4px;font-family:'DM Mono',monospace}
+.tl-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.tl-tag{font-size:9.5px;font-weight:600;padding:1px 7px;border-radius:20px}
+
+/* ═══════════════════════════════════════
+   ⑤ INFLUENCE NETWORK
+═══════════════════════════════════════ */
+.network-canvas{
+  background:rgba(0,0,0,0.3);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+  position:relative;height:280px;
+}
+.net-svg{width:100%;height:100%}
+
+/* Network legend */
+.net-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+.net-leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink2)}
+.net-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+
+/* Network stats */
+.net-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.ns-box{background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:10px;
+  padding:11px 13px;text-align:center}
+.ns-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;line-height:1;margin-bottom:3px}
+.ns-label{font-size:10px;color:var(--ink3);line-height:1.4}
+
+/* ═══════════════════════════════════════
+   ⑥ SHARE CARD
+═══════════════════════════════════════ */
+.share-preview{
+  background:var(--night);border:1px solid rgba(201,168,76,0.25);
+  border-radius:18px;overflow:hidden;position:relative;
+  max-width:460px;
+}
+.share-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--teal),var(--gold),var(--blue))}
+.sp-inner{padding:22px 22px 18px}
+.sp-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.sp-av{width:50px;height:50px;border-radius:50%;background:var(--teal-d);
+  border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;color:var(--teal-l);flex-shrink:0}
+.sp-info{flex:1}
+.sp-name{font-size:15px;font-weight:600;margin-bottom:1px}
+.sp-org{font-size:11px;color:var(--ink2)}
+.sp-shield{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:2px}
+.sp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.sp-stat{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;
+  padding:9px;text-align:center}
+.sp-stat-val{font-size:17px;font-weight:700;font-family:'DM Mono',monospace;line-height:1}
+.sp-stat-label{font-size:9.5px;color:var(--ink2);margin-top:3px}
+.sp-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.sp-bdg{font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px}
+.sp-footer{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 22px;background:rgba(0,0,0,0.3);border-top:1px solid var(--border)}
+.sp-chain{font-size:9.5px;color:var(--ink3);font-family:'DM Mono',monospace}
+.sp-brand{font-size:10px;color:var(--teal-l);font-weight:600}
+
+/* share action area */
+.share-actions{display:flex;flex-direction:column;gap:10px;justify-content:center;padding:10px 0}
+.s-btn{padding:10px 14px;border-radius:10px;font-size:12.5px;font-weight:600;
+  border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;
+  display:flex;align-items:center;gap:8px;width:100%}
+.s-btn:hover{opacity:0.88}
+.s-btn-g{background:var(--green-d);border:1px solid rgba(59,158,74,0.35);color:var(--green-l)}
+.s-btn-b{background:var(--blue-d);border:1px solid rgba(24,95,165,0.3);color:var(--blue-l)}
+.s-btn-y{background:var(--gold-d);border:1px solid rgba(201,168,76,0.35);color:var(--gold-l)}
+.s-btn-t{background:var(--teal-d);border:1px solid rgba(29,158,117,0.3);color:var(--teal-l)}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:20px;white-space:nowrap}
+.pl-g{background:var(--green-d);color:var(--green-l);border:1px solid rgba(59,158,74,0.3)}
+.pl-y{background:var(--gold-d);color:var(--gold-l);border:1px solid rgba(201,168,76,0.3)}
+.pl-b{background:var(--blue-d);color:var(--blue-l);border:1px solid rgba(24,95,165,0.3)}
+.pl-t{background:var(--teal-d);color:var(--teal-l);border:1px solid rgba(29,158,117,0.3)}
+.pl-p{background:var(--purple-d);color:var(--purple-l);border:1px solid rgba(127,119,221,0.3)}
+.pl-gray{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--border)}
+
+/* progress ring for next badge */
+.next-ring{position:relative;width:56px;height:56px}
+.next-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.next-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;font-size:11px;font-weight:700}
+
+/* toast */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--panel2);
+  border:1px solid rgba(29,158,117,0.45);border-radius:11px;
+  padding:11px 16px;display:flex;align-items:center;gap:9px;
+  font-size:12.5px;color:var(--teal-l);z-index:9999;
+  opacity:0;transform:translateY(8px);transition:all 0.3s;
+  pointer-events:none;min-width:240px}
+
+/* animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp 0.5s ease both}
+.fu1{animation-delay:0.05s}.fu2{animation-delay:0.12s}.fu3{animation-delay:0.19s}
+.fu4{animation-delay:0.26s}.fu5{animation-delay:0.33s}.fu6{animation-delay:0.4s}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.pulse{animation:pulse 2s ease-in-out infinite}
+
+@keyframes barFill{from{width:0}to{width:var(--w)}}
+.bar-anim{animation:barFill 1.2s cubic-bezier(.4,0,.2,1) both;animation-delay:0.4s}
+</style>
+<style id="qa-sidebar-css">
+/* HengAI V2.0 QA · 全站统一侧栏基线
+   设计原则：
+   1. 容器级规则使用 :where() 零特异性 —— 页面自己的 .sidebar{} 原生规则优先
+   2. 内部元素 (.sb-brand/.sb-item/...) 使用普通选择器 —— 提供基线视觉
+   3. 不动 .main —— 每页主区偏移由自家 CSS 决定（不污染 flex 布局）
+*/
+:where(.sidebar#sidebar[data-qa-version="2.0"]){width:200px;background:#0b0f19;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;overflow-y:auto;font-family:inherit}
+.sidebar .sb-brand{padding:17px 15px 13px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sidebar .sb-brand-ic{width:32px;height:32px;border-radius:9px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar .sb-brand-name{font-size:14px;font-weight:700;letter-spacing:.2px;color:#e6e9f2}
+.sidebar .sb-brand-sub{font-size:9.5px;color:#8a92a8;margin-top:1px}
+.sidebar .sb-group-title{font-size:9.5px;text-transform:uppercase;color:#8a92a8;letter-spacing:.6px;padding:14px 18px 6px;font-weight:600}
+.sidebar .sb-item{padding:9px 18px;font-size:12.5px;color:#c3cbdc;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .12s;border-left:2px solid transparent;font-family:inherit;line-height:1.3}
+.sidebar .sb-item:hover{background:rgba(255,255,255,0.03);color:#e6e9f2}
+.sidebar .sb-item.active{background:rgba(16,185,129,0.08);border-left-color:#10b981;color:#e6e9f2;font-weight:600}
+.sidebar .sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* 嵌入模式（?embed=1）：只露内容，侧栏/顶栏/老 .sb 全部隐藏，主区 margin 归零 */
+html[data-embed="1"] .sidebar,html[data-embed="1"] .sb,html[data-embed="1"] .topbar{display:none !important}
+html[data-embed="1"] body{padding-left:0 !important}
+html[data-embed="1"] .main,html[data-embed="1"] .main-wrap,html[data-embed="1"] .main-content{margin-left:0 !important}
+</style>
+<script src="hengai-embed-boot.js"></script>
+</head>
+<body>
+
+<!-- CANONICAL SIDEBAR — HengAI V3.5 工业主权网络 · MPA 统一版 -->
+
+<div class="sidebar" id="sidebar" data-qa-version="3.5">
+
+  <div class="sb-brand">
+
+    <div class="sb-brand-ic">
+
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+
+    </div>
+
+    <div>
+
+      <div class="sb-brand-name">HengAI</div>
+
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+
+    </div>
+
+  </div>
+
+
+
+  <div style="padding:12px 14px 4px;">
+
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+      返回 HengAI 对话
+
+    </div>
+
+  </div>
+
+
+
+  <div class="sb-group-title" id="g-personal">个人空间</div>
+
+  <div class="sb-item" data-page="overview" onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+
+  <div class="sb-item" data-page="achieve" onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+
+  <div class="sb-item" data-page="calc" onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+
+  <div class="sb-item" data-page="wallet" onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+
+  <div class="sb-item" data-page="resource" onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+
+
+
+  <div class="sb-group-title" id="g-business">企业工作台</div>
+
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+
+  <div class="sb-item" data-page="report" onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+
+  <div class="sb-item" data-page="decision" onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-item locked" data-page="supply" id="nav-supply" data-role-nav="sme-only" onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" id="dot-supply" style="background:var(--ink3)"></div>供应链协同</div>
+
+  <div class="sb-item locked" data-page="origin-audit" id="n-origin-audit" data-role-nav="origin-only" onclick="window.location.href='HengAI_HeavyIndustry_Suite.html'"><div class="sb-dot" id="dot-origin-audit" style="background:var(--ink3)"></div>产业主权看板</div>
+
+
+
+  <div class="sb-group-title" id="g-sovereign">大国重器 / 生态</div>
+
+  <div class="sb-item" data-page="honor" onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+
+  <div class="sb-item locked" data-page="eu" onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:var(--ink3)"></div>欧盟海关直连</div>
+
+  <div class="sb-item locked" data-page="dld" onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:var(--ink3)"></div>DLD 绿色信贷</div>
+
+  <div class="sb-item locked" data-page="acf" onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:var(--ink3)"></div>ACF 认证通道</div>
+
+  <div class="sb-item locked" data-page="gov" onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:var(--ink3)"></div>生态共治委员会</div>
+
+</div>
+
+<script id="qa-sidebar-active-script">
+
+(function(){
+
+  var map = {"全域中心.html":"overview","index.html":"overview","HengAI_CBAM测算工具.html":"calc","HengAI_星火成就档案.html":"achieve","HengAI_GM_Wallet.html":"wallet","HengAI_算力资源.html":"resource","HengAI_企业数字档案.html":"enterprise","HengAI_供应链协同.html":"supply","HengAI_全域诊断报告.html":"report","HengAI_决策层呈送包生成器.html":"decision","HengAI_HeavyIndustry_Suite.html":"origin-audit","HengAI_荣誉体系.html":"honor","HengAI_EU_Customs.html":"eu","HengAI_DLD_Credit.html":"dld","HengAI_ACF_Cert.html":"acf","HengAI_Governance.html":"gov"};
+
+  try {
+
+    var fn = decodeURIComponent((location.pathname.split("/").pop() || "").split("?")[0]);
+
+    var id = map[fn]; if (!id) return;
+
+    document.querySelectorAll(".sidebar .sb-item[data-page]").forEach(function(el){
+
+      if (el.getAttribute("data-page") === id) el.classList.add("active");
+
+    });
+
+  } catch(e){}
+
+})();
+
+</script>
+<script>
+/* embed 模式：物理移除子页侧栏，防止 position:fixed 侧栏叠在父页左侧造成「双菜单粘连」 */
+(function () {
+  if (!/[?&]embed=1/.test(location.search || '')) return;
+  function stripEmbedChrome() {
+    ['sidebar', 'topbar'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+    });
+    document.querySelectorAll('.sidebar, .topbar, .sb').forEach(function (el) {
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+    });
+    var main = document.querySelector('.main');
+    if (main) main.style.marginLeft = '0';
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', stripEmbedChrome, { once: true });
+  } else {
+    stripEmbedChrome();
+  }
+})();
+</script>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-l">
+      <span class="tb-title">星火成就档案</span>
+      <span class="pill pl-y"><span class="dyn-user-tier">Lv.3 架构师</span></span>
+      <span class="pill" style="background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--border)">
+        <span class="pulse" style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--green);margin-right:4px"></span>
+        实时更新
+      </span>
+    </div>
+    <div style="display:flex;align-items:center;gap:9px">
+      <div class="gm-chip" onclick="window.location.href='HengAI_GM_Wallet.html'">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+          <path d="M5.5 1L10 3.5V8.5L5.5 10L1 8.5V3.5L5.5 1Z" stroke="#c9a84c" stroke-width="0.9" fill="rgba(201,168,76,0.15)"/>
+        </svg>
+        <span style="font-size:10px;color:var(--ink2)">GM</span>
+        <span class="gm-chip-val dyn-gm-balance">0</span>
+      </div>
+      <button class="tb-btn primary" onclick="showSection('share')">导出档案卡片</button>
+    </div>
+  </div>
+
+  <!-- ── ① HERO ── -->
+  <div class="hero fu fu1">
+    <div class="hero-inner">
+      <div class="hero-av-wrap">
+        <div class="hero-av-ring"></div>
+        <div id="achieve-avatar" class="hero-av"><span id="achieve-avatar-initials" class="dyn-user-avatar"></span><div class="hero-av-dot"></div></div>
+      </div>
+      <div class="hero-info">
+        <div class="hero-eyebrow">Co2Lion · HengAI 星火成就档案</div>
+        <div class="hero-name"><span id="achieve-name" class="dyn-user-name"></span></div>
+        <div class="hero-org"><span id="achieve-org">待完善企业档案 · 碳合规负责人 · 注册于 —</span></div>
+        <div class="hero-tags">
+          <span class="h-tag" style="background:rgba(201,168,76,0.14);color:var(--gold-l);border:1px solid rgba(201,168,76,0.32)"><span class="dyn-user-tier">Lv.3 架构师</span></span>
+          <span class="h-tag" style="background:rgba(59,158,74,0.12);color:var(--green-l);border:1px solid rgba(59,158,74,0.3)">CBAM 合规专家</span>
+          <span class="h-tag" style="background:rgba(24,95,165,0.12);color:var(--blue-l);border:1px solid rgba(24,95,165,0.28)">Scope 3 穿透专家</span>
+          <span class="h-tag" style="background:rgba(127,119,221,0.1);color:var(--purple-l);border:1px solid rgba(127,119,221,0.28)">生态先行者 #0412</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="shield-hero">
+          <div class="sh-body">
+            <svg viewBox="0 0 70 79" fill="none">
+              <path d="M35 3L65 14V38C65 54 51 67 35 72C19 67 5 54 5 38V14L35 3Z"
+                fill="rgba(201,168,76,0.12)" stroke="#c9a84c" stroke-width="1.8"/>
+              <path d="M35 9L59 18.5V38C59 52 47 64 35 68C23 64 11 52 11 38V18.5L35 9Z"
+                fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="0.7"/>
+              <path d="M23 13L27 17L35 11L43 17L47 13"
+                fill="none" stroke="#c9a84c" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="19" cy="34" r="1.6" fill="rgba(201,168,76,0.45)"/>
+              <circle cx="19" cy="42" r="1.6" fill="rgba(201,168,76,0.45)"/>
+              <circle cx="51" cy="34" r="1.6" fill="rgba(201,168,76,0.45)"/>
+              <circle cx="51" cy="42" r="1.6" fill="rgba(201,168,76,0.45)"/>
+            </svg>
+            <span class="sh-num" style="color:var(--gold);margin-bottom:4px">3</span>
+          </div>
+          <span class="sh-en" style="color:rgba(201,168,76,0.6)">Architect</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-stats fu fu2">
+      <div class="hs-box">
+        <div class="hs-val" style="color:var(--gold)"><span id="achieve-gm-val">0</span><span class="hs-unit">GM</span></div>
+        <div class="hs-label">累计 GreenMark<br>与底座实时同步</div>
+        <div class="hs-delta" style="color:var(--gold)">全域中心数据管道</div>
+      </div>
+      <div class="hs-box">
+        <div class="hs-val" style="color:var(--blue-l)"><span id="achieve-calc-count">0</span><span class="hs-unit">次</span></div>
+        <div class="hs-label">完成 CBAM 测算<br>报告条目</div>
+        <div class="hs-delta" style="color:var(--blue-l)">recent_reports</div>
+      </div>
+      <div class="hs-box">
+        <div class="hs-val" style="color:var(--teal-l)"><span id="achieve-co2-val">0</span><span class="hs-unit">tCO₂e</span></div>
+        <div class="hs-label">累计推动减排量<br>链上存证</div>
+        <div class="hs-delta" style="color:var(--teal-l)">impact.tCO2eTotal</div>
+      </div>
+      <div class="hs-box">
+        <div class="hs-val" style="color:var(--green-l)"><span id="achieve-supplier-val">0</span><span class="hs-unit">家</span></div>
+        <div class="hs-label">供应链协同节点<br>supplier_nodes</div>
+        <div class="hs-delta" style="color:var(--green-l)">底座实时计数</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ② BADGE WALL ── -->
+  <div class="section fu fu3">
+    <div class="sec-head">
+      <div class="sec-title">成就徽章
+        <div class="sec-title-line"></div>
+      </div>
+      <span class="sec-action" onclick="showToast('徽章体系完整说明已打开')">查看全部规则 →</span>
+    </div>
+
+    <div class="badge-wall" style="margin-bottom:14px">
+      <!-- Earned badges -->
+      <div class="badge-card earned" style="--gold-border-c:rgba(59,158,74,0.4);--gold-top:var(--green)">
+        <div class="badge-icon" style="background:rgba(59,158,74,0.13);border:1.5px solid rgba(59,158,74,0.35)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <path d="M13 2L23 7V15C23 20 18.5 24 13 25C7.5 24 3 20 3 15V7L13 2Z" stroke="#3b9e4a" stroke-width="1.3" fill="rgba(59,158,74,0.1)"/>
+            <polyline points="8,13 11.5,16.5 18,10" stroke="#7dd98a" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="badge-name">CBAM 申报架构师</div>
+        <div class="badge-desc">3 次通关预演 · 置信度 Lv.4</div>
+        <div class="badge-date"><span data-empty="待记录">---</span></div>
+        <span class="badge-gm" style="color:var(--green-l)">+500 GM</span>
+      </div>
+
+      <div class="badge-card earned" style="--gold-border-c:rgba(24,95,165,0.4);--gold-top:var(--blue-l)">
+        <div class="badge-icon" style="background:rgba(24,95,165,0.12);border:1.5px solid rgba(24,95,165,0.35)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <circle cx="13" cy="13" r="10" stroke="#185fa5" stroke-width="1.3"/>
+            <circle cx="13" cy="13" r="4" stroke="#93c5fd" stroke-width="1.1"/>
+            <line x1="13" y1="3" x2="13" y2="8" stroke="#185fa5" stroke-width="1.1"/>
+            <line x1="13" y1="18" x2="13" y2="23" stroke="#185fa5" stroke-width="1.1"/>
+            <line x1="3" y1="13" x2="8" y2="13" stroke="#185fa5" stroke-width="1.1"/>
+            <line x1="18" y1="13" x2="23" y2="13" stroke="#185fa5" stroke-width="1.1"/>
+          </svg>
+        </div>
+        <div class="badge-name">Scope 3 穿透专家</div>
+        <div class="badge-desc">推动 8 家供应商接入 · 覆盖率 47%</div>
+        <div class="badge-date"><span data-empty="待记录">---</span></div>
+        <span class="badge-gm" style="color:var(--blue-l)">+400 GM</span>
+      </div>
+
+      <div class="badge-card earned" style="--gold-border-c:rgba(127,119,221,0.4);--gold-top:var(--purple-l)">
+        <div class="badge-icon" style="background:rgba(127,119,221,0.12);border:1.5px solid rgba(127,119,221,0.35)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <path d="M13 2L15.5 9.5L23 10.5L18 16L19.5 23.5L13 20L6.5 23.5L8 16L3 10.5L10.5 9.5L13 2Z"
+              stroke="#7f77dd" stroke-width="1.3" fill="rgba(127,119,221,0.12)"/>
+          </svg>
+        </div>
+        <div class="badge-name">生态先行者 #0412</div>
+        <div class="badge-desc">HengAI 首批 1,000 名会员 · 早鸟认证</div>
+        <div class="badge-date">--</div>
+        <span class="badge-gm" style="color:var(--purple-l)">+200 GM</span>
+      </div>
+
+      <div class="badge-card earned" style="--gold-border-c:rgba(201,168,76,0.4);--gold-top:var(--gold)">
+        <div class="badge-icon" style="background:var(--gold-d);border:1.5px solid rgba(201,168,76,0.35)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <rect x="3" y="8" width="20" height="15" rx="2.5" stroke="#c9a84c" stroke-width="1.3"/>
+            <path d="M8 8V7a5 5 0 0110 0v1" stroke="#c9a84c" stroke-width="1.2"/>
+            <polyline points="9,15.5 12,18.5 17.5,13" stroke="#f0d080" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="badge-name">首份真实碳档案</div>
+        <div class="badge-desc">企业 CBAM 精确测算完成 · 链上存证</div>
+        <div class="badge-date"><span data-empty="待记录">---</span></div>
+        <span class="badge-gm" style="color:var(--gold-l)">+100 GM</span>
+      </div>
+    </div>
+
+    <!-- Locked badges (next targets) -->
+    <div style="font-size:10px;font-weight:700;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      即将解锁
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
+    <div class="badge-wall">
+      <div class="badge-card locked">
+        <div class="badge-icon" style="background:rgba(29,158,117,0.07);border:1.5px dashed rgba(29,158,117,0.25)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <path d="M13 2L23 7V15C23 20 18.5 24 13 25C7.5 24 3 20 3 15V7L13 2Z" stroke="rgba(29,158,117,0.4)" stroke-width="1.3"/>
+            <text x="13" y="17" text-anchor="middle" font-size="10" fill="rgba(29,158,117,0.5)" font-family="sans-serif" font-weight="700">15</text>
+          </svg>
+        </div>
+        <div class="badge-name" style="color:var(--ink3)">供应链协同大师</div>
+        <div class="badge-desc" style="color:var(--ink3)">15 家供应商完成填报</div>
+        <div style="margin:4px 0">
+          <div class="next-ring">
+            <svg viewBox="0 0 56 56">
+              <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5"/>
+              <circle cx="28" cy="28" r="22" fill="none" stroke="var(--teal)" stroke-width="5"
+                stroke-dasharray="${2*3.14159*22*8/15} ${2*3.14159*22*(1-8/15)}" stroke-linecap="round"/>
+            </svg>
+            <div class="next-ring-center" style="color:var(--teal-l)">
+              <span style="font-size:12px;font-weight:700">8/15</span>
+            </div>
+          </div>
+        </div>
+        <span class="lock-pill">还差 7 家</span>
+      </div>
+
+      <div class="badge-card locked">
+        <div class="badge-icon" style="background:rgba(29,158,117,0.07);border:1.5px dashed rgba(29,158,117,0.25)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <circle cx="13" cy="13" r="10.5" stroke="rgba(29,158,117,0.4)" stroke-width="1.3"/>
+            <path d="M7 13C7 9.7 9.7 7 13 7M13 7V10M19 13C19 16.3 16.3 19 13 19" stroke="rgba(29,158,117,0.5)" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="badge-name" style="color:var(--ink3)">地球公民勋章</div>
+        <div class="badge-desc" style="color:var(--ink3)">累计推动减排 10 tCO₂e · Lv.2+</div>
+        <div style="margin:4px 0">
+          <div class="next-ring">
+            <svg viewBox="0 0 56 56">
+              <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5"/>
+              <circle cx="28" cy="28" r="22" fill="none" stroke="var(--teal)" stroke-width="5"
+                stroke-dasharray="${2*3.14159*22}" stroke-dashoffset="0" stroke-linecap="round"/>
+            </svg>
+            <div class="next-ring-center" style="color:var(--green-l)">
+              <span style="font-size:11px;font-weight:700">✓</span>
+            </div>
+          </div>
+        </div>
+        <span class="lock-pill" style="background:var(--green-d);color:var(--green-l);border-color:rgba(59,158,74,0.3)">条件已满足</span>
+      </div>
+
+      <div class="badge-card locked">
+        <div class="badge-icon" style="background:rgba(201,168,76,0.07);border:1.5px dashed rgba(201,168,76,0.25)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <path d="M13 3L24 9V17C24 22 19 25.5 13 26.5C7 25.5 2 22 2 17V9L13 3Z" stroke="rgba(201,168,76,0.4)" stroke-width="1.3"/>
+            <line x1="13" y1="8" x2="13" y2="18" stroke="rgba(201,168,76,0.5)" stroke-width="1.1"/>
+            <line x1="8" y1="13" x2="18" y2="13" stroke="rgba(201,168,76,0.5)" stroke-width="1.1"/>
+          </svg>
+        </div>
+        <div class="badge-name" style="color:var(--ink3)">企业升级推动者</div>
+        <div class="badge-desc" style="color:var(--ink3)">推动所在企业升级为企业账户</div>
+        <div style="margin:4px 0">
+          <div class="next-ring">
+            <svg viewBox="0 0 56 56">
+              <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5"/>
+              <circle cx="28" cy="28" r="22" fill="none" stroke="var(--gold)" stroke-width="5"
+                stroke-dasharray="${2*3.14159*22*0.4} ${2*3.14159*22*0.6}" stroke-linecap="round"/>
+            </svg>
+            <div class="next-ring-center" style="color:var(--gold-l)">
+              <span style="font-size:11px;font-weight:700">进行中</span>
+            </div>
+          </div>
+        </div>
+        <span class="lock-pill">报告呈送中</span>
+      </div>
+
+      <div class="badge-card locked">
+        <div class="badge-icon" style="background:rgba(127,119,221,0.06);border:1.5px dashed rgba(127,119,221,0.2)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+            <path d="M13 3L15 10H22L16.5 14.5L18.5 21.5L13 17L7.5 21.5L9.5 14.5L4 10H11L13 3Z"
+              stroke="rgba(127,119,221,0.4)" stroke-width="1.3"/>
+          </svg>
+        </div>
+        <div class="badge-name" style="color:var(--ink3)">破晓见证者</div>
+        <div class="badge-desc" style="color:var(--ink3)">平台累计减排 10 万 tCO₂e 时在场</div>
+        <div style="margin:6px 0;font-size:10px;color:var(--ink3)">全局进度</div>
+        <span class="lock-pill">1.8M / 100k → 已突破!</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ③ GREENMARK PANEL ── -->
+  <div class="section fu fu3" style="margin-top:20px">
+    <div class="sec-head">
+      <div class="sec-title">GreenMark 绿印资产 <div class="sec-title-line"></div></div>
+      <span class="sec-action" onclick="showToast('GreenMark 钱包页面即将上线')">查看钱包 →</span>
+    </div>
+
+    <div class="gm-hero">
+      <div class="gm-coin">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <path d="M16 2L29 8V20C29 26 23 30.5 16 32C9 30.5 3 26 3 20V8L16 2Z"
+            fill="rgba(201,168,76,0.12)" stroke="#c9a84c" stroke-width="1.3"/>
+          <path d="M10 9L13 12L16 8L19 12L22 9" fill="none" stroke="#c9a84c" stroke-width="0.9" stroke-linecap="round"/>
+          <text x="16" y="23" text-anchor="middle" font-size="8" font-weight="700" fill="#c9a84c" font-family="sans-serif">GM</text>
+        </svg>
+      </div>
+      <div>
+        <div class="gm-big"><span class="dyn-gm-balance">0</span> <span class="gm-unit">GM</span></div>
+        <div class="gm-sub">本月 <span style="color:var(--green-l)">+320 GM</span> · 代际收益 <span style="color:rgba(201,168,76,0.7)">+148 GM</span> · 可赠与合作伙伴</div>
+      </div>
+      <div class="gm-bar-wrap">
+        <div class="gm-lvs">
+          <span>Lv.3 起点 2,000</span>
+          <span style="color:var(--blue-l)">距 Lv.4 还差 2,160 GM</span>
+          <span>Lv.4 门槛 5,000</span>
+        </div>
+        <div class="gm-track">
+          <div class="gm-fill bar-anim" style="--w:57%;width:0"></div>
+        </div>
+        <div class="gm-next">57% · 完成 2 件关键行动即可升至 Lv.4 战略家</div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <!-- Distribution -->
+      <div class="card">
+        <div style="font-size:10.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px">GM 来源分布</div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div class="donut-wrap">
+            <svg viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="12"/>
+              <!-- segments: supply=44%, action=25%, membership=18%, generational=13% -->
+              <circle cx="50" cy="50" r="38" fill="none" stroke="var(--green)" stroke-width="12"
+                stroke-dasharray="104.9 238.8" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="var(--blue-l)" stroke-width="12"
+                stroke-dasharray="59.7 283.9" stroke-dashoffset="-104.9" transform="rotate(-90 50 50)"/>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="var(--teal)" stroke-width="12"
+                stroke-dasharray="43.0 300.7" stroke-dashoffset="-164.6" transform="rotate(-90 50 50)"/>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="var(--gold)" stroke-width="12"
+                stroke-dasharray="31.0 312.6" stroke-dashoffset="-207.6" transform="rotate(-90 50 50)"/>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-val dyn-gm-balance" style="color:var(--gold)">0</span>
+              <span class="donut-lbl">总 GM</span>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
+              <span style="font-size:11.5px;flex:1;color:var(--ink2)">推动供应商填报</span>
+              <span style="font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:var(--green-l)">1,250</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--blue-l);flex-shrink:0"></div>
+              <span style="font-size:11.5px;flex:1;color:var(--ink2)">合规行动认证</span>
+              <span style="font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:var(--blue-l)">720</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0"></div>
+              <span style="font-size:11.5px;flex:1;color:var(--ink2)">会员权益积累</span>
+              <span style="font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:var(--teal-l)">522</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0"></div>
+              <span style="font-size:11.5px;flex:1;color:var(--ink2)">代际收益</span>
+              <span style="font-size:12px;font-weight:600;font-family:'DM Mono',monospace;color:var(--gold-l)">348</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent GM events -->
+      <div class="card">
+        <div style="font-size:10.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">近期获取记录</div>
+        <div class="gm-ev-list">
+          <div class="gm-ev">
+            <div class="gm-ev-l">
+              <div class="gm-ev-ic" style="background:var(--green-d);border:1px solid rgba(59,158,74,0.3)">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1,6 4,9 11,3" stroke="#7dd98a" stroke-width="1.3" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <div class="gm-ev-title">浙江五金 · 供应商填报完成</div>
+                <div class="gm-ev-time"><span data-empty="待记录">---</span></div>
+              </div>
+            </div>
+            <span class="gm-ev-val" style="color:var(--green-l)">+200</span>
+          </div>
+          <div class="gm-ev">
+            <div class="gm-ev-l">
+              <div class="gm-ev-ic" style="background:var(--teal-d);border:1px solid rgba(29,158,117,0.3)">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="3" r="1.5" stroke="var(--teal-l)" stroke-width="1"/><circle cx="2" cy="9.5" r="1.2" stroke="var(--teal-l)" stroke-width="1"/><circle cx="10" cy="9.5" r="1.2" stroke="var(--teal-l)" stroke-width="1"/><line x1="6" y1="4.5" x2="2.8" y2="8.3" stroke="var(--teal-l)" stroke-width="0.8"/><line x1="6" y1="4.5" x2="9.2" y2="8.3" stroke="var(--teal-l)" stroke-width="0.8"/></svg>
+              </div>
+              <div>
+                <div class="gm-ev-title">代际收益 · 浙江五金→其供应商</div>
+                <div class="gm-ev-time"><span data-empty="待记录">---</span></div>
+              </div>
+            </div>
+            <span class="gm-ev-val" style="color:var(--teal-l)">+40</span>
+          </div>
+          <div class="gm-ev">
+            <div class="gm-ev-l">
+              <div class="gm-ev-ic" style="background:var(--gold-d);border:1px solid rgba(201,168,76,0.3)">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1.5L7.2 4.8L10.5 5.2L8.2 7.5L8.8 10.5L6 9L3.2 10.5L3.8 7.5L1.5 5.2L4.8 4.8L6 1.5Z" stroke="#c9a84c" stroke-width="1"/></svg>
+              </div>
+              <div>
+                <div class="gm-ev-title">CBAM 通关预演完成 · 第 3 次</div>
+                <div class="gm-ev-time"><span data-empty="待记录">---</span></div>
+              </div>
+            </div>
+            <span class="gm-ev-val" style="color:var(--gold-l)">+150</span>
+          </div>
+          <div class="gm-ev">
+            <div class="gm-ev-l">
+              <div class="gm-ev-ic" style="background:var(--blue-d);border:1px solid rgba(24,95,165,0.3)">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="1.5" width="9" height="9" rx="1.5" stroke="#93c5fd" stroke-width="1"/><line x1="4" y1="5" x2="8" y2="5" stroke="#93c5fd" stroke-width="0.9"/><line x1="4" y1="7" x2="6.5" y2="7" stroke="#93c5fd" stroke-width="0.9"/></svg>
+              </div>
+              <div>
+                <div class="gm-ev-title">企业数字档案建立</div>
+                <div class="gm-ev-time"><span data-empty="待记录">---</span></div>
+              </div>
+            </div>
+            <span class="gm-ev-val" style="color:var(--blue-l)">+50</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ④ ACTION TIMELINE ── -->
+  <div class="section fu fu4" style="margin-top:20px">
+    <div class="sec-head">
+      <div class="sec-title">行动时间轴 <div class="sec-title-line"></div></div>
+      <span class="sec-action" id="achieve-timeline-count">加载行动记录…</span>
+    </div>
+    <div class="card" style="padding:18px 20px">
+      <div id="achieve-action-timeline" class="tl-group" data-empty-hint="暂无行动记录。建立企业档案、完成 CBAM 测算、阅读法规或推动供应商填报后，将按真实时间记入此处。">
+        <div class="tl-empty" style="padding:12px 4px;font-size:12px;color:var(--ink3)">正在同步绿印流水与业务动作…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ⑤ INFLUENCE NETWORK ── -->
+  <div class="section fu fu5" style="margin-top:20px">
+    <div class="sec-head">
+      <div class="sec-title">影响力网络 <div class="sec-title-line"></div></div>
+      <span class="sec-action" onclick="openSupplyChainHub()">管理供应链 →</span>
+    </div>
+    <div class="card" style="padding:16px 18px">
+      <div class="network-canvas">
+        <svg class="net-svg" viewBox="0 0 760 280" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="ng1" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(201,168,76,0.15)"/>
+              <stop offset="100%" stop-color="rgba(201,168,76,0)"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Background glow for center node -->
+          <circle cx="380" cy="140" r="60" fill="url(#ng1)"/>
+
+          <!-- Connections — Tier 1 -->
+          <line x1="380" y1="140" x2="200" y2="80" stroke="rgba(59,158,74,0.4)" stroke-width="1.5" stroke-dasharray="none"/>
+          <line x1="380" y1="140" x2="150" y2="160" stroke="rgba(201,168,76,0.3)" stroke-width="1" stroke-dasharray="4 3"/>
+          <line x1="380" y1="140" x2="200" y2="220" stroke="rgba(226,75,74,0.35)" stroke-width="1.5"/>
+          <line x1="380" y1="140" x2="560" y2="80" stroke="rgba(59,158,74,0.4)" stroke-width="1.5"/>
+          <line x1="380" y1="140" x2="600" y2="160" stroke="rgba(201,168,76,0.3)" stroke-width="1" stroke-dasharray="4 3"/>
+          <line x1="380" y1="140" x2="570" y2="225" stroke="rgba(74,85,104,0.3)" stroke-width="1" stroke-dasharray="4 3"/>
+
+          <!-- Connections — Tier 2 (from Tier 1 nodes) -->
+          <line x1="200" y1="80" x2="100" y2="45" stroke="rgba(29,158,117,0.35)" stroke-width="1" stroke-dasharray="3 2"/>
+          <line x1="200" y1="80" x2="90" y2="110" stroke="rgba(29,158,117,0.25)" stroke-width="1" stroke-dasharray="3 2"/>
+          <line x1="560" y1="80" x2="660" y2="45" stroke="rgba(59,158,74,0.3)" stroke-width="1" stroke-dasharray="3 2"/>
+
+          <!-- CENTER NODE: USER -->
+          <circle cx="380" cy="140" r="32" fill="rgba(13,18,32,0.95)" stroke="#c9a84c" stroke-width="2"/>
+          <circle cx="380" cy="140" r="36" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="1"/>
+          <text x="380" y="135" text-anchor="middle" font-size="11" font-weight="700" fill="#c9a84c" font-family="sans-serif" class="dyn-user-name"></text>
+          <text x="380" y="149" text-anchor="middle" font-size="8" fill="rgba(201,168,76,0.6)" font-family="sans-serif">Lv.3 架构师</text>
+          <text x="380" y="161" text-anchor="middle" font-size="8" fill="rgba(201,168,76,0.5)" font-family="sans-serif"><tspan class="dyn-gm-balance">0</tspan> GM</text>
+
+          <!-- TIER 1: Done -->
+          <circle cx="200" cy="80" r="22" fill="rgba(13,18,32,0.9)" stroke="#3b9e4a" stroke-width="1.5"/>
+          <text x="200" y="76" text-anchor="middle" font-size="8.5" font-weight="600" fill="#7dd98a" font-family="sans-serif">浙江五金</text>
+          <text x="200" y="87" text-anchor="middle" font-size="7.5" fill="rgba(125,217,138,0.6)" font-family="sans-serif">✓ 已填报</text>
+
+          <circle cx="560" cy="80" r="22" fill="rgba(13,18,32,0.9)" stroke="#3b9e4a" stroke-width="1.5"/>
+          <text x="560" y="76" text-anchor="middle" font-size="8.5" font-weight="600" fill="#7dd98a" font-family="sans-serif">无锡铝材</text>
+          <text x="560" y="87" text-anchor="middle" font-size="7.5" fill="rgba(125,217,138,0.6)" font-family="sans-serif">⚡ 部分填报</text>
+
+          <!-- TIER 1: Missing -->
+          <circle cx="200" cy="220" r="22" fill="rgba(13,18,32,0.9)" stroke="#e24b4a" stroke-width="1.5"/>
+          <text x="200" y="216" text-anchor="middle" font-size="8.5" font-weight="600" fill="#fca5a5" font-family="sans-serif">广东压铸</text>
+          <text x="200" y="227" text-anchor="middle" font-size="7.5" fill="rgba(252,165,165,0.6)" font-family="sans-serif">✗ 数据缺口</text>
+
+          <!-- TIER 1: Pending -->
+          <circle cx="150" cy="160" r="18" fill="rgba(13,18,32,0.85)" stroke="rgba(74,85,104,0.6)" stroke-width="1.2" stroke-dasharray="3 2"/>
+          <text x="150" y="156" text-anchor="middle" font-size="7.5" fill="rgba(160,174,192,0.7)" font-family="sans-serif">山东锻造</text>
+          <text x="150" y="166" text-anchor="middle" font-size="7" fill="rgba(74,85,104,0.8)" font-family="sans-serif">○ 待邀请</text>
+
+          <circle cx="600" cy="160" r="18" fill="rgba(13,18,32,0.85)" stroke="rgba(74,85,104,0.6)" stroke-width="1.2" stroke-dasharray="3 2"/>
+          <text x="600" y="156" text-anchor="middle" font-size="7.5" fill="rgba(160,174,192,0.7)" font-family="sans-serif">江苏橡胶</text>
+          <text x="600" y="166" text-anchor="middle" font-size="7" fill="rgba(74,85,104,0.8)" font-family="sans-serif">○ 待邀请</text>
+
+          <circle cx="570" cy="225" r="18" fill="rgba(13,18,32,0.85)" stroke="rgba(74,85,104,0.6)" stroke-width="1.2" stroke-dasharray="3 2"/>
+          <text x="570" y="221" text-anchor="middle" font-size="7.5" fill="rgba(160,174,192,0.7)" font-family="sans-serif">其他 ×12</text>
+          <text x="570" y="231" text-anchor="middle" font-size="7" fill="rgba(74,85,104,0.8)" font-family="sans-serif">○ 待邀请</text>
+
+          <!-- TIER 2: Secondary nodes -->
+          <circle cx="100" cy="45" r="14" fill="rgba(13,18,32,0.85)" stroke="rgba(29,158,117,0.5)" stroke-width="1.1"/>
+          <text x="100" y="42" text-anchor="middle" font-size="7" fill="rgba(109,213,176,0.7)" font-family="sans-serif">二级节点</text>
+          <text x="100" y="51" text-anchor="middle" font-size="6.5" fill="rgba(109,213,176,0.5)" font-family="sans-serif">+40 GM代际</text>
+
+          <circle cx="90" cy="110" r="14" fill="rgba(13,18,32,0.85)" stroke="rgba(29,158,117,0.4)" stroke-width="1.1"/>
+          <text x="90" y="107" text-anchor="middle" font-size="7" fill="rgba(109,213,176,0.6)" font-family="sans-serif">二级节点</text>
+          <text x="90" y="116" text-anchor="middle" font-size="6.5" fill="rgba(109,213,176,0.4)" font-family="sans-serif">待激活</text>
+
+          <circle cx="660" cy="45" r="14" fill="rgba(13,18,32,0.85)" stroke="rgba(59,158,74,0.4)" stroke-width="1.1"/>
+          <text x="660" y="42" text-anchor="middle" font-size="7" fill="rgba(125,217,138,0.6)" font-family="sans-serif">二级节点</text>
+          <text x="660" y="51" text-anchor="middle" font-size="6.5" fill="rgba(125,217,138,0.4)" font-family="sans-serif">待激活</text>
+
+          <!-- Labels -->
+          <text x="20" y="25" font-size="9" fill="rgba(255,255,255,0.2)" font-family="sans-serif">二级节点（代际收益）</text>
+          <text x="20" y="250" font-size="9" fill="rgba(255,255,255,0.2)" font-family="sans-serif">一级供应商</text>
+          <text x="340" y="270" font-size="9" fill="rgba(255,255,255,0.2)" font-family="sans-serif" text-anchor="middle">供应链影响力地图 · 实线=已连接 · 虚线=待激活</text>
+        </svg>
+      </div>
+
+      <div class="net-stats">
+        <div class="ns-box">
+          <div class="ns-val" style="color:var(--green-l)">8</div>
+          <div class="ns-label">直接推动供应商</div>
+        </div>
+        <div class="ns-box">
+          <div class="ns-val" style="color:var(--teal-l)">3</div>
+          <div class="ns-label">二级延伸节点</div>
+        </div>
+        <div class="ns-box">
+          <div class="ns-val" style="color:var(--gold)">47%</div>
+          <div class="ns-label">供应链覆盖率</div>
+        </div>
+        <div class="ns-box">
+          <div class="ns-val" style="color:var(--purple-l)">5</div>
+          <div class="ns-label">已付费升级伙伴</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ⑥ SHARE CARD ── -->
+  <div class="section fu fu6" id="section-share" style="margin-top:20px;padding-bottom:32px">
+    <div class="sec-head">
+      <div class="sec-title">对外分享卡片 <div class="sec-title-line"></div></div>
+      <span class="sec-action" onclick="showToast('分享链接已生成，有效期 72 小时')">生成链接 →</span>
+    </div>
+    <div class="g2">
+      <div class="share-preview">
+        <div class="sp-inner">
+          <div class="sp-top">
+            <div class="sp-av dyn-user-avatar"></div>
+            <div class="sp-info">
+              <div class="sp-name"><span class="dyn-user-name"></span></div>
+              <div class="sp-org"><span class="dyn-company-name"></span> · 碳合规负责人</div>
+            </div>
+            <div class="sp-shield">
+              <div style="position:relative;width:42px;height:47px;display:flex;align-items:center;justify-content:center">
+                <svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 42 47" fill="none">
+                  <path d="M21 2L39 9V23C39 33 30 41 21 44C12 41 3 33 3 23V9L21 2Z" fill="rgba(201,168,76,0.12)" stroke="#c9a84c" stroke-width="1.3"/>
+                </svg>
+                <span style="position:relative;z-index:1;font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--gold)">3</span>
+              </div>
+              <span style="font-size:8px;color:rgba(201,168,76,0.55);font-weight:700;letter-spacing:1px">Lv.3</span>
+            </div>
+          </div>
+          <div class="sp-stats">
+            <div class="sp-stat">
+              <div class="sp-stat-val dyn-co2-total" style="color:var(--teal-l)">0</div>
+              <div class="sp-stat-label">tCO₂e 推动减排</div>
+            </div>
+            <div class="sp-stat">
+              <div class="sp-stat-val dyn-gm-balance" style="color:var(--gold)">0</div>
+              <div class="sp-stat-label">GreenMark</div>
+            </div>
+            <div class="sp-stat">
+              <div class="sp-stat-val" style="color:var(--green-l)">8</div>
+              <div class="sp-stat-label">供应商节点</div>
+            </div>
+          </div>
+          <div class="sp-badges">
+            <span class="sp-bdg" style="background:rgba(59,158,74,0.14);color:var(--green-l);border:1px solid rgba(59,158,74,0.3)">CBAM 架构师</span>
+            <span class="sp-bdg" style="background:rgba(24,95,165,0.12);color:var(--blue-l);border:1px solid rgba(24,95,165,0.28)">Scope 3 专家</span>
+            <span class="sp-bdg" style="background:rgba(127,119,221,0.1);color:var(--purple-l);border:1px solid rgba(127,119,221,0.28)">先行者 #0412</span>
+          </div>
+        </div>
+        <div class="sp-footer">
+          <span class="sp-chain"><span class="dyn-wallet-hash">#WL-TEMP</span> · CL-IVC 链上核验</span>
+          <span class="sp-brand">HengAI · Co2Lion</span>
+        </div>
+      </div>
+
+      <div class="share-actions" style="display:flex;flex-direction:column;gap:10px;padding:10px 0">
+        <div style="font-size:11px;color:var(--ink2);line-height:1.7;padding:10px 14px;background:rgba(0,0,0,0.2);border-radius:9px;border:1px solid var(--border)">
+          这张卡片背后的每一个数字都是<strong style="color:var(--ink)">链上存证的真实行动</strong>——不是自我声明，是可被任何人独立核验的职业资历。分享它，是在告诉行业：你做过这些事。
+        </div>
+        <button class="s-btn s-btn-g" onclick="showToast('微信分享图片已生成，正在调起分享...')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="10.5" cy="3.5" r="1.5" stroke="var(--green-l)" stroke-width="1"/><circle cx="3.5" cy="7" r="1.5" stroke="var(--green-l)" stroke-width="1"/><circle cx="10.5" cy="10.5" r="1.5" stroke="var(--green-l)" stroke-width="1"/><line x1="4.9" y1="6.2" x2="9.1" y2="4.3" stroke="var(--green-l)" stroke-width="0.9"/><line x1="4.9" y1="7.8" x2="9.1" y2="9.7" stroke="var(--green-l)" stroke-width="0.9"/></svg>
+          分享到微信朋友圈
+        </button>
+        <button class="s-btn s-btn-b" onclick="showToast('LinkedIn 链接已复制')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="var(--blue-l)" stroke-width="1"/><line x1="4.5" y1="6" x2="4.5" y2="10" stroke="var(--blue-l)" stroke-width="1"/><line x1="7" y1="10" x2="7" y2="7.5" stroke="var(--blue-l)" stroke-width="1"/><path d="M7 7.5C7 6.5 8 6 9 6.5V10" stroke="var(--blue-l)" stroke-width="1"/><circle cx="4.5" cy="4.5" r="0.8" fill="var(--blue-l)"/></svg>
+          分享到 LinkedIn
+        </button>
+        <button class="s-btn s-btn-t" onclick="showToast('职业档案 PDF 已生成，准备下载')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1.5" width="10" height="11" rx="1.5" stroke="var(--teal-l)" stroke-width="1"/><line x1="4.5" y1="5.5" x2="9.5" y2="5.5" stroke="var(--teal-l)" stroke-width="0.9"/><line x1="4.5" y1="7.5" x2="9.5" y2="7.5" stroke="var(--teal-l)" stroke-width="0.9"/><line x1="4.5" y1="9.5" x2="7.5" y2="9.5" stroke="var(--teal-l)" stroke-width="0.9"/></svg>
+          下载职业档案 PDF
+        </button>
+        <button class="s-btn s-btn-y" onclick="showToast('档案链接已复制，72小时有效')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5.5 8.5L8 5M8 5L9.5 7M8 5L6 6" stroke="var(--gold-l)" stroke-width="1" stroke-linecap="round"/><rect x="1.5" y="8.5" width="11" height="4" rx="1.2" stroke="var(--gold-l)" stroke-width="1"/></svg>
+          复制分享链接
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- Toast -->
+<div id="toast">
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="var(--teal-l)" stroke-width="1.5" stroke-linecap="round"/></svg>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+function openSupplyChainHub() {
+  try {
+    if (window.parent && window.parent !== window && typeof window.parent.navTo === 'function') {
+      window.parent.navTo('supply');
+      return;
+    }
+  } catch (_) {}
+  if (typeof navigateToHub === 'function') {
+    navigateToHub('supply');
+    return;
+  }
+  window.location.href = (typeof hengaiPage === 'function')
+    ? hengaiPage('全域中心.html') + '#supply'
+    : '全域中心.html#supply';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateY(0)';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateY(8px)';
+  }, 2800);
+}
+function showSection(id) {
+  const el = document.getElementById('section-' + id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Animate bars on load
+setTimeout(() => {
+  document.querySelectorAll('.bar-anim').forEach(el => {
+    const w = getComputedStyle(el).getPropertyValue('--w');
+    el.style.width = w;
+  });
+}, 300);
+
+// Animate donut on load - draw circles progressively
+const circles = document.querySelectorAll('.donut-wrap circle:not(:first-child)');
+circles.forEach((c, i) => {
+  setTimeout(() => {
+    c.style.transition = 'stroke-dasharray 1s ease';
+  }, 400 + i * 150);
+});
+</script>
+<script src="hengai-timeline-bind.js"></script>
+<script>
+(function () {
+  function avInit(name) {
+    var s = String(name || '新用户').replace(/\s/g, '');
+    return (s.slice(0, 2) || '新').toUpperCase();
+  }
+  function applyAchievePipeline(p) {
+    if (!p) return;
+    var user = p.user || {};
+    var company = p.company || {};
+    var meta = p.meta || {};
+    var name = user.name || '新用户';
+    var gm = Number(user.gmBalance != null ? user.gmBalance : user.gm_balance != null ? user.gm_balance : 0);
+    var co2 = Number(user.tCO2e_total != null ? user.tCO2e_total : user.tco2e_total != null ? user.tco2e_total : 0);
+    var level = user.currentLevel || user.tier || '未激活';
+    var el;
+    if ((el = document.getElementById('achieve-name'))) el.textContent = name;
+    if ((el = document.getElementById('achieve-avatar-initials'))) el.textContent = avInit(name);
+    if ((el = document.getElementById('achieve-org'))) {
+      el.textContent =
+        (company.name || '未绑定企业') + ' · ' + level + (user.regLabel ? ' · ' + user.regLabel : '');
+    }
+    if ((el = document.getElementById('achieve-gm-val'))) el.textContent = gm.toLocaleString();
+    if ((el = document.getElementById('achieve-calc-count'))) {
+      el.textContent = String(meta.calcCount != null ? meta.calcCount : (p.recentReports || []).length);
+    }
+    if ((el = document.getElementById('achieve-co2-val'))) {
+      el.textContent = co2.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    }
+    if ((el = document.getElementById('achieve-supplier-val'))) {
+      el.textContent = String(meta.supplierCount != null ? meta.supplierCount : (p.metrics && p.metrics.supplierCount) || 0);
+    }
+    var chip = document.querySelector('.topbar .gm-chip-val');
+    if (chip) chip.textContent = gm.toLocaleString();
+    if (typeof window.hengaiBindTimelinesFromPayload === 'function') {
+      try { window.hengaiBindTimelinesFromPayload(p); } catch (e) { console.warn('[achieve] timeline', e); }
+    }
+  }
+  window.applyAchievePipeline = applyAchievePipeline;
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || ev.data.type !== 'HENGAI_HUB_PIPELINE') return;
+    applyAchievePipeline(ev.data.payload);
+  });
+
+  function bridgeFromAppState() {
+    var S = window.AppState;
+    if (!S) return;
+    applyAchievePipeline({
+      user: S.user || {},
+      company: S.company || {},
+      metrics: S.metrics || {},
+      gmLedger: S.gmLedger || [],
+      activityTimeline: S.activityTimeline || [],
+      recentReports: S.recentReports || [],
+      supplierNodes: S.supplierNodes || [],
+      badges: S.badges || [],
+      regulation: S.regulation || {},
+      milestones: S.milestones || {},
+      meta: {
+        calcCount: (S.recentReports || []).length,
+        supplierCount: (S.metrics && S.metrics.supplierCount) || (S.supplierNodes || []).length || 0
+      }
+    });
+  }
+  if (window.EventBus && typeof window.EventBus.on === 'function') {
+    window.EventBus.on('APP_READY', bridgeFromAppState);
+    window.EventBus.on('STATE_SYNCED', bridgeFromAppState);
+    window.EventBus.on('STATE_COMMIT', bridgeFromAppState);
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    setTimeout(bridgeFromAppState, 50);
+    setTimeout(bridgeFromAppState, 800);
+  });
+})();
+</script>
+<script src="hengai-module-pipeline.js"></script>
+</body>
+</html>

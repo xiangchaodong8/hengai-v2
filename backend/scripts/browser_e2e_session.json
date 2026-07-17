@@ -1,0 +1,11 @@
+{
+  "email": "browser-e2e-1780649063@example.com",
+  "password": "TestPass1",
+  "company": "BrowserE2E原厂-1780649063",
+  "credit": "910000001780649063",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmNGI2NGUwMS05ZDE5LTRjZTYtYWFkZi0wN2QwZmZjZmRiZWMiLCJpYXQiOjE3ODA2NDkwNjQsImV4cCI6MTc4MTI1Mzg2NCwidHlwZSI6ImFjY2VzcyJ9.ZbOmBDV64GDFmi1Fo8vFxNkYm2u1mz8lrdpgvUF9IsQ",
+  "cert": "CL-COP-76LH",
+  "carbonIntensity": 2.1567,
+  "poolMatch": true,
+  "phase": "Phase2"
+}

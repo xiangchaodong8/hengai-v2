@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Co2Lion · HengAI 全域合规中心</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+/* === appstate.js 内联 === */
+/**
+ * ╔══════════════════════════════════════════════════════════════════════╗
+ * ║   HengAI Co2Lion · AppState 唯一真理引擎 · V3.2                      ║
+ * ║   全域 14 模块共用 · 严禁在各模块页面 Hardcode 任何业务数据            ║
+ * ║                                                                      ║
+ * ║   加载顺序：[已内联]（所有模块 <head> 首位）║
+ * ╚══════════════════════════════════════════════════════════════════════╝
+ *
+ *  暴露到 window：
+ *    window.AppState        — 唯一真理对象
+ *    window.EventBus        — 跨模块事件总线
+ *    window.ACCOUNT_TIER    — 账户等级枚举
+ *    window.F               — 格式化工具集
+ *    window.FM              — dyn-* CSS class → AppState 路径映射表
+ *    window.syncAppState()  — 全量 DOM 灌注
+ *    window.initAppState()  — 异步初始化入口（每页调用一次）
+ *    window.getMacroOracle()— 宏观价源读取
+ *    window.publishMacroSync()— 跨标签碳价同步
+ */
+
+'use strict';
+
+/* ═══════════════════════════════════════════════════════════════════════
+   0 · 常量
+   ═══════════════════════════════════════════════════════════════════════ */
+const API_BASE          = (window.APP_CONFIG && window.APP_CONFIG.api_base) || 'http://localhost:8000';
+const API_HUB_OVERVIEW  = `${API_BASE}/api/v1/hub/overview`;
+const API_TIMEOUT_MS    = 3000;
+
+const LS_TOKEN_KEY      = 'hengai_token';
+const LS_TOKEN_ALT      = 'authToken';
+const LS_CACHE_KEY      = 'hengai_hub_cache_v1';
+const LS_MACRO_KEY      = 'hengai_macro_sync_v1';
+const BC_MACRO_CHANNEL  = 'hengai_macro_sync_channel';
+
+/* ═══════════════════════════════════════════════════════════════════════
+   1 · 账户等级枚举
+   ═══════════════════════════════════════════════════════════════════════ */
+const ACCOUNT_TIER = Object.freeze({
+  GUEST:        'GUEST',
+  FREE_USER:    'FREE_USER',
+  PRO_PERSONAL: 'PRO_PERSONAL',
+  ENT_VERIFIED: 'ENT_VERIFIED',
+});
+window.ACCOUNT_TIER = ACCOUNT_TIER;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   2 · EventBus —— 跨模块事件总线
+   ═══════════════════════════════════════════════════════════════════════ */
+const EventBus = {
+  _ev: {},
+  on(event, fn)   { (this._ev[event] = this._ev[event] || []).push(fn); return this; },
+  off(event, fn)  { this._ev[event] = (this._ev[event] || []).filter(f => f !== fn); },
+  emit(event, d)  { (this._ev[event] || []).forEach(fn => { try { fn(d); } catch(e) { console.warn('[EventBus]', event, e); } }); },
+};
+window.EventBus = EventBus;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   3 · Token 工具
+   ═══════════════════════════════════════════════════════════════════════ */
+const getToken   = () => localStorage.getItem(LS_TOKEN_KEY) || localStorage.getItem(LS_TOKEN_ALT);
+const setToken   = t  => { localStorage.setItem(LS_TOKEN_KEY, t); localStorage.setItem(LS_TOKEN_ALT, t); };
+const clearToken = () => { localStorage.removeItem(LS_TOKEN_KEY); localStorage.removeItem(LS_TOKEN_ALT); };
+window.getToken  = getToken;
+window.clearToken = clearToken;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   4 · 认证辅助
+   ═══════════════════════════════════════════════════════════════════════ */
+function normalizeTierCode(input) {
+  const raw = String(input || '').trim();
+  if (!raw) return ACCOUNT_TIER.GUEST;
+  if (Object.values(ACCOUNT_TIER).includes(raw)) return raw;
+  if (/企业|共治|认证|旗舰|sovereign|ent/i.test(raw)) return ACCOUNT_TIER.ENT_VERIFIED;
+  if (/专业|pro|年付|月付/i.test(raw))                  return ACCOUNT_TIER.PRO_PERSONAL;
+  if (/免费|free|体验/i.test(raw))                      return ACCOUNT_TIER.FREE_USER;
+  return ACCOUNT_TIER.FREE_USER;
+}
+function oracleIsLoggedIn()  { return !!(AppState.auth && AppState.auth.user); }
+function currentTierCode()   {
+  if (!oracleIsLoggedIn()) return ACCOUNT_TIER.GUEST;
+  return normalizeTierCode((AppState.user && AppState.user.tier_code) || (AppState.user && AppState.user.tier));
+}
+window.oracleIsLoggedIn = oracleIsLoggedIn;
+window.currentTierCode  = currentTierCode;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   5 · MOCK_STATE —— 离线降级 / 演示数据
+       所有 dyn-* 节点 100% 可亮，无一横线兜底
+   ═══════════════════════════════════════════════════════════════════════ */
+const MOCK_STATE = {
+  user: {
+    name:           '---',
+    email:          'wanglei@demo.hengai.cn',
+    tier:           'Sovereign',
+    tier_code:      ACCOUNT_TIER.ENT_VERIFIED,
+    tierLevel:      5,
+    currentLevel:   5,
+    complianceScore:92,
+    gmBalance:      2840,
+    tokensLeft:     47250,
+    tokensUsed:     12750,
+    totalCo2eSaved: 142,
+    badgeCount:     8,
+    regDate:        '2026-01-12',
+    regLabel:       '2026-01-12 注册',
+    lastLoginAt:    '2026-05-07T14:00:00Z',
+    levels:         { 1:'Lv.1 观察员', 2:'Lv.3 架构师', 3:'Lv.5 智库顾问', 4:'Lv.4 物理认证', 5:'Lv.5 全域顾问' },
+  },
+  company: {
+    name:                   '---',
+    creditCode:             '91330000MA28XYZ123',
+    industryLabel:          '铝压铸 · 汽车零部件',
+    stage:                  'Certified',
+    stageLabel:             'Lv.4 物理认证',
+    employeeCount:          320,
+    complianceLevel:        4,
+    annualRevenue:          280000000,
+    declaredSupplierCount:  17,
+    exportTons:             1920,
+    productLine:            '铝压铸汽配零件',
+    factorMethod:           'CBAM v3.0 / GHG Protocol',
+    customsLevel:           'Lv.4 物理认证',
+    creditLimit:            '¥ 240万',
+    netSavings:             '¥ 372k',
+    roiRatio:               '6.4×',
+    interestSave:           '¥ 10,800',
+    declareCount:           3,
+    cbamRisk:               '€ 145,000',
+    cbamRiskRaw:            145000,
+  },
+  metrics: {
+    tCO2eTotal:             3494,
+    globalRank:             1247,
+    roiRatio:               0.64,
+    supplyChainCoverage:    0.65,
+    scope3Coverage:         0.65,
+    riskExposureEur:        145000,
+    cbamTaxEstimate:        73600,
+    reductionTarget:        240,
+    reductionAchieved:      142,
+    reductionProgress:      0.59,
+    energyTco2eSum:         72.1,
+    supplierCount:          17,
+    supplierSubmitted:      11,
+    supplierSubmittedCount: 11,
+    supplierPendingCount:   4,
+    scope1:                 0,
+    scope2:                 72,
+    scope3:                 3422,
+    taxSavingsWan:          38.6,
+    carbonIntensity:        1.82,
+    roiMultiple:            9.1,
+    industryBetterPct:      24.5,
+    barWidthPct:            75.5,
+    supplierPush:           8,
+    cbamDrills:             3,
+    paidPartners:           5,
+    coverageDeltaPct:       91,
+    emissionReductionT:     142,
+    gmMonthlyDelta:         320,
+    scope3Rate:             45,
+    shieldEn:               'Architect',
+  },
+  impact: {
+    riskExposureEur: 145000,
+    scope1: 0,
+    scope2: 72,
+    scope3: 3422,
+  },
+  macro: {
+    cbam_current_price: 75.36,
+    eur_cny_rate:       7.85,
+    last_updated:       '2026-04-20',
+  },
+  wallet: {
+    address: '#WL-WANGLEI-E87D-B4F2-9A1C',
+    balance: 2840,
+  },
+  flags: {
+    currentPhase:       'Phase3',
+    phaseLabel:         'Phase 3 · 企业共治期',
+    nextAction:         '建议向决策层呈送《Q2 CBAM 升级方案》以申领 ¥58k 预算',
+    unlockedMenusList:  [
+      'dashboard','achievement','cbam','compute','regulation',
+      'company','supplychain','diagnosis','package','wallet',
+      'customs','dld','acf','governance'
+    ],
+  },
+  recentReports: [
+    { reportingPeriod:'2026-Q1', status:'verified',  tCO2eTotal:802,  riskExposureEur:36288,  submittedAt:'2026-04-01' },
+    { reportingPeriod:'2025-Q4', status:'verified',  tCO2eTotal:908,  riskExposureEur:41837,  submittedAt:'2026-01-15' },
+    { reportingPeriod:'2025-Q3', status:'verified',  tCO2eTotal:837,  riskExposureEur:53586,  submittedAt:'2025-10-12' },
+    { reportingPeriod:'2026-Q2', status:'submitted', tCO2eTotal:null, riskExposureEur:null,   submittedAt:null },
+  ],
+  badges: [
+    { badgeName:'碳数据先锋',    earnedAt:'2026-01-12', gmReward:200,  locked:false },
+    { badgeName:'CBAM 测算员',   earnedAt:'2026-01-28', gmReward:300,  locked:false },
+    { badgeName:'供应链推动者',  earnedAt:'2026-02-15', gmReward:500,  locked:false },
+    { badgeName:'Lv.4 物理认证', earnedAt:'2026-03-01', gmReward:1000, locked:false },
+    { badgeName:'ZCP 绿电签证',  earnedAt:'2026-03-20', gmReward:200,  locked:false },
+    { badgeName:'企业文明候选',  earnedAt:'2026-04-01', gmReward:150,  locked:false },
+    { badgeName:'生态共治委员',  earnedAt:'2026-04-12', gmReward:500,  locked:false },
+    { badgeName:'代际收益领袖',  earnedAt:'2026-04-20', gmReward:400,  locked:false },
+  ],
+  suppliers: [
+    { name:'星辰五金',   category:'铝型材', status:'done',    completeness:'完整',      carbonIntensity:1.24, priority:'high' },
+    { name:'无锡YY铝材', category:'铝锭',   status:'partial', completeness:'Scope2缺失', carbonIntensity:null, priority:'high' },
+    { name:'广东ZZ压铸', category:'铸件',   status:'missing', completeness:'—',          carbonIntensity:null, priority:'high' },
+    { name:'山东AA锻造', category:'钢材',   status:'invited', completeness:'—',          carbonIntensity:null, priority:'mid'  },
+    { name:'江苏BB橡胶', category:'橡胶件', status:'invited', completeness:'—',          carbonIntensity:null, priority:'mid'  },
+    { name:'上海CC精工', category:'精密件', status:'none',    completeness:'—',          carbonIntensity:null, priority:'low'  },
+    { name:'宁波DD模具', category:'模具',   status:'none',    completeness:'—',          carbonIntensity:null, priority:'low'  },
+    { name:'温州EE电气', category:'电气件', status:'none',    completeness:'—',          carbonIntensity:null, priority:'low'  },
+    { name:'绍兴FF纺织', category:'辅料',   status:'none',    completeness:'—',          carbonIntensity:null, priority:'low'  },
+    { name:'杭州GG涂料', category:'涂料',   status:'none',    completeness:'—',          carbonIntensity:null, priority:'low'  },
+  ],
+  gmTransactions: [
+    { type:'代际收益',         desc:'供应商完成注册 × 20%',               amount:+200,  ts:'2026-04-13T14:22:00Z' },
+    { type:'CBAM 通关预演奖励', desc:'第3次通关预演完成 · 置信度升Lv.4',    amount:+500,  ts:'2026-04-13T14:22:00Z' },
+    { type:'企业档案建立奖励',  desc:'数字档案正式建立',                    amount:+150,  ts:'2026-04-12T09:41:00Z' },
+    { type:'月度会员开通',      desc:'个人月度会员 · ¥99',                  amount:+50,   ts:'2026-04-12T08:15:00Z' },
+    { type:'注册 · 首次AI问答', desc:'HengAI账户创建 · 完成7条CBAM问答',    amount:+50,   ts:'2026-04-11T09:31:00Z' },
+    { type:'CBAM测算奖励',      desc:'第1次CBAM测算完成',                   amount:+28,   ts:'2026-04-11T09:17:00Z' },
+  ],
+  compute: {
+    tokenQuota:      500000,
+    tokenUsed:       214580,
+    deepCalcQuota:   100,
+    deepCalcUsed:    43,
+    storageGB:       2,
+    storageUsedGB:   0.8,
+    ledger: [
+      { action:'全域诊断报告',   tokens:12500, ts:'2026-04-13T14:22:00Z', saving:'节省外包律师3.5h' },
+      { action:'CBAM风险测算',   tokens:2100,  ts:'2026-04-12T09:41:00Z', saving:'精准预算€14k' },
+      { action:'供应链穿透分析', tokens:3400,  ts:'2026-04-11T16:05:00Z', saving:'识别3家高优先级' },
+      { action:'ROI呈送包生成',  tokens:18700, ts:'2026-04-10T11:30:00Z', saving:'决策层通过预算' },
+      { action:'法规动态扫描',   tokens:800,   ts:'2026-04-09T08:00:00Z', saving:'无漏项风险' },
+    ],
+  },
+  euCustoms: {
+    level: 'Lv.4 物理认证',
+    declareCount: 3,
+    declarations: [
+      { period:'2026 Q1', product:'铝压铸件', exportTons:480, carbonEI:1.62, taxEur:36288, status:'accepted', submittedAt:'2026-04-01' },
+      { period:'2025 Q4', product:'铝压铸件', exportTons:510, carbonEI:1.78, taxEur:41837, status:'accepted', submittedAt:'2026-01-15' },
+      { period:'2025 Q3', product:'铝压铸件', exportTons:460, carbonEI:1.82, taxEur:53586, status:'accepted', submittedAt:'2025-10-12' },
+      { period:'2026 Q2', product:'铝压铸件', exportTons:null, carbonEI:null, taxEur:null, status:'draft',    submittedAt:null },
+    ],
+  },
+  dld: {
+    certifiedCO2e: 142,
+    creditLimit:   '¥ 240万',
+    creditStatus:  '已授信',
+    interestSave:  '¥ 10,800',
+    banks:         ['工商银行 · 绿色信贷部', '农业银行 · ESG专项', '兴业银行 · 绿色金融'],
+    assets: [
+      { batchId:'DLD-2026-0412', co2e:142, org:'DLD国家认证', expiry:'2027-03-31', status:'valid', certDate:'2026-04-01' },
+      { batchId:'DLD-2026-Q2',   co2e:'~110', org:'预测值',   expiry:'—',           status:'pending', certDate:null },
+    ],
+  },
+  acf: {
+    certStatus:     '认证通过',
+    productLine:    '铝压铸汽配零件',
+    factorMethod:   'CBAM v3.0 / GHG Protocol',
+    carbonFactor:   0.51,
+    certExpiry:     '2027-03-31',
+    progressSteps: [
+      { step:'数据录入', done:true },
+      { step:'MAT物理核验', done:true },
+      { step:'供应链Scope3', done:true },
+      { step:'广东省生态环境厅审核', done:true },
+      { step:'证书颁发', done:true },
+    ],
+  },
+  governance: {
+    seatTitle:        '顾问委员席位',
+    seatId:           '#0412',
+    seatRegion:       '---',
+    votesAvailable:   3,
+    passedProposals:  1,
+    totalMembers:     31,
+    activeProposals:  4,
+    proposals: [
+      {
+        id:'GCP-2026-008', title:'GM 代际收益率从 15% 提升至 20%',
+        proposer:'张磊（Lv.5 #0001）', initDate:'2026-04-10', deadline:'2026-04-30',
+        desc:'将供应商推荐带来的代际 GM 收益从 15% 提升至 20%，进一步激励供应链协同扩展。',
+        supportPct:74, supportVotes:23, abstainPct:8, opposePct:18,
+        threshold:66, status:'passing', myVote:'支持',
+      },
+      {
+        id:'GCP-2026-009', title:'休眠 GM 豁免：决策层等待期保护',
+        proposer:'李云（Lv.4 #0028）', initDate:'2026-04-12', deadline:'2026-05-05',
+        desc:'新增"180天休眠保护"豁免机制：对于正在推动企业升级（有进行中的提案呈送记录）的用户，休眠计时暂停，直至决策层回应。',
+        supportPct:89, supportVotes:27, abstainPct:6, opposePct:5,
+        threshold:66, status:'passing', myVote:null,
+      },
+      {
+        id:'GCP-2026-010', title:'Scope 3 黑盒供应商的 GM 惩罚机制',
+        proposer:'---', initDate:'---', deadline:'---',
+        desc:'对 Scope 3 覆盖率低于 30% 的企业，在生成诊断报告时自动触发 -50 GM/季度惩罚，以激励数据透明化。',
+        supportPct:61, supportVotes:19, abstainPct:13, opposePct:26,
+        threshold:66, status:'at_risk', myVote:null,
+        note:'需达到 66% 通过 · 距通过还差 2 票 · 截止前还有 18 天',
+      },
+      {
+        id:'GCP-2026-011', title:'开放 ACF 大湾区认证通道接入',
+        proposer:'陈子涵（Lv.4 #0089）', initDate:'2026-04-15', deadline:'2026-05-15',
+        desc:'开放 ACF 大湾区认证通道，将广东实时碳因子 API 正式接入 Co2Lion 系统。需委员会授权后方可推进与深圳/广东监管局的对接谈判。',
+        supportPct:42, supportVotes:13, abstainPct:19, opposePct:39,
+        threshold:66, status:'failing', myVote:null,
+      },
+    ],
+    members: [
+      { name:'张磊', id:'#0001', region:'山东', level:'Lv.5', contribution:3200, voteRate:'94%' },
+      { name:'李云', id:'#0028', region:'广东', level:'Lv.4', contribution:1800, voteRate:'87%' },
+      { name:'---', id:'---', region:'---', level:'---', contribution:0, voteRate:'---', isMe:true },
+      { name:'陈子涵', id:'#0089', region:'深圳', level:'Lv.4', contribution:1200, voteRate:'81%' },
+    ],
+    timeline: [
+      { id:'GCP-2026-007', title:'代际收益率从15%提升至20%', status:'passed', date:'2026-04-08' },
+      { id:'GCP-2026-006', title:'企业文明进步奖评选标准修订', status:'passed', date:'2026-03-25' },
+      { title:'第3届委员会正式成立', status:'milestone', date:'2026-03-01' },
+    ],
+  },
+  diagnostic: {
+    overallScore: 78,
+    riskLevel:    'mid',
+    generatedAt:  '2026-05-07T14:00:00Z',
+    dimensions: [
+      { name:'碳数据完整性',  status:'Scope3黑盒占比高',   riskLevel:'high', action:'启动供应链穿透计划' },
+      { name:'CBAM申报就绪', status:'缺少书面证据链',       riskLevel:'high', action:'完成3次通关预演' },
+      { name:'供应链覆盖率',  status:'65%已提交',          riskLevel:'mid',  action:'推动剩余6家填报' },
+      { name:'减排路径规划',  status:'59%目标完成',        riskLevel:'mid',  action:'制定Q3减排方案' },
+      { name:'合规文档存档',  status:'链上存证已完成',      riskLevel:'low',  action:'维持现有节奏' },
+    ],
+  },
+  cbam: {
+    step:               1,
+    productType:        '铝压铸件',
+    exportVolume:       480,
+    carbonIntensity:    1.62,
+    paidCarbonPrice:    0,
+    calcResult:         null,
+    sensitivityPrices:  [40, 75.36, 80, 100],
+  },
+  serverTime: new Date().toISOString(),
+};
+
+/* ═══════════════════════════════════════════════════════════════════════
+   6 · AppState 对象 —— 唯一真理
+   ═══════════════════════════════════════════════════════════════════════ */
+const AppState = {
+  /* 从 MOCK_STATE 获取初始默认值，在线时由 API 覆盖 */
+  ...JSON.parse(JSON.stringify(MOCK_STATE)),
+
+  /* 额外运行时字段 */
+  auth:         { user: null, token: null },
+  chat:         { messages:[], turnCount:0, isStreaming:false, guestLimit:5, lastUserText:'' },
+  contextTags:  [],
+  justSawROI:   false,
+  _mode:        'mock',   /* 'live' | 'mock' */
+
+  /* ── 方法 ── */
+  updateAuth(user, token) {
+    this.auth.user  = user;
+    this.auth.token = token;
+    if (token) setToken(token); else clearToken();
+    if (user) {
+      const u = this.user;
+      if (user.name)       u.name       = user.name;
+      if (user.email)      u.email      = user.email;
+      if (user.gmBalance != null) { u.gmBalance = Number(user.gmBalance); this.wallet.balance = u.gmBalance; }
+      if (user.tier)       u.tier       = user.tier;
+      if (user.tier_code)  u.tier_code  = normalizeTierCode(user.tier_code);
+    }
+    EventBus.emit('AUTH_CHANGED', this.auth.user);
+    syncAppState();
+  },
+
+  updateGM(delta) {
+    this.user.gmBalance    = Math.max(0, (this.user.gmBalance || 0) + delta);
+    this.wallet.balance    = this.user.gmBalance;
+    EventBus.emit('GM_UPDATED', this.user.gmBalance);
+    syncAppState();
+  },
+
+  setGM(val) {
+    this.user.gmBalance    = Number(val) || 0;
+    this.wallet.balance    = this.user.gmBalance;
+    EventBus.emit('GM_UPDATED', this.user.gmBalance);
+    syncAppState();
+  },
+
+  addContext(tag) {
+    if (!this.contextTags.includes(tag)) {
+      this.contextTags.push(tag);
+      EventBus.emit('CONTEXT_UPDATED', this.contextTags);
+    }
+  },
+
+  incrementTurn() {
+    this.chat.turnCount++;
+    const el = document.getElementById('turnCounter');
+    if (el) el.textContent = `第${this.chat.turnCount}轮`;
+  },
+};
+window.AppState = AppState;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   7 · 格式化工具集 F
+   ═══════════════════════════════════════════════════════════════════════ */
+const F = {
+  n:    (v, d=0) => v == null ? '—' : Number(v).toLocaleString('zh-CN', { minimumFractionDigits:d, maximumFractionDigits:d }),
+  t:    (v)      => v == null ? '—' : `${F.n(v,1)} tCO₂e`,
+  eur:  (v)      => {
+    if (v == null) return '—';
+    if (v >= 1e6)  return `€${(v/1e6).toFixed(2)}M`;
+    if (v >= 1e4)  return `€${F.n(v,0)}`;
+    return `€${F.n(v,2)}`;
+  },
+  cny:  (v)      => v == null ? '—' : `¥${F.n(v,0)}`,
+  pct:  (v, d=1) => v == null ? '—' : `${(Number(v)*100).toFixed(d)}%`,
+  gm:   (v)      => v == null ? '—' : `${F.n(v,0)} GM`,
+  dt:   (v)      => {
+    if (!v) return '—';
+    try { return new Date(v).toLocaleDateString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit' }); }
+    catch { return String(v); }
+  },
+  tier: (v)      => {
+    const map = {
+      [ACCOUNT_TIER.GUEST]:        '访客',
+      [ACCOUNT_TIER.FREE_USER]:    '免费体验版',
+      [ACCOUNT_TIER.PRO_PERSONAL]: '个人专业版',
+      [ACCOUNT_TIER.ENT_VERIFIED]: '企业共治版',
+      Sovereign: '全域主权版',
+    };
+    return map[String(v)] || String(v || '未知');
+  },
+  esc:  (v)      => String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'),
+};
+window.F = F;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   8 · FM —— dyn-* CSS class → AppState 路径映射表
+       { c: CSS-class, p: dot-path | null, compute: fn, f: formatter, a: attr }
+   ═══════════════════════════════════════════════════════════════════════ */
+const FM = [
+  /* ── user ── */
+  { c:'dyn-user-name',           p:'user.name' },
+  { c:'dyn-user-email',          p:'user.email' },
+  { c:'dyn-user-tier',           p:'user.tier',              f:F.tier },
+  { c:'dyn-user-level',          p:'user.currentLevel' },
+  { c:'dyn-user-reg-date',       p:'user.regDate',           f:F.dt },
+  { c:'dyn-user-last-login',     p:'user.lastLoginAt',       f:F.dt },
+  { c:'dyn-user-compliance',     p:'user.complianceScore' },
+  { c:'dyn-gm-balance',          p:'user.gmBalance',         f:F.gm },
+  { c:'dyn-gm-balance-num',      p:'user.gmBalance',         f:(v)=>F.n(v,0) },
+  { c:'dyn-tokens-left',         p:'user.tokensLeft',        f:F.n },
+  { c:'dyn-tokens-used',         p:'user.tokensUsed',        f:F.n },
+  { c:'dyn-tokens-total',        p:null, compute:(s)=>(s.user?.tokensLeft||0)+(s.user?.tokensUsed||0), f:F.n },
+  { c:'dyn-tokens-rounds',       p:null, compute:(s)=>Math.floor((s.user?.tokensLeft||0)/500), f:F.n },
+  { c:'dyn-tokens-pct',          p:null, compute:(s)=>{const t=(s.user?.tokensLeft||0)+(s.user?.tokensUsed||0);return t?s.user.tokensUsed/t:0}, f:F.pct },
+  { c:'dyn-co2e-saved',          p:'user.totalCo2eSaved',    f:F.t },
+  { c:'dyn-badge-count',         p:'user.badgeCount' },
+  { c:'dyn-user-name-initial',   p:'user.name',              f:(v)=>String(v||'?')[0].toUpperCase() },
+
+  /* ── company ── */
+  { c:'dyn-company-name',        p:'company.name' },
+  { c:'dyn-ent-name',            p:'company.name' },
+  { c:'dyn-company-credit',      p:'company.creditCode' },
+  { c:'dyn-company-industry',    p:'company.industryLabel' },
+  { c:'dyn-company-stage',       p:'company.stageLabel' },
+  { c:'dyn-ent-stage-label',     p:'company.stageLabel' },
+  { c:'dyn-company-employees',   p:'company.employeeCount',  f:F.n },
+  { c:'dyn-company-compliance',  p:'company.complianceLevel' },
+  { c:'dyn-company-revenue',     p:'company.annualRevenue',  f:(v)=>v?`¥${F.n(v/10000,0)}万`:'—' },
+  { c:'dyn-ent-code',            p:'company.creditCode' },
+  { c:'dyn-ent-export-tons',     p:'company.exportTons',     f:(v)=>v!=null?F.n(v,0)+' t':'—' },
+  { c:'dyn-acf-product',         p:'company.productLine' },
+  { c:'dyn-acf-method',          p:'company.factorMethod' },
+  { c:'dyn-customs-level',       p:'company.customsLevel' },
+  { c:'dyn-customs-declare-count',p:'company.declareCount',  f:F.n },
+  { c:'dyn-rep-roi',             p:'company.roiRatio' },
+  { c:'dyn-rep-save',            p:'company.netSavings' },
+  { c:'dyn-credit-limit',        p:'company.creditLimit' },
+  { c:'dyn-interest-save',       p:'company.interestSave' },
+
+  /* ── company form inputs ── */
+  { c:'dyn-company-name-inp',    p:'company.name',           a:'value' },
+  { c:'dyn-company-credit-inp',  p:'company.creditCode',     a:'value' },
+
+  /* ── metrics ── */
+  { c:'dyn-tco2e-total',         p:'metrics.tCO2eTotal',         f:F.t },
+  { c:'dyn-tco2e-topbar',        p:'metrics.tCO2eTotal',         f:F.t },
+  { c:'dyn-total-co2',           p:'metrics.tCO2eTotal',         f:(v)=>v!=null?F.n(v,1):'—' },
+  { c:'dyn-global-rank',         p:'metrics.globalRank',         f:(v)=>v?`#${F.n(v,0)}`:'—' },
+  { c:'dyn-roi-ratio',           p:'metrics.roiRatio',           f:(v)=>v!=null?F.pct(v):'—' },
+  { c:'dyn-supply-pct',          p:'metrics.supplyChainCoverage',f:F.pct },
+  { c:'dyn-sup-pct',             p:'metrics.supplyChainCoverage',f:F.pct },
+  { c:'dyn-scope3-pct',          p:'metrics.scope3Coverage',     f:F.pct },
+  { c:'dyn-risk-eur',            p:'metrics.riskExposureEur',    f:F.eur },
+  { c:'dyn-cbam-tax',            p:'metrics.cbamTaxEstimate',    f:F.eur },
+  { c:'dyn-reduction-target',    p:'metrics.reductionTarget',    f:F.t },
+  { c:'dyn-reduction-achieved',  p:'metrics.reductionAchieved',  f:F.t },
+  { c:'dyn-reduction-pct',       p:'metrics.reductionProgress',  f:F.pct },
+  { c:'dyn-energy-tco2e',        p:'metrics.energyTco2eSum',     f:F.t },
+  { c:'dyn-supplier-count',      p:'metrics.supplierCount',      f:F.n },
+  { c:'dyn-supplier-submitted',  p:'metrics.supplierSubmitted',  f:F.n },
+  { c:'dyn-sup-total',           p:'metrics.supplierCount',      f:F.n },
+  { c:'dyn-sup-count',           p:'metrics.supplierSubmitted',  f:F.n },
+  { c:'dyn-sup-pending',         p:'metrics.supplierPendingCount',f:F.n },
+  { c:'dyn-supplier-gap',        p:null, compute:(s)=>Math.max(0,(s.company?.declaredSupplierCount||0)-(s.metrics?.supplierSubmitted||0)), f:F.n },
+  { c:'dyn-tax-savings',         p:'metrics.taxSavingsWan',      f:(v)=>v!=null?`${v} 万`:'—' },
+  { c:'dyn-carbon-intensity',    p:'metrics.carbonIntensity',    f:(v)=>v!=null?`${v} t/t`:'—' },
+  { c:'dyn-roi-multiple',        p:'metrics.roiMultiple',        f:(v)=>v!=null?`${v}x`:'—' },
+  { c:'dyn-scope1-tco2',         p:'metrics.scope1',             f:(v)=>v!=null?F.n(v,1):'—' },
+  { c:'dyn-scope2-tco2',         p:'metrics.scope2',             f:(v)=>v!=null?F.n(v,1):'—' },
+  { c:'dyn-scope3-tco2',         p:'metrics.scope3',             f:(v)=>v!=null?F.n(v,1):'—' },
+  { c:'dyn-rep-tax',             p:'metrics.riskExposureEur',    f:F.eur },
+
+  /* ── radar (derived) ── */
+  { c:'dyn-radar-carbon',        p:null, compute:(s)=>Math.min(100,(s.metrics?.tCO2eTotal||0)>0?65:10), f:(v)=>v+'%' },
+  { c:'dyn-radar-supply',        p:'metrics.supplyChainCoverage', f:(v)=>F.pct(v,0) },
+  { c:'dyn-radar-compliance',    p:'user.complianceScore',         f:(v)=>v+'%' },
+  { c:'dyn-radar-reduction',     p:'metrics.reductionProgress',    f:(v)=>v!=null?F.pct(v,0):'0%' },
+  { c:'dyn-radar-roi',           p:'metrics.roiRatio',             f:(v)=>v!=null?F.pct(v,0):'0%' },
+  { c:'dyn-radar-quality',       p:'company.complianceLevel',      f:(v)=>v!=null?v*20+'%':'0%' },
+
+  /* ── progress bars (style.width) ── */
+  { c:'dyn-scope3-bar',          p:'metrics.scope3Coverage',     a:'style.width', f:(v)=>`${Math.min(100,(v||0)*100).toFixed(1)}%` },
+  { c:'dyn-supply-bar',          p:'metrics.supplyChainCoverage',a:'style.width', f:(v)=>`${Math.min(100,(v||0)*100).toFixed(1)}%` },
+  { c:'dyn-reduction-bar',       p:'metrics.reductionProgress',  a:'style.width', f:(v)=>`${Math.min(100,(v||0)*100).toFixed(1)}%` },
+  { c:'dyn-tier-bar',            p:'user.tierLevel',             a:'style.width', f:(v)=>`${((v-1)/4*100).toFixed(0)}%` },
+  { c:'dyn-tokens-bar',          p:null, compute:(s)=>{const t=(s.user?.tokensLeft||0)+(s.user?.tokensUsed||0);return t?s.user.tokensUsed/t:0}, a:'style.width', f:(v)=>`${Math.min(100,(v||0)*100).toFixed(1)}%` },
+  { c:'dyn-token-ring-pct',      p:null, compute:(s)=>{const t=(s.user?.tokensLeft||0)+(s.user?.tokensUsed||0);return t?s.user.tokensUsed/t:0}, f:(v)=>`${Math.min(100,(v||0)*100).toFixed(0)}%` },
+
+  /* ── flags ── */
+  { c:'dyn-phase-code',          p:'flags.currentPhase' },
+  { c:'dyn-phase-label',         p:'flags.phaseLabel' },
+  { c:'dyn-next-action',         p:'flags.nextAction' },
+
+  /* ── wallet ── */
+  { c:'dyn-wallet-balance',      p:'user.gmBalance',         f:(v)=>F.n(v,0) },
+  { c:'dyn-wallet-hash',         p:'wallet.address' },
+  { c:'dyn-gm-total-earned',     p:'user.gmBalance',         f:(v)=>F.n(v,0) },
+  { c:'dyn-gm-spent',            p:null, compute:()=>0,      f:F.n },
+
+  /* ── latest report ── */
+  { c:'dyn-rep-period',          p:'recentReports.0.reportingPeriod' },
+  { c:'dyn-rep-status',          p:'recentReports.0.status' },
+  { c:'dyn-rep-tco2e',           p:'recentReports.0.tCO2eTotal',      f:F.t },
+  { c:'dyn-rep-risk',            p:'recentReports.0.riskExposureEur', f:F.eur },
+
+  /* ── diagnostic ── */
+  { c:'dyn-diag-risk-level',     p:'metrics.riskExposureEur', f:(v)=>!v?'低风险':v>100000?'高风险':v>30000?'中等风险':'低风险' },
+  { c:'dyn-diag-risk-eur',       p:'metrics.riskExposureEur', f:F.eur },
+  { c:'dyn-diag-tco2e',          p:'metrics.tCO2eTotal',      f:F.t },
+  { c:'dyn-diag-score',          p:'diagnostic.overallScore' },
+
+  /* ── compute ── */
+  { c:'dyn-token-quota',         p:'compute.tokenQuota',     f:F.n },
+  { c:'dyn-token-used',          p:'compute.tokenUsed',      f:F.n },
+  { c:'dyn-deep-quota',          p:'compute.deepCalcQuota',  f:F.n },
+  { c:'dyn-deep-used',           p:'compute.deepCalcUsed',   f:F.n },
+
+  /* ── DLD / ACF / governance ── */
+  { c:'dyn-dld-co2',             p:'dld.certifiedCO2e',      f:(v)=>v?`${v} tCO₂e`:'—' },
+  { c:'dyn-dld-credit',          p:'dld.creditLimit' },
+  { c:'dyn-dld-status',          p:'dld.creditStatus' },
+  { c:'dyn-acf-status',          p:'acf.certStatus' },
+  { c:'dyn-gov-seat',            p:'governance.seatTitle' },
+  { c:'dyn-gov-votes',           p:'governance.votesAvailable', f:F.n },
+  { c:'dyn-gov-members',         p:'governance.totalMembers',   f:F.n },
+
+  /* ── decision package ── */
+  { c:'dyn-decision-tax-k',      p:'metrics.riskExposureEur', f:(v)=>v?`€ ${(v/1000).toFixed(0)}k`:'—' },
+
+  /* ── server time ── */
+  { c:'dyn-server-time',         p:'serverTime', f:(v)=>v?new Date(v).toLocaleTimeString('zh-CN'):'' },
+];
+window.FM = FM;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   9 · 路径解析 gp()
+   ═══════════════════════════════════════════════════════════════════════ */
+function gp(obj, path) {
+  if (!path) return undefined;
+  return path.split('.').reduce((cur, k) => {
+    if (cur == null) return null;
+    const i = parseInt(k, 10);
+    return isNaN(i) ? cur[k] : cur[i];
+  }, obj);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   10 · countUp 律动动画
+   ═══════════════════════════════════════════════════════════════════════ */
+function countUp(el, toStr, dur=700) {
+  const from = parseFloat(String(el.textContent||'').replace(/[^\d.-]/g,''));
+  const to   = parseFloat(String(toStr).replace(/[^\d.-]/g,''));
+  if (isNaN(from)||isNaN(to)||from===to) { el.textContent=toStr; return; }
+  const pre = String(toStr).match(/^[^\d-]*/)?.[0]||'';
+  const suf = String(toStr).match(/[^\d.,]+$/)?.[0]||'';
+  const dec = (String(toStr).split('.')?.[1]?.replace(/[^\d]/g,'')||'').length;
+  const t0  = performance.now();
+  el.classList.add('counting');
+  function fr(now) {
+    const p = Math.min((now-t0)/dur,1);
+    const e = 1 - Math.pow(1-p, 3);
+    const c = from+(to-from)*e;
+    el.textContent = pre+c.toLocaleString('zh-CN',{minimumFractionDigits:dec,maximumFractionDigits:dec})+(p<1?'':suf);
+    if (p<1) requestAnimationFrame(fr);
+    else { el.textContent=toStr; el.classList.remove('counting'); }
+  }
+  requestAnimationFrame(fr);
+}
+
+function setEl(el, val, attr) {
+  const d = (val==null||val==='')?'—':String(val);
+  if (attr) {
+    if (attr.startsWith('style.')) el.style[attr.slice(6)] = d;
+    else el.setAttribute(attr, d==='—'?'':d);
+    return;
+  }
+  if (el.textContent===d) return;
+  const ov = parseFloat(String(el.textContent||'').replace(/[^\d.-]/g,''));
+  const nv = parseFloat(d.replace(/[^\d.-]/g,''));
+  if (!isNaN(ov)&&!isNaN(nv)&&el.textContent!=='—'&&el.textContent!=='--') {
+    countUp(el, d);
+  } else {
+    el.classList.add('hash-jump');
+    el.textContent = d;
+    setTimeout(()=>el.classList.remove('hash-jump'), 400);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   11 · syncAppState() —— 全量 DOM 灌注
+   ═══════════════════════════════════════════════════════════════════════ */
+function syncAppState(state) {
+  const s = state || window.AppState;
+  if (!s) return;
+
+  /* FM 绑定 */
+  FM.forEach(({ c, p, compute, f, a }) => {
+    const els = document.querySelectorAll('.' + c);
+    if (!els.length) return;
+    let raw = compute ? compute(s) : gp(s, p);
+    let d;
+    if (raw==null||raw==='') d='—';
+    else if (f) { try { d=f(raw); } catch { d=String(raw); } }
+    else d = String(raw);
+    els.forEach(el => setEl(el, d, a));
+  });
+
+  /* topbar GM 芯片 */
+  const gmChips = document.querySelectorAll('.gm-chip-val, .topbar-gm-val, #headerTopGMValue');
+  const gmVal   = Number(s.user?.gmBalance||0).toLocaleString();
+  gmChips.forEach(el => { if (el.textContent !== gmVal) el.textContent = gmVal; });
+
+  /* 用户名 / 头像首字 */
+  const name    = s.user?.name || '访客';
+  document.querySelectorAll('.topbar-user-name, #headerIdentityName').forEach(el => el.textContent = name);
+  document.querySelectorAll('.topbar-user-avatar, #headerIdentityAvatar').forEach(el => el.textContent = name[0].toUpperCase());
+
+  /* Phase badge */
+  const ph    = gp(s,'flags.currentPhase') || 'Phase1';
+  const badge = document.getElementById('t-phase-badge');
+  if (badge) {
+    badge.className = 't-phase';
+    badge.classList.add(ph==='Phase3'?'ph3':ph==='Phase2'?'ph2':'ph1');
+    const sp = badge.querySelector('.dyn-phase-code');
+    if (sp) sp.textContent = ph;
+  }
+
+  /* Menu locks (Phase 2/3 gates) */
+  const ul = new Set(gp(s,'flags.unlockedMenusList')||[]);
+  document.querySelectorAll('[data-slug]').forEach(el => {
+    el.classList.toggle('locked', !ul.has(el.dataset.slug));
+  });
+
+  /* Sidebar active item */
+  const fn  = decodeURIComponent((location.pathname.split('/').pop()||'').split('?')[0]);
+  const PAGE_MAP = {
+    '全域中心.html':'overview','index.html':'overview',
+    'HengAI_星火成就档案.html':'achieve',
+    'HengAI_CBAM测算工具.html':'cbam',
+    'HengAI_算力资源.html':'compute',
+    'HengAI_法规知识库.html':'regulation',
+    'HengAI_企业数字档案.html':'company',
+    'HengAI_供应链协同.html':'supplychain',
+    'HengAI_全域诊断报告.html':'diagnosis',
+    'HengAI_决策层呈送包生成器.html':'package',
+    'HengAI_荣誉体系.html':'honor',
+    'HengAI_Governance.html':'governance',
+    'HengAI_GM_Wallet.html':'wallet',
+    'HengAI_EU_Customs.html':'customs',
+    'HengAI_DLD_Credit.html':'dld',
+    'HengAI_ACF_Cert.html':'acf',
+  };
+  const currentPage = PAGE_MAP[fn];
+  if (currentPage) {
+    document.querySelectorAll('.sidebar .sb-item[data-page]').forEach(el => {
+      el.classList.toggle('active', el.dataset.page === currentPage);
+    });
+    document.querySelectorAll('.nav[data-slug]').forEach(el => {
+      el.classList.toggle('active', el.dataset.slug === currentPage);
+    });
+  }
+
+  /* 侧边栏 Phase Strip */
+  const phaseStrip = document.getElementById('sb-phase-text');
+  if (phaseStrip) phaseStrip.textContent = gp(s,'flags.phaseLabel') || '';
+  const phaseRole = document.getElementById('sb-urole');
+  if (phaseRole) phaseRole.textContent = s.user?.tier || '';
+
+  EventBus.emit('STATE_SYNCED', s);
+}
+window.syncAppState = syncAppState;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   12 · deepMerge —— 深合并 API 响应到 AppState
+   ═══════════════════════════════════════════════════════════════════════ */
+function deepMerge(target, source) {
+  if (!source || typeof source !== 'object') return target;
+  const result = Object.assign({}, target);
+  for (const k of Object.keys(source)) {
+    if (source[k] !== null && typeof source[k] === 'object' && !Array.isArray(source[k]) && target[k] && typeof target[k] === 'object') {
+      result[k] = deepMerge(target[k], source[k]);
+    } else if (source[k] !== null && source[k] !== undefined) {
+      result[k] = source[k];
+    }
+  }
+  return result;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   13 · API 层 —— 在线优先，3s 超时自动降级 MOCK
+   ═══════════════════════════════════════════════════════════════════════ */
+async function fetchWithTimeout(url, opts={}, ms=API_TIMEOUT_MS) {
+  const ctrl  = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), ms);
+  try {
+    const r = await fetch(url, { ...opts, signal:ctrl.signal });
+    clearTimeout(timer);
+    return r;
+  } catch(e) {
+    clearTimeout(timer);
+    throw e;
+  }
+}
+
+async function apiFetch(endpoint, options={}) {
+  const token = getToken();
+  const headers = { 'Content-Type':'application/json', ...(options.headers||{}) };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const r = await fetchWithTimeout(`${API_BASE}${endpoint}`, { ...options, headers });
+  if (r.status === 401) { clearToken(); return null; }
+  if (!r.ok) {
+    let msg = `HTTP ${r.status}`;
+    try { const d = await r.json(); msg = d.detail||d.error||msg; } catch{}
+    throw new Error(msg);
+  }
+  if (r.status === 204) return null;
+  return r.json();
+}
+window.apiFetch = apiFetch;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   14 · LocalStorage 缓存持久化
+   ═══════════════════════════════════════════════════════════════════════ */
+function loadCachedState() {
+  try {
+    const raw = localStorage.getItem(LS_CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+function saveCachedState(state) {
+  try {
+    const slim = { user:state.user, company:state.company, metrics:state.metrics,
+                   flags:state.flags, wallet:state.wallet, macro:state.macro,
+                   _ts: Date.now() };
+    localStorage.setItem(LS_CACHE_KEY, JSON.stringify(slim));
+  } catch {}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   15 · 宏观价源 —— BroadcastChannel + localStorage 跨标签同步
+   ═══════════════════════════════════════════════════════════════════════ */
+const MACRO_SRC_ID     = 'appstate_' + Math.random().toString(36).slice(2,8);
+let _macroSyncLastTs   = 0;
+let _macroChannel      = null;
+let _macroDebounce     = null;
+let _macroPillTimer    = null;
+
+function getMacroOracle() {
+  const fb = { cbam_current_price:75.36, eur_cny_rate:7.85, last_updated:'2026-04-20' };
+  if (!window.AppState) return fb;
+  if (!window.AppState.macro) window.AppState.macro = { ...fb };
+  return window.AppState.macro;
+}
+window.getMacroOracle = getMacroOracle;
+
+function pulseMacroSyncPill(text) {
+  let el = document.getElementById('macroSyncPill');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'macroSyncPill';
+    el.style.cssText = 'position:fixed;right:14px;bottom:14px;z-index:10002;padding:6px 10px;border-radius:999px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.45);color:#8ff2cc;font-size:11px;font-weight:600;pointer-events:none;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;';
+    document.body?.appendChild(el);
+  }
+  el.textContent = text||'宏观价源已同步';
+  el.style.opacity='1'; el.style.transform='translateY(0)';
+  clearTimeout(_macroPillTimer);
+  _macroPillTimer = setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(6px)'; }, 1400);
+}
+
+function publishMacroSync(patch) {
+  const macro   = getMacroOracle();
+  const payload = {
+    cbam_current_price: Number(patch?.cbam_current_price ?? macro.cbam_current_price) || 75.36,
+    eur_cny_rate:       Number(patch?.eur_cny_rate       ?? macro.eur_cny_rate)        || 7.85,
+    last_updated:       patch?.last_updated || macro.last_updated || new Date().toISOString().slice(0,10),
+    _ts: Date.now(),
+    _src: MACRO_SRC_ID,
+  };
+  macro.cbam_current_price = payload.cbam_current_price;
+  macro.eur_cny_rate       = payload.eur_cny_rate;
+  macro.last_updated       = payload.last_updated;
+  syncMacroUi();
+  pulseMacroSyncPill('已同步');
+  try { localStorage.setItem(LS_MACRO_KEY, JSON.stringify(payload)); } catch {}
+  try { _macroChannel?.postMessage(payload); } catch {}
+}
+window.publishMacroSync = publishMacroSync;
+
+function applyIncomingMacroSync(payload) {
+  if (!payload || payload._src === MACRO_SRC_ID) return;
+  const ts = Number(payload._ts||0);
+  if (ts && ts <= _macroSyncLastTs) return;
+  _macroSyncLastTs = ts || Date.now();
+  const macro = getMacroOracle();
+  const p     = Number(payload.cbam_current_price);
+  const fx    = Number(payload.eur_cny_rate);
+  if (!isNaN(p)  && p  > 0) macro.cbam_current_price = p;
+  if (!isNaN(fx) && fx > 0) macro.eur_cny_rate = fx;
+  if (payload.last_updated) macro.last_updated = payload.last_updated;
+  syncMacroUi();
+  pulseMacroSyncPill('跨标签同步成功');
+}
+
+function syncMacroUi() {
+  const macro = getMacroOracle();
+  const price = Number(macro.cbam_current_price)||75.36;
+  const fx    = Number(macro.eur_cny_rate)||7.85;
+  const updated = macro.last_updated || '';
+  const ids = {
+    'f-price':        String(price.toFixed(2)),
+    'f-fx':           String(fx.toFixed(2)),
+    'wgCbamPrice':    String(price.toFixed(2)),
+    'wgFxRate':       String(fx.toFixed(2)),
+    'rb-price':       `€${price.toFixed(2)}`,
+    'slider-display': `€${price.toFixed(2)}（当前）`,
+  };
+  Object.entries(ids).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.tagName==='INPUT') { if (el.value!==val) el.value=val; }
+    else { if (el.textContent!==val) el.textContent=val; }
+  });
+  const sliders = ['slider-price','result-slider'];
+  sliders.forEach(id => { const el=document.getElementById(id); if(el) el.value=String(Math.round(price)); });
+  const hPrice = document.getElementById('h-price');
+  if (hPrice) hPrice.textContent = `⚡ 实时挂钩 EU ETS 官方牌价：€${price.toFixed(2)}（更新于 ${updated}）`;
+}
+window.syncMacroUi = syncMacroUi;
+
+function initMacroRealtimeSync() {
+  if (typeof BroadcastChannel !== 'undefined') {
+    try {
+      _macroChannel = new BroadcastChannel(BC_MACRO_CHANNEL);
+      _macroChannel.onmessage = e => applyIncomingMacroSync(e?.data);
+    } catch {}
+  }
+  window.addEventListener('storage', e => {
+    if (e.key!==LS_MACRO_KEY||!e.newValue) return;
+    try { applyIncomingMacroSync(JSON.parse(e.newValue)); } catch {}
+  });
+  /* 监听 CBAM 价格输入框 */
+  document.addEventListener('input', e => {
+    const id = e?.target?.id;
+    if (!['f-price','f-fx','wgCbamPrice','wgFxRate'].includes(id)) return;
+    clearTimeout(_macroDebounce);
+    _macroDebounce = setTimeout(() => {
+      const macro = getMacroOracle();
+      const priceEl = document.getElementById('f-price') || document.getElementById('wgCbamPrice');
+      const fxEl    = document.getElementById('f-fx')    || document.getElementById('wgFxRate');
+      publishMacroSync({
+        cbam_current_price: Number(priceEl?.value || macro.cbam_current_price),
+        eur_cny_rate:       Number(fxEl?.value    || macro.eur_cny_rate),
+      });
+    }, 120);
+  });
+  /* 恢复上次缓存的宏观值 */
+  try {
+    const cached = JSON.parse(localStorage.getItem(LS_MACRO_KEY)||'{}');
+    if (cached.cbam_current_price) applyIncomingMacroSync(cached);
+  } catch {}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   16 · Toast 通知（全局复用）
+   ═══════════════════════════════════════════════════════════════════════ */
+let _toastTimer;
+function showToast(msg, type='ok') {
+  let el = document.getElementById('toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toast';
+    el.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);z-index:9999;padding:9px 18px;border-radius:12px;font-size:13px;font-weight:500;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;';
+    document.body?.appendChild(el);
+  }
+  const colors = {
+    ok:   { bg:'rgba(29,158,117,0.18)', border:'rgba(29,158,117,0.45)', color:'#6dd5b0' },
+    err:  { bg:'rgba(226,75,74,0.16)',  border:'rgba(226,75,74,0.4)',   color:'#fca5a5' },
+    warn: { bg:'rgba(201,168,76,0.16)', border:'rgba(201,168,76,0.4)',  color:'#f0d080' },
+  };
+  const c = colors[type] || colors.ok;
+  el.style.background = c.bg;
+  el.style.border     = `1px solid ${c.border}`;
+  el.style.color      = c.color;
+  el.textContent      = msg;
+  el.style.opacity    = '1';
+  el.style.transform  = 'translateX(-50%) translateY(0)';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 2800);
+}
+window.showToast = showToast;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   17 · initAppState() —— 每页异步初始化入口
+       调用方式：在 DOMContentLoaded 后执行
+       window.addEventListener('DOMContentLoaded', () => initAppState(onReady));
+   ═══════════════════════════════════════════════════════════════════════ */
+async function initAppState(onReady) {
+  /* Step 1: 先从缓存恢复，让 UI 立刻有数据 */
+  const cached = loadCachedState();
+  if (cached) {
+    Object.assign(window.AppState, deepMerge(window.AppState, cached));
+    syncAppState();
+  }
+
+  /* Step 2: 尝试在线 API（3s 超时降级） */
+  const token = getToken();
+  let liveState = null;
+  if (token) {
+    try {
+      const r = await fetchWithTimeout(
+        API_HUB_OVERVIEW,
+        { credentials:'include', headers:{ Accept:'application/json', Authorization:`Bearer ${token}` } },
+        API_TIMEOUT_MS
+      );
+      if (r.ok) {
+        liveState = await r.json();
+        window.AppState._mode = 'live';
+      }
+    } catch (e) {
+      console.info('[HengAI] 在线底座超时，使用本地演示数据：', e.message);
+    }
+  }
+
+  /* Step 3: 合并并灌注 */
+  if (liveState) {
+    Object.assign(window.AppState, deepMerge(window.AppState, liveState));
+    saveCachedState(window.AppState);
+  } else if (!cached) {
+    /* 纯离线演示：MOCK_STATE 已是默认值，无需重新赋值 */
+    window.AppState._mode = 'mock';
+  }
+
+  /* Step 4: 同步 auth 状态 */
+  if (token && liveState?.user) {
+    window.AppState.auth.user  = liveState.user;
+    window.AppState.auth.token = token;
+  }
+
+  /* Step 5: 初始化宏观价源跨标签同步 */
+  initMacroRealtimeSync();
+
+  /* Step 6: 全量 DOM 灌注 */
+  syncAppState();
+
+  /* Step 7: 回调 */
+  if (typeof onReady === 'function') {
+    try { onReady(window.AppState); } catch(e) { console.warn('[AppState] onReady error', e); }
+  }
+
+  EventBus.emit('APP_READY', window.AppState);
+  return window.AppState;
+}
+window.initAppState = initAppState;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   18 · 便捷工具
+   ═══════════════════════════════════════════════════════════════════════ */
+/* 防抖 */
+function debounce(fn, ms=200) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(()=>fn(...args), ms); };
+}
+window.debounce = debounce;
+
+/* 简写 $ */
+window.$ = id => document.getElementById(id);
+
+/* 模式标识（console 提示） */
+console.info(
+  '%c[HengAI AppState V3.2]%c 引擎已装载 · 等待 initAppState() 调用',
+  'color:#6dd5b0;font-weight:700', 'color:#8a95a8'
+);
+
+</script>
+<!-- shared-shell.css 已合并至上方 <style> 块，无需外部引用 -->
+<style>
+/* ═══ ROOT TOKENS ═══ */
+:root {
+  --bg0:#06080f; --bg1:#0a0d16; --bg2:#0e1220;
+  --bg3:rgba(255,255,255,0.04); --bg4:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.14);
+  --ink:#e2e8f4; --ink2:#8896aa; --ink3:#475569;
+  --green:#10b981; --green-l:#6ee7b7; --green-d:rgba(16,185,129,0.13); --green-b:rgba(16,185,129,0.30);
+  --gold:#c9a84c;  --gold-l:#f0d080;  --gold-d:rgba(201,168,76,0.13);  --gold-b:rgba(201,168,76,0.30);
+  --blue:#3b82f6;  --blue-l:#93c5fd;  --blue-d:rgba(59,130,246,0.13);  --blue-b:rgba(59,130,246,0.30);
+  --purple:#8b5cf6;--purple-l:#c4b5fd;--purple-d:rgba(139,92,246,0.13);--purple-b:rgba(139,92,246,0.30);
+  --red:#ef4444;   --red-l:#fca5a5;   --red-d:rgba(239,68,68,0.13);    --red-b:rgba(239,68,68,0.30);
+  --teal:#14b8a6;  --teal-l:#5eead4;  --teal-d:rgba(20,184,166,0.13);  --teal-b:rgba(20,184,166,0.30);
+  --sb-w:218px; --tb-h:52px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--ink);font-family:'Noto Sans SC',sans-serif;font-size:13px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+input,select{font-family:inherit}
+
+/* ═══ LAYOUT ═══ */
+.app{display:flex;height:100vh}
+
+/* ═══ SIDEBAR (原版 CSS 保留) ═══ */
+.sidebar{width:var(--sb-w);flex-shrink:0;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sb-brand{padding:17px 15px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sb-brand-ic{width:32px;height:32px;border-radius:9px;background:var(--green-d);border:1px solid var(--green-b);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-brand-name{font-size:14px;font-weight:700;letter-spacing:.2px}
+.sb-brand-sub{font-size:9.5px;color:var(--ink3);margin-top:1px}
+.sb-phase{margin:10px 12px 2px;padding:8px 12px;border-radius:9px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;transition:opacity .2s}
+.sb-phase:hover{opacity:.8}
+.sb-phase-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;animation:pulseDot 2.2s ease-in-out infinite}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.ph1{background:var(--green-d);border:1px solid var(--green-b);color:var(--green-l)}
+.ph2{background:var(--gold-d);border:1px solid var(--gold-b);color:var(--gold-l)}
+.ph3{background:var(--purple-d);border:1px solid var(--purple-b);color:var(--purple-l)}
+.sb-group-title{padding:10px 14px 3px;font-size:9px;color:var(--ink3);letter-spacing:1.4px;text-transform:uppercase;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:12.5px;color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all .14s;position:relative}
+.sb-item:hover{color:var(--ink);background:var(--bg4)}
+.sb-item.active{color:var(--ink);background:rgba(255,255,255,.07);border-left-color:var(--green)}
+.sb-item.locked{color:var(--ink3);cursor:not-allowed}
+.sb-item.locked:hover{background:transparent;color:var(--ink3)}
+.sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-tag{margin-left:auto;font-size:9px;font-weight:700;padding:1px 6px;border-radius:20px;white-space:nowrap}
+.tag-gold{background:var(--gold-d);color:var(--gold-l);border:1px solid var(--gold-b)}
+.tag-purple{background:var(--purple-d);color:var(--purple-l);border:1px solid var(--purple-b)}
+.tag-lock{background:var(--bg4);color:var(--ink3)}
+.sb-footer{border-top:1px solid var(--border);padding:10px 14px;margin-top:auto;flex-shrink:0}
+.sb-user{display:flex;align-items:center;gap:9px}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--green-d);border:1px solid var(--green-b);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--green-l);flex-shrink:0;text-transform:uppercase}
+.sb-uname{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-urole{font-size:10px;color:var(--ink3);margin-top:1px}
+
+/* ═══ TOPBAR ═══ */
+.topbar{height:var(--tb-h);display:flex;align-items:center;padding:0 18px;gap:10px;border-bottom:1px solid var(--border);background:var(--bg1);flex-shrink:0}
+.tb-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.tb-right{display:flex;align-items:center;gap:8px}
+.tb-title{font-size:14px;font-weight:700;letter-spacing:-.2px;white-space:nowrap}
+.tb-pill{font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 8px;border-radius:20px}
+.gm-chip{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:8px;background:var(--gold-d);border:1px solid var(--gold-b);cursor:pointer;transition:opacity .15s}
+.gm-chip:hover{opacity:.8}
+.gm-chip-lbl{font-size:9.5px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.5px}
+.gm-chip-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--gold-l)}
+.tb-btn{padding:6px 13px;border-radius:7px;border:1px solid var(--border2);background:var(--bg4);font-size:11.5px;color:var(--ink2);transition:all .14s}
+.tb-btn:hover{border-color:var(--green-b);color:var(--green-l)}
+.tb-btn-primary{background:var(--green-d);border-color:var(--green-b);color:var(--green-l)}
+.tb-btn-primary:hover{background:rgba(16,185,129,.22)}
+
+/* ═══ MAIN ═══ */
+.main-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.main-scroll{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.main-scroll::-webkit-scrollbar{width:4px}
+.main-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.main-pad{padding:18px;max-width:960px;margin:0 auto}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .4s ease both}
+.d1{animation-delay:.05s}.d2{animation-delay:.1s}.d3{animation-delay:.15s}.d4{animation-delay:.2s}
+
+/* ═══ COMPONENTS ═══ */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px}
+.card-hi{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:16px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.3px;border:1px solid transparent}
+.p-green{background:var(--green-d);color:var(--green-l);border-color:var(--green-b)}
+.p-gold{background:var(--gold-d);color:var(--gold-l);border-color:var(--gold-b)}
+.p-blue{background:var(--blue-d);color:var(--blue-l);border-color:var(--blue-b)}
+.p-purple{background:var(--purple-d);color:var(--purple-l);border-color:var(--purple-b)}
+.p-red{background:var(--red-d);color:var(--red-l);border-color:var(--red-b)}
+.p-teal{background:var(--teal-d);color:var(--teal-l);border-color:var(--teal-b)}
+.p-gray{background:var(--bg4);color:var(--ink3)}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sh-t{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--ink)}
+.sh-line{width:18px;height:1px;background:var(--border2)}
+.hr{border:none;border-top:1px solid var(--border);margin:12px 0}
+.metric{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px}
+.m-lbl{font-size:10px;color:var(--ink3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.m-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;line-height:1.1}
+.m-unit{font-size:11px;font-weight:400;margin-left:3px}
+.m-sub{font-size:10px;color:var(--ink3);margin-top:2px}
+.ins{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border-radius:9px;font-size:12px;line-height:1.65;margin-bottom:10px}
+.ins-green{background:var(--green-d);border:1px solid var(--green-b);color:var(--green-l)}
+.ins-gold{background:var(--gold-d);border:1px solid var(--gold-b);color:var(--gold-l)}
+.ins-red{background:var(--red-d);border:1px solid var(--red-b);color:var(--red-l)}
+.ins-purple{background:var(--purple-d);border:1px solid var(--purple-b);color:var(--purple-l)}
+.prog{height:5px;background:var(--bg4);border-radius:999px;overflow:hidden;margin-bottom:6px}
+.prog-fill{height:100%;border-radius:999px;transition:width .6s cubic-bezier(.22,.97,.65,1)}
+.f-grp{margin-bottom:12px}
+.f-lbl{display:block;font-size:10.5px;color:var(--ink3);margin-bottom:4px;font-weight:500}
+.f-inp,.f-sel{width:100%;padding:8px 11px;background:var(--bg1);border:1px solid var(--border2);border-radius:8px;color:var(--ink);font-size:12.5px;outline:none;transition:border-color .14s}
+.f-inp:focus,.f-sel:focus{border-color:var(--green-b)}
+.cta{width:100%;padding:10px;border-radius:9px;border:none;font-size:12.5px;font-weight:600;cursor:pointer;transition:opacity .15s;letter-spacing:.3px}
+.cta:hover{opacity:.85}
+.cta-green{background:var(--green);color:#fff}
+.cta-gold{background:var(--gold);color:#000}
+.cta-outline{background:transparent;border:1px solid var(--green-b);color:var(--green-l)}
+.act-btn{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:11px;font-size:11.5px;color:var(--ink2);cursor:pointer;transition:all .14s;text-align:center}
+.act-btn:hover{background:var(--bg4);color:var(--ink);border-color:var(--border2)}
+.act-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+
+/* ═══ PHASE TABS ═══ */
+.phase-tabs{display:flex;gap:6px;margin-bottom:14px;padding:4px;background:var(--bg1);border-radius:12px;border:1px solid var(--border)}
+.ph-tab{flex:1;padding:8px 12px;border-radius:9px;font-size:11px;font-weight:600;cursor:pointer;text-align:center;color:var(--ink3);transition:all .2s;user-select:none;line-height:1.3}
+.ph-tab:hover{color:var(--ink2);background:var(--bg3)}
+.ph-tab-code{display:block;font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:1px;margin-bottom:2px;opacity:.6}
+.on-ph1{background:var(--green-d)!important;color:var(--green-l)!important;border:1px solid var(--green-b)}
+.on-ph2{background:var(--gold-d)!important;color:var(--gold-l)!important;border:1px solid var(--gold-b)}
+.on-ph3{background:var(--purple-d)!important;color:var(--purple-l)!important;border:1px solid var(--purple-b)}
+
+/* ═══ IDENTITY CARD ═══ */
+.id-card{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:16px;margin-bottom:14px;position:relative;overflow:hidden}
+.id-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--green) 40%,var(--blue) 70%,transparent 95%)}
+.id-inner{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.id-av{width:52px;height:52px;border-radius:50%;background:var(--green-d);border:2px solid var(--green-b);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--green-l);flex-shrink:0;position:relative;text-transform:uppercase}
+.id-av-dot{position:absolute;bottom:1px;right:1px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid var(--bg2);animation:pulseDot 2s infinite}
+.id-name{font-size:17px;font-weight:700;letter-spacing:-.3px;margin-bottom:3px}
+.id-meta{font-size:11px;color:var(--ink3);margin-bottom:6px}
+.id-tags{display:flex;gap:5px;flex-wrap:wrap}
+.shield-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;margin-left:auto;flex-shrink:0}
+.shield-body{position:relative;width:54px;height:60px;display:flex;align-items:center;justify-content:center}
+.shield-body svg{position:absolute;inset:0;width:100%;height:100%}
+.shield-n{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;position:relative;z-index:1}
+.shield-lbl{font-size:10px;font-weight:700}
+
+/* ═══ REG TIMELINE ═══ */
+.reg-strip{display:flex;align-items:flex-start;gap:0;padding-top:4px}
+.rt-node{display:flex;flex-direction:column;align-items:center;flex:1;min-width:0}
+.rt-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:3px}
+.rt-d{width:20px;height:20px;border-radius:50%;background:var(--bg4);border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.rt-done{background:var(--green-d);border-color:var(--green-b)}
+.rt-active{background:var(--blue-d);border-color:var(--blue-b);animation:pulseDot 2s infinite}
+.rt-lock{background:var(--bg3)}
+.rt-lbl{font-size:9.5px;color:var(--ink3);text-align:center;margin-top:4px;white-space:nowrap}
+.rt-date{font-size:8.5px;color:var(--ink3);font-family:'DM Mono',monospace;text-align:center}
+.rt-ln{height:1.5px;width:100%;background:var(--border);margin-top:9px}
+.rt-ln-done{background:var(--green)}
+
+/* ═══ PHASE BODY COMPONENTS ═══ */
+.gm-evs{display:flex;flex-direction:column;gap:6px}
+.gm-ev{display:flex;align-items:center;gap:9px;padding:7px 10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)}
+.gm-ev-l{display:flex;align-items:center;gap:9px;flex:1;min-width:0}
+.gm-ev-ic{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.gm-ev-name{font-size:11.5px;font-weight:600}
+.gm-ev-time{font-size:10px;color:var(--ink3)}
+.gm-ev-val{font-family:'DM Mono',monospace;font-size:11.5px;font-weight:700;color:var(--gold-l);flex-shrink:0}
+.alarm{background:var(--red-d);border:1px solid var(--red-b);border-radius:14px;padding:16px;display:flex;align-items:flex-start;gap:12px}
+.alarm-val{font-family:'DM Mono',monospace;font-size:28px;font-weight:700;color:var(--red-l);line-height:1}
+.alarm-lbl{font-size:11px;color:var(--red-l);margin-top:3px;opacity:.8}
+.roi-strip{display:grid;grid-template-columns:1fr 26px 1fr 26px 1fr;align-items:center;gap:6px}
+.roi-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.roi-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:700;margin-bottom:2px}
+.roi-lbl{font-size:9.5px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px}
+.donut-w{position:relative;width:72px;height:72px;flex-shrink:0}
+.donut-w svg{width:100%;height:100%}
+.donut-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-pct{font-family:'DM Mono',monospace;font-size:15px;font-weight:700;line-height:1}
+.donut-lbl{font-size:8.5px;color:var(--ink3)}
+.rail-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px}
+.rail-l,.rail-r{display:flex;flex-direction:column}
+.rail-tag{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.rail-level{font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:2px}
+.rail-en{font-size:10.5px;color:var(--ink3);margin-bottom:10px}
+.rail-bignum{font-family:'DM Mono',monospace;font-size:30px;font-weight:700;letter-spacing:-1px;line-height:1;margin-bottom:4px}
+.rail-bigsub{font-size:10.5px;color:var(--ink3);margin-bottom:12px}
+.cert-vault{border-radius:10px;padding:11px 13px;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.cv-pulse{width:8px;height:8px;border-radius:50%;animation:pulseDot 2s infinite;flex-shrink:0}
+.gw-list{display:flex;flex-direction:column;gap:5px}
+.gw-item{display:flex;align-items:center;gap:8px;font-size:11.5px}
+.gw-d{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.gw-name{flex:1;color:var(--ink2)}
+.gw-status{font-size:10.5px;font-weight:600}
+.p3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.p3-btn{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .14s;font-size:11.5px;color:var(--ink2)}
+.p3-btn:hover{background:var(--bg4);color:var(--ink);border-color:var(--border2)}
+.p3-ic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.p3-lbl{font-size:11px;font-weight:600;text-align:center}
+.p3-sub{font-size:9.5px;color:var(--ink3);text-align:center}
+.step-list{display:flex;flex-direction:column;gap:0}
+.sl-item{display:flex;align-items:flex-start;gap:10px;padding-bottom:12px;position:relative}
+.sl-item:not(:last-child)::after{content:'';position:absolute;left:9px;top:21px;bottom:0;width:1.5px;background:var(--border)}
+.sl-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;border:1.5px solid var(--border2)}
+.sl-done{background:var(--green-d);border-color:var(--green-b)}
+.sl-active{background:var(--blue-d);border-color:var(--blue-b);animation:pulseDot 2s infinite}
+.sl-wait{background:var(--bg3);color:var(--ink3)}
+.sl-body{flex:1;padding-top:1px}
+.sl-title{font-size:12px;font-weight:600;line-height:1.4}
+.sl-desc{font-size:10.5px;color:var(--ink3);margin-top:2px;line-height:1.5}
+
+/* ═══ TOAST ═══ */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);z-index:9999;padding:9px 18px;border-radius:12px;font-size:13px;font-weight:500;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-ic">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z" stroke="var(--green)" stroke-width="1.2" fill="var(--green-d)"/>
+        <polyline points="5,8 7.5,10.5 11.5,6.5" stroke="var(--green-l)" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sb-brand-name">HengAI</div>
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+    </div>
+  </div>
+
+  <!-- Phase Strip -->
+  <div class="sb-phase ph1" id="sb-phase" onclick="cyclePhase()">
+    <div class="sb-phase-dot" id="sb-pdot"></div>
+    <span id="sb-ptext">个体启蒙期</span>
+  </div>
+
+  <div class="sb-group-title">个人工作台</div>
+  <div class="sb-item active" data-page="overview" onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:var(--green)"></div>全域总览</div>
+  <div class="sb-item" data-page="achieve" onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:var(--gold)"></div>星火成就档案</div>
+  <div class="sb-item" data-page="calc" onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:var(--gold)"></div>CBAM 测算工具</div>
+  <div class="sb-item" data-page="resource" onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:var(--blue-l)"></div>算力资源</div>
+  <div class="sb-item" data-page="knowledge" onclick="window.location.href='HengAI_法规知识库.html'"><div class="sb-dot" style="background:var(--purple-l)"></div>企业法规库</div>
+
+  <div class="sb-group-title">企业工作台</div>
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:var(--teal-l)"></div>企业数字档案</div>
+  <div class="sb-item" data-page="supply" onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" style="background:var(--teal-l)"></div>供应链协同</div>
+  <div class="sb-item" data-page="report" onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:var(--blue-l)"></div>全域诊断报告</div>
+  <div class="sb-item" data-page="decision" onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:var(--gold)"></div>决策层呈送包</div>
+
+  <div class="sb-group-title">大国重器</div>
+  <div class="sb-item" data-page="honor" onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:var(--purple-l)"></div>荣誉体系</div>
+  <div class="sb-item" data-page="gov" onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:var(--teal-l)"></div>生态共治委员会</div>
+
+  <div class="sb-group-title">深潜模块</div>
+  <div class="sb-item" data-page="wallet" onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:var(--gold)"></div>GM 绿印钱包</div>
+  <div class="sb-item" data-page="eu" onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:var(--blue-l)"></div>欧盟海关直连</div>
+  <div class="sb-item" data-page="dld" onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:var(--green)"></div>DLD 绿色信贷</div>
+  <div class="sb-item" data-page="acf" onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:var(--teal-l)"></div>ACF 大湾区认证</div>
+
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar dyn-user-name-initial">?</div>
+      <div>
+        <div class="sb-uname dyn-user-name">访客</div>
+        <div class="sb-urole" id="sb-urole">--</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="main-wrap">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-left">
+      <span class="tb-title">全域合规中心</span>
+      <span class="tb-pill ph1" id="tb-badge" style="background:var(--green-d);color:var(--green-l);border:1px solid var(--green-b)">阶段一 · 个体启蒙</span>
+    </div>
+    <div class="tb-right">
+      <div class="gm-chip" onclick="window.location.href='HengAI_GM_Wallet.html'">
+        <span class="gm-chip-lbl">GM</span>
+        <span class="gm-chip-val dyn-gm-balance-num" id="top-gm">--</span>
+      </div>
+      <button class="tb-btn" id="tb-btn-a" onclick="handleAction()">升级年付</button>
+      <button class="tb-btn tb-btn-primary" id="tb-btn-p" onclick="handlePrimary()">建立企业档案 →</button>
+    </div>
+  </div>
+
+  <div class="main-scroll">
+  <div class="main-pad">
+
+    <!-- Phase Tabs -->
+    <div class="phase-tabs fu">
+      <div class="ph-tab on-ph1" id="ptab1" onclick="setPhase(1)">
+        <span class="ph-tab-code">PHASE 1</span>个体启蒙期
+      </div>
+      <div class="ph-tab" id="ptab2" onclick="setPhase(2)">
+        <span class="ph-tab-code">PHASE 2</span>业务映射期
+      </div>
+      <div class="ph-tab" id="ptab3" onclick="setPhase(3)">
+        <span class="ph-tab-code">PHASE 3</span>全域共治期
+      </div>
+    </div>
+
+    <!-- Identity Card -->
+    <div class="id-card fu d1">
+      <div class="id-inner">
+        <div class="id-av" id="id-avatar">
+          <span id="H-uav" class="dyn-user-name-initial">?</span>
+          <div class="id-av-dot"></div>
+        </div>
+        <div style="flex:1">
+          <div class="id-name dyn-user-name" id="id-name"></div>
+          <div class="id-meta" id="id-meta">注册于 <span class="dyn-user-reg-date">—</span> · <span class="dyn-user-tier">免费体验版</span></div>
+          <div class="id-tags" id="id-tags">
+            <span class="pill p-green dyn-company-stage">Lv.1 观察员</span>
+          </div>
+        </div>
+        <div class="shield-wrap">
+          <div class="shield-body">
+            <svg viewBox="0 0 54 61" fill="none">
+              <path id="sh-path" d="M27 2L51 11V31C51 44 40 54 27 58C14 54 3 44 3 31V11L27 2Z" fill="rgba(16,185,129,.12)" stroke="var(--green)" stroke-width="1.5"/>
+              <path id="sh-crown" d="M18 9L22 13L27 8L32 13L36 9" fill="none" stroke="var(--green)" stroke-width="1.1" stroke-linecap="round"/>
+            </svg>
+            <span class="shield-n dyn-user-level" id="sh-num" style="color:var(--green)">1</span>
+          </div>
+          <span class="shield-lbl dyn-company-stage" id="sh-lbl" style="color:var(--green)">Lv.1</span>
+        </div>
+      </div>
+
+      <!-- Registration Timeline -->
+      <div class="reg-strip">
+        <div class="rt-node">
+          <div class="rt-dot-wrap">
+            <div class="rt-d rt-done" id="tl-d1">
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </div>
+            <div class="rt-lbl" style="color:var(--green)">注册</div>
+            <div class="rt-date dyn-user-reg-date" id="tl-dt1">—</div>
+          </div>
+          <div class="rt-ln rt-ln-done" id="tl-ln1"></div>
+        </div>
+        <div class="rt-node">
+          <div class="rt-dot-wrap">
+            <div class="rt-d rt-done" id="tl-d2">
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </div>
+            <div class="rt-lbl" style="color:var(--green)">付费会员</div>
+            <div class="rt-date" id="tl-dt2">—</div>
+          </div>
+          <div class="rt-ln rt-ln-done" id="tl-ln2"></div>
+        </div>
+        <div class="rt-node">
+          <div class="rt-dot-wrap">
+            <div class="rt-d rt-done" id="tl-d3">
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round"/></svg>
+            </div>
+            <div class="rt-lbl" style="color:var(--green)">CBAM粗测</div>
+            <div class="rt-date">—</div>
+          </div>
+          <div class="rt-ln" id="tl-ln3"></div>
+        </div>
+        <div class="rt-node">
+          <div class="rt-dot-wrap">
+            <div class="rt-d rt-lock" id="tl-d4" style="font-size:9px;color:var(--ink3)">4</div>
+            <div class="rt-lbl" id="tl-l4">企业档案</div>
+            <div class="rt-date" id="tl-dt4">—</div>
+          </div>
+          <div class="rt-ln" id="tl-ln4"></div>
+        </div>
+        <div class="rt-node">
+          <div class="rt-dot-wrap">
+            <div class="rt-d rt-lock" id="tl-d5" style="font-size:9px;color:var(--ink3)">5</div>
+            <div class="rt-lbl" id="tl-l5">供应链</div>
+            <div class="rt-date">—</div>
+          </div>
+          <div class="rt-ln" id="tl-ln5"></div>
+        </div>
+        <div class="rt-node">
+          <div class="rt-dot-wrap">
+            <div class="rt-d rt-lock" id="tl-d6" style="font-size:9px;color:var(--ink3)">6</div>
+            <div class="rt-lbl" id="tl-l6">全域激活</div>
+            <div class="rt-date">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Phase Body -->
+    <div id="phase-body"></div>
+
+  </div>
+  </div>
+</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   全域中心 · Phase System · 完全由 AppState 驱动
+   ═══════════════════════════════════════════════════════════ */
+var PHASE = 1;
+
+/* Phase 配置（视觉层 —— 文案由 AppState 提供，颜色在此定义） */
+var PHASE_CFG = {
+  1: {
+    badgeText:'阶段一 · 个体启蒙',
+    badgeStyle:'background:var(--green-d);color:var(--green-l);border:1px solid var(--green-b)',
+    phaseClass:'ph1', phaseDot:'var(--green)', phaseText:'个体启蒙期',
+    shFill:'rgba(16,185,129,.12)', shStroke:'#10b981',
+    btnA:'升级年付', btnP:'建立企业档案 →',
+    ptabs:['on-ph1','','']
+  },
+  2: {
+    badgeText:'阶段二 · 业务映射',
+    badgeStyle:'background:var(--gold-d);color:var(--gold-l);border:1px solid var(--gold-b)',
+    phaseClass:'ph2', phaseDot:'var(--gold)', phaseText:'业务映射期',
+    shFill:'rgba(201,168,76,.12)', shStroke:'#c9a84c',
+    btnA:'申请企业升级', btnP:'生成升级报告 →',
+    ptabs:['','on-ph2','']
+  },
+  3: {
+    badgeText:'阶段三 · 全域共治',
+    badgeStyle:'background:var(--purple-d);color:var(--purple-l);border:1px solid var(--purple-b)',
+    phaseClass:'ph3', phaseDot:'var(--purple)', phaseText:'全域共治期',
+    shFill:'rgba(139,92,246,.12)', shStroke:'#8b5cf6',
+    btnA:'全域枢纽已激活', btnP:'进入生态枢纽 →',
+    ptabs:['','','on-ph3']
+  }
+};
+
+function setPhase(p) {
+  PHASE = p;
+  var s  = window.AppState;
+  var c  = PHASE_CFG[p];
+  var ck = '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round"/></svg>';
+
+  /* GM 用 AppState 的实时值 */
+  var liveGm   = (s && s.user && s.user.gmBalance != null) ? Number(s.user.gmBalance) : 128;
+  var liveTier = (s && s.user && s.user.tier) ? s.user.tier : '免费体验版';
+  var liveName = (s && s.user && s.user.name) ? s.user.name : '访客';
+
+  /* topbar */
+  var badge = document.getElementById('tb-badge');
+  if (badge) { badge.textContent = c.badgeText; badge.style.cssText = c.badgeStyle; }
+  var btnA = document.getElementById('tb-btn-a');
+  if (btnA) btnA.textContent = c.btnA;
+  var btnP = document.getElementById('tb-btn-p');
+  if (btnP) btnP.textContent = c.btnP;
+  var topGm = document.getElementById('top-gm');
+  if (topGm) topGm.textContent = liveGm.toLocaleString();
+
+  /* sidebar */
+  var strip = document.getElementById('sb-phase');
+  if (strip) strip.className = 'sb-phase ' + c.phaseClass;
+  var pdot = document.getElementById('sb-pdot');
+  if (pdot) pdot.style.background = c.phaseDot;
+  var ptext = document.getElementById('sb-ptext');
+  if (ptext) ptext.textContent = c.phaseText;
+  var urole = document.getElementById('sb-urole');
+  if (urole) urole.textContent = liveTier;
+
+  /* phase tabs */
+  [1,2,3].forEach(function(i) {
+    var t = document.getElementById('ptab'+i);
+    if (t) {
+      t.className = 'ph-tab' + (c.ptabs[i-1] ? ' ' + c.ptabs[i-1] : '');
+    }
+  });
+
+  /* id-meta */
+  var meta = document.getElementById('id-meta');
+  if (meta && s && s.user) {
+    var regDate = (s.user.regDate && s.user.regDate !== '—') ? s.user.regDate : '—';
+    meta.innerHTML = '注册于 ' + regDate + ' · ' + liveTier;
+  }
+
+  /* id-tags */
+  var tags = document.getElementById('id-tags');
+  if (tags && s && s.company) {
+    var stage  = s.company.stageLabel || '—';
+    var t2     = s.metrics && s.metrics.cbamDrills > 0 ? '<span class="pill p-gold">CBAM 专家</span>' : '';
+    var t3     = (s.metrics && s.metrics.supplyChainCoverage > .3) ? '<span class="pill p-blue">Scope 3 穿透中</span>' : '';
+    tags.innerHTML = '<span class="pill p-green">' + stage + '</span>' + t2 + t3;
+  }
+
+  /* shield */
+  var shPath   = document.getElementById('sh-path');
+  var shCrown  = document.getElementById('sh-crown');
+  var shNum    = document.getElementById('sh-num');
+  var shLbl    = document.getElementById('sh-lbl');
+  if (shPath)  { shPath.setAttribute('fill', c.shFill); shPath.setAttribute('stroke', c.shStroke); }
+  if (shCrown) shCrown.setAttribute('stroke', c.shStroke);
+  var lvNum = (s && s.user && s.user.tierLevel) ? s.user.tierLevel : p;
+  if (shNum)   { shNum.textContent = lvNum; shNum.style.color = c.phaseDot; }
+  if (shLbl)   { shLbl.textContent = 'Lv.' + lvNum; shLbl.style.color = c.phaseDot; }
+
+  /* timeline: unlock nodes for phase 2+ / 3+ */
+  if (p >= 2) {
+    var d4 = document.getElementById('tl-d4');
+    if (d4) { d4.className = 'rt-d rt-done'; d4.innerHTML = ck; }
+    var l4 = document.getElementById('tl-l4'); if (l4) l4.style.color = 'var(--green)';
+    var ln3 = document.getElementById('tl-ln3'); if (ln3) ln3.className = 'rt-ln rt-ln-done';
+    var ln4 = document.getElementById('tl-ln4'); if (ln4) ln4.className = 'rt-ln rt-ln-done';
+  }
+  if (p >= 3) {
+    var d5 = document.getElementById('tl-d5');
+    if (d5) { d5.className = 'rt-d rt-done'; d5.innerHTML = ck; }
+    var l5 = document.getElementById('tl-l5'); if (l5) l5.style.color = 'var(--green)';
+    var d6 = document.getElementById('tl-d6');
+    if (d6) { d6.className = 'rt-d rt-done'; d6.innerHTML = ck; }
+    var l6 = document.getElementById('tl-l6'); if (l6) l6.style.color = 'var(--green)';
+    var ln5 = document.getElementById('tl-ln5'); if (ln5) ln5.className = 'rt-ln rt-ln-done';
+  }
+
+  renderPhaseBody(p);
+  if (window.syncAppState) window.syncAppState();
+}
+
+function cyclePhase() { setPhase(PHASE < 3 ? PHASE + 1 : 1); }
+
+/* ═══ PHASE BODY RENDERERS ═══ */
+function renderPhaseBody(p) {
+  var el = document.getElementById('phase-body');
+  if (!el) return;
+  if (p === 1) el.innerHTML = getP1HTML();
+  else if (p === 2) el.innerHTML = getP2HTML();
+  else el.innerHTML = getP3HTML();
+  /* re-sync dyn-* inside phase body */
+  if (window.syncAppState) window.syncAppState();
+}
+
+function getP1HTML() {
+  var s   = window.AppState || {};
+  var gm  = (s.user && s.user.gmBalance != null) ? Number(s.user.gmBalance).toLocaleString() : '128';
+  var evs = (s.gmTransactions || []).slice(0, 3);
+  var evHtml = evs.map(function(tx) {
+    var col = tx.amount > 0 ? 'var(--gold-l)' : 'var(--red-l)';
+    var sign = tx.amount > 0 ? '+' : '';
+    return '<div class="gm-ev"><div class="gm-ev-l"><div class="gm-ev-ic" style="background:var(--green-d);border:1px solid var(--green-b)"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><polyline points="1,5 4,8 11,2" stroke="var(--green-l)" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><div class="gm-ev-name">' + tx.type + '</div><div class="gm-ev-time">' + F.dt(tx.ts) + '</div></div></div><div class="gm-ev-val" style="color:' + col + '">' + sign + tx.amount + ' GM</div></div>';
+  }).join('');
+  var progW = Math.min(100, Math.round(Number((s.user && s.user.gmBalance) || 128) / 500 * 100));
+
+  return '<div class="g2 fu d2" style="margin-bottom:16px">' +
+    '<div class="card">' +
+      '<div class="sh"><div class="sh-t">GreenMark 绿印资产 <div class="sh-line"></div></div><span class="pill p-gold">本月活跃</span></div>' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:34px;font-weight:700;color:var(--gold-l);letter-spacing:-1px;line-height:1">' +
+        '<span class="dyn-gm-balance-num" id="hub-p1-gm-val">' + gm + '</span>' +
+        '<span style="font-size:14px;font-weight:400;color:var(--ink2);margin-left:6px">GM</span>' +
+      '</div>' +
+      '<div style="font-size:11.5px;color:var(--green-l);margin-top:4px">本月 +<span class="dyn-gm-monthly">320</span> GM 积累</div>' +
+      '<div style="margin:10px 0 4px"><div class="prog"><div class="prog-fill" style="width:' + progW + '%;background:linear-gradient(90deg,var(--gold),rgba(201,168,76,.4))"></div></div></div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink3)"><span>0</span><span style="color:var(--gold-l)">Lv.2 门槛 500 GM</span></div>' +
+      '<hr class="hr">' +
+      '<div class="gm-evs">' + evHtml + '</div>' +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="sh"><div class="sh-t">成长路径 <div class="sh-line"></div></div></div>' +
+      '<div class="step-list">' +
+        '<div class="sl-item"><div class="sl-dot sl-done"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="sl-body"><div class="sl-title" style="color:var(--green-l)">注册 HengAI · 首次AI问答</div><div class="sl-desc">完成 7 条 CBAM 问答 · +50 GM</div></div></div>' +
+        '<div class="sl-item"><div class="sl-dot sl-done"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="sl-body"><div class="sl-title" style="color:var(--green-l)">CBAM 精确测算</div><div class="sl-desc">首次完整碳税测算 · +28 GM</div></div></div>' +
+        '<div class="sl-item"><div class="sl-dot sl-active"><div style="width:7px;height:7px;background:var(--blue-l);border-radius:50%"></div></div><div class="sl-body"><div class="sl-title" style="color:var(--blue-l)">建立企业数字档案</div><div class="sl-desc">解锁企业工作台 · +150 GM</div></div></div>' +
+        '<div class="sl-item" style="padding-bottom:0"><div class="sl-dot sl-wait">4</div><div class="sl-body"><div class="sl-title" style="color:var(--ink3)">推动供应链数据填报</div><div class="sl-desc" style="color:var(--ink3)">解锁 Scope 3 穿透 · +200 GM/家</div></div></div>' +
+      '</div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="ins ins-green fu d2"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><circle cx="7" cy="7" r="6" stroke="var(--green-l)" stroke-width="1"/><line x1="7" y1="5" x2="7" y2="9" stroke="var(--green-l)" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="3.5" r=".7" fill="var(--green-l)"/></svg>每一吨减排都有主人——你的成长路径将永久记录在 CL-IVC 链上，不可篡改，不可转让，属于你的数字主权资产。</div>' +
+  '<div class="card fu d3" style="border-style:dashed;border-color:rgba(255,255,255,.13);background:rgba(0,0,0,.2)">' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:14px">' +
+      '<div style="display:flex;align-items:flex-start;gap:12px">' +
+        '<div style="width:38px;height:38px;border-radius:9px;background:var(--blue-d);border:1px solid var(--blue-b);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="11" rx="2" stroke="var(--blue-l)" stroke-width="1.2"/><path d="M5 4V3a4 4 0 018 0v1" stroke="var(--blue-l)" stroke-width="1.2" stroke-linecap="round"/></svg></div>' +
+        '<div><div style="font-size:13.5px;font-weight:600;margin-bottom:3px">建立企业数字档案</div><div style="font-size:12px;color:var(--ink2);line-height:1.65">将个人知识转化为企业合规资产，解锁精确诊断与供应链协同</div></div>' +
+      '</div>' +
+      '<button class="cta cta-green" style="white-space:nowrap;padding:9px 18px;font-size:12.5px;width:auto" onclick="enterPhase2()">立即建立 →</button>' +
+    '</div>' +
+  '</div>' +
+  '<div style="margin-top:16px" class="fu d3">' +
+    '<div class="sh"><div class="sh-t">快速工具 <div class="sh-line"></div></div></div>' +
+    '<div class="g3">' +
+      '<button class="act-btn" onclick="window.location.href=\'HengAI_法规知识库.html\'"><div class="act-ic" style="background:var(--teal-d);border:1px solid var(--teal-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1.5" width="10" height="11" rx="1.5" stroke="var(--teal-l)" stroke-width="1"/><line x1="4.5" y1="5" x2="9.5" y2="5" stroke="var(--teal-l)" stroke-width="1" stroke-linecap="round"/><line x1="4.5" y1="7.5" x2="9.5" y2="7.5" stroke="var(--teal-l)" stroke-width="1" stroke-linecap="round"/><line x1="4.5" y1="10" x2="7.5" y2="10" stroke="var(--teal-l)" stroke-width="1" stroke-linecap="round"/></svg></div>法规知识库</button>' +
+      '<button class="act-btn" onclick="window.location.href=\'HengAI_CBAM测算工具.html\'"><div class="act-ic" style="background:var(--gold-d);border:1px solid var(--gold-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L13 4.5V10.5L7 12.5L1 10.5V4.5L7 1.5Z" stroke="var(--gold-l)" stroke-width="1"/><text x="7" y="9.5" text-anchor="middle" font-size="5" font-weight="700" fill="var(--gold-l)">€</text></svg></div>CBAM 测算</button>' +
+      '<button class="act-btn" onclick="window.location.href=\'HengAI_荣誉体系.html\'"><div class="act-ic" style="background:var(--purple-d);border:1px solid var(--purple-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L8.5 5.5L12.5 6L9.5 9L10.5 13L7 11L3.5 13L4.5 9L1.5 6L5.5 5.5L7 1.5Z" stroke="var(--purple-l)" stroke-width="1"/></svg></div>荣誉体系</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function getP2HTML() {
+  var s     = window.AppState || {};
+  var riskEur = (s.metrics && s.metrics.riskExposureEur) || 145000;
+  var riskStr = F.eur(riskEur);
+  var taxStr  = F.eur((s.metrics && s.metrics.cbamTaxEstimate) || 73600);
+  var roiStr  = (s.company && s.company.roiRatio) || '6.4×';
+  var saveStr = (s.company && s.company.netSavings) || '¥ 372k';
+  var covRaw  = (s.metrics && s.metrics.supplyChainCoverage) || 0;
+  var covPct  = Math.round(covRaw * 100);
+  var supTotal= (s.metrics && s.metrics.supplierCount) || 17;
+  var supDone = (s.metrics && s.metrics.supplierSubmitted) || 11;
+  var donutC  = 2 * Math.PI * 32;
+  var donutOffset = donutC - (covRaw * donutC);
+  var gmVal   = (s.user && s.user.gmBalance != null) ? Number(s.user.gmBalance).toLocaleString() : '840';
+  var gmProg  = Math.min(100, Math.round(Number((s.user && s.user.gmBalance) || 840) / 2000 * 100));
+  var entName = (s.company && s.company.name) || '待完善企业档案';
+
+  return '<div class="g2 fu d2" style="margin-bottom:16px">' +
+    '<div class="alarm">' +
+      '<div style="flex-shrink:0;margin-top:2px"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2L20 18H2L11 2Z" stroke="var(--red-l)" stroke-width="1.5" fill="var(--red-d)"/><line x1="11" y1="9" x2="11" y2="13" stroke="var(--red-l)" stroke-width="1.5" stroke-linecap="round"/><circle cx="11" cy="15.5" r=".8" fill="var(--red-l)"/></svg></div>' +
+      '<div><div class="alarm-val"><span class="dyn-risk-eur">' + riskStr + '</span></div><div class="alarm-lbl">2026 年 CBAM 年度碳税预测</div><div style="font-size:11.5px;color:rgba(252,165,165,.7);margin-top:5px">你需要向欧盟海关提交申报，否则将面临双倍惩罚</div></div>' +
+    '</div>' +
+    '<div class="card">' +
+      '<div style="font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">三步对冲 ROI</div>' +
+      '<div class="roi-strip">' +
+        '<div class="roi-box" style="background:var(--red-d);border-color:var(--red-b);text-align:center"><div class="roi-val" style="color:var(--red-l)"><span class="dyn-risk-eur">' + riskStr + '</span></div><div class="roi-lbl" style="color:var(--red-l)">碳税敞口</div></div>' +
+        '<div style="text-align:center;color:var(--ink3);font-size:11px">→</div>' +
+        '<div class="roi-box" style="background:rgba(0,0,0,.28);border-color:var(--border);text-align:center"><div class="roi-val" style="color:var(--ink2)">¥58k</div><div class="roi-lbl" style="color:var(--ink3)">HengAI 投入</div></div>' +
+        '<div style="text-align:center;color:var(--ink3);font-size:11px">→</div>' +
+        '<div class="roi-box" style="background:var(--green-d);border-color:var(--green-b);text-align:center"><div class="roi-val" style="color:var(--green-l)"><span class="dyn-rep-roi">' + roiStr + '</span></div><div class="roi-lbl" style="color:var(--green-l)">ROI 回报</div></div>' +
+      '</div>' +
+      '<div class="ins ins-gold" style="margin-top:11px;margin-bottom:0;font-size:11.5px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0"><path d="M6 1L11 3.5V8.5L6 11L1 8.5V3.5L6 1Z" stroke="var(--gold-l)" stroke-width="1"/></svg>节税 <strong>' + saveStr + '</strong> · ROI <strong>' + roiStr + '</strong> · 净收益 ≈ 投入的 9.1 倍</div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="g2 fu d3" style="margin-bottom:16px">' +
+    '<div class="card">' +
+      '<div class="sh"><div class="sh-t">供应链穿透状态 <div class="sh-line"></div></div><span class="pill p-red">' + covPct + '%</span></div>' +
+      '<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">' +
+        '<div class="donut-w"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8"/><circle cx="40" cy="40" r="32" fill="none" stroke="var(--green)" stroke-width="8" stroke-dasharray="' + (covRaw*donutC).toFixed(1) + ' ' + donutC.toFixed(1) + '" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 40 40)"/></svg><div class="donut-c"><div class="donut-pct" style="color:var(--green-l)">' + covPct + '%</div><div class="donut-lbl">覆盖率</div></div></div>' +
+        '<div style="flex:1;display:flex;flex-direction:column;gap:6px">' +
+          '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--ink2)">已填报</span><span style="font-family:\'DM Mono\',monospace;font-weight:700;color:var(--green-l)">' + supDone + ' 家</span></div>' +
+          '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--ink2)">待填报</span><span style="font-family:\'DM Mono\',monospace;font-weight:700;color:var(--gold-l)">' + (supTotal - supDone) + ' 家</span></div>' +
+          '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--ink2)">覆盖率目标</span><span style="font-family:\'DM Mono\',monospace;font-weight:700;color:var(--ink)">90%</span></div>' +
+        '</div>' +
+      '</div>' +
+      '<button class="cta cta-green" style="width:100%;font-size:12px;padding:9px" onclick="window.location.href=\'HengAI_供应链协同.html\'">进入供应链协同 →</button>' +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="sh"><div class="sh-t">GreenMark <div class="sh-line"></div></div><span style="font-family:\'DM Mono\',monospace;font-size:18px;font-weight:700;color:var(--gold-l)" class="dyn-gm-balance-num">' + gmVal + '</span></div>' +
+      '<div class="prog" style="margin-bottom:4px"><div class="prog-fill dyn-supply-bar" style="width:' + gmProg + '%;background:linear-gradient(90deg,var(--gold),rgba(201,168,76,.4))"></div></div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink3);margin-bottom:12px"><span>0</span><span style="color:var(--gold-l)">Lv.4 门槛 2,000 GM</span></div>' +
+      '<div class="gm-evs">' +
+        '<div class="gm-ev"><div class="gm-ev-l"><div class="gm-ev-ic" style="background:var(--blue-d);border:1px solid var(--blue-b)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="1.5" width="9" height="9" rx="1.5" stroke="var(--blue-l)" stroke-width="1"/><line x1="6" y1="4" x2="6" y2="8" stroke="var(--blue-l)" stroke-width="1" stroke-linecap="round"/><line x1="4" y1="6" x2="8" y2="6" stroke="var(--blue-l)" stroke-width="1" stroke-linecap="round"/></svg></div><div class="gm-ev-name">每推动1家供应商注册</div></div><div class="gm-ev-val">+100 GM</div></div>' +
+        '<div class="gm-ev"><div class="gm-ev-l"><div class="gm-ev-ic" style="background:var(--green-d);border:1px solid var(--green-b)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4.5" stroke="var(--green-l)" stroke-width="1"/><polyline points="3.5,6 5.5,8 8.5,4" stroke="var(--green-l)" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="gm-ev-name">每完成1次填报确认</div></div><div class="gm-ev-val">+200 GM</div></div>' +
+      '</div>' +
+      '<button class="cta cta-gold" style="width:100%;margin-top:12px;font-size:12px;padding:9px" onclick="window.location.href=\'HengAI_决策层呈送包生成器.html\'">生成《全域升级报告》→</button>' +
+    '</div>' +
+  '</div>' +
+  '<div class="card fu d4" style="border-color:rgba(16,185,129,.22)">' +
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulseDot 2s infinite"></div><span style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--green-l);font-weight:700">实时诊断报告</span></div>' +
+    '<div style="font-size:14px;font-weight:600;margin-bottom:4px"><span class="dyn-company-name">' + entName + '</span> · 全域碳合规诊断报告</div>' +
+    '<div style="font-size:12px;color:var(--ink2);margin-bottom:12px">供应链覆盖率 <span class="dyn-sup-pct">' + covPct + '%</span> · 下次更新：更多供应商填报完成后</div>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"><span class="pill p-red">碳税敞口 <span class="dyn-risk-eur">' + riskStr + '</span></span><span class="pill p-gold">ROI <span class="dyn-rep-roi">' + roiStr + '</span></span><span class="pill p-green">覆盖率 <span class="dyn-sup-pct">' + covPct + '%</span></span></div>' +
+    '<button class="tb-btn tb-btn-primary" style="font-size:12.5px" onclick="window.location.href=\'HengAI_全域诊断报告.html\'">查看完整诊断报告 →</button>' +
+  '</div>';
+}
+
+function getP3HTML() {
+  var s      = window.AppState || {};
+  var lvl    = (s.user && s.user.currentLevel) ? 'Lv.' + s.user.currentLevel + ' 生态领袖' : 'Lv.5 生态领袖';
+  var tco2   = (s.user && s.user.totalCo2eSaved) ? s.user.totalCo2eSaved : 142;
+  var gmVal  = (s.user && s.user.gmBalance != null) ? Number(s.user.gmBalance).toLocaleString() : '2,840';
+  var seatId = (s.governance && s.governance.seatId) ? s.governance.seatId : '#0412';
+  var trees  = Math.round(tco2 * 333);
+
+  return '<div style="background:var(--bg2);border:1px solid rgba(139,92,246,.22);border-radius:18px;overflow:hidden;margin-bottom:16px;position:relative" class="fu d2">' +
+    '<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--gold) 40%,var(--purple) 70%,transparent 95%)"></div>' +
+    '<div class="rail-row">' +
+      '<div class="rail-l">' +
+        '<div class="rail-tag" style="color:var(--gold-l)">地球公民 · 个人成就</div>' +
+        '<div class="rail-level" style="color:var(--purple-l)">' + lvl + '</div>' +
+        '<div class="rail-en">Global Eco-Advisor · <span class="dyn-gov-seat-id">' + seatId + '</span></div>' +
+        '<div class="rail-bignum" style="color:var(--teal-l)"><span class="dyn-co2e-saved">' + tco2 + '</span></div>' +
+        '<div class="rail-bigsub">tCO₂e · 累计推动减排 · 链上存证不可篡改</div>' +
+        '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px"><span class="pill p-purple">生态顾问委员会</span><span class="pill p-gold">GM 乘数 ×2.0</span><span class="pill p-teal">减排证书颁发权</span></div>' +
+        '<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--gold-d);border:1px solid var(--gold-b);border-radius:10px;margin-bottom:10px">' +
+          '<svg width="30" height="30" viewBox="0 0 30 30" fill="none"><path d="M15 2L28 8V19C28 25 22 29.5 15 31C8 29.5 2 25 2 19V8L15 2Z" fill="rgba(201,168,76,.15)" stroke="var(--gold)" stroke-width="1.3"/><polyline points="8,15 13,20 22,10" stroke="var(--gold-l)" stroke-width="1.5" stroke-linecap="round"/></svg>' +
+          '<div><div style="font-size:12px;font-weight:600;color:var(--gold-l)">地球公民荣誉勋章</div><div style="font-size:10px;color:var(--gold);margin-top:1px">' + seatId + ' · CL-IVC 链上存证 · 不可撤销</div></div>' +
+        '</div>' +
+        '<div style="font-family:\'DM Mono\',monospace;font-size:26px;font-weight:700;color:var(--gold-l);letter-spacing:-1px"><span class="dyn-gm-balance-num">' + gmVal + '</span> <span style="font-size:14px;font-weight:400;color:var(--ink2)">GM</span></div>' +
+        '<div style="font-size:11px;color:var(--ink2)">GreenMark · 可授予合作伙伴</div>' +
+      '</div>' +
+      '<div class="rail-r">' +
+        '<div class="rail-tag" style="color:var(--teal-l)">企业文明 · 官方认证</div>' +
+        '<div class="rail-level" style="color:var(--teal-l)">官方认证金库</div>' +
+        '<div class="rail-en">Certified Vault · Enterprise</div>' +
+        '<div class="cert-vault" style="background:var(--teal-d);border:1px solid var(--teal-b)"><div class="cv-pulse" style="background:var(--green)"></div><div style="font-size:12px;color:var(--teal-l);font-weight:600"><span class="dyn-company-name">待完善</span> · 链上认证中</div></div>' +
+        '<div class="gw-list" style="margin-bottom:12px">' +
+          '<div class="gw-item"><div class="gw-d" style="background:var(--green)"></div><div class="gw-name">MAT 边缘感知网关</div><div class="gw-status" style="color:var(--green-l)">Lv.4 在线</div></div>' +
+          '<div class="gw-item"><div class="gw-d" style="background:var(--blue-l)"></div><div class="gw-name">ZCP 零碳算力签证</div><div class="gw-status" style="color:var(--blue-l)">时移运行中</div></div>' +
+          '<div class="gw-item"><div class="gw-d" style="background:var(--teal-l)"></div><div class="gw-name">CL-GTS 欧盟直连通道</div><div class="gw-status" style="color:var(--teal-l)">申报就绪</div></div>' +
+        '</div>' +
+        '<div style="padding:11px 14px;background:var(--green-d);border:1px solid var(--green-b);border-radius:10px">' +
+          '<div style="font-size:10px;color:var(--green);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">CL-IVC 隐私誓言</div>' +
+          '<div style="font-size:11.5px;color:var(--green-l);line-height:1.65">你的碳数据属于你。Co2Lion 仅用于合规计算，永不出售，永不授权第三方分析。</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="fu d3" style="margin-bottom:16px">' +
+    '<div class="sh"><div class="sh-t">全域业务引擎 <div class="sh-line"></div></div><span class="pill p-purple">旗舰模式已激活</span></div>' +
+    '<div class="p3-grid">' +
+      '<button class="p3-btn" onclick="window.location.href=\'HengAI_EU_Customs.html\'"><div class="p3-ic" style="background:var(--blue-d);border:1px solid var(--blue-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="3.5" width="11" height="8" rx="1.5" stroke="var(--blue-l)" stroke-width="1"/><path d="M5 3.5V3a2 2 0 014 0v.5" stroke="var(--blue-l)" stroke-width="1" stroke-linecap="round"/></svg></div><div class="p3-lbl">欧盟海关直连</div><div class="p3-sub">申报就绪</div></button>' +
+      '<button class="p3-btn" onclick="window.location.href=\'HengAI_DLD_Credit.html\'"><div class="p3-ic" style="background:var(--green-d);border:1px solid var(--green-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="4" width="10" height="8" rx="1.5" stroke="var(--green-l)" stroke-width="1"/><path d="M5 4V3a2 2 0 014 0v1" stroke="var(--green-l)" stroke-width="1" stroke-linecap="round"/><line x1="7" y1="7" x2="7" y2="9" stroke="var(--green-l)" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="p3-lbl">DLD 绿色信贷</div><div class="p3-sub"><span class="dyn-dld-credit">--</span></div></button>' +
+      '<button class="p3-btn" onclick="window.location.href=\'HengAI_ACF_Cert.html\'"><div class="p3-ic" style="background:var(--teal-d);border:1px solid var(--teal-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="6" r="4" stroke="var(--teal-l)" stroke-width="1"/><path d="M4 10.5L7 13L10 10.5" stroke="var(--teal-l)" stroke-width="1" stroke-linecap="round"/></svg></div><div class="p3-lbl">ACF 认证</div><div class="p3-sub"><span class="dyn-acf-status">--</span></div></button>' +
+      '<button class="p3-btn" onclick="window.location.href=\'HengAI_供应链协同.html\'"><div class="p3-ic" style="background:var(--teal-d);border:1px solid var(--teal-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="3" cy="7" r="1.5" stroke="var(--teal-l)" stroke-width="1"/><circle cx="11" cy="4" r="1.5" stroke="var(--teal-l)" stroke-width="1"/><circle cx="11" cy="10" r="1.5" stroke="var(--teal-l)" stroke-width="1"/><line x1="4.5" y1="6.5" x2="9.5" y2="4.5" stroke="var(--teal-l)" stroke-width=".9"/><line x1="4.5" y1="7.5" x2="9.5" y2="9.5" stroke="var(--teal-l)" stroke-width=".9"/></svg></div><div class="p3-lbl">供应链协同</div><div class="p3-sub"><span class="dyn-sup-pct">--</span> 覆盖</div></button>' +
+      '<button class="p3-btn" onclick="showToast(\'ZCP 时移签证 · 本月节税 ¥3.2万\')"><div class="p3-ic" style="background:var(--gold-d);border:1px solid var(--gold-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--gold-l)" stroke-width="1"/><path d="M7 4V7L9 9" stroke="var(--gold-l)" stroke-width="1.2" stroke-linecap="round"/></svg></div><div class="p3-lbl">ZCP 时移签证</div><div class="p3-sub">时移运行中</div></button>' +
+      '<button class="p3-btn" onclick="window.location.href=\'HengAI_Governance.html\'"><div class="p3-ic" style="background:var(--purple-d);border:1px solid var(--purple-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="var(--purple-l)" stroke-width="1"/><circle cx="7" cy="7" r="2" stroke="var(--purple-l)" stroke-width="1"/><line x1="7" y1="2" x2="7" y2="4" stroke="var(--purple-l)" stroke-width="1" stroke-linecap="round"/><line x1="7" y1="10" x2="7" y2="12" stroke="var(--purple-l)" stroke-width="1" stroke-linecap="round"/><line x1="2" y1="7" x2="4" y2="7" stroke="var(--purple-l)" stroke-width="1" stroke-linecap="round"/><line x1="10" y1="7" x2="12" y2="7" stroke="var(--purple-l)" stroke-width="1" stroke-linecap="round"/></svg></div><div class="p3-lbl">共治委员会</div><div class="p3-sub"><span class="dyn-gov-votes">--</span> 票待用</div></button>' +
+    '</div>' +
+  '</div>' +
+  '<div class="card fu d4" style="border-color:rgba(139,92,246,.22)">' +
+    '<div class="sh"><div class="sh-t">全球减排贡献 <div class="sh-line"></div></div><span class="pill p-purple">CL-IVC 链上核验</span></div>' +
+    '<div class="g4">' +
+      '<div class="metric"><div class="m-lbl">累计推动减排</div><div class="m-val" style="color:var(--teal-l)"><span class="dyn-co2e-saved">' + tco2 + '</span><span class="m-unit">tCO₂e</span></div><div class="m-sub">链上不可篡改</div></div>' +
+      '<div class="metric"><div class="m-lbl">影响供应商</div><div class="m-val" style="color:var(--green-l)"><span class="dyn-supplier-count">' + ((s.metrics && s.metrics.supplierCount) || 17) + '</span><span class="m-unit">家</span></div><div class="m-sub">二级节点扩展中</div></div>' +
+      '<div class="metric"><div class="m-lbl">年度节税</div><div class="m-val" style="color:var(--gold-l)"><span class="dyn-rep-save">' + saveStr + '</span></div><div class="m-sub">ROI <span class="dyn-rep-roi">' + roiStr + '</span></div></div>' +
+      '<div class="metric"><div class="m-lbl">等效植树</div><div class="m-val" style="color:var(--purple-l)">' + (trees/1000).toFixed(1) + '<span class="m-unit">k棵</span></div><div class="m-sub">一年固碳量</div></div>' +
+    '</div>' +
+  '</div>';
+}
+
+/* ═══ ACTION HANDLERS ═══ */
+function handleAction() {
+  if (PHASE === 1) showToast('年付升级 · ¥799/年 · 节省33%');
+  else if (PHASE === 2) showToast('企业升级申请已发起，请等待审核');
+  else showToast('全域枢纽已完全激活，所有功能可用');
+}
+function handlePrimary() {
+  if (PHASE === 1) enterPhase2();
+  else if (PHASE === 2) window.location.href = 'HengAI_决策层呈送包生成器.html';
+  else window.location.href = 'HengAI_EU_Customs.html';
+}
+function enterPhase2() {
+  setPhase(2);
+  showToast('企业档案已建立 · +50 GM · 欢迎进入阶段二');
+  setTimeout(function() { window.location.href = 'HengAI_企业数字档案.html'; }, 800);
+}
+
+/* ═══ BOOT ═══ */
+window.addEventListener('DOMContentLoaded', function() {
+  initAppState(function onReady(state) {
+    /* Phase 根据用户真实等级决定 */
+    var ph = 1;
+    var code = state.flags && state.flags.currentPhase;
+    if (code === 'Phase3' || (state.user && state.user.tierLevel >= 4)) ph = 3;
+    else if (code === 'Phase2' || (state.user && state.user.tierLevel >= 2)) ph = 2;
+    setPhase(ph);
+  });
+});
+</script>
+</body>
+</html>

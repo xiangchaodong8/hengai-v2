@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Co2Lion · HengAI 全域合规中心</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+
+/* ═══════ ROOT DESIGN TOKENS ═══════ */
+:root {
+  --bg0: #06080f;
+  --bg1: #0a0d16;
+  --bg2: #0e1220;
+  --bg3: rgba(255,255,255,0.04);
+  --bg4: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --ink: #e2e8f4;
+  --ink2: #8896aa;
+  --ink3: #475569;
+  --green: #10b981; --green-l: #6ee7b7; --green-d: rgba(16,185,129,0.13); --green-b: rgba(16,185,129,0.30);
+  --gold:  #c9a84c; --gold-l:  #f0d080; --gold-d:  rgba(201,168,76,0.13);  --gold-b:  rgba(201,168,76,0.30);
+  --blue:  #3b82f6; --blue-l:  #93c5fd; --blue-d:  rgba(59,130,246,0.13);  --blue-b:  rgba(59,130,246,0.30);
+  --purple:#8b5cf6; --purple-l:#c4b5fd; --purple-d:rgba(139,92,246,0.13); --purple-b:rgba(139,92,246,0.30);
+  --red:   #ef4444; --red-l:   #fca5a5; --red-d:   rgba(239,68,68,0.13);  --red-b:   rgba(239,68,68,0.30);
+  --teal:  #14b8a6; --teal-l:  #5eead4; --teal-d:  rgba(20,184,166,0.13); --teal-b:  rgba(20,184,166,0.30);
+  --sb-w: 218px;
+  --tb-h: 52px;
+}
+
+/* ═══════ RESET & BASE ═══════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: var(--bg0); color: var(--ink); font-family: 'Noto Sans SC', sans-serif; font-size: 13px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }
+
+/* ═══════ LAYOUT ═══════ */
+.app { display: flex; height: 100vh; }
+
+/* ═══════ SIDEBAR ═══════ */
+.sidebar {
+  width: var(--sb-w); flex-shrink: 0;
+  background: var(--bg1);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  height: 100vh; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.sidebar::-webkit-scrollbar { width: 3px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.sb-brand {
+  padding: 17px 15px 13px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.sb-brand-ic {
+  width: 32px; height: 32px; border-radius: 9px;
+  background: var(--green-d); border: 1px solid var(--green-b);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sb-brand-name { font-size: 14px; font-weight: 700; letter-spacing: 0.2px; }
+.sb-brand-sub  { font-size: 9.5px; color: var(--ink3); margin-top: 1px; }
+
+/* Phase badge */
+.sb-phase {
+  margin: 10px 12px 2px;
+  padding: 8px 12px; border-radius: 9px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; user-select: none; transition: opacity .2s;
+}
+.sb-phase:hover { opacity: .8; }
+.sb-phase-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; animation: pulseDot 2.2s ease-in-out infinite; }
+@keyframes pulseDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+.ph1 { background: var(--green-d); border: 1px solid var(--green-b); color: var(--green-l); }
+.ph2 { background: var(--gold-d);  border: 1px solid var(--gold-b);  color: var(--gold-l);  }
+.ph3 { background: var(--purple-d);border: 1px solid var(--purple-b);color: var(--purple-l);}
+
+/* Nav */
+.sb-group-title {
+  padding: 10px 14px 3px;
+  font-size: 9px; color: var(--ink3); letter-spacing: 1.4px; text-transform: uppercase; font-weight: 600;
+}
+.sb-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 14px; font-size: 12.5px; color: var(--ink2);
+  cursor: pointer; border-left: 2px solid transparent;
+  transition: all .14s; position: relative;
+}
+.sb-item:hover { color: var(--ink); background: var(--bg4); }
+.sb-item.active { color: var(--ink); background: rgba(255,255,255,0.07); border-left-color: var(--green); }
+.sb-item.locked { color: var(--ink3); cursor: not-allowed; }
+.sb-item.locked:hover { background: transparent; color: var(--ink3); }
+.sb-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.sb-tag {
+  margin-left: auto; font-size: 9px; font-weight: 700;
+  padding: 1px 6px; border-radius: 20px; white-space: nowrap;
+}
+.tag-new    { background: var(--green-d); color: var(--green-l); border: 1px solid var(--green-b); }
+.tag-gold   { background: var(--gold-d);  color: var(--gold-l);  border: 1px solid var(--gold-b);  }
+.tag-purple { background: var(--purple-d);color: var(--purple-l);border: 1px solid var(--purple-b);}
+.tag-lock   { background: rgba(255,255,255,0.04); color: var(--ink3); border: 1px solid var(--border); }
+
+/* Sidebar footer */
+.sb-footer {
+  margin-top: auto; padding: 12px 14px;
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.sb-user { display: flex; align-items: center; gap: 9px; }
+.sb-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--teal-d); border: 1.5px solid var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--teal-l); flex-shrink: 0;
+}
+.sb-uname { font-size: 12.5px; font-weight: 500; }
+.sb-urole { font-size: 10px; color: var(--ink3); margin-top: 1px; }
+
+/* ═══════ TOPBAR ═══════ */
+.topbar {
+  height: var(--tb-h); flex-shrink: 0;
+  background: rgba(6,8,15,.93); backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.tb-left  { display: flex; align-items: center; gap: 12px; }
+.tb-right { display: flex; align-items: center; gap: 10px; }
+.tb-title { font-size: 15px; font-weight: 600; }
+.tb-pill {
+  font-size: 9.5px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px; letter-spacing: .6px; text-transform: uppercase;
+}
+/* GM chip */
+.gm-chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 14px; border-radius: 20px;
+  background: var(--gold-d); border: 1px solid var(--gold-b);
+  cursor: pointer; transition: background .2s;
+}
+.gm-chip:hover { background: rgba(201,168,76,.22); }
+.gm-chip-lbl { font-size: 10px; color: var(--gold); font-weight: 500; }
+.gm-chip-val { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 700; color: var(--gold-l); letter-spacing: -.3px; }
+
+/* Topbar buttons */
+.tb-btn {
+  padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 500;
+  border: 1px solid var(--border2); background: transparent; color: var(--ink);
+  transition: background .15s; display: inline-flex; align-items: center; gap: 6px;
+}
+.tb-btn:hover { background: var(--bg4); }
+.tb-btn-primary { background: var(--green-d); border-color: var(--green-b); color: var(--green-l); }
+.tb-btn-primary:hover { background: rgba(16,185,129,.22); }
+
+/* ═══════ MAIN CONTENT ═══════ */
+.main-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+.main-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.main-scroll::-webkit-scrollbar { width: 4px; }
+.main-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.main-pad { padding: 24px 28px 72px; }
+
+/* ═══════ PAGE PANELS ═══════ */
+.page-panel { display: none; }
+.page-panel.active { display: block; }
+
+/* ═══════ SHARED COMPONENTS ═══════ */
+.card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 14px; padding: 18px 20px;
+  backdrop-filter: blur(8px);
+}
+.card-hi { border-color: var(--border2); background: var(--bg3); }
+
+.g2  { display: grid; grid-template-columns: 1fr 1fr;             gap: 14px; }
+.g3  { display: grid; grid-template-columns: repeat(3,1fr);       gap: 12px; }
+.g4  { display: grid; grid-template-columns: repeat(4,1fr);       gap: 10px; }
+.g12 { display: grid; grid-template-columns: 1fr 1.6fr;           gap: 14px; }
+.g21 { display: grid; grid-template-columns: 1.6fr 1fr;           gap: 14px; }
+
+/* Pills */
+.pill { display: inline-flex; align-items: center; font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
+.p-green  { background: var(--green-d);  color: var(--green-l);  border: 1px solid var(--green-b);  }
+.p-gold   { background: var(--gold-d);   color: var(--gold-l);   border: 1px solid var(--gold-b);   }
+.p-blue   { background: var(--blue-d);   color: var(--blue-l);   border: 1px solid var(--blue-b);   }
+.p-purple { background: var(--purple-d); color: var(--purple-l); border: 1px solid var(--purple-b); }
+.p-red    { background: var(--red-d);    color: var(--red-l);    border: 1px solid var(--red-b);    }
+.p-teal   { background: var(--teal-d);   color: var(--teal-l);   border: 1px solid var(--teal-b);   }
+.p-gray   { background: rgba(255,255,255,.05); color: var(--ink2); border: 1px solid var(--border);  }
+
+/* Section heading */
+.sh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.sh-t { font-size: 11px; font-weight: 700; color: var(--ink3); letter-spacing: 1.2px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.sh-line { flex: 1; height: 1px; background: var(--border); }
+.sh-a { font-size: 11.5px; color: var(--green-l); cursor: pointer; white-space: nowrap; }
+
+/* Divider */
+.hr { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+
+/* Metric box */
+.metric { background: rgba(0,0,0,.28); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.m-lbl  { font-size: 10px; color: var(--ink3); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.m-val  { font-family: 'DM Mono', monospace; font-size: 24px; font-weight: 700; letter-spacing: -.5px; line-height: 1; }
+.m-unit { font-size: 12px; font-weight: 400; margin-left: 2px; opacity: .7; }
+.m-sub  { font-size: 11px; color: var(--ink2); margin-top: 4px; }
+
+/* Insight banners */
+.ins { padding: 11px 14px; border-radius: 10px; font-size: 12px; line-height: 1.7; display: flex; gap: 9px; align-items: flex-start; margin-bottom: 14px; }
+.ins-green  { background: var(--green-d);  border: 1px solid var(--green-b);  color: var(--green-l);  }
+.ins-gold   { background: var(--gold-d);   border: 1px solid var(--gold-b);   color: var(--gold-l);   }
+.ins-red    { background: var(--red-d);    border: 1px solid var(--red-b);    color: var(--red-l);    }
+.ins-blue   { background: var(--blue-d);   border: 1px solid var(--blue-b);   color: var(--blue-l);   }
+.ins-purple { background: var(--purple-d); border: 1px solid var(--purple-b); color: var(--purple-l); }
+.ins svg { flex-shrink: 0; margin-top: 2px; }
+
+/* Progress bar */
+.prog { height: 6px; background: rgba(255,255,255,.07); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; transition: width .8s ease; }
+
+/* Dark form inputs */
+.f-grp { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.f-lbl { font-size: 12px; font-weight: 500; color: var(--ink); }
+.f-hint { font-size: 10.5px; color: var(--ink3); }
+.f-inp, .f-sel {
+  background: rgba(0,0,0,.4); border: 1px solid var(--border2);
+  border-radius: 9px; padding: 10px 13px;
+  color: var(--ink); outline: none; width: 100%;
+  transition: border-color .2s; font-size: 13px;
+}
+.f-inp { font-family: 'DM Mono', monospace; }
+.f-inp:focus, .f-sel:focus { border-color: var(--green-b); }
+.f-inp::placeholder { color: var(--ink3); font-family: 'Noto Sans SC', sans-serif; font-size: 12px; }
+.f-sel {
+  font-family: 'Noto Sans SC', sans-serif; font-size: 12.5px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23475569' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+}
+
+/* CTA buttons */
+.cta { padding: 11px 22px; border-radius: 10px; font-size: 13px; font-weight: 600; border: none; transition: all .2s; letter-spacing: .2px; }
+.cta-green  { background: linear-gradient(135deg,var(--green),rgba(16,185,129,.55)); color: #fff; }
+.cta-green:hover  { opacity: .9; transform: translateY(-1px); }
+.cta-gold   { background: linear-gradient(135deg,var(--gold),rgba(201,168,76,.55));  color: #000; }
+.cta-gold:hover   { opacity: .9; transform: translateY(-1px); }
+.cta-outline { background: transparent; border: 1px solid var(--border2); color: var(--ink); }
+.cta-outline:hover { background: var(--bg4); }
+
+/* Action row button */
+.act-btn {
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 14px; border-radius: 11px;
+  border: 1px solid var(--border2); background: rgba(0,0,0,.28);
+  cursor: pointer; transition: all .18s; font-size: 12.5px; color: var(--ink);
+  text-decoration: none;
+}
+.act-btn:hover { background: var(--bg4); border-color: var(--border2); transform: translateY(-1px); }
+.act-ic { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* Fade-up */
+@keyframes fadeUp { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+.fu  { animation: fadeUp .4s ease both; }
+.d1  { animation-delay: .05s; } .d2 { animation-delay: .12s; }
+.d3  { animation-delay: .19s; } .d4 { animation-delay: .26s; }
+
+/* Toast */
+#toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  background: rgba(8,12,22,.97); border: 1px solid var(--green-b);
+  border-radius: 12px; padding: 12px 18px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--green-l);
+  min-width: 260px; max-width: 380px;
+  opacity: 0; transform: translateY(14px);
+  transition: all .36s cubic-bezier(.34,1.56,.64,1);
+  pointer-events: none; backdrop-filter: blur(18px);
+}
+#toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+/* ═══════ OVERVIEW PAGE STYLES ═══════ */
+.phase-tabs {
+  display: flex; gap: 6px; margin-bottom: 20px;
+  background: rgba(0,0,0,.3); border: 1px solid var(--border);
+  border-radius: 12px; padding: 5px;
+}
+.ph-tab {
+  flex: 1; padding: 9px 10px; border-radius: 8px; text-align: center;
+  font-size: 12px; font-weight: 500; cursor: pointer; transition: all .2s;
+  color: var(--ink3); border: 1px solid transparent;
+}
+.ph-tab .ph-tab-code { font-size: 9px; opacity: .65; display: block; margin-bottom: 2px; }
+.ph-tab:hover { color: var(--ink2); background: var(--bg4); }
+.ph-tab.on-ph1 { background: var(--green-d); border-color: var(--green-b); color: var(--green-l); font-weight: 700; }
+.ph-tab.on-ph2 { background: var(--gold-d);  border-color: var(--gold-b);  color: var(--gold-l);  font-weight: 700; }
+.ph-tab.on-ph3 { background: var(--purple-d);border-color: var(--purple-b);color: var(--purple-l);font-weight: 700; }
+
+/* Identity card */
+.id-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 20px; position: relative; }
+.id-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background: linear-gradient(90deg,transparent 5%,var(--green) 40%,var(--gold) 70%,transparent 95%); }
+.id-inner { padding: 20px 22px; display: flex; align-items: flex-start; gap: 16px; }
+.id-av { width:54px; height:54px; border-radius:50%; background:var(--teal-d); border:2.5px solid var(--teal); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:var(--teal-l); position:relative; flex-shrink:0; }
+.id-av-dot { position:absolute; bottom:1px; right:1px; width:12px; height:12px; border-radius:50%; background:var(--green); border:2px solid var(--bg0); }
+.id-name { font-size:17px; font-weight:700; margin-bottom:2px; }
+.id-meta { font-size:11.5px; color:var(--ink2); margin-bottom:8px; }
+.id-tags { display:flex; gap:5px; flex-wrap:wrap; }
+.shield-wrap { display:flex; flex-direction:column; align-items:center; gap:4px; flex-shrink:0; }
+.shield-body { width:54px; height:61px; position:relative; display:flex; align-items:center; justify-content:center; }
+.shield-body svg { position:absolute; inset:0; width:100%; height:100%; }
+.shield-n { position:relative; z-index:1; font-size:22px; font-weight:700; font-family:'DM Mono',monospace; }
+.shield-lbl { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; }
+
+/* Reg timeline */
+.reg-strip { border-top:1px solid var(--border); padding:10px 22px 14px; background:rgba(0,0,0,.2); display:flex; align-items:center; overflow-x:auto; gap:0; }
+.rt-node { display:flex; align-items:center; }
+.rt-dot-wrap { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.rt-d { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.rt-done   { background:var(--green-d); border:1.5px solid var(--green); }
+.rt-active { background:var(--blue-d);  border:1.5px solid var(--blue-l); }
+.rt-lock   { background:rgba(255,255,255,.03); border:1.5px solid var(--border2); color:var(--ink3); font-size:9px; font-weight:700; }
+.rt-lbl  { font-size:9px; color:var(--ink3); text-align:center; white-space:nowrap; }
+.rt-date { font-size:8.5px; color:var(--ink3); font-family:'DM Mono',monospace; }
+.rt-ln { width:36px; height:1px; flex-shrink:0; }
+.rt-ln-done { background:rgba(16,185,129,.45); }
+.rt-ln-off  { background:var(--border); }
+
+/* Step list */
+.step-list { display:flex; flex-direction:column; gap:0; position:relative; padding-left:28px; }
+.step-list::before { content:''; position:absolute; left:10px; top:12px; bottom:12px; width:1px; background:var(--border); }
+.sl-item { display:flex; gap:12px; padding-bottom:14px; position:relative; }
+.sl-item:last-child { padding-bottom:0; }
+.sl-dot { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; z-index:1; position:absolute; left:-28px; top:1px; }
+.sl-done   { background:var(--green-d); border:1.5px solid var(--green); }
+.sl-active { background:var(--blue-d);  border:1.5px solid var(--blue-l); }
+.sl-wait   { background:rgba(255,255,255,.03); border:1.5px solid var(--border2); color:var(--ink3); font-size:10px; font-weight:700; }
+.sl-body {}
+.sl-title { font-size:12.5px; font-weight:600; margin-bottom:2px; }
+.sl-desc  { font-size:11.5px; color:var(--ink2); line-height:1.6; }
+
+/* GM events */
+.gm-evs { display:flex; flex-direction:column; gap:7px; }
+.gm-ev { display:flex; align-items:center; justify-content:space-between; padding:8px 11px; background:rgba(0,0,0,.25); border-radius:9px; border:1px solid var(--border); }
+.gm-ev-l { display:flex; align-items:center; gap:8px; }
+.gm-ev-ic { width:26px; height:26px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.gm-ev-name { font-size:12px; }
+.gm-ev-time { font-size:10px; color:var(--ink3); font-family:'DM Mono',monospace; margin-top:1px; }
+.gm-ev-val  { font-size:13px; font-weight:700; font-family:'DM Mono',monospace; }
+
+/* Phase2 alarm */
+.alarm { background:var(--red-d); border:1px solid var(--red-b); border-radius:12px; padding:16px 18px; display:flex; align-items:flex-start; gap:12px; }
+.alarm-val { font-family:'DM Mono',monospace; font-size:26px; font-weight:700; color:var(--red-l); letter-spacing:-1px; line-height:1; }
+.alarm-lbl { font-size:11px; color:rgba(252,165,165,.8); margin-top:3px; }
+
+/* ROI strip */
+.roi-strip { display:grid; grid-template-columns:1fr 26px 1fr 26px 1fr; align-items:center; gap:6px; }
+.roi-box { border-radius:10px; padding:12px 14px; text-align:center; border:1px solid; }
+.roi-val { font-family:'DM Mono',monospace; font-size:19px; font-weight:700; letter-spacing:-.5px; line-height:1; margin-bottom:3px; }
+.roi-lbl { font-size:10px; font-weight:500; }
+.roi-note { font-size:9.5px; opacity:.6; margin-top:2px; }
+
+/* Donut */
+.donut-w { position:relative; width:86px; height:86px; flex-shrink:0; }
+.donut-w svg { width:100%; height:100%; transform:rotate(-90deg); }
+.donut-c { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.donut-pct { font-size:18px; font-weight:700; font-family:'DM Mono',monospace; line-height:1; }
+.donut-lbl { font-size:9px; color:var(--ink3); }
+
+/* Phase3 dual rail */
+.dual-rail { background:var(--bg3); border:1px solid rgba(139,92,246,.22); border-radius:18px; overflow:hidden; margin-bottom:16px; position:relative; }
+.dual-rail::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent 5%,var(--gold) 40%,var(--purple) 70%,transparent 95%); }
+.rail-row { display:grid; grid-template-columns:1fr 1fr; }
+.rail-l { padding:22px 24px; border-right:1px solid var(--border); }
+.rail-r { padding:22px 24px; }
+.rail-tag { font-size:9.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
+.rail-level { font-size:26px; font-weight:700; line-height:1.1; margin-bottom:3px; }
+.rail-en { font-size:10px; color:var(--ink2); letter-spacing:1px; margin-bottom:12px; }
+.rail-bignum { font-family:'DM Mono',monospace; font-size:36px; font-weight:700; letter-spacing:-1.5px; line-height:1; }
+.rail-bigsub { font-size:11.5px; color:var(--ink2); margin-top:4px; margin-bottom:14px; }
+
+.cert-vault { display:flex; align-items:center; gap:8px; padding:10px 13px; border-radius:9px; margin-bottom:8px; }
+.cv-pulse { width:8px; height:8px; border-radius:50%; flex-shrink:0; animation:pulseDot 1.8s ease-in-out infinite; }
+
+.gw-list { display:flex; flex-direction:column; gap:6px; }
+.gw-item { display:flex; align-items:center; gap:9px; padding:8px 11px; background:rgba(0,0,0,.3); border:1px solid var(--border); border-radius:8px; }
+.gw-d { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+.gw-name { flex:1; font-size:12px; }
+.gw-status { font-size:10.5px; color:var(--ink3); }
+
+.p3-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.p3-btn {
+  display:flex; align-items:center; gap:9px;
+  padding:11px 13px; border-radius:11px;
+  border:1px solid var(--border2); background:rgba(0,0,0,.28);
+  cursor:pointer; transition:all .18s; font-size:12.5px; color:var(--ink);
+  text-decoration:none; font-family:inherit;
+}
+.p3-btn:hover { background:var(--bg4); border-color:var(--border2); transform:translateY(-1px); }
+.p3-ic { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.p3-lbl { font-size:12.5px; font-weight:500; }
+.p3-sub { font-size:10px; color:var(--ink3); margin-top:1px; }
+
+/* ═══════ CBAM PAGE STYLES ═══════ */
+.cbam-step-hd {
+  display:flex; gap:0; margin-bottom:20px;
+  background:rgba(0,0,0,.3); border:1px solid var(--border); border-radius:12px; padding:5px;
+}
+.cst { flex:1; padding:9px 8px; border-radius:8px; text-align:center; font-size:11.5px; font-weight:500; cursor:pointer; transition:all .18s; color:var(--ink3); border:1px solid transparent; }
+.cst:hover { color:var(--ink2); background:var(--bg4); }
+.cst.cst-on { background:var(--green-d); border-color:var(--green-b); color:var(--green-l); font-weight:700; }
+.cst-num { font-size:9px; display:block; margin-bottom:2px; opacity:.65; }
+.cbam-step { display:none; }
+.cbam-step.active { display:block; }
+.result-big { font-family:'DM Mono',monospace; font-size:44px; font-weight:700; letter-spacing:-2px; line-height:1; }
+
+/* ═══════ HONOR PAGE STYLES ═══════ */
+.medal-wall { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:14px; }
+.medal-card { background:var(--bg3); border:1px solid var(--border); border-radius:14px; padding:16px 14px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:8px; position:relative; overflow:hidden; transition:transform .2s; cursor:default; }
+.medal-card:hover { transform:translateY(-2px); }
+.medal-card.earned::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.medal-card.locked { opacity:.4; }
+.medal-card.locked::after { content:''; position:absolute; inset:0; background:repeating-linear-gradient(-45deg,transparent,transparent 7px,rgba(255,255,255,.015) 7px,rgba(255,255,255,.015) 14px); }
+.medal-ic { width:54px; height:54px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+.medal-name { font-size:12.5px; font-weight:600; line-height:1.3; }
+.medal-desc { font-size:10.5px; color:var(--ink2); line-height:1.5; }
+.medal-date { font-size:9.5px; color:var(--ink3); font-family:'DM Mono',monospace; }
+.medal-gm   { font-size:11px; font-weight:700; font-family:'DM Mono',monospace; }
+
+.ms-tabs { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:0; }
+.mst { padding:12px 20px; font-size:12.5px; font-weight:500; cursor:pointer; color:var(--ink2); border-bottom:2px solid transparent; transition:all .18s; display:flex; align-items:center; gap:7px; }
+.mst:hover { color:var(--ink); }
+.mst.mst-on { color:var(--ink); border-bottom-color:var(--gold); }
+.ms-content { padding:20px 0; display:none; }
+.ms-content.active { display:block; }
+.ms-hero { border-radius:16px; padding:24px 28px; position:relative; overflow:hidden; border:1px solid; margin-bottom:14px; }
+.ms-hero::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; }
+.ms-code  { font-size:9.5px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; margin-bottom:8px; }
+.ms-bignum { font-family:'DM Mono',monospace; font-size:38px; font-weight:700; letter-spacing:-1.5px; line-height:1; margin-bottom:3px; }
+.ms-title  { font-family:'Noto Sans SC',sans-serif; font-size:22px; font-weight:700; margin-bottom:4px; }
+.ms-en     { font-size:10px; letter-spacing:2px; margin-bottom:12px; }
+.ms-desc   { font-size:12px; line-height:1.75; max-width:520px; }
+.ms-prog-wrap { margin:14px 0; }
+.ms-prog-hd { display:flex; justify-content:space-between; font-size:10.5px; margin-bottom:5px; }
+
+.cert-preview { border-radius:13px; padding:18px 20px; position:relative; overflow:hidden; border:1px solid; }
+.cp-tag  { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:7px; display:flex; align-items:center; gap:6px; }
+.cp-name { font-size:16px; font-weight:700; margin-bottom:3px; }
+.cp-sub  { font-size:11.5px; color:var(--ink2); margin-bottom:10px; }
+.cp-stats { display:flex; gap:16px; flex-wrap:wrap; }
+.cp-sv { font-family:'DM Mono',monospace; font-size:15px; font-weight:700; line-height:1; }
+.cp-sl { font-size:10px; color:var(--ink3); margin-top:2px; }
+.cp-hash { font-family:'DM Mono',monospace; font-size:10px; color:var(--ink3); margin-top:10px; }
+
+/* Ranking table */
+.rank-tbl { width:100%; border-collapse:collapse; }
+.rank-tbl th { font-size:10px; color:var(--ink3); font-weight:600; text-transform:uppercase; letter-spacing:.5px; padding:8px 12px; border-bottom:1px solid var(--border); text-align:left; }
+.rank-tbl td { padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.04); font-size:12.5px; vertical-align:middle; }
+.rank-tbl tr:last-child td { border-bottom:none; }
+.rank-tbl tr:hover td { background:rgba(255,255,255,.02); }
+.rank-tbl tr.me-row td { background:rgba(201,168,76,.05); }
+
+/* ═══════ VOTE / PROPOSAL styles ═══════ */
+.prop-card { background:rgba(0,0,0,.22); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:10px; cursor:pointer; transition:all .18s; }
+.prop-card:hover { border-color:var(--border2); background:rgba(255,255,255,.02); }
+.pc-top { display:flex; align-items:flex-start; gap:11px; margin-bottom:8px; }
+.pc-ic { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pc-title { font-size:12.5px; font-weight:600; color:var(--ink); margin-bottom:2px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.pc-sub { font-size:10.5px; color:var(--ink2); }
+.pc-desc { font-size:11.5px; color:var(--ink2); line-height:1.65; margin-bottom:8px; }
+.vote-bar { height:6px; background:rgba(255,255,255,.06); border-radius:3px; overflow:hidden; margin-bottom:5px; }
+.vote-y { height:100%; border-radius:3px; float:left; background:var(--green-l); }
+.vote-n { height:100%; border-radius:3px; float:right; background:var(--red-l); }
+.vote-lbls { display:flex; justify-content:space-between; font-size:10px; margin-bottom:8px; }
+.vote-btns { display:flex; gap:6px; }
+.vb { padding:5px 13px; border-radius:7px; font-size:11.5px; font-weight:600; border:none; cursor:pointer; font-family:inherit; transition:all .15s; }
+.vb-y { background:var(--green-d); border:1px solid var(--green-b); color:var(--green-l); }
+.vb-n { background:var(--red-d);   border:1px solid var(--red-b);   color:var(--red-l);   }
+.vb-a { background:rgba(255,255,255,.05); border:1px solid var(--border2); color:var(--ink2); }
+.vb-voted { background:var(--purple-d); border:1px solid var(--purple-b); color:var(--purple-l); cursor:default; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<!-- ═══════════════════════════════════════════
+     SIDEBAR — 唯一侧边栏，全局共用
+═══════════════════════════════════════════ -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-brand-ic">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z" stroke="#10b981" stroke-width="1.2" fill="rgba(16,185,129,.15)"/>
+        <polyline points="5,8 7.5,10.5 11.5,6.5" stroke="#6ee7b7" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="sb-brand-name">HengAI</div>
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+    </div>
+  </div>
+
+  <div class="sb-phase ph1" id="sb-phase" onclick="cyclePhase()">
+    <div class="sb-phase-dot" id="sb-pdot" style="background:var(--green)"></div>
+    <span id="sb-ptext">个体启蒙期</span>
+  </div>
+
+  <div class="sb-group-title">个人工作台</div>
+  <div class="sb-item active" id="nav-overview" onclick="navTo('overview',this)">
+    <div class="sb-dot" style="background:var(--green)"></div>全域总览
+  </div>
+  <div class="sb-item" id="nav-achieve" onclick="navTo('achieve',this)">
+    <div class="sb-dot" style="background:var(--gold)"></div>星火成就档案
+    <span class="sb-tag tag-gold">Lv.3</span>
+  </div>
+  <div class="sb-item" id="nav-calc" onclick="navTo('calc',this)">
+    <div class="sb-dot" style="background:var(--gold)"></div>CBAM 测算工具
+  </div>
+  <div class="sb-item" id="nav-resource" onclick="navTo('resource',this)">
+    <div class="sb-dot" style="background:var(--blue-l)"></div>算力资源仪表盘
+  </div>
+<div class="sb-item" id="nav-resource" onclick="navTo('resource',this)">
+    <div class="sb-dot" style="background:var(--blue-l)"></div>企业法规库
+</div>
+
+  <div class="sb-group-title">企业工作台</div>
+  <div class="sb-item locked" id="nav-enterprise" onclick="navLocked('enterprise',this)">
+    <div class="sb-dot" id="dot-enterprise" style="background:var(--ink3)"></div>
+    <span id="lbl-enterprise">企业数字档案</span>
+    <span class="sb-tag tag-lock" id="tag-enterprise">锁定</span>
+  </div>
+  <div class="sb-item locked" id="nav-supply" onclick="navLocked('supply',this)">
+    <div class="sb-dot" id="dot-supply" style="background:var(--ink3)"></div>
+    <span>供应链协同</span>
+    <span class="sb-tag tag-lock" id="tag-supply">锁定</span>
+  </div>
+  <div class="sb-item locked" id="nav-report" onclick="navLocked('report',this)">
+    <div class="sb-dot" id="dot-report" style="background:var(--ink3)"></div>
+    <span>全域诊断报告</span>
+    <span class="sb-tag tag-lock" id="tag-report">锁定</span>
+  </div>
+  <div class="sb-item locked" id="nav-decision" onclick="navLocked('decision',this)">
+    <div class="sb-dot" id="dot-decision" style="background:var(--ink3)"></div>
+    <span>决策层呈送包</span>
+    <span class="sb-tag tag-lock" id="tag-decision">锁定</span>
+  </div>
+
+  <div class="sb-group-title">大国重器</div>
+  <div class="sb-item" id="nav-honor" onclick="navTo('honor',this)">
+    <div class="sb-dot" style="background:var(--purple-l)"></div>荣誉体系
+    <span class="sb-tag tag-purple">里程碑</span>
+  </div>
+  <div class="sb-item locked" id="nav-gov" onclick="navLocked('gov',this)">
+    <div class="sb-dot" id="dot-gov" style="background:var(--ink3)"></div>
+    <span>生态共治委员会</span>
+    <span class="sb-tag tag-lock" id="tag-gov">P3</span>
+  </div>
+
+  <div class="sb-group-title">深潜模块</div>
+  <div class="sb-item" id="nav-wallet" onclick="navTo('wallet',this)">
+    <div class="sb-dot" style="background:var(--gold)"></div>GM 绿印钱包
+  </div>
+  <div class="sb-item locked" id="nav-eu" onclick="navLocked('eu',this)">
+    <div class="sb-dot" id="dot-eu" style="background:var(--ink3)"></div>
+    <span>欧盟海关直连</span>
+    <span class="sb-tag tag-lock" id="tag-eu">P3</span>
+  </div>
+  <div class="sb-item locked" id="nav-dld" onclick="navLocked('dld',this)">
+    <div class="sb-dot" id="dot-dld" style="background:var(--ink3)"></div>
+    <span>DLD 绿色信贷</span>
+    <span class="sb-tag tag-lock" id="tag-dld">P3</span>
+  </div>
+  <div class="sb-item locked" id="nav-acf" onclick="navLocked('acf',this)">
+    <div class="sb-dot" id="dot-acf" style="background:var(--ink3)"></div>
+    <span>ACF 大湾区认证</span>
+    <span class="sb-tag tag-lock" id="tag-acf">P3</span>
+  </div>
+
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-avatar">王L</div>
+      <div>
+        <div class="sb-uname">王磊</div>
+        <div class="sb-urole" id="sb-urole">个人会员 · 月付</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MAIN WRAP
+═══════════════════════════════════════════ -->
+<div class="main-wrap">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-left">
+      <span class="tb-title" id="tb-title">全域总览</span>
+      <span class="tb-pill" id="tb-badge" style="background:var(--green-d);color:var(--green-l);border:1px solid var(--green-b)">阶段一 · 个体启蒙</span>
+    </div>
+    <div class="tb-right">
+      <div class="gm-chip" onclick="navTo('wallet',document.getElementById('nav-wallet'))">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L11 3.8V8.2L6 11L1 8.2V3.8L6 1Z" stroke="#c9a84c" stroke-width=".9" fill="rgba(201,168,76,.15)"/></svg>
+        <span class="gm-chip-lbl">GM</span>
+        <span class="gm-chip-val" id="top-gm">128</span>
+      </div>
+      <button class="tb-btn" id="tb-btn-a" onclick="handleAction()">升级年付</button>
+      <button class="tb-btn tb-btn-primary" id="tb-btn-p" onclick="handlePrimary()">建立企业档案 →</button>
+    </div>
+  </div>
+
+  <!-- SCROLLABLE AREA -->
+  <div class="main-scroll">
+    <div class="main-pad">
+
+<!-- ═══════════════════════════════════════════
+     PAGE: 全域总览 (overview)
+═══════════════════════════════════════════ -->
+<div id="page-overview" class="page-panel active">
+
+  <!-- Phase Tabs -->
+  <div class="phase-tabs fu">
+    <div class="ph-tab on-ph1" id="ptab1" onclick="setPhase(1)">
+      <span class="ph-tab-code">PHASE 1</span>个体启蒙期
+    </div>
+    <div class="ph-tab" id="ptab2" onclick="setPhase(2)">
+      <span class="ph-tab-code">PHASE 2</span>业务映射期
+    </div>
+    <div class="ph-tab" id="ptab3" onclick="setPhase(3)">
+      <span class="ph-tab-code">PHASE 3</span>全域共治期
+    </div>
+  </div>
+
+  <!-- Identity Card -->
+  <div class="id-card fu d1">
+    <div class="id-inner">
+      <div class="id-av">王L<div class="id-av-dot"></div></div>
+      <div style="flex:1">
+        <div class="id-name">王磊</div>
+        <div class="id-meta" id="id-meta">注册于 2026-04-11 · HengAI 个人月度会员</div>
+        <div class="id-tags" id="id-tags">
+          <span class="pill p-green">Lv.1 观察员</span>
+          <span class="pill p-gray">CBAM 合规学习者</span>
+        </div>
+      </div>
+      <div class="shield-wrap">
+        <div class="shield-body">
+          <svg viewBox="0 0 54 61" fill="none">
+            <path id="sh-path" d="M27 2L51 11V31C51 44 40 54 27 58C14 54 3 44 3 31V11L27 2Z" fill="rgba(16,185,129,.12)" stroke="#10b981" stroke-width="1.5"/>
+            <path id="sh-crown" d="M18 9L22 13L27 8L32 13L36 9" fill="none" stroke="#10b981" stroke-width="1.1" stroke-linecap="round"/>
+          </svg>
+          <span class="shield-n" id="sh-num" style="color:var(--green)">1</span>
+        </div>
+        <span class="shield-lbl" id="sh-lbl" style="color:var(--green)">Lv.1</span>
+      </div>
+    </div>
+    <!-- Timeline strip -->
+    <div class="reg-strip">
+      <div class="rt-node">
+        <div class="rt-dot-wrap">
+          <div class="rt-d rt-done"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+          <div class="rt-lbl" style="color:var(--green)">注册</div><div class="rt-date">04-11</div>
+        </div>
+        <div class="rt-ln rt-ln-done"></div>
+      </div>
+      <div class="rt-node">
+        <div class="rt-dot-wrap">
+          <div class="rt-d rt-done"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+          <div class="rt-lbl" style="color:var(--green)">付费会员</div><div class="rt-date">04-11</div>
+        </div>
+        <div class="rt-ln rt-ln-done"></div>
+      </div>
+      <div class="rt-node">
+        <div class="rt-dot-wrap">
+          <div class="rt-d rt-done"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+          <div class="rt-lbl" style="color:var(--green)">CBAM粗测</div><div class="rt-date">04-11</div>
+        </div>
+        <div class="rt-ln" id="tl-ln3" style="background:var(--border)"></div>
+      </div>
+      <div class="rt-node">
+        <div class="rt-dot-wrap">
+          <div class="rt-d rt-lock" id="tl-d4" style="font-size:9px;color:var(--ink3)">4</div>
+          <div class="rt-lbl" id="tl-l4">企业档案</div><div class="rt-date" id="tl-dt4">—</div>
+        </div>
+        <div class="rt-ln" id="tl-ln4" style="background:var(--border)"></div>
+      </div>
+      <div class="rt-node">
+        <div class="rt-dot-wrap">
+          <div class="rt-d rt-lock" id="tl-d5" style="font-size:9px;color:var(--ink3)">5</div>
+          <div class="rt-lbl" id="tl-l5">供应链</div><div class="rt-date">—</div>
+        </div>
+        <div class="rt-ln" id="tl-ln5" style="background:var(--border)"></div>
+      </div>
+      <div class="rt-node">
+        <div class="rt-dot-wrap">
+          <div class="rt-d rt-lock" id="tl-d6" style="font-size:9px;color:var(--ink3)">6</div>
+          <div class="rt-lbl" id="tl-l6">全域激活</div><div class="rt-date">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dynamic Phase Content -->
+  <div id="phase-body"></div>
+
+</div><!-- /page-overview -->
+
+<!-- ═══════════════════════════════════════════
+     PAGE: CBAM 测算工具 (calc)
+═══════════════════════════════════════════ -->
+<div id="page-calc" class="page-panel">
+
+  <!-- Step indicator -->
+  <div class="cbam-step-hd fu">
+    <div class="cst cst-on" id="cst1" onclick="cbamStep(1)"><span class="cst-num">STEP 1</span>基础信息</div>
+    <div class="cst" id="cst2" onclick="cbamStep(2)"><span class="cst-num">STEP 2</span>能耗数据</div>
+    <div class="cst" id="cst3" onclick="cbamStep(3)"><span class="cst-num">STEP 3</span>供应链</div>
+    <div class="cst" id="cst4" onclick="cbamStep(4)"><span class="cst-num">RESULT</span>碳税结果</div>
+  </div>
+
+  <!-- STEP 1: 基础信息 -->
+  <div id="cbam-s1" class="cbam-step active fu d1">
+    <div class="ins ins-gold">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><path d="M7 1L13 4V10L7 13L1 10V4L7 1Z" stroke="var(--gold-l)" stroke-width="1" fill="var(--gold-d)"/></svg>
+      <div><strong style="color:var(--gold-l)">照妖镜模式：</strong>填入您的真实数据，30秒内看清碳税敞口。这是大多数中国制造企业过去从未做过的计算。</div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="sh"><div class="sh-t">企业基础信息 <div class="sh-line"></div></div></div>
+        <div class="f-grp">
+          <label class="f-lbl">企业名称</label>
+          <input class="f-inp" id="c-company" value="浙江XX汽配制造厂" placeholder="您的企业名称">
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">主要出口产品</label>
+          <select class="f-sel" id="c-product">
+            <option value="aluminum">铝及铝制品（HS 7601-7616）</option>
+            <option value="steel">钢铁及制品（HS 7201-7307）</option>
+            <option value="cement">水泥及熟料（HS 2523）</option>
+            <option value="fertilizer">化学肥料（HS 3101-3105）</option>
+            <option value="electricity">电力（HS 2716）</option>
+            <option value="hydrogen">氢（HS 2804.10）</option>
+          </select>
+          <span class="f-hint">CBAM 首批覆盖六大品类，2026年起正式征收</span>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">年出口量（吨）</label>
+          <input class="f-inp" id="c-export" value="1920" type="number" placeholder="例：1920">
+          <span class="f-hint">填写出口至欧盟的产品年总量</span>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">出口目的地</label>
+          <select class="f-sel" id="c-dest">
+            <option>德国</option><option>法国</option><option>荷兰</option>
+            <option>意大利</option><option>西班牙</option><option>欧盟其他</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sh"><div class="sh-t">数据质量等级 <div class="sh-line"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="padding:10px 13px;border-radius:9px;border:1px solid;cursor:pointer;transition:all .15s"
+            id="lv-btn2"
+            style="background:var(--red-d);border-color:var(--red-b)"
+            onclick="selectLevel(2)"
+            class="lv-opt lv-active-2">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:14px;height:14px;border-radius:50%;border:1.5px solid var(--red-l);display:flex;align-items:center;justify-content:center" id="lv-radio2">
+                <div style="width:7px;height:7px;border-radius:50%;background:var(--red-l)"></div>
+              </div>
+              <div>
+                <div style="font-size:12.5px;font-weight:600;color:var(--red-l)">Lv.2 · 人工凭证</div>
+                <div style="font-size:10.5px;color:rgba(252,165,165,.7)">传统申报方式 · 惩罚溢价 ×1.35</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:10px 13px;border-radius:9px;border:1px solid var(--border);cursor:pointer;transition:all .15s"
+            onclick="selectLevel(4)" id="lv-btn4" class="lv-opt">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:14px;height:14px;border-radius:50%;border:1.5px solid var(--ink3)" id="lv-radio4"></div>
+              <div>
+                <div style="font-size:12.5px;font-weight:600;color:var(--ink2)">Lv.4 · MAT 物理认证</div>
+                <div style="font-size:10.5px;color:var(--ink3)">方舟魔盒实测 · 零溢价 · 欧盟免审</div>
+              </div>
+            </div>
+          </div>
+          <div style="padding:11px 13px;background:rgba(0,0,0,.2);border-radius:9px;border:1px solid var(--border)">
+            <div style="font-size:10px;color:var(--ink3);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">选择等级说明</div>
+            <div style="font-size:11.5px;color:var(--ink2);line-height:1.7" id="lv-desc">
+              当前选择 Lv.2：您提交人工估算数据，欧盟无法核实，自动施加 35% 不确定性附加费。<br>
+              以铝制品为例，Lv.2 vs Lv.4 每年差异可达 <strong style="color:var(--red-l)">€38,000+</strong>。
+            </div>
+          </div>
+        </div>
+        <button class="cta cta-green" style="width:100%;margin-top:14px" onclick="cbamStep(2)">下一步：填写能耗数据 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: 能耗数据 -->
+  <div id="cbam-s2" class="cbam-step fu">
+    <div class="g2">
+      <div class="card">
+        <div class="sh"><div class="sh-t">工厂能耗数据 <div class="sh-line"></div></div></div>
+        <div class="f-grp">
+          <label class="f-lbl">年用电量（kWh）</label>
+          <input class="f-inp" id="c-elec" value="124000" type="number">
+          <span class="f-hint">来自电费账单或电表读数</span>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">所在电网区域</label>
+          <select class="f-sel" id="c-grid">
+            <option value="0.581">华东电网（上海/江苏/浙江/安徽）— 0.581 kgCO₂/kWh</option>
+            <option value="0.558">华南电网（广东/广西/云南/贵州）— 0.558 kgCO₂/kWh</option>
+            <option value="0.663">华北电网（北京/天津/河北/山西）— 0.663 kgCO₂/kWh</option>
+            <option value="0.596">华中电网（湖北/湖南/河南/江西）— 0.596 kgCO₂/kWh</option>
+            <option value="0.543">西北电网（陕西/甘肃/青海/宁夏）— 0.543 kgCO₂/kWh</option>
+            <option value="0.308">西南电网（四川/重庆）— 0.308 kgCO₂/kWh（水电为主）</option>
+          </select>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">天然气消耗量（m³/年，无则填0）</label>
+          <input class="f-inp" id="c-gas" value="0" type="number">
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">铝锭/原料年采购量（吨）</label>
+          <input class="f-inp" id="c-material" value="480" type="number">
+          <span class="f-hint">用于核算 Scope 3 上游排放</span>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">是否已购买绿色电力证书（GEC）</label>
+          <select class="f-sel" id="c-gec">
+            <option value="0">否，未购买</option>
+            <option value="0.3">是，覆盖 30% 用电量</option>
+            <option value="0.5">是，覆盖 50% 用电量</option>
+            <option value="1.0">是，覆盖 100% 用电量</option>
+          </select>
+        </div>
+        <button class="cta cta-green" style="width:100%;margin-top:8px" onclick="cbamStep(3)">下一步：供应链数据 →</button>
+      </div>
+      <div class="card">
+        <div class="sh"><div class="sh-t">Scope 2 实时估算 <div class="sh-line"></div></div></div>
+        <div class="metric" style="margin-bottom:10px">
+          <div class="m-lbl">Scope 2 排放量</div>
+          <div class="m-val" style="color:var(--teal-l)" id="scope2-preview">72.0 <span class="m-unit">tCO₂e</span></div>
+          <div class="m-sub">年用电 124,000 kWh × 华东因子 0.581</div>
+        </div>
+        <div class="metric" style="margin-bottom:10px">
+          <div class="m-lbl">GEC 抵扣后净排放</div>
+          <div class="m-val" style="color:var(--green-l)" id="scope2-net">72.0 <span class="m-unit">tCO₂e</span></div>
+          <div class="m-sub">当前未购买 GEC，无抵扣</div>
+        </div>
+        <div class="ins ins-blue" style="font-size:11.5px">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="flex-shrink:0"><circle cx="6.5" cy="6.5" r="5.5" stroke="var(--blue-l)" stroke-width="1"/><line x1="6.5" y1="4" x2="6.5" y2="7" stroke="var(--blue-l)" stroke-width="1"/><circle cx="6.5" cy="8.5" r=".7" fill="var(--blue-l)"/></svg>
+          <div>欧盟已确认：中国 GEC 可用于抵扣 CBAM Scope 2 排放。购买 GEC 是最快速降低碳税的工具之一。</div>
+        </div>
+        <div style="padding:11px 13px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:9px">
+          <div style="font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">华东电网实时碳因子</div>
+          <div style="display:flex;align-items:baseline;gap:5px">
+            <span style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:var(--teal-l)">0.581</span>
+            <span style="font-size:11px;color:var(--ink3)">kgCO₂/kWh · 2026-04 月均</span>
+          </div>
+          <div style="font-size:10.5px;color:var(--green-l);margin-top:3px">↓ 同比 -2.1%（可再生比例提升）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: 供应链 -->
+  <div id="cbam-s3" class="cbam-step fu">
+    <div class="g2">
+      <div class="card">
+        <div class="sh"><div class="sh-t">Scope 3 供应链数据 <div class="sh-line"></div></div></div>
+        <div class="f-grp">
+          <label class="f-lbl">供应商总数量</label>
+          <input class="f-inp" id="c-suppliers" value="17" type="number">
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">已完成碳数据填报的供应商数量</label>
+          <input class="f-inp" id="c-sup-filled" value="2" type="number">
+          <span class="f-hint">决定 Scope 3 数据质量与申报惩罚系数</span>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">主要铝锭供应商碳强度（tCO₂e/t，未知填 0）</label>
+          <input class="f-inp" id="c-upstream" value="0" type="number" placeholder="0 = 使用行业默认值 2.1">
+          <span class="f-hint">0 表示未知，系统将使用行业默认值，并施加 Lv.2 惩罚</span>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">当前产品碳强度自评（tCO₂e/t，不确定填 0）</label>
+          <input class="f-inp" id="c-intensity" value="1.82" type="number">
+          <span class="f-hint">铝压铸行业均值约 1.9 t/t，优秀企业可达 1.5 以下</span>
+        </div>
+        <button class="cta cta-green" style="width:100%;margin-top:8px" onclick="calcCBAM()">立即计算碳税敞口 →</button>
+      </div>
+      <div class="card">
+        <div class="sh"><div class="sh-t">Scope 3 说明 <div class="sh-line"></div></div></div>
+        <div class="ins ins-red" style="font-size:11.5px">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="flex-shrink:0"><path d="M6.5 1.5L12 9.5H1L6.5 1.5Z" stroke="var(--red-l)" stroke-width="1" fill="var(--red-d)"/><line x1="6.5" y1="5" x2="6.5" y2="7.5" stroke="var(--red-l)" stroke-width="1"/><circle cx="6.5" cy="9" r=".6" fill="var(--red-l)"/></svg>
+          <div>供应商填报率低是中国企业 CBAM 最大风险来源。您有 <strong style="color:var(--red-l)">15/17 家</strong> 供应商数据缺失，这是碳税的主要黑盒。</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:rgba(0,0,0,.25);border-radius:9px;border:1px solid var(--border)">
+            <span style="font-size:12px;color:var(--ink2)">供应商填报率</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--red-l)">12%</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:rgba(0,0,0,.25);border-radius:9px;border:1px solid var(--border)">
+            <span style="font-size:12px;color:var(--ink2)">Scope 3 数据覆盖率</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--gold-l)">~18%</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 11px;background:rgba(0,0,0,.25);border-radius:9px;border:1px solid var(--border)">
+            <span style="font-size:12px;color:var(--ink2)">黑盒风险敞口预估</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--red-l)">€92,000+</span>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding:11px 13px;background:var(--gold-d);border:1px solid var(--gold-b);border-radius:9px;font-size:11.5px;color:var(--gold-l);line-height:1.7">
+          <strong>Co2Lion 供应链穿透：</strong>向每家供应商发送专属填报邀请，系统自动催办，每完成一家 +200 GM。目标：覆盖率从 12% → 80%，直接省税 <strong>€65,000+</strong>。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: 计算结果 -->
+  <div id="cbam-s4" class="cbam-step fu">
+    <div class="ins ins-red" id="cbam-warning" style="margin-bottom:20px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M8 1.5L14.5 13H1.5L8 1.5Z" stroke="var(--red-l)" stroke-width="1.3" fill="var(--red-d)"/><line x1="8" y1="6" x2="8" y2="9.5" stroke="var(--red-l)" stroke-width="1.3"/><circle cx="8" cy="11.5" r=".9" fill="var(--red-l)"/></svg>
+      <div id="cbam-warn-text">您的企业正面临重大碳税风险，以下是精确计算结果。</div>
+    </div>
+
+    <!-- Big numbers -->
+    <div class="g3 fu d1" style="margin-bottom:16px">
+      <div class="card" style="border-color:var(--red-b);background:var(--red-d);text-align:center">
+        <div style="font-size:10px;color:var(--red-l);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">当前年度碳税敞口（Lv.2）</div>
+        <div class="result-big" style="color:var(--red-l)" id="r-total">€ 145,000</div>
+        <div style="font-size:11px;color:rgba(252,165,165,.7);margin-top:6px" id="r-formula">1,920t × 1.82 t/t × €65 × 1.35(惩罚)</div>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:10px;color:var(--green-l);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">三项对冲后净节税</div>
+        <div class="result-big" style="color:var(--green-l)" id="r-save">¥ 528,000</div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:6px">MAT+ZCP+供应链协同 年度节省</div>
+      </div>
+      <div class="card" style="border-color:var(--green-b);background:var(--green-d);text-align:center">
+        <div style="font-size:10px;color:var(--green-l);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">真实 ROI</div>
+        <div class="result-big" style="color:var(--green-l)">1:9.1</div>
+        <div style="font-size:11px;color:rgba(110,231,183,.7);margin-top:6px">投入 ¥58k → 节税 ¥528k</div>
+      </div>
+    </div>
+
+    <!-- Breakdown -->
+    <div class="g2 fu d2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="sh"><div class="sh-t">碳税拆解 <div class="sh-line"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(0,0,0,.25);border-radius:9px;border:1px solid var(--border);font-size:12px">
+            <span style="color:var(--ink2)">出口量</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:600" id="r-export-d">1,920 t</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(0,0,0,.25);border-radius:9px;border:1px solid var(--border);font-size:12px">
+            <span style="color:var(--ink2)">产品碳强度（Lv.2 含黑盒）</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:600;color:var(--red-l)" id="r-intensity-d">1.82 tCO₂e/t</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 11px;background:rgba(0,0,0,.25);border-radius:9px;border:1px solid var(--border);font-size:12px">
+            <span style="color:var(--ink2)">EU ETS 碳价</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:600">€ 65/tCO₂e</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:8px 11px;background:var(--red-d);border-radius:9px;border:1px solid var(--red-b);font-size:12px">
+            <span style="color:var(--red-l)">Lv.2 惩罚溢价</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--red-l)">× 1.35</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:10px 11px;background:var(--green-d);border-radius:9px;border:1px solid var(--green-b);font-size:12px">
+            <span style="color:var(--green-l);font-weight:600">升至 Lv.4 后节税</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--green-l)">€ 38,000/年</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sh"><div class="sh-t">三步对冲方案 <div class="sh-line"></div></div></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="padding:11px 13px;border-radius:10px;background:var(--teal-d);border:1px solid var(--teal-b)">
+            <div style="font-size:11.5px;font-weight:600;color:var(--teal-l);margin-bottom:3px">① MAT 物理网关接驳</div>
+            <div style="font-size:11px;color:rgba(94,234,212,.7)">消除 35% 惩罚溢价 → 节税 ¥274,000/年</div>
+          </div>
+          <div style="padding:11px 13px;border-radius:10px;background:var(--blue-d);border:1px solid var(--blue-b)">
+            <div style="font-size:11.5px;font-weight:600;color:var(--blue-l);margin-bottom:3px">② ZCP 零碳算力签证</div>
+            <div style="font-size:11px;color:rgba(147,197,253,.7)">Scope 2 降碳 50% → 节税 ¥126,000/年</div>
+          </div>
+          <div style="padding:11px 13px;border-radius:10px;background:var(--green-d);border:1px solid var(--green-b)">
+            <div style="font-size:11.5px;font-weight:600;color:var(--green-l);margin-bottom:3px">③ 供应链穿透填报</div>
+            <div style="font-size:11px;color:rgba(110,231,183,.7)">覆盖率 12%→80% → 节税 ¥128,000/年</div>
+          </div>
+          <div style="padding:10px 13px;border-radius:9px;background:rgba(0,0,0,.25);border:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px">
+            <span style="color:var(--ink2)">合计年度节税</span>
+            <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--green-l)">¥528,000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA actions -->
+    <div class="g3 fu d3">
+      <button class="act-btn" style="justify-content:center" onclick="navTo('enterprise',document.getElementById('nav-enterprise'));showToast('正在打开企业数字档案 →')">
+        <div class="act-ic" style="background:var(--blue-d);border:1px solid var(--blue-b)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="4" width="10" height="8" rx="1.5" stroke="var(--blue-l)" stroke-width="1.1"/><path d="M5 4V3a2 2 0 014 0v1" stroke="var(--blue-l)" stroke-width="1"/></svg>
+        </div>
+        <div><div style="font-weight:500">建立企业档案</div><div style="font-size:10.5px;color:var(--ink3);margin-top:1px">精确诊断，解锁对冲方案</div></div>
+      </button>
+      <button class="act-btn" style="justify-content:center" onclick="showToast('决策层呈送包生成中，预计30秒...')">
+        <div class="act-ic" style="background:var(--gold-d);border:1px solid var(--gold-b)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2" width="11" height="10" rx="1.5" stroke="var(--gold-l)" stroke-width="1"/><line x1="4" y1="5.5" x2="10" y2="5.5" stroke="var(--gold-l)" stroke-width=".9"/><line x1="4" y1="7.5" x2="10" y2="7.5" stroke="var(--gold-l)" stroke-width=".9"/><line x1="4" y1="9.5" x2="7.5" y2="9.5" stroke="var(--gold-l)" stroke-width=".9"/></svg>
+        </div>
+        <div><div style="font-weight:500">生成呈送报告</div><div style="font-size:10.5px;color:var(--ink3);margin-top:1px">一键生成 CFO 级决策包</div></div>
+      </button>
+      <button class="act-btn" style="justify-content:center" onclick="cbamStep(1);showToast('已重置，可重新输入数据')">
+        <div class="act-ic" style="background:rgba(255,255,255,.05);border:1px solid var(--border)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 7A5 5 0 112 7" stroke="var(--ink2)" stroke-width="1.2" stroke-linecap="round"/><path d="M12 4v3h-3" stroke="var(--ink2)" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </div>
+        <div><div style="font-weight:500;color:var(--ink2)">重新测算</div><div style="font-size:10.5px;color:var(--ink3);margin-top:1px">修改数据重新计算</div></div>
+      </button>
+    </div>
+  </div>
+
+</div><!-- /page-calc -->
+
+<!-- ═══════════════════════════════════════════
+     PAGE: 荣誉体系 (honor)
+═══════════════════════════════════════════ -->
+<div id="page-honor" class="page-panel">
+
+  <!-- Honor Hero -->
+  <div style="background:var(--bg3);border:1px solid rgba(139,92,246,.25);border-radius:16px;padding:24px 26px;margin-bottom:20px;position:relative;overflow:hidden" class="fu">
+    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--gold) 40%,var(--purple) 70%,transparent 95%)"></div>
+    <div style="font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--purple-l);margin-bottom:8px">Co2Lion · HengAI 荣誉体系</div>
+    <div style="font-size:20px;font-weight:700;margin-bottom:6px">每一吨减排，都有主人</div>
+    <div style="font-size:12px;color:var(--ink2);line-height:1.75;max-width:600px;margin-bottom:14px">荣誉不是颁发的，是赢得的。这里记录的每一个数字都是链上可追溯的真实行动——不是自我声明，而是对企业、行业、社会可量化贡献的永久见证。</div>
+    <div style="display:flex;align-items:baseline;gap:10px">
+      <span style="font-family:'DM Mono',monospace;font-size:36px;font-weight:700;color:var(--teal-l)">142</span>
+      <span style="font-size:14px;color:var(--ink2)">tCO₂e · 王磊累计推动减排 · 链上存证 · 不可篡改</span>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <span class="pill p-green">Lv.3 架构师</span>
+      <span class="pill p-gold">2,840 GM</span>
+      <span class="pill p-teal">全球排名 #412</span>
+      <span class="pill p-purple">4 枚已获徽章</span>
+    </div>
+  </div>
+
+  <!-- 已获徽章 -->
+  <div class="sh fu d1"><div class="sh-t">已获成就徽章 <div class="sh-line"></div></div><span style="font-size:11px;color:var(--ink3)">4 枚已获 · 8 枚待解锁</span></div>
+  <div class="medal-wall fu d1" style="margin-bottom:6px">
+    <div class="medal-card earned" style="border-color:rgba(16,185,129,.35)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--green)"></div>
+      <div class="medal-ic" style="background:var(--green-d);border:1.5px solid var(--green-b)">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 2L25 7.5V17C25 22.5 20 27 14 28.5C8 27 3 22.5 3 17V7.5L14 2Z" stroke="#10b981" stroke-width="1.3" fill="rgba(16,185,129,.12)"/><polyline points="8,14 12,18 20,11" stroke="#6ee7b7" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <div class="medal-name" style="color:var(--green-l)">CBAM 申报架构师</div>
+      <div class="medal-desc">3次通关预演 · Lv.4 置信度</div>
+      <div class="medal-date">2026-04-12</div>
+      <span class="medal-gm" style="color:var(--green-l)">+500 GM</span>
+    </div>
+    <div class="medal-card earned" style="border-color:rgba(59,130,246,.35)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--blue-l)"></div>
+      <div class="medal-ic" style="background:var(--blue-d);border:1.5px solid var(--blue-b)">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11.5" stroke="#3b82f6" stroke-width="1.3"/><circle cx="14" cy="14" r="5" stroke="#93c5fd" stroke-width="1.1"/><line x1="14" y1="2.5" x2="14" y2="9" stroke="#3b82f6" stroke-width="1"/><line x1="14" y1="19" x2="14" y2="25.5" stroke="#3b82f6" stroke-width="1"/><line x1="2.5" y1="14" x2="9" y2="14" stroke="#3b82f6" stroke-width="1"/><line x1="19" y1="14" x2="25.5" y2="14" stroke="#3b82f6" stroke-width="1"/></svg>
+      </div>
+      <div class="medal-name" style="color:var(--blue-l)">Scope 3 穿透专家</div>
+      <div class="medal-desc">8家供应商接入 · 47%覆盖率</div>
+      <div class="medal-date">2026-04-13</div>
+      <span class="medal-gm" style="color:var(--blue-l)">+400 GM</span>
+    </div>
+    <div class="medal-card earned" style="border-color:rgba(139,92,246,.35)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--purple-l)"></div>
+      <div class="medal-ic" style="background:var(--purple-d);border:1.5px solid var(--purple-b)">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 2L16.5 9.5L24.5 10.5L18.5 16.5L20.5 24L14 20.5L7.5 24L9.5 16.5L3.5 10.5L11.5 9.5L14 2Z" stroke="#8b5cf6" stroke-width="1.3" fill="rgba(139,92,246,.12)"/></svg>
+      </div>
+      <div class="medal-name" style="color:var(--purple-l)">生态先行者 #0412</div>
+      <div class="medal-desc">首批1,000名会员 · 早鸟认证</div>
+      <div class="medal-date">2026-04-11</div>
+      <span class="medal-gm" style="color:var(--purple-l)">+200 GM</span>
+    </div>
+    <div class="medal-card earned" style="border-color:rgba(201,168,76,.35)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold)"></div>
+      <div class="medal-ic" style="background:var(--gold-d);border:1.5px solid var(--gold-b)">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="9" width="20" height="15" rx="2.5" stroke="#c9a84c" stroke-width="1.3"/><path d="M9 9V7.5a5 5 0 0110 0V9" stroke="#c9a84c" stroke-width="1.2"/><polyline points="10,15.5 13.5,19 19,13" stroke="#f0d080" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="medal-name" style="color:var(--gold-l)">首份真实碳档案</div>
+      <div class="medal-desc">企业CBAM精确测算 · 存证</div>
+      <div class="medal-date">2026-04-12</div>
+      <span class="medal-gm" style="color:var(--gold-l)">+100 GM</span>
+    </div>
+  </div>
+
+  <!-- 待解锁 -->
+  <div style="font-size:10px;font-weight:700;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px" class="fu d2">待解锁 <div class="sh-line"></div></div>
+  <div class="medal-wall fu d2" style="margin-bottom:20px">
+    <div class="medal-card locked" style="border-color:rgba(20,184,166,.18)">
+      <div class="medal-ic" style="background:rgba(20,184,166,.07);border:1.5px dashed rgba(20,184,166,.25)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L22 7V15C22 20 17.5 23.5 12 25C6.5 23.5 2 20 2 15V7L12 2Z" stroke="rgba(20,184,166,.5)" stroke-width="1.2"/><text x="12" y="16.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="rgba(20,184,166,.5)" font-family="sans-serif">15</text></svg>
+      </div>
+      <div class="medal-name" style="color:var(--ink3)">供应链协同大师</div>
+      <div style="width:100%">
+        <div class="prog" style="margin-bottom:4px"><div class="prog-fill" style="width:53%;background:var(--teal)"></div></div>
+        <div style="font-size:9.5px;color:var(--ink3)">8/15 家 · 还差7家</div>
+      </div>
+    </div>
+    <div class="medal-card locked" style="border-color:rgba(20,184,166,.18)">
+      <div class="medal-ic" style="background:rgba(201,168,76,.07);border:1.5px dashed rgba(201,168,76,.22)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="rgba(201,168,76,.4)" stroke-width="1.2" stroke-dasharray="3 2"/></svg>
+      </div>
+      <div class="medal-name" style="color:var(--ink3)">地球公民勋章</div>
+      <div style="width:100%">
+        <div class="prog" style="margin-bottom:4px"><div class="prog-fill" style="width:100%;background:var(--teal)"></div></div>
+        <div style="font-size:9.5px;color:var(--teal-l);font-weight:600">条件已满足 · 申领中</div>
+      </div>
+    </div>
+    <div class="medal-card locked" style="border-color:rgba(59,130,246,.15)">
+      <div class="medal-ic" style="background:rgba(59,130,246,.07);border:1.5px dashed rgba(59,130,246,.2)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="14" rx="2.5" stroke="rgba(59,130,246,.4)" stroke-width="1.2"/><path d="M8 7V6a4 4 0 018 0v1" stroke="rgba(59,130,246,.4)" stroke-width="1.1"/></svg>
+      </div>
+      <div class="medal-name" style="color:var(--ink3)">企业升级推动者</div>
+      <div style="width:100%">
+        <div class="prog" style="margin-bottom:4px"><div class="prog-fill" style="width:40%;background:var(--gold)"></div></div>
+        <div style="font-size:9.5px;color:var(--ink3)">呈送报告中</div>
+      </div>
+    </div>
+    <div class="medal-card locked" style="border-color:rgba(139,92,246,.15)">
+      <div class="medal-ic" style="background:rgba(139,92,246,.07);border:1.5px dashed rgba(139,92,246,.2)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L14.5 9H22L16 13.5L18.5 20.5L12 16.5L5.5 20.5L8 13.5L2 9H9.5L12 2Z" stroke="rgba(139,92,246,.4)" stroke-width="1.2"/></svg>
+      </div>
+      <div class="medal-name" style="color:var(--ink3)">破晓见证者</div>
+      <div style="width:100%">
+        <div class="prog" style="margin-bottom:4px"><div class="prog-fill" style="width:100%;background:var(--green-l)"></div></div>
+        <div style="font-size:9.5px;color:var(--green-l);font-weight:600">全局已突破 · 待颁发</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 里程碑庆典 Tabs -->
+  <div class="fu d3">
+    <div class="sh"><div class="sh-t">里程碑庆典 <div class="sh-line"></div><span style="font-size:10.5px;color:var(--ink2);font-weight:400;letter-spacing:0">燎原已突破 · 距纪元还差 8.15M tCO₂e</span></div></div>
+    <div style="background:var(--bg1);border-radius:14px;overflow:hidden;border:1px solid var(--border)">
+      <div class="ms-tabs">
+        <div class="mst mst-on" id="mst1" onclick="setMilestone(1)">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 3.5,7.5 9,2.5" stroke="var(--green-l)" stroke-width="1.3" stroke-linecap="round"/></svg>
+          破晓 · DAWN
+        </div>
+        <div class="mst" id="mst2" onclick="setMilestone(2)">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 3.5,7.5 9,2.5" stroke="var(--gold-l)" stroke-width="1.3" stroke-linecap="round"/></svg>
+          燎原 · WILDFIRE
+        </div>
+        <div class="mst" id="mst3" onclick="setMilestone(3)">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--blue-l);animation:pulseDot 2s infinite"></div>
+          纪元 · NEW ERA
+        </div>
+      </div>
+
+      <!-- DAWN -->
+      <div id="ms-dawn" class="ms-content active" style="padding:20px 24px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div>
+            <div class="ms-hero" style="background:rgba(16,185,129,.06);border-color:rgba(16,185,129,.3)">
+              <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(16,185,129,.6),transparent)"></div>
+              <div class="ms-code" style="color:var(--green)">MILESTONE I · DAWN · 已突破</div>
+              <div class="ms-bignum" style="color:var(--green-l)">10万 <span style="font-size:16px;font-weight:400;color:var(--ink2)">tCO₂e</span></div>
+              <div class="ms-title" style="color:var(--green-l)">破晓</div>
+              <div class="ms-en" style="color:var(--green)">The First Light</div>
+              <div class="ms-desc" style="color:rgba(110,231,183,.8)">等效于 <strong style="color:var(--green-l)">167万棵树</strong> 生长一年的固碳量</div>
+              <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:var(--green-d);border:1px solid var(--green-b);font-size:11px;color:var(--green-l);font-weight:600">
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="var(--green-l)" stroke-width="1.3" stroke-linecap="round"/></svg>
+                2025-11-12 · 09:17 突破
+              </div>
+            </div>
+          </div>
+          <div class="cert-preview" style="border-color:rgba(16,185,129,.35);background:rgba(0,0,0,.25)">
+            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(16,185,129,.5),transparent)"></div>
+            <div class="cp-tag" style="color:var(--green)">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><polyline points="1,3.5 3.5,6 8,2" stroke="var(--green-l)" stroke-width="1.2" stroke-linecap="round"/></svg>
+              破晓见证者证书 · CL-IVC 链上存证
+            </div>
+            <div class="cp-name" style="color:var(--green-l)">王磊</div>
+            <div class="cp-sub">于 10万 tCO₂e 突破时刻见证 · 贡献 142 tCO₂e</div>
+            <div class="cp-stats">
+              <div><div class="cp-sv" style="color:var(--teal-l)">142</div><div class="cp-sl">贡献 tCO₂e</div></div>
+              <div><div class="cp-sv" style="color:var(--gold-l)">0.142%</div><div class="cp-sl">占全球总量</div></div>
+              <div><div class="cp-sv" style="color:var(--green-l)">#412</div><div class="cp-sl">全球排名</div></div>
+            </div>
+            <div class="cp-hash">#GN-DAWN-0412 · 2025-11-12 09:17:43 CST</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WILDFIRE -->
+      <div id="ms-wildfire" class="ms-content" style="padding:20px 24px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div>
+            <div class="ms-hero" style="background:rgba(201,168,76,.06);border-color:rgba(201,168,76,.28)">
+              <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.65),transparent)"></div>
+              <div class="ms-code" style="color:var(--gold)">MILESTONE II · WILDFIRE · 已突破</div>
+              <div class="ms-bignum" style="color:var(--gold-l)">100万 <span style="font-size:16px;font-weight:400;color:var(--ink2)">tCO₂e</span></div>
+              <div class="ms-title" style="color:var(--gold-l)">燎原</div>
+              <div class="ms-en" style="color:var(--gold)">The Spreading Fire</div>
+              <div class="ms-desc" style="color:rgba(240,208,128,.8)">等效于关停一座 <strong style="color:var(--gold-l)">中型燃煤电厂</strong> 运行一整年</div>
+              <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;background:var(--gold-d);border:1px solid var(--gold-b);font-size:11px;color:var(--gold-l);font-weight:600">
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="var(--gold-l)" stroke-width="1.3" stroke-linecap="round"/></svg>
+                2026-03-08 · 23:41 突破
+              </div>
+            </div>
+          </div>
+          <div class="cert-preview" style="border-color:rgba(201,168,76,.35);background:rgba(0,0,0,.25)">
+            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.55),transparent)"></div>
+            <div class="cp-tag" style="color:var(--gold)">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><polyline points="1,3.5 3.5,6 8,2" stroke="var(--gold-l)" stroke-width="1.2" stroke-linecap="round"/></svg>
+              燎原见证者证书 · CL-IVC 链上存证
+            </div>
+            <div class="cp-name" style="color:var(--gold-l)">王磊</div>
+            <div class="cp-sub">于 100万 tCO₂e 突破时刻见证 · 全球 #412</div>
+            <div class="cp-stats">
+              <div><div class="cp-sv" style="color:var(--teal-l)">142</div><div class="cp-sl">贡献 tCO₂e</div></div>
+              <div><div class="cp-sv" style="color:var(--gold-l)">0.0142%</div><div class="cp-sl">占全球总量</div></div>
+              <div><div class="cp-sv" style="color:var(--green-l)">#412</div><div class="cp-sl">全球排名</div></div>
+            </div>
+            <div class="cp-hash">#GN-WILDFIRE-0412 · 2026-03-08 23:41:07 CST</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW ERA -->
+      <div id="ms-era" class="ms-content" style="padding:20px 24px">
+        <div class="ms-hero" style="background:rgba(59,130,246,.06);border-color:rgba(59,130,246,.25)">
+          <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,130,246,.5),transparent)"></div>
+          <div class="ms-code" style="color:var(--blue-l)">MILESTONE III · NEW ERA · 进行中</div>
+          <div class="ms-bignum" style="color:var(--blue-l)">1,000万 <span style="font-size:16px;font-weight:400;color:var(--ink2)">tCO₂e</span></div>
+          <div class="ms-title" style="color:var(--blue-l)">纪元</div>
+          <div class="ms-en" style="color:var(--blue)">The Beginning of a New Age</div>
+          <div class="ms-desc" style="color:rgba(147,197,253,.8)">等效于关停 <strong style="color:var(--blue-l)">3座大型燃煤电厂</strong> 运行一年——这是人类历史上第一次，自下而上的供应链行动进入国家级气候叙事。</div>
+          <div class="ms-prog-wrap">
+            <div class="ms-prog-hd" style="color:var(--ink2)"><span>当前进度</span><span style="color:var(--blue-l);font-weight:600">1,847,293 / 10,000,000 tCO₂e · 18.5%</span></div>
+            <div class="prog"><div class="prog-fill" style="width:18.5%;background:var(--blue-l)"></div></div>
+          </div>
+        </div>
+        <!-- 纪元名录 -->
+        <div style="background:var(--bg3);border:1px solid rgba(139,92,246,.22);border-radius:13px;overflow:hidden">
+          <div style="padding:11px 15px;background:rgba(0,0,0,.2);font-size:9.5px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)">纪元名录预览（当前贡献排名）</div>
+          <table class="rank-tbl">
+            <thead><tr><th>排名</th><th>贡献者</th><th>贡献量</th><th>行业</th></tr></thead>
+            <tbody>
+              <tr><td><span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--gold)">#1</span></td><td style="font-weight:500">张 **</td><td style="font-family:'DM Mono',monospace;color:var(--green-l)">2,847 tCO₂e</td><td style="color:var(--ink2)">钢铁 · 山东</td></tr>
+              <tr><td><span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--ink2)">#2</span></td><td style="font-weight:500">李 **</td><td style="font-family:'DM Mono',monospace;color:var(--green-l)">1,923 tCO₂e</td><td style="color:var(--ink2)">铝材 · 浙江</td></tr>
+              <tr><td><span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--ink2)">#3</span></td><td style="font-weight:500">Chen **</td><td style="font-family:'DM Mono',monospace;color:var(--green-l)">1,401 tCO₂e</td><td style="color:var(--ink2)">汽配 · 广东</td></tr>
+              <tr class="me-row"><td><span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--gold)">#412</span></td><td style="font-weight:600;color:var(--gold)">王磊 · 我</td><td style="font-family:'DM Mono',monospace;color:var(--teal-l)">142 tCO₂e</td><td style="color:var(--ink2)">铝压铸 · 浙江</td></tr>
+              <tr><td><span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--ink3)">#413</span></td><td style="color:var(--ink3)">陈 **</td><td style="font-family:'DM Mono',monospace;color:var(--ink3)">141 tCO₂e</td><td style="color:var(--ink3)">机械 · 江苏</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 双轨荣誉 -->
+  <div style="margin-top:20px" class="fu d4">
+    <div class="sh"><div class="sh-t">双轨荣誉制度 <div class="sh-line"></div></div></div>
+    <div class="g2">
+      <!-- 个人轨 -->
+      <div class="card" style="border-color:rgba(201,168,76,.25)">
+        <div style="font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-l);margin-bottom:8px">个人轨 · 地球公民荣誉勋章</div>
+        <div style="font-size:14px;font-weight:600;color:var(--gold-l);margin-bottom:10px">解锁条件</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 11px;background:var(--green-d);border-radius:9px;border:1px solid var(--green-b);font-size:12px">
+            <span style="color:var(--green-l)">累计推动减排 ≥ 10 tCO₂e</span>
+            <span style="color:var(--green-l);font-weight:700">✓ 142 t</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 11px;background:var(--green-d);border-radius:9px;border:1px solid var(--green-b);font-size:12px">
+            <span style="color:var(--green-l)">等级 ≥ Lv.2 实践者</span>
+            <span style="color:var(--green-l);font-weight:700">✓ Lv.3</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 11px;background:var(--green-d);border-radius:9px;border:1px solid var(--green-b);font-size:12px">
+            <span style="color:var(--green-l)">CL-IVC 链上数据核验通过</span>
+            <span style="color:var(--green-l);font-weight:700">✓ 已核验</span>
+          </div>
+        </div>
+        <button class="cta cta-green" style="width:100%;font-size:12.5px;padding:9px" onclick="showToast('地球公民勋章申领中，链上核验预计24小时')">立即申领地球公民勋章 →</button>
+      </div>
+      <!-- 企业轨 -->
+      <div class="card" style="border-color:rgba(16,185,129,.22)">
+        <div style="font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--green-l);margin-bottom:8px">企业轨 · 企业文明进步奖</div>
+        <div style="font-size:14px;font-weight:600;color:var(--green-l);margin-bottom:10px">解锁条件</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 11px;background:rgba(0,0,0,.25);border-radius:9px;border:1px solid var(--border);font-size:12px">
+            <span style="color:var(--ink2)">企业 Scope 3 覆盖率 ≥ 80%</span>
+            <span style="color:var(--red-l);font-weight:700">12% / 80%</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 11px;background:rgba(0,0,0,.25);border-radius:9px;border:1px solid var(--border);font-size:12px">
+            <span style="color:var(--ink2)">累计推动减排 ≥ 500 tCO₂e</span>
+            <span style="color:var(--gold-l);font-weight:700">142 / 500 t</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 11px;background:rgba(0,0,0,.25);border-radius:9px;border:1px solid var(--border);font-size:12px">
+            <span style="color:var(--ink2)">通过 DLD 机构数据认定</span>
+            <span style="color:var(--ink3)">待解锁</span>
+          </div>
+        </div>
+        <div style="padding:10px 13px;background:var(--gold-d);border:1px solid var(--gold-b);border-radius:9px;font-size:11.5px;color:var(--gold-l);line-height:1.7">
+          距离企业文明进步奖还差：<strong>Scope 3 覆盖率 +68%</strong> 和 <strong>减排量 +358 tCO₂e</strong>。推动供应链协同是最快路径。
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-honor -->
+
+<!-- ═══════════════════════════════════════════
+     EMPTY SLOTS — 剩余9个模块卡槽
+═══════════════════════════════════════════ -->
+<div id="page-achieve" class="page-panel">
+  <div class="ins ins-blue fu"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><circle cx="7" cy="7" r="6" stroke="var(--blue-l)" stroke-width="1.1"/><line x1="7" y1="4" x2="7" y2="7.5" stroke="var(--blue-l)" stroke-width="1"/><circle cx="7" cy="9.5" r=".7" fill="var(--blue-l)"/></svg><div>卡槽：<strong>星火成就档案</strong> ── 个人成长时间轴、GM资产全景、影响力网络地图、对外分享卡片</div></div>
+</div>
+
+<div id="page-resource" class="page-panel">
+  <div class="ins ins-blue fu"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><circle cx="7" cy="7" r="6" stroke="var(--blue-l)" stroke-width="1.1"/><line x1="7" y1="4" x2="7" y2="7.5" stroke="var(--blue-l)" stroke-width="1"/><circle cx="7" cy="9.5" r=".7" fill="var(--blue-l)"/></svg><div>卡槽：<strong>算力资源仪表盘; </strong> ── 深度推演次数、法规更新推送、AI调用记录</div></div>
+</div>
+
+<div id="page-enterprise" class="page-panel">
+  <div class="ins ins-gold fu"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><path d="M7 1L13 4V10L7 13L1 10V4L7 1Z" stroke="var(--gold-l)" stroke-width="1" fill="var(--gold-d)"/></svg><div>卡槽：<strong>企业数字档案</strong> ── 企业基础信息、碳排放数字档案、MAT网关状态</div></div>
+</div>
+
+<div id="page-supply" class="page-panel">
+  <div class="ins ins-green fu"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><polyline points="2,7 5.5,10.5 12,4" stroke="var(--green-l)" stroke-width="1.4" stroke-linecap="round"/></svg><div>卡槽：<strong>供应链协同</strong> ── 17家供应商管理、穿透率漏斗、代际收益追踪</div></div>
+</div>
+
+<div id="page-report" class="page-panel">
+  <div class="ins ins-purple fu"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><rect x="2" y="1.5" width="10" height="11" rx="1.5" stroke="var(--purple-l)" stroke-width="1"/><line x1="4.5" y1="5" x2="9.5" y2="5" stroke="var(--purple-l)" stroke-width=".9"/><line x1="4.5" y1="7" x2="9.5" y2="7" stroke="var(--purple-l)" stroke-width=".9"/><line x1="4.5" y1="9" x2="7" y2="9" stroke="var(--purple-l)" stroke-width=".9"/></svg><div>卡槽：<strong>全域诊断报告</strong> ── 双模式（决策层简报+完整诊断），6章节全量报告</div></div>
+</div>
+
+<div id="page-decision" class="page-panel">
+  <div class="ins ins-gold fu"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><path d="M7 1L13 4V10L7 13L1 10V4L7 1Z" stroke="var(--gold-l)" stroke-width="1" fill="var(--gold-d)"/></svg><div>卡槽：<strong>决策层呈送包生成器</strong> ── 配置→预览→导出，阅读追踪，CFO逼单包</div></div>
+</div>
+
+<div id="page-gov" class="page-panel">
+  <div class="ins ins-purple fu"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><path d="M7 1L9 5.5L14 6L10.5 9.5L11.5 14L7 11.5L2.5 14L3.5 9.5L0 6L5 5.5L7 1Z" stroke="var(--purple-l)" stroke-width="1"/></svg><div>卡槽：<strong>生态共治委员会</strong> ── 活跃提案投票、委员名录、提案提交</div></div>
+</div>
+
+<div id="page-wallet" class="page-panel">
+  <div class="ins ins-gold fu"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><path d="M7 1L13 4V10L7 13L1 10V4L7 1Z" stroke="var(--gold-l)" stroke-width="1" fill="var(--gold-d)"/></svg><div>卡槽：<strong>GM 绿印钱包</strong> ── 资产余额、赠与弹窗、链上流水记录</div></div>
+</div>
+
+<div id="page-eu" class="page-panel">
+  <div class="ins ins-blue fu"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><circle cx="7" cy="7" r="6" stroke="var(--blue-l)" stroke-width="1.1"/></svg><div>卡槽：<strong>欧盟海关直连</strong> ── GEC分摊引擎、CBAM XML报文、ZKP隐私保护</div></div>
+</div>
+
+<div id="page-dld" class="page-panel">
+  <div class="ins ins-green fu"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><polyline points="2,7 5.5,10.5 12,4" stroke="var(--green-l)" stroke-width="1.4" stroke-linecap="round"/></svg><div>卡槽：<strong>DLD 绿色信贷</strong> ── GEC质押快贷、碳资产保理、集采撮合</div></div>
+</div>
+
+<div id="page-acf" class="page-panel">
+  <div class="ins ins-teal fu" style="background:var(--teal-d);border-color:var(--teal-b);color:var(--teal-l)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><path d="M7 1L13 4.5V9.5C13 12 10.5 13.5 7 14.5C3.5 13.5 1 12 1 9.5V4.5L7 1Z" stroke="var(--teal-l)" stroke-width="1"/></svg><div>卡槽：<strong>ACF 大湾区认证</strong> ── 广东实时因子、自动预填、一键提交监管局</div></div>
+</div>
+
+
+    </div><!-- /main-pad -->
+  </div><!-- /main-scroll -->
+</div><!-- /main-wrap -->
+</div><!-- /app -->
+
+<!-- TOAST -->
+<div id="toast">
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+    <polyline points="2,7 5.5,10.5 12,4" stroke="var(--green-l)" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <span id="toast-text">操作成功</span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+var PAGE_TITLES = {
+  overview:'全域总览', achieve:'星火成就档案', calc:'CBAM 测算工具',
+  resource:'算力资源仪表盘', enterprise:'企业数字档案', supply:'供应链协同',
+  report:'全域诊断报告', decision:'决策层呈送包', honor:'荣誉体系',
+  gov:'生态共治委员会', wallet:'GM 绿印钱包', eu:'欧盟海关直连',
+  dld:'DLD 绿色信贷', acf:'ACF 大湾区认证'
+};
+
+var P2_PAGES = ['enterprise','supply','report','decision'];
+var P3_PAGES = ['gov','eu','dld','acf'];
+
+function navTo(pageId, navEl) {
+  // Hide all panels
+  document.querySelectorAll('.page-panel').forEach(function(p){ p.classList.remove('active'); });
+  var pg = document.getElementById('page-' + pageId);
+  if (pg) pg.classList.add('active');
+
+  // Update nav highlight
+  document.querySelectorAll('.sb-item').forEach(function(n){ n.classList.remove('active'); });
+  if (navEl) navEl.classList.add('active');
+
+  // Update topbar title
+  document.getElementById('tb-title').textContent = PAGE_TITLES[pageId] || pageId;
+
+  // Scroll to top
+  var scr = document.querySelector('.main-scroll');
+  if (scr) scr.scrollTop = 0;
+}
+
+function navLocked(pageId, navEl) {
+  if (P2_PAGES.indexOf(pageId) !== -1 && PHASE >= 2) { navTo(pageId, navEl); return; }
+  if (P3_PAGES.indexOf(pageId) !== -1 && PHASE >= 3) { navTo(pageId, navEl); return; }
+  var msgs = {
+    enterprise: '建立企业档案——点击右上角"建立企业档案"进入阶段二',
+    supply:   '阶段二解锁：先建立企业档案',
+    report:   '阶段二解锁：建立企业档案后自动生成报告',
+    decision: '阶段二解锁：建立企业档案后可用',
+    gov:      '阶段三专属：企业账户升级后解锁',
+    eu:       '阶段三专属：企业账户升级后解锁',
+    dld:      '阶段三专属：企业账户升级后解锁',
+    acf:      '阶段三专属：企业账户升级后解锁'
+  };
+  showToast(msgs[pageId] || '当前阶段暂未解锁');
+}
+
+// ═══════════════════════════════════════════
+// PHASE SYSTEM
+// ═══════════════════════════════════════════
+var PHASE = 1;
+
+var PHASE_CFG = {
+  1: {
+    gm:128, badgeText:'阶段一 · 个体启蒙',
+    badgeStyle:'background:var(--green-d);color:var(--green-l);border:1px solid var(--green-b)',
+    phaseClass:'ph1', phaseDot:'var(--green)', phaseText:'个体启蒙期',
+    shFill:'rgba(16,185,129,.12)', shStroke:'#10b981', shNum:'1', shLbl:'Lv.1', shColor:'var(--green)',
+    idMeta:'注册于 2026-04-11 · HengAI 个人月度会员',
+    idTags:'<span class="pill p-green">Lv.1 观察员</span><span class="pill p-gray">CBAM 合规学习者</span>',
+    role:'个人会员 · 月付',
+    btnA:'升级年付', btnP:'建立企业档案 →',
+    tabCls:'on-ph1',
+    ptabs:['on-ph1','','']
+  },
+  2: {
+    gm:840, badgeText:'阶段二 · 业务映射',
+    badgeStyle:'background:var(--gold-d);color:var(--gold-l);border:1px solid var(--gold-b)',
+    phaseClass:'ph2', phaseDot:'var(--gold)', phaseText:'业务映射期',
+    shFill:'rgba(201,168,76,.12)', shStroke:'#c9a84c', shNum:'3', shLbl:'Lv.3', shColor:'var(--gold)',
+    idMeta:'注册于 2026-04-11 · HengAI 个人年付会员',
+    idTags:'<span class="pill p-gold">Lv.3 架构师</span><span class="pill p-green">CBAM 专家</span><span class="pill p-blue">Scope 3 穿透中</span>',
+    role:'个人会员 · 年付',
+    btnA:'申请企业升级', btnP:'生成升级报告 →',
+    ptabs:['','on-ph2','']
+  },
+  3: {
+    gm:4280, badgeText:'阶段三 · 全域共治',
+    badgeStyle:'background:var(--purple-d);color:var(--purple-l);border:1px solid var(--purple-b)',
+    phaseClass:'ph3', phaseDot:'var(--purple)', phaseText:'全域共治期',
+    shFill:'rgba(139,92,246,.12)', shStroke:'#8b5cf6', shNum:'5', shLbl:'Lv.5', shColor:'var(--purple-l)',
+    idMeta:'注册于 2026-04-11 · HengAI 企业旗舰版',
+    idTags:'<span class="pill p-purple">Lv.5 生态领袖</span><span class="pill p-gold">地球公民勋章</span><span class="pill p-teal">Global Eco-Advisor</span>',
+    role:'企业账户 · 旗舰版',
+    btnA:'全域枢纽已激活', btnP:'进入生态枢纽 →',
+    ptabs:['','','on-ph3']
+  }
+};
+
+function setPhase(p) {
+  PHASE = p;
+  var c = PHASE_CFG[p];
+
+  // Topbar
+  document.getElementById('tb-badge').textContent = c.badgeText;
+  document.getElementById('tb-badge').style.cssText = c.badgeStyle;
+  document.getElementById('tb-btn-a').textContent = c.btnA;
+  document.getElementById('tb-btn-p').textContent = c.btnP;
+  document.getElementById('top-gm').textContent = c.gm.toLocaleString();
+
+  // Sidebar
+  var strip = document.getElementById('sb-phase');
+  strip.className = 'sb-phase ' + c.phaseClass;
+  document.getElementById('sb-pdot').style.background = c.phaseDot;
+  document.getElementById('sb-ptext').textContent = c.phaseText;
+  document.getElementById('sb-urole').textContent = c.role;
+
+  // Identity card
+  document.getElementById('id-meta').textContent = c.idMeta;
+  document.getElementById('id-tags').innerHTML = c.idTags;
+
+  // Shield
+  var shp = document.getElementById('sh-path');
+  if(shp){ shp.setAttribute('fill',c.shFill); shp.setAttribute('stroke',c.shStroke); }
+  var shc = document.getElementById('sh-crown');
+  if(shc) shc.setAttribute('stroke',c.shStroke);
+  var shn = document.getElementById('sh-num');
+  if(shn){ shn.textContent = c.shNum; shn.style.color = c.shColor; }
+  var shl = document.getElementById('sh-lbl');
+  if(shl){ shl.textContent = c.shLbl; shl.style.color = c.shColor; }
+
+  // Phase tabs
+  ['ptab1','ptab2','ptab3'].forEach(function(id,i){
+    var el = document.getElementById(id);
+    el.className = 'ph-tab ' + (c.ptabs[i]||'');
+  });
+
+  // Unlock nav items
+  unlockNav(p);
+
+  // Update timeline
+  updateTimeline(p);
+
+  // Render phase body
+  renderPhaseBody(p);
+}
+
+function unlockNav(p) {
+  var ck = '<svg width="9" height="7" viewBox="0 0 9 7" fill="none"><polyline points="1,3.5 3.5,6 8,2" stroke="var(--green-l)" stroke-width="1.3" stroke-linecap="round"/></svg>';
+  var p2nav = ['enterprise','supply','report','decision'];
+  var p3nav = ['gov','eu','dld','acf'];
+  var p2colors = {enterprise:'var(--gold)',supply:'var(--teal)',report:'var(--blue-l)',decision:'var(--gold)'};
+  var p3colors = {gov:'var(--purple-l)',eu:'var(--blue-l)',dld:'var(--green-l)',acf:'var(--teal-l)'};
+
+  p2nav.forEach(function(id){
+    var el=document.getElementById('nav-'+id);
+    var dot=document.getElementById('dot-'+id);
+    var tag=document.getElementById('tag-'+id);
+    if(p>=2){
+      if(el){el.classList.remove('locked');}
+      if(dot) dot.style.background=p2colors[id];
+      if(tag){tag.textContent='';tag.className='';}
+    } else {
+      if(el){el.classList.add('locked');}
+      if(dot) dot.style.background='var(--ink3)';
+      if(tag){tag.textContent='锁定';tag.className='sb-tag tag-lock';}
+    }
+  });
+  p3nav.forEach(function(id){
+    var el=document.getElementById('nav-'+id);
+    var dot=document.getElementById('dot-'+id);
+    var tag=document.getElementById('tag-'+id);
+    if(p>=3){
+      if(el){el.classList.remove('locked');}
+      if(dot) dot.style.background=p3colors[id];
+      if(tag){tag.textContent='激活';tag.className='sb-tag tag-new';}
+    } else {
+      if(el){el.classList.add('locked');}
+      if(dot) dot.style.background='var(--ink3)';
+      if(tag){tag.textContent='P3';tag.className='sb-tag tag-lock';}
+    }
+  });
+}
+
+function updateTimeline(p) {
+  var ck = '<svg width="9" height="7" viewBox="0 0 9 7" fill="none"><polyline points="1,3.5 3.5,6 8,2" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round"/></svg>';
+  var act = '<div style="width:7px;height:7px;background:var(--blue-l);border-radius:50%"></div>';
+  if(p>=2){
+    var d4=document.getElementById('tl-d4');
+    if(d4){d4.className='rt-d rt-done';d4.innerHTML=ck;}
+    var l4=document.getElementById('tl-l4'); if(l4){l4.className='rt-lbl';l4.style.color='var(--green)';}
+    var dt4=document.getElementById('tl-dt4'); if(dt4) dt4.textContent='04-12';
+    var ln3=document.getElementById('tl-ln3'); if(ln3) ln3.className='rt-ln rt-ln-done';
+    var d5=document.getElementById('tl-d5');
+    if(d5){d5.className='rt-d rt-active';d5.innerHTML=act;}
+    var l5=document.getElementById('tl-l5'); if(l5){l5.className='rt-lbl';l5.style.color='var(--blue-l)';}
+    var ln4=document.getElementById('tl-ln4'); if(ln4) ln4.className='rt-ln rt-ln-done';
+  }
+  if(p>=3){
+    var d5b=document.getElementById('tl-d5');
+    if(d5b){d5b.className='rt-d rt-done';d5b.innerHTML=ck;}
+    var l5b=document.getElementById('tl-l5'); if(l5b){l5b.style.color='var(--green)';}
+    var d6=document.getElementById('tl-d6');
+    if(d6){d6.className='rt-d rt-done';d6.innerHTML=ck;}
+    var l6=document.getElementById('tl-l6'); if(l6){l6.className='rt-lbl';l6.style.color='var(--green)';}
+    var ln5=document.getElementById('tl-ln5'); if(ln5) ln5.className='rt-ln rt-ln-done';
+  }
+}
+
+function cyclePhase(){ setPhase(PHASE<3?PHASE+1:1); }
+
+// ═══════════════════════════════════════════
+// PHASE BODY RENDERER
+// ═══════════════════════════════════════════
+function renderPhaseBody(p) {
+  var el = document.getElementById('phase-body');
+  if (!el) return;
+  if (p===1) el.innerHTML = getP1HTML();
+  else if (p===2) el.innerHTML = getP2HTML();
+  else el.innerHTML = getP3HTML();
+}
+
+function getP1HTML(){
+  return '<div class="g2 fu d2" style="margin-bottom:16px">' +
+  '<div class="card">' +
+    '<div class="sh"><div class="sh-t">GreenMark 绿印资产 <div class="sh-line"></div></div><span class="pill p-gold">本月活跃</span></div>' +
+    '<div style="font-family:\'DM Mono\',monospace;font-size:34px;font-weight:700;color:var(--gold-l);letter-spacing:-1px;line-height:1">128 <span style="font-size:14px;font-weight:400;color:var(--ink2)">GM</span></div>' +
+    '<div style="font-size:11.5px;color:var(--green-l);margin-top:4px">本月 +128 GM 积累</div>' +
+    '<div style="margin:10px 0 4px"><div class="prog"><div class="prog-fill" style="width:25.6%;background:linear-gradient(90deg,var(--gold),rgba(201,168,76,.4))"></div></div></div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink3)"><span>0</span><span style="color:var(--gold-l)">Lv.2 门槛 500 GM</span></div>' +
+    '<hr class="hr">' +
+    '<div class="gm-evs">' +
+      '<div class="gm-ev"><div class="gm-ev-l"><div class="gm-ev-ic" style="background:var(--green-d);border:1px solid var(--green-b)"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><polyline points="1.5,5 4.5,8 10.5,2" stroke="#6ee7b7" stroke-width="1.4" stroke-linecap="round"/></svg></div><div><div class="gm-ev-name">注册并完成首次 AI 问答</div><div class="gm-ev-time">2026-04-11 · 09:17</div></div></div><span class="gm-ev-val" style="color:var(--green-l)">+50</span></div>' +
+      '<div class="gm-ev"><div class="gm-ev-l"><div class="gm-ev-ic" style="background:var(--blue-d);border:1px solid var(--blue-b)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#93c5fd" stroke-width="1"/><line x1="6" y1="3.5" x2="6" y2="6.5" stroke="#93c5fd" stroke-width="1"/></svg></div><div><div class="gm-ev-name">付费成为月度会员</div><div class="gm-ev-time">2026-04-11 · 09:31</div></div></div><span class="gm-ev-val" style="color:var(--blue-l)">+50</span></div>' +
+      '<div class="gm-ev"><div class="gm-ev-l"><div class="gm-ev-ic" style="background:var(--gold-d);border:1px solid var(--gold-b)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L7.2 4.8L11.5 5.3L8.5 8L9.3 12L6 10.2L2.7 12L3.5 8L.5 5.3L4.8 4.8L6 1Z" stroke="#c9a84c" stroke-width="1"/></svg></div><div><div class="gm-ev-name">完成 CBAM 粗测算</div><div class="gm-ev-time">2026-04-11 · 10:02</div></div></div><span class="gm-ev-val" style="color:var(--gold-l)">+28</span></div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="card">' +
+    '<div class="sh"><div class="sh-t">成长路径 <div class="sh-line"></div></div></div>' +
+    '<div class="step-list">' +
+      '<div class="sl-item"><div class="sl-dot sl-done"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="sl-body"><div class="sl-title">注册 · 首次 AI 问答</div><div class="sl-desc">感受到知识颠覆，决定继续</div></div></div>' +
+      '<div class="sl-item"><div class="sl-dot sl-done"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="#6ee7b7" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="sl-body"><div class="sl-title">付费会员 · CBAM 粗测完成</div><div class="sl-desc">¥99 解锁 ¥30万咨询报告价值</div></div></div>' +
+      '<div class="sl-item"><div class="sl-dot sl-active"><div style="width:7px;height:7px;background:var(--blue-l);border-radius:50%"></div></div><div class="sl-body"><div class="sl-title" style="color:var(--blue-l)">建立企业数字档案（下一步）</div><div class="sl-desc">将个人知识转化为企业合规资产</div></div></div>' +
+      '<div class="sl-item" style="padding-bottom:0"><div class="sl-dot sl-wait">4</div><div class="sl-body"><div class="sl-title" style="color:var(--ink3)">推动供应链数据填报</div><div class="sl-desc" style="color:var(--ink3)">Scope 3 覆盖率提升，GM 大幅增加</div></div></div>' +
+    '</div>' +
+  '</div>' +
+  '</div>' +
+  '<div class="ins ins-green fu d2"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><circle cx="7" cy="7" r="6" stroke="var(--green-l)" stroke-width="1.1"/><line x1="7" y1="4" x2="7" y2="7.5" stroke="var(--green-l)" stroke-width="1"/><circle cx="7" cy="9.5" r=".7" fill="var(--green-l)"/></svg><div><strong style="color:var(--green-l)">HengAI 提示：</strong>您已完成粗测，发现供应链数据黑盒是主要风险。建立企业档案后，系统将生成精确碳税敞口诊断。</div></div>' +
+  '<div class="card fu d3" style="border-style:dashed;border-color:rgba(255,255,255,.13);background:rgba(0,0,0,.2)">' +
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:14px">' +
+      '<div style="display:flex;align-items:flex-start;gap:12px">' +
+        '<div style="width:38px;height:38px;border-radius:9px;background:var(--blue-d);border:1px solid var(--blue-b);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 17 17" fill="none"><rect x="2" y="4.5" width="13" height="10" rx="1.8" stroke="#93c5fd" stroke-width="1.2"/><path d="M5.5 4.5V3.5a3 3 0 016 0v1" stroke="#93c5fd" stroke-width="1.1"/></svg></div>' +
+        '<div><div style="font-size:13.5px;font-weight:600;margin-bottom:3px">建立企业数字档案</div><div style="font-size:12px;color:var(--ink2);line-height:1.65">将个人知识转化为企业合规资产，解锁精确诊断与供应链协同</div></div>' +
+      '</div>' +
+      '<button class="cta cta-green" style="white-space:nowrap;padding:9px 18px;font-size:12.5px" onclick="enterPhase2()">立即建立 →</button>' +
+    '</div>' +
+  '</div>' +
+  '<div style="margin-top:16px" class="fu d3">' +
+    '<div class="sh"><div class="sh-t">快速工具 <div class="sh-line"></div></div></div>' +
+    '<div class="g3">' +
+      '<button class="act-btn" onclick="navTo(\'resource\',document.getElementById(\'nav-resource\'))"><div class="act-ic" style="background:var(--teal-d);border:1px solid var(--teal-b)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="var(--teal-l)" stroke-width="1"/></svg></div><div><div style="font-weight:500">法规问答</div><div style="font-size:10.5px;color:var(--ink3);margin-top:1px">AI 智库 · 93次剩余</div></div></button>' +
+      '<button class="act-btn" onclick="navTo(\'calc\',document.getElementById(\'nav-calc\'))"><div class="act-ic" style="background:var(--gold-d);border:1px solid var(--gold-b)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="2" y="2" width="9" height="9" rx="1.5" stroke="var(--gold-l)" stroke-width="1"/><line x1="4.5" y1="6.5" x2="8.5" y2="6.5" stroke="var(--gold-l)" stroke-width="1"/><line x1="6.5" y1="4.5" x2="6.5" y2="8.5" stroke="var(--gold-l)" stroke-width="1"/></svg></div><div><div style="font-weight:500">CBAM 测算</div><div style="font-size:10.5px;color:var(--ink3);margin-top:1px">估算碳税敞口</div></div></button>' +
+      '<button class="act-btn" onclick="navTo(\'honor\',document.getElementById(\'nav-honor\'))"><div class="act-ic" style="background:var(--purple-d);border:1px solid var(--purple-b)"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5L8 5H12L9 7.5L10 11.5L6.5 9.5L3 11.5L4 7.5L1 5H5L6.5 1.5Z" stroke="var(--purple-l)" stroke-width="1"/></svg></div><div><div style="font-weight:500">荣誉体系</div><div style="font-size:10.5px;color:var(--ink3);margin-top:1px">勋章 · 里程碑</div></div></button>' +
+    '</div>' +
+  '</div>';
+}
+
+function getP2HTML(){
+  return '<div class="g2 fu d2" style="margin-bottom:16px">' +
+  '<div class="alarm">' +
+    '<div style="flex-shrink:0;margin-top:2px"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2L20 18H2L11 2Z" stroke="var(--red-l)" stroke-width="1.5" fill="var(--red-d)"/><line x1="11" y1="8" x2="11" y2="13" stroke="var(--red-l)" stroke-width="1.3"/><circle cx="11" cy="15.5" r=".9" fill="var(--red-l)"/></svg></div>' +
+    '<div><div class="alarm-val">€ 145,000</div><div class="alarm-lbl">2026 年 CBAM 年度碳税预测</div><div style="font-size:11.5px;color:rgba(252,165,165,.7);margin-top:5px;line-height:1.6">照妖镜数据 · 供应链穿透率 12% · Lv.2 惩罚系数 ×1.35</div></div>' +
+  '</div>' +
+  '<div class="card">' +
+    '<div style="font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">三步对冲 ROI</div>' +
+    '<div class="roi-strip">' +
+      '<div class="roi-box" style="background:var(--red-d);border-color:var(--red-b);text-align:center"><div class="roi-val" style="color:var(--red-l)">€145k</div><div class="roi-lbl" style="color:rgba(252,165,165,.7)">当前敞口</div></div>' +
+      '<div style="text-align:center;color:var(--ink3);font-size:11px">→</div>' +
+      '<div class="roi-box" style="background:rgba(0,0,0,.28);border-color:var(--border);text-align:center"><div class="roi-val" style="color:var(--ink2)">¥58k</div><div class="roi-lbl" style="color:var(--ink3)">方案投入</div></div>' +
+      '<div style="text-align:center;color:var(--ink3);font-size:11px">→</div>' +
+      '<div class="roi-box" style="background:var(--green-d);border-color:var(--green-b);text-align:center"><div class="roi-val" style="color:var(--green-l)">1:9.1</div><div class="roi-lbl" style="color:rgba(110,231,183,.7)">真实 ROI</div><div class="roi-note" style="color:rgba(110,231,183,.45)">净节税¥528k</div></div>' +
+    '</div>' +
+    '<div class="ins ins-gold" style="margin-top:11px;margin-bottom:0;font-size:11.5px"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="flex-shrink:0"><path d="M6 1L11 3.5V8.5L6 11L1 8.5V3.5L6 1Z" stroke="var(--gold-l)" stroke-width="1" fill="var(--gold-d)"/></svg><div>实质性对冲须启用企业基建。<strong style="color:var(--gold-l)">一键生成《全域升级报告》</strong>，由决策层定夺。</div></div>' +
+  '</div>' +
+  '</div>' +
+  '<div class="g2 fu d3" style="margin-bottom:16px">' +
+  '<div class="card">' +
+    '<div class="sh"><div class="sh-t">供应链穿透状态 <div class="sh-line"></div></div><span class="pill p-red">12%</span></div>' +
+    '<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">' +
+      '<div class="donut-w"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8"/><circle cx="40" cy="40" r="32" fill="none" stroke="var(--red-l)" stroke-width="8" stroke-dasharray="24.1 127.2" stroke-linecap="round"/></svg><div class="donut-c"><span class="donut-pct" style="color:var(--red-l)">12%</span><span class="donut-lbl">穿透率</span></div></div>' +
+      '<div style="flex:1;display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--ink2)">已填报</span><span style="font-weight:600">2 / 17 家</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--ink2)">Scope 3 缺口</span><span style="font-weight:600;color:var(--red-l)">88%</span></div><div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--ink2)">高优先级</span><span style="font-weight:600;color:var(--gold-l)">5 家</span></div></div>' +
+    '</div>' +
+    '<button class="cta cta-green" style="width:100%;font-size:12px;padding:9px" onclick="navTo(\'supply\',document.getElementById(\'nav-supply\'))">进入供应链协同 →</button>' +
+  '</div>' +
+  '<div class="card">' +
+    '<div class="sh"><div class="sh-t">GreenMark <div class="sh-line"></div></div><span style="font-family:\'DM Mono\',monospace;font-size:18px;font-weight:700;color:var(--gold-l)">840</span></div>' +
+    '<div class="prog" style="margin-bottom:4px"><div class="prog-fill" style="width:42%;background:linear-gradient(90deg,var(--gold),rgba(201,168,76,.4))"></div></div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink3);margin-bottom:12px"><span>0</span><span style="color:var(--gold-l)">Lv.4 门槛 2,000 GM</span></div>' +
+    '<div class="gm-evs">' +
+      '<div class="gm-ev"><div class="gm-ev-l"><div class="gm-ev-ic" style="background:var(--blue-d);border:1px solid var(--blue-b)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="1.5" width="9" height="9" rx="1.5" stroke="#93c5fd" stroke-width="1"/></svg></div><div><div class="gm-ev-name">建立企业数字档案</div><div class="gm-ev-time">+50 GM</div></div></div><span class="gm-ev-val" style="color:var(--blue-l)">+50</span></div>' +
+      '<div class="gm-ev"><div class="gm-ev-l"><div class="gm-ev-ic" style="background:var(--green-d);border:1px solid var(--green-b)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="3" r="1.5" stroke="var(--green-l)" stroke-width="1"/><circle cx="2" cy="9.5" r="1.2" stroke="var(--green-l)" stroke-width="1"/><circle cx="10" cy="9.5" r="1.2" stroke="var(--green-l)" stroke-width="1"/></svg></div><div><div class="gm-ev-name">2 家供应商完成填报</div><div class="gm-ev-time">代际收益累计中</div></div></div><span class="gm-ev-val" style="color:var(--green-l)">+400</span></div>' +
+    '</div>' +
+    '<button class="cta cta-gold" style="width:100%;margin-top:12px;font-size:12px;padding:9px" onclick="showToast(\'《全域升级报告》已生成，可向决策层呈送\')">生成《全域升级报告》→</button>' +
+  '</div>' +
+  '</div>' +
+  '<div class="card fu d4" style="border-color:rgba(16,185,129,.22)">' +
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulseDot 2s infinite"></div><span style="font-size:10.5px;color:var(--green);font-weight:600;letter-spacing:.5px">诊断报告实时更新中</span></div>' +
+    '<div style="font-size:14px;font-weight:600;margin-bottom:4px">浙江 XX 汽配制造厂 · 全域碳合规诊断报告 v0.2</div>' +
+    '<div style="font-size:12px;color:var(--ink2);margin-bottom:12px">供应链覆盖率 12% · 下次更新：更多供应商填报完成后</div>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"><span class="pill p-red">碳税敞口 €145,000</span><span class="pill p-gold">Scope 3 覆盖率 12%</span><span class="pill p-gray">MAT 网关 未启用</span><span class="pill p-gray">ZCP 签证 未启用</span></div>' +
+    '<button class="tb-btn tb-btn-primary" style="font-size:12.5px" onclick="navTo(\'report\',document.getElementById(\'nav-report\'))">查看完整诊断报告 →</button>' +
+  '</div>';
+}
+
+function getP3HTML(){
+  return '<div style="background:var(--bg3);border:1px solid rgba(139,92,246,.22);border-radius:18px;overflow:hidden;margin-bottom:16px;position:relative" class="fu d2">' +
+  '<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--gold) 40%,var(--purple) 70%,transparent 95%)"></div>' +
+  '<div class="rail-row">' +
+    '<div class="rail-l">' +
+      '<div class="rail-tag" style="color:var(--gold-l)">地球公民 · 个人成就</div>' +
+      '<div class="rail-level" style="color:var(--purple-l)">Lv.5 生态领袖</div>' +
+      '<div class="rail-en">Global Eco-Advisor · #0412</div>' +
+      '<div class="rail-bignum" style="color:var(--teal-l)">2,847<span style="font-size:14px;font-weight:400;color:var(--ink2)"> tCO₂e</span></div>' +
+      '<div class="rail-bigsub">累计推动减排 · 链上存证不可篡改</div>' +
+      '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px"><span class="pill p-purple">生态顾问委员会</span><span class="pill p-gold">GM 乘数 ×2.0</span><span class="pill p-teal">减排证书颁发权</span></div>' +
+      '<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--gold-d);border:1px solid var(--gold-b);border-radius:10px;margin-bottom:10px">' +
+        '<svg width="30" height="30" viewBox="0 0 30 30" fill="none"><path d="M15 2L28 8V19C28 25 22 29.5 15 31C8 29.5 2 25 2 19V8L15 2Z" fill="rgba(201,168,76,.15)" stroke="var(--gold)" stroke-width="1.2"/><polyline points="9,14.5 13.5,19 21,12" stroke="var(--gold-l)" stroke-width="1.6" stroke-linecap="round"/></svg>' +
+        '<div><div style="font-size:12px;font-weight:600;color:var(--gold-l)">地球公民荣誉勋章</div><div style="font-size:10px;color:var(--gold);margin-top:1px">#0412 · CL-IVC 链上存证 · 不可撤销</div></div>' +
+      '</div>' +
+      '<div style="font-family:\'DM Mono\',monospace;font-size:26px;font-weight:700;color:var(--gold-l);letter-spacing:-1px">4,280 <span style="font-size:13px;font-weight:400;color:var(--ink2)">GM</span></div>' +
+      '<div style="font-size:11px;color:var(--ink2)">GreenMark · 可授予合作伙伴</div>' +
+    '</div>' +
+    '<div class="rail-r">' +
+      '<div class="rail-tag" style="color:var(--teal-l)">企业文明 · 官方认证</div>' +
+      '<div class="rail-level" style="color:var(--teal-l)">官方认证金库</div>' +
+      '<div class="rail-en">Certified Vault · Enterprise</div>' +
+      '<div class="cert-vault" style="background:var(--teal-d);border:1px solid var(--teal-b)"><div class="cv-pulse" style="background:var(--green)"></div><div style="font-size:12px;color:var(--teal-l)">MAT 网关在线 · ZCP 算力时移生效中</div></div>' +
+      '<div class="gw-list" style="margin-bottom:12px">' +
+        '<div class="gw-item"><div class="gw-d" style="background:var(--green)"></div><div class="gw-name">MAT 边缘感知网关</div><div class="gw-status" style="color:var(--green-l)">Lv.4 在线</div></div>' +
+        '<div class="gw-item"><div class="gw-d" style="background:var(--blue-l)"></div><div class="gw-name">ZCP 零碳算力签证</div><div class="gw-status" style="color:var(--blue-l)">时移运行中</div></div>' +
+        '<div class="gw-item"><div class="gw-d" style="background:var(--teal-l)"></div><div class="gw-name">CL-GTS 欧盟直连通道</div><div class="gw-status" style="color:var(--teal-l)">申报就绪</div></div>' +
+      '</div>' +
+      '<div style="padding:11px 14px;background:var(--green-d);border:1px solid var(--green-b);border-radius:10px"><div style="font-size:10px;color:var(--green);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">企业文明进步奖 · 候选资格</div><div style="font-size:12px;color:var(--green-l);line-height:1.65">供应链覆盖率 <strong>94%</strong> · 碳强度 <strong>1.62 t/t</strong><br>优于行业均值 31% · 已具备参选资格</div></div>' +
+    '</div>' +
+  '</div>' +
+  '</div>' +
+  '<div class="fu d3" style="margin-bottom:16px">' +
+    '<div class="sh"><div class="sh-t">全域业务引擎 <div class="sh-line"></div></div><span class="pill p-purple">旗舰模式已激活</span></div>' +
+    '<div class="p3-grid">' +
+      '<button class="p3-btn" onclick="navTo(\'eu\',document.getElementById(\'nav-eu\'))"><div class="p3-ic" style="background:var(--blue-d);border:1px solid var(--blue-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="var(--blue-l)" stroke-width="1.1"/><path d="M3 7h8M7 3v8" stroke="var(--blue-l)" stroke-width=".9" stroke-dasharray="1.5 1.5"/></svg></div><div><div class="p3-lbl">欧盟海关直连</div><div class="p3-sub">CBAM 申报一键提交</div></div></button>' +
+      '<button class="p3-btn" onclick="navTo(\'dld\',document.getElementById(\'nav-dld\'))"><div class="p3-ic" style="background:var(--green-d);border:1px solid var(--green-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="4" width="11" height="8" rx="1.5" stroke="var(--green-l)" stroke-width="1"/><line x1="4" y1="7.5" x2="10" y2="7.5" stroke="var(--green-l)" stroke-width="1"/></svg></div><div><div class="p3-lbl">DLD 绿色信贷</div><div class="p3-sub">碳资产金融确权</div></div></button>' +
+      '<button class="p3-btn" onclick="navTo(\'acf\',document.getElementById(\'nav-acf\'))"><div class="p3-ic" style="background:var(--teal-d);border:1px solid var(--teal-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L13 4.5V9C13 11.5 10.5 13.5 7 14.5C3.5 13.5 1 11.5 1 9V4.5L7 1.5Z" stroke="var(--teal-l)" stroke-width="1.1"/><polyline points="4.5,7 6.5,9.5 10,5.5" stroke="var(--teal-l)" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="p3-lbl">ACF 大湾区认证</div><div class="p3-sub">一键提交广东监管局</div></div></button>' +
+      '<button class="p3-btn" onclick="navTo(\'supply\',document.getElementById(\'nav-supply\'))"><div class="p3-ic" style="background:var(--teal-d);border:1px solid var(--teal-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="3" r="1.8" stroke="var(--teal-l)" stroke-width="1"/><circle cx="2.5" cy="10.5" r="1.5" stroke="var(--teal-l)" stroke-width="1"/><circle cx="11.5" cy="10.5" r="1.5" stroke="var(--teal-l)" stroke-width="1"/><line x1="7" y1="4.8" x2="3.2" y2="9" stroke="var(--teal-l)" stroke-width=".9"/><line x1="7" y1="4.8" x2="10.8" y2="9" stroke="var(--teal-l)" stroke-width=".9"/></svg></div><div><div class="p3-lbl">供应商网络</div><div class="p3-sub">28节点 · 双向可视</div></div></button>' +
+      '<button class="p3-btn" onclick="showToast(\'ZCP 时移签证 · 本月节税 ¥3.2万\')"><div class="p3-ic" style="background:var(--gold-d);border:1px solid var(--gold-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L13 5V9.5L7 13L1 9.5V5L7 1.5Z" stroke="var(--gold-l)" stroke-width="1"/><polyline points="5,7 6.5,9.5 10,5.5" stroke="var(--gold-l)" stroke-width="1.2" stroke-linecap="round"/></svg></div><div><div class="p3-lbl">ZCP 套利监控</div><div class="p3-sub">本月节税 ¥3.2万</div></div></button>' +
+      '<button class="p3-btn" onclick="navTo(\'gov\',document.getElementById(\'nav-gov\'))"><div class="p3-ic" style="background:var(--purple-d);border:1px solid var(--purple-b)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L8.5 5H13L9.5 7.5L11 12L7 9.5L3 12L4.5 7.5L1 5H5.5L7 1Z" stroke="var(--purple-l)" stroke-width="1" fill="var(--purple-d)"/></svg></div><div><div class="p3-lbl">生态共治委员会</div><div class="p3-sub">4个活跃提案待投票</div></div></button>' +
+    '</div>' +
+  '</div>' +
+  '<div class="card fu d4" style="border-color:rgba(139,92,246,.22)">' +
+    '<div class="sh"><div class="sh-t">全球减排贡献 <div class="sh-line"></div></div><span class="pill p-purple">CL-IVC 链上核验</span></div>' +
+    '<div class="g4">' +
+      '<div class="metric"><div class="m-lbl">累计推动减排</div><div class="m-val" style="color:var(--teal-l)">2,847<span class="m-unit">tCO₂e</span></div><div class="m-sub">全球排名 #412</div></div>' +
+      '<div class="metric"><div class="m-lbl">影响供应商</div><div class="m-val" style="color:var(--green-l)">28<span class="m-unit">家</span></div><div class="m-sub">二级节点 ×3</div></div>' +
+      '<div class="metric"><div class="m-lbl">年度节税</div><div class="m-val" style="color:var(--gold-l)">¥38.6<span class="m-unit">万</span></div><div class="m-sub">ROI 1:9.1</div></div>' +
+      '<div class="metric"><div class="m-lbl">等效植树</div><div class="m-val" style="color:var(--purple-l)">47.4<span class="m-unit">k棵</span></div><div class="m-sub">一年固碳量</div></div>' +
+    '</div>' +
+  '</div>';
+}
+
+// ═══════════════════════════════════════════
+// ACTION HANDLERS
+// ═══════════════════════════════════════════
+function handleAction(){
+  if(PHASE===1) showToast('年付升级 · ¥799/年 · 节省33%');
+  else if(PHASE===2) showToast('企业升级申请已发起，请等待审核');
+  else showToast('全域枢纽已完全激活，所有功能可用');
+}
+function handlePrimary(){
+  if(PHASE===1) enterPhase2();
+  else if(PHASE===2) navTo('decision',document.getElementById('nav-decision'));
+  else navTo('eu',document.getElementById('nav-eu'));
+}
+function enterPhase2(){
+  setPhase(2);
+  navTo('enterprise',document.getElementById('nav-enterprise'));
+  showToast('企业档案已建立 · +50 GM · 欢迎进入阶段二');
+}
+
+// ═══════════════════════════════════════════
+// CBAM CALCULATOR
+// ═══════════════════════════════════════════
+var cbamLvl = 2;
+function cbamStep(n){
+  [1,2,3,4].forEach(function(i){
+    var s=document.getElementById('cbam-s'+i);
+    var t=document.getElementById('cst'+i);
+    if(s) s.className='cbam-step'+(i===n?' active':'');
+    if(t) t.className='cst'+(i===n?' cst-on':'');
+  });
+}
+function selectLevel(lvl){
+  cbamLvl=lvl;
+  var r2=document.getElementById('lv-radio2');
+  var r4=document.getElementById('lv-radio4');
+  var btn2=document.getElementById('lv-btn2');
+  var btn4=document.getElementById('lv-btn4');
+  var desc=document.getElementById('lv-desc');
+  if(lvl===2){
+    r2.innerHTML='<div style="width:7px;height:7px;border-radius:50%;background:var(--red-l)"></div>';
+    r2.style.borderColor='var(--red-l)';
+    r4.innerHTML=''; r4.style.borderColor='var(--ink3)';
+    btn2.style.cssText='padding:10px 13px;border-radius:9px;border:1px solid var(--red-b);cursor:pointer;transition:all .15s;background:var(--red-d)';
+    btn4.style.cssText='padding:10px 13px;border-radius:9px;border:1px solid var(--border);cursor:pointer;transition:all .15s';
+    if(desc) desc.innerHTML='当前选择 Lv.2：提交人工估算数据，欧盟自动施加 35% 不确定性附加费。以铝制品为例，每年额外损失 <strong style="color:var(--red-l)">€38,000+</strong>。';
+  } else {
+    r4.innerHTML='<div style="width:7px;height:7px;border-radius:50%;background:var(--green-l)"></div>';
+    r4.style.borderColor='var(--green-l)';
+    r2.innerHTML=''; r2.style.borderColor='var(--ink3)';
+    btn4.style.cssText='padding:10px 13px;border-radius:9px;border:1px solid var(--green-b);cursor:pointer;transition:all .15s;background:var(--green-d)';
+    btn2.style.cssText='padding:10px 13px;border-radius:9px;border:1px solid var(--border);cursor:pointer;transition:all .15s';
+    if(desc) desc.innerHTML='Lv.4 MAT 物理认证：方舟魔盒实测数据，欧盟直接接受，<strong style="color:var(--green-l)">零惩罚溢价</strong>，申报免人工审核，速度快 14天。';
+  }
+}
+
+function calcCBAM(){
+  var exportT = parseFloat(document.getElementById('c-export').value)||1920;
+  var intensity = parseFloat(document.getElementById('c-intensity').value)||1.82;
+  var carbon_price = 65;
+  var penalty = cbamLvl===2 ? 1.35 : 1.0;
+
+  var base_tax = exportT * intensity * carbon_price;
+  var total_tax = base_tax * penalty;
+  var total_tax_cny = total_tax * 7.8;
+
+  var save_mat   = (base_tax * 0.35) * 7.8;
+  var save_zcp   = exportT * intensity * 0.4 * carbon_price * 7.8;
+  var save_chain = exportT * (intensity * 0.35) * carbon_price * 7.8;
+  var total_save = save_mat + save_zcp + save_chain;
+
+  var r_total = document.getElementById('r-total');
+  var r_save  = document.getElementById('r-save');
+  var r_export_d = document.getElementById('r-export-d');
+  var r_int_d = document.getElementById('r-intensity-d');
+
+  if(r_total) r_total.textContent = '€ ' + Math.round(total_tax).toLocaleString();
+  if(r_save)  r_save.textContent  = '¥ ' + Math.round(total_save).toLocaleString();
+  if(r_export_d) r_export_d.textContent = exportT.toLocaleString() + ' t';
+  if(r_int_d)    r_int_d.textContent    = intensity + ' tCO₂e/t';
+
+  var wt = document.getElementById('cbam-warn-text');
+  if(wt) wt.innerHTML = '<strong>测算结果：</strong>按当前 Lv.' + cbamLvl + ' 申报模式，年度碳税敞口约 <strong style="color:var(--red-l)">€' + Math.round(total_tax).toLocaleString() + '</strong>，折合人民币约 <strong style="color:var(--red-l)">¥' + Math.round(total_tax_cny).toLocaleString() + '</strong>。';
+
+  cbamStep(4);
+  showToast('碳税测算完成 · 点击查看对冲方案');
+}
+
+// ═══════════════════════════════════════════
+// MILESTONE TABS
+// ═══════════════════════════════════════════
+function setMilestone(n){
+  [1,2,3].forEach(function(i){
+    var t=document.getElementById('mst'+i);
+    if(t) t.className='mst'+(i===n?' mst-on':'');
+  });
+  var map={1:'dawn',2:'wildfire',3:'era'};
+  ['dawn','wildfire','era'].forEach(function(id){
+    var el=document.getElementById('ms-'+id);
+    if(el) el.className='ms-content'+(id===map[n]?' active':'');
+  });
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+function showToast(msg){
+  var t=document.getElementById('toast');
+  var m=document.getElementById('toast-text');
+  if(!t||!m) return;
+  m.textContent=msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTmr);
+  window._toastTmr=setTimeout(function(){ t.classList.remove('show'); },2800);
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+setPhase(1);
+renderPhaseBody(1);
+</script>
+</body>
+</html>

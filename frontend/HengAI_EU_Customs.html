@@ -1,0 +1,506 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · 欧盟海关直连申报</title>
+<script>
+/* 嵌入模式：?embed=1 时隐藏原页 chrome (sidebar/topbar)，仅呈现内容模块 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<link rel="stylesheet" href="hengai-embed-layout.css">
+<style>
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .sb,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] .main,
+html[data-embed="1"] .main-wrap { margin-left: 0 !important; }
+html[data-embed="1"] body { padding-left: 0 !important; background: var(--night, #06080f) !important; }
+</style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+:root{
+  --night:#06080f;--dark:#0a0e1a;--panel:#0d1220;--p2:#111827;
+  --b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);
+  --ink:#e8edf5;--ink2:#8a95a8;--ink3:#4a5568;
+  --gold:#c9a84c;--gl:#f0d080;--gd:rgba(201,168,76,0.11);
+  --green:#3b9e4a;--greenl:#7dd98a;--greend:rgba(59,158,74,0.1);
+  --teal:#1d9e75;--teall:#6dd5b0;--teald:rgba(29,158,117,0.09);
+  --blue:#185fa5;--bluel:#93c5fd;--blued:rgba(24,95,165,0.1);
+  --red:#e24b4a;--redl:#fca5a5;--redd:rgba(226,75,74,0.09);
+  --purple:#7f77dd;--purpl:#c4b5fd;--purpd:rgba(127,119,221,0.09);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--night);color:var(--ink);font-family:'Noto Sans SC',sans-serif;font-size:13px;line-height:1.6;min-height:100vh}
+
+.sb{width:200px;background:var(--dark);border-right:1px solid var(--b);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50}
+.sb-logo{padding:15px 14px 12px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:9px}
+.sb-li{width:28px;height:28px;border-radius:7px;background:var(--greend);border:1px solid rgba(59,158,74,0.35);display:flex;align-items:center;justify-content:center}
+.sb-tx{font-size:13px;font-weight:700}.sb-sub{font-size:9px;color:var(--ink3);margin-top:1px}
+.nav-s{padding:10px 13px 4px;font-size:9px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;font-weight:600}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 13px;font-size:12px;color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all 0.15s}
+.ni:hover{color:var(--ink);background:rgba(255,255,255,0.04)}
+.ni.on{color:var(--ink);background:rgba(255,255,255,0.06);border-left-color:var(--blue)}
+.nd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-ft{margin-top:auto;padding:11px 13px;border-top:1px solid var(--b)}
+.u-av{width:28px;height:28px;border-radius:50%;background:var(--teald);border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--teall);flex-shrink:0}
+.main{margin-left:200px}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(6,8,15,0.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--b);padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.tl{display:flex;align-items:center;gap:10px}
+.tt{font-size:14px;font-weight:500}
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.pl-g{background:var(--greend);color:var(--greenl);border:1px solid rgba(59,158,74,0.3)}
+.pl-b{background:var(--blued);color:var(--bluel);border:1px solid rgba(24,95,165,0.3)}
+.pl-t{background:var(--teald);color:var(--teall);border:1px solid rgba(29,158,117,0.3)}
+.pl-y{background:var(--gd);color:var(--gl);border:1px solid rgba(201,168,76,0.3)}
+.pl-r{background:var(--redd);color:var(--redl);border:1px solid rgba(226,75,74,0.3)}
+.pl-gray{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--b)}
+.tr{display:flex;align-items:center;gap:8px}
+.tb-btn{padding:5px 13px;border-radius:7px;font-size:11.5px;font-weight:500;border:1px solid var(--b2);background:transparent;color:var(--ink);cursor:pointer;font-family:inherit;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.07)}
+.tb-btn.pri{background:var(--blued);border-color:rgba(24,95,165,0.45);color:var(--bluel)}
+.page{padding:24px 28px 72px;max-width:1060px}
+.card{background:var(--panel);border:1px solid var(--b);border-radius:14px;padding:18px 20px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.div{border:none;border-top:1px solid var(--b);margin:14px 0}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-t{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.1px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sh-line{flex:1;height:1px;background:var(--b)}
+.sh-a{font-size:11px;color:var(--teall);cursor:pointer;white-space:nowrap}
+
+/* CONNECTION STATUS */
+.conn-hero{background:var(--panel);border:1px solid rgba(24,95,165,0.3);border-radius:16px;padding:0;overflow:hidden;margin-bottom:18px;position:relative}
+.conn-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(24,95,165,0.65),rgba(29,158,117,0.5),transparent)}
+.ch-inner{padding:20px 24px;display:flex;align-items:center;gap:20px;background:linear-gradient(135deg,rgba(24,95,165,0.07) 0%,transparent 60%)}
+.ch-left{flex:1}
+.ch-ey{font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--bluel);margin-bottom:8px}
+.ch-title{font-size:18px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.ch-sub{font-size:12px;color:var(--ink2);line-height:1.7}
+.ch-right{flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+.conn-light{width:10px;height:10px;border-radius:50%;flex-shrink:0;animation:glow 2s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:1;box-shadow:0 0 0 0 currentColor}50%{opacity:0.7;box-shadow:0 0 0 4px transparent}}
+.gate-row{display:flex;align-items:center;gap:9px;padding:8px 12px;background:rgba(0,0,0,0.25);border:1px solid var(--b);border-radius:9px;font-size:12px}
+.gate-status{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;margin-left:auto}
+
+/* STATUS STRIP */
+.status-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--b);border-top:1px solid var(--b)}
+.ss-box{background:rgba(8,12,22,0.95);padding:13px 16px;text-align:center}
+.ss-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:700;letter-spacing:-0.5px;line-height:1;margin-bottom:3px}
+.ss-label{font-size:10px;color:var(--ink3)}
+.ss-sub{font-size:9.5px;font-weight:600;margin-top:3px}
+
+/* DECLARATION TABLE */
+.decl-table{width:100%;border-collapse:collapse}
+.decl-table th{font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;border-bottom:1px solid var(--b);text-align:left}
+.decl-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12.5px;vertical-align:middle}
+.decl-table tr:last-child td{border-bottom:none}
+.decl-table tr:hover td{background:rgba(255,255,255,0.02)}
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px}
+.sb-accepted{background:var(--greend);color:var(--greenl);border:1px solid rgba(59,158,74,0.3)}
+.sb-review{background:var(--blued);color:var(--bluel);border:1px solid rgba(24,95,165,0.3)}
+.sb-draft{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--b)}
+.sb-pending{background:var(--gd);color:var(--gl);border:1px solid rgba(201,168,76,0.3)}
+
+/* NEW DECLARATION WIZARD */
+.wizard-steps{display:flex;align-items:center;gap:0;margin-bottom:20px}
+.ws-item{display:flex;align-items:center;gap:0;flex:1}
+.ws-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;transition:all 0.2s}
+.ws-done{background:var(--greend);border:1.5px solid var(--green);color:var(--greenl)}
+.ws-active{background:var(--blued);border:1.5px solid var(--bluel);color:var(--bluel)}
+.ws-lock{background:rgba(255,255,255,0.03);border:1.5px solid var(--b2);color:var(--ink3)}
+.ws-line{flex:1;height:1px;background:var(--b)}
+.ws-line.done{background:rgba(59,158,74,0.4)}
+.ws-info{display:flex;flex-direction:column;align-items:center;gap:3px;margin:0 4px}
+.ws-label{font-size:9.5px;color:var(--ink3);white-space:nowrap}
+.ws-label.active{color:var(--bluel)}
+.ws-label.done{color:var(--green)}
+
+/* FORM FIELDS */
+.f-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.f-label{font-size:11.5px;font-weight:500;color:var(--ink)}
+.f-input{background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;transition:border-color 0.2s;width:100%}
+.f-input:focus{border-color:rgba(24,95,165,0.5)}
+.f-select{background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;width:100%;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%234a5568' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.f-hint{font-size:10.5px;color:var(--ink3);line-height:1.5}
+
+/* COMPLIANCE CHECK */
+.check-grid{display:flex;flex-direction:column;gap:8px}
+.check-item{display:flex;align-items:center;gap:10px;padding:9px 13px;background:rgba(0,0,0,0.2);border:1px solid var(--b);border-radius:9px}
+.ci-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ci-label{flex:1;font-size:12.5px;color:var(--ink)}
+.ci-status{font-size:11px;font-weight:600;white-space:nowrap}
+
+/* SUBMIT BUTTON */
+.submit-btn{width:100%;padding:13px;border-radius:11px;font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--blue),rgba(24,95,165,0.7));color:#fff;margin-top:6px;transition:all 0.2s;letter-spacing:0.3px}
+.submit-btn:hover{opacity:0.9;transform:translateY(-1px)}
+.submit-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+/* INSIGHT */
+.ins{padding:11px 14px;border-radius:9px;font-size:11.5px;line-height:1.75;display:flex;gap:9px;align-items:flex-start;margin-bottom:14px}
+.ins-b{background:var(--blued);border:1px solid rgba(24,95,165,0.2);color:var(--bluel)}
+.ins-g{background:var(--greend);border:1px solid rgba(59,158,74,0.2);color:var(--greenl)}
+
+#toast{position:fixed;bottom:22px;right:22px;background:var(--p2);border:1px solid rgba(29,158,117,0.4);border-radius:11px;padding:11px 16px;display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--teall);z-index:9999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;min-width:240px}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu 0.4s ease both}
+.fu1{animation-delay:.05s}.fu2{animation-delay:.12s}.fu3{animation-delay:.18s}
+</style>
+<style id="qa-sidebar-css">
+/* HengAI V2.0 QA · 全站统一侧栏基线
+   设计原则：
+   1. 容器级规则使用 :where() 零特异性 —— 页面自己的 .sidebar{} 原生规则优先
+   2. 内部元素 (.sb-brand/.sb-item/...) 使用普通选择器 —— 提供基线视觉
+   3. 不动 .main —— 每页主区偏移由自家 CSS 决定（不污染 flex 布局）
+*/
+:where(.sidebar#sidebar[data-qa-version="2.0"]){width:200px;background:#0b0f19;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;overflow-y:auto;font-family:inherit}
+.sidebar .sb-brand{padding:17px 15px 13px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sidebar .sb-brand-ic{width:32px;height:32px;border-radius:9px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar .sb-brand-name{font-size:14px;font-weight:700;letter-spacing:.2px;color:#e6e9f2}
+.sidebar .sb-brand-sub{font-size:9.5px;color:#8a92a8;margin-top:1px}
+.sidebar .sb-group-title{font-size:9.5px;text-transform:uppercase;color:#8a92a8;letter-spacing:.6px;padding:14px 18px 6px;font-weight:600}
+.sidebar .sb-item{padding:9px 18px;font-size:12.5px;color:#c3cbdc;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .12s;border-left:2px solid transparent;font-family:inherit;line-height:1.3}
+.sidebar .sb-item:hover{background:rgba(255,255,255,0.03);color:#e6e9f2}
+.sidebar .sb-item.active{background:rgba(16,185,129,0.08);border-left-color:#10b981;color:#e6e9f2;font-weight:600}
+.sidebar .sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* 嵌入模式（?embed=1）：只露内容，侧栏/顶栏/老 .sb 全部隐藏，主区 margin 归零 */
+html[data-embed="1"] .sidebar,html[data-embed="1"] .sb,html[data-embed="1"] .topbar{display:none !important}
+html[data-embed="1"] body{padding-left:0 !important}
+html[data-embed="1"] .main,html[data-embed="1"] .main-wrap,html[data-embed="1"] .main-content{margin-left:0 !important}
+</style>
+<script src="hengai-embed-boot.js"></script>
+</head>
+<body>
+<!-- CANONICAL SIDEBAR — HengAI V3.5 工业主权网络 · MPA 统一版 -->
+
+<div class="sidebar" id="sidebar" data-qa-version="3.5">
+
+  <div class="sb-brand">
+
+    <div class="sb-brand-ic">
+
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+
+    </div>
+
+    <div>
+
+      <div class="sb-brand-name">HengAI</div>
+
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+
+    </div>
+
+  </div>
+
+
+
+  <div style="padding:12px 14px 4px;">
+
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+      返回 HengAI 对话
+
+    </div>
+
+  </div>
+
+
+
+  <div class="sb-group-title" id="g-personal">个人空间</div>
+
+  <div class="sb-item" data-page="overview" onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+
+  <div class="sb-item" data-page="achieve" onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+
+  <div class="sb-item" data-page="calc" onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+
+  <div class="sb-item" data-page="wallet" onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+
+  <div class="sb-item" data-page="resource" onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+
+
+
+  <div class="sb-group-title" id="g-business">企业工作台</div>
+
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+
+  <div class="sb-item" data-page="report" onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+
+  <div class="sb-item" data-page="decision" onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-item locked" data-page="supply" id="nav-supply" data-role-nav="sme-only" onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" id="dot-supply" style="background:var(--ink3)"></div>供应链协同</div>
+
+  <div class="sb-item locked" data-page="origin-audit" id="n-origin-audit" data-role-nav="origin-only" onclick="window.location.href='HengAI_HeavyIndustry_Suite.html'"><div class="sb-dot" id="dot-origin-audit" style="background:var(--ink3)"></div>产业主权看板</div>
+
+
+
+  <div class="sb-group-title" id="g-sovereign">大国重器 / 生态</div>
+
+  <div class="sb-item" data-page="honor" onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+
+  <div class="sb-item locked" data-page="eu" onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:var(--ink3)"></div>欧盟海关直连</div>
+
+  <div class="sb-item locked" data-page="dld" onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:var(--ink3)"></div>DLD 绿色信贷</div>
+
+  <div class="sb-item locked" data-page="acf" onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:var(--ink3)"></div>ACF 认证通道</div>
+
+  <div class="sb-item locked" data-page="gov" onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:var(--ink3)"></div>生态共治委员会</div>
+
+</div>
+
+<script id="qa-sidebar-active-script">
+
+(function(){
+
+  var map = {"全域中心.html":"overview","index.html":"overview","HengAI_CBAM测算工具.html":"calc","HengAI_星火成就档案.html":"achieve","HengAI_GM_Wallet.html":"wallet","HengAI_算力资源.html":"resource","HengAI_企业数字档案.html":"enterprise","HengAI_供应链协同.html":"supply","HengAI_全域诊断报告.html":"report","HengAI_决策层呈送包生成器.html":"decision","HengAI_HeavyIndustry_Suite.html":"origin-audit","HengAI_荣誉体系.html":"honor","HengAI_EU_Customs.html":"eu","HengAI_DLD_Credit.html":"dld","HengAI_ACF_Cert.html":"acf","HengAI_Governance.html":"gov"};
+
+  try {
+
+    var fn = decodeURIComponent((location.pathname.split("/").pop() || "").split("?")[0]);
+
+    var id = map[fn]; if (!id) return;
+
+    document.querySelectorAll(".sidebar .sb-item[data-page]").forEach(function(el){
+
+      if (el.getAttribute("data-page") === id) el.classList.add("active");
+
+    });
+
+  } catch(e){}
+
+})();
+
+</script>
+<div class="main">
+<div class="topbar">
+  <div class="tl">
+    <span class="tt">CL-GTS · 欧盟海关直连申报通道</span>
+    <span class="pill pl-g" style="animation:glow2 2s infinite" id="eu-status-label">
+      <span style="width:5px;height:5px;border-radius:50%;background:var(--greenl);display:inline-block;margin-right:4px;animation:pulse 2s infinite"></span>
+      通道在线
+    </span>
+    <span class="pill pl-b"><span class="dyn-customs-level">待确权</span> · 免审</span>
+  </div>
+  <div class="tr">
+    <button class="tb-btn" onclick="showToast('申报历史记录已打开')">申报历史</button>
+    <button class="tb-btn pri" onclick="startDeclaration()">新建申报 →</button>
+  </div>
+</div>
+<style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}</style>
+
+<div class="page">
+  <!-- CONNECTION HERO -->
+  <div class="conn-hero fu fu1">
+    <div class="ch-inner">
+      <div class="ch-left">
+        <div class="ch-ey">CL-GTS · EU Customs Gateway</div>
+        <div class="ch-title">欧盟海关直连通道已激活</div>
+        <div class="ch-sub">通过 MAT 物理网关采集的数据，经 CL-IVC 主权链存证后，可直接通过 CL-GTS 通道提交至欧盟 CBAM 申报系统（CBAM Registry）。置信度 Lv.4，欧盟海关免除人工审核，申报时效从平均 14 天缩短至 <strong style="color:var(--bluel)">实时</strong>。</div>
+      </div>
+      <div class="ch-right">
+        <div class="gate-row">
+          <span class="conn-light" style="background:var(--greenl);color:var(--greenl)"></span>
+          <span style="font-size:12px;flex:1">MAT 物理网关</span>
+          <div class="gate-status" style="color:var(--greenl)"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>在线</div>
+        </div>
+        <div class="gate-row">
+          <span class="conn-light" style="background:var(--greenl);color:var(--greenl)"></span>
+          <span style="font-size:12px;flex:1">CL-IVC 存证链</span>
+          <div class="gate-status" style="color:var(--greenl)"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>已同步</div>
+        </div>
+        <div class="gate-row">
+          <span class="conn-light" style="background:var(--greenl);color:var(--greenl)"></span>
+          <span style="font-size:12px;flex:1">EU CBAM Registry</span>
+          <div class="gate-status" style="color:var(--greenl)"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>已接入</div>
+        </div>
+      </div>
+    </div>
+    <div class="status-strip">
+      <div class="ss-box"><div class="ss-val" style="color:var(--greenl)"><span id="eu-declare-count">3</span></div><div class="ss-label">历史申报次数</div><div class="ss-sub" style="color:var(--greenl)">全部通过</div></div>
+      <div class="ss-box"><div class="ss-val dyn-customs-level" style="color:var(--bluel)">待确权</div><div class="ss-label">数据置信度</div><div class="ss-sub" style="color:var(--bluel)">物理级免审</div></div>
+      <div class="ss-box"><div class="ss-val" style="color:var(--teall)">实时</div><div class="ss-label">审核时效</div><div class="ss-sub" style="color:var(--teall)">vs 传统 14 天</div></div>
+      <div class="ss-box"><div class="ss-val" style="color:var(--gold)"><span id="eu-penalty-eur">€ 0</span></div><div class="ss-label">惩罚溢价</div><div class="ss-sub" style="color:var(--gold)">已消除</div></div>
+    </div>
+  </div>
+
+  <div class="g2 fu fu2">
+    <!-- Declaration list -->
+    <div>
+      <div class="sh"><div class="sh-t">申报记录 <div class="sh-line"></div></div><span class="sh-a" onclick="startDeclaration()">新建申报 →</span></div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="decl-table">
+          <thead><tr><th>申报期</th><th>产品</th><th>出口量</th><th>碳含量</th><th>税款</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div style="font-weight:500">—</div><div style="font-size:10.5px;color:var(--ink3)"><span data-state-bind="recentReports.0.submittedAt" data-state-fmt="dt" data-empty="待记录">---</span> 提交</div></td>
+              <td style="color:var(--ink2)">铝压铸件</td>
+              <td style="font-family:'DM Mono',monospace">480 t</td>
+              <td style="font-family:'DM Mono',monospace;color:var(--greenl)">1.62 t/t</td>
+              <td style="font-family:'DM Mono',monospace;color:var(--greenl)">€ 36,288</td>
+              <td><span class="status-badge sb-accepted"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="0.5,3 2.5,5 7.5,0.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>欧盟已接受</span></td>
+            </tr>
+            <tr>
+              <td><div style="font-weight:500">—</div><div style="font-size:10.5px;color:var(--ink3)"><span data-state-bind="recentReports.1.submittedAt" data-state-fmt="dt" data-empty="待记录">---</span> 提交</div></td>
+              <td style="color:var(--ink2)">铝压铸件</td>
+              <td style="font-family:'DM Mono',monospace">510 t</td>
+              <td style="font-family:'DM Mono',monospace;color:var(--gl)">1.78 t/t</td>
+              <td style="font-family:'DM Mono',monospace;color:var(--gl)">€ 41,837</td>
+              <td><span class="status-badge sb-accepted"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="0.5,3 2.5,5 7.5,0.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>欧盟已接受</span></td>
+            </tr>
+            <tr>
+              <td><div style="font-weight:500">—</div><div style="font-size:10.5px;color:var(--ink3)"><span data-state-bind="recentReports.2.submittedAt" data-state-fmt="dt" data-empty="待记录">---</span> 提交</div></td>
+              <td style="color:var(--ink2)">铝压铸件</td>
+              <td style="font-family:'DM Mono',monospace">460 t</td>
+              <td style="font-family:'DM Mono',monospace;color:var(--redl)" data-ghost-ignore>1.82 t/t</td>
+              <td style="font-family:'DM Mono',monospace;color:var(--redl)">€ 53,586</td>
+              <td><span class="status-badge sb-accepted"><svg width="8" height="6" viewBox="0 0 8 6" fill="none"><polyline points="0.5,3 2.5,5 7.5,0.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>欧盟已接受</span></td>
+            </tr>
+            <tr>
+              <td><div style="font-weight:500;color:var(--bluel)">—</div><div style="font-size:10.5px;color:var(--bluel)">截止 <span data-state-bind="compute.quotaResetAt" data-state-fmt="dt" data-empty="待记录">---</span></div></td>
+              <td style="color:var(--ink3)">铝压铸件</td>
+              <td style="font-family:'DM Mono',monospace;color:var(--ink3)">—</td>
+              <td style="color:var(--ink3)">进行中</td>
+              <td style="color:var(--ink3)">—</td>
+              <td><span class="status-badge sb-draft">草稿中</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- New declaration wizard -->
+    <div id="wizard-panel">
+      <div class="sh"><div class="sh-t">新建申报 · 2026 Q2 <div class="sh-line"></div></div></div>
+
+      <div class="wizard-steps">
+        <div class="ws-item">
+          <div class="ws-info"><div class="ws-dot ws-done"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="var(--greenl)" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="ws-label done">基础信息</div></div>
+          <div class="ws-line done"></div>
+        </div>
+        <div class="ws-item">
+          <div class="ws-info"><div class="ws-dot ws-active">2</div><div class="ws-label active">碳数据</div></div>
+          <div class="ws-line"></div>
+        </div>
+        <div class="ws-item">
+          <div class="ws-info"><div class="ws-dot ws-lock">3</div><div class="ws-label">合规检查</div></div>
+          <div class="ws-line"></div>
+        </div>
+        <div class="ws-item">
+          <div class="ws-info"><div class="ws-dot ws-lock">★</div><div class="ws-label">提交</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">碳排放数据（自 MAT 网关自动读取）</div>
+        <div class="g2" style="gap:10px">
+          <div class="f-group">
+            <div class="f-label">申报季度</div>
+            <select class="f-select"><option>下一申报期 · 待记录</option></select>
+          </div>
+          <div class="f-group">
+            <div class="f-label">出口量（吨）</div>
+            <input class="f-input" value="495" type="number">
+          </div>
+          <div class="f-group">
+            <div class="f-label">Scope 1 排放（tCO₂e）</div>
+            <input class="f-input" value="0" type="number" style="border-color:rgba(29,158,117,0.4)">
+            <div class="f-hint" style="color:var(--teall)">MAT 网关实时数据 · 自动填入</div>
+          </div>
+          <div class="f-group">
+            <div class="f-label">Scope 2 排放（tCO₂e）</div>
+            <input class="f-input" value="63.2" type="number" style="border-color:rgba(29,158,117,0.4)">
+            <div class="f-hint" style="color:var(--teall)">已扣减 GEC 绿电证书 · 自动填入</div>
+          </div>
+          <div class="f-group">
+            <div class="f-label">Scope 3 排放（tCO₂e）</div>
+            <input class="f-input" value="739.5" type="number" style="border-color:rgba(29,158,117,0.4)">
+            <div class="f-hint" style="color:var(--teall)">供应链覆盖率 94% · 高可信</div>
+          </div>
+          <div class="f-group">
+            <div class="f-label">产品碳强度（tCO₂e/t）</div>
+            <input class="f-input" value="1.62" readonly style="color:var(--greenl);font-family:'DM Mono',monospace;font-weight:600">
+            <div class="f-hint" style="color:var(--greenl)">自动计算 · 优于行业均值 24%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px;padding:14px 16px">
+        <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:11px">合规预检</div>
+        <div class="check-grid">
+          <div class="check-item"><div class="ci-icon" style="background:var(--greend)"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="var(--greenl)" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="ci-label">数据来源符合 <span class="dyn-customs-level">待确权</span> 要求</div><div class="ci-status" style="color:var(--greenl)">通过</div></div>
+          <div class="check-item"><div class="ci-icon" style="background:var(--greend)"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="var(--greenl)" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="ci-label">GEC 绿电证书有效期覆盖申报季度</div><div class="ci-status" style="color:var(--greenl)">通过</div></div>
+          <div class="check-item"><div class="ci-icon" style="background:var(--greend)"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="var(--greenl)" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="ci-label">供应链覆盖率 ≥ 80%，满足精确申报条件</div><div class="ci-status" style="color:var(--greenl)">通过</div></div>
+          <div class="check-item"><div class="ci-icon" style="background:var(--greend)"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="var(--greenl)" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="ci-label">EU 进口商已完成 CBAM 授权委托</div><div class="ci-status" style="color:var(--greenl)">通过</div></div>
+          <div class="check-item"><div class="ci-icon" style="background:var(--greend)"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><polyline points="1,4 3.5,6.5 9,1.5" stroke="var(--greenl)" stroke-width="1.3" stroke-linecap="round"/></svg></div><div class="ci-label">申报截止日期检查（距截止 77 天）</div><div class="ci-status" style="color:var(--greenl)">充裕</div></div>
+        </div>
+        <div style="margin-top:10px;padding:9px 12px;background:var(--greend);border:1px solid rgba(59,158,74,0.25);border-radius:8px;font-size:11.5px;color:var(--greenl)">
+          <strong>5 / 5 项检查通过</strong> · 可直接提交至欧盟 CBAM Registry
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="padding:11px 14px;background:var(--blued);border:1px solid rgba(24,95,165,0.25);border-radius:10px;text-align:center">
+          <div style="font-size:10px;color:var(--bluel);font-weight:600;margin-bottom:4px">预计税款</div>
+          <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:var(--bluel)">€ 51,920</div>
+          <div style="font-size:10px;color:var(--ink3);margin-top:2px">1.62 × 495 × €65</div>
+        </div>
+        <div style="padding:11px 14px;background:var(--greend);border:1px solid rgba(59,158,74,0.25);border-radius:10px;text-align:center">
+          <div style="font-size:10px;color:var(--greenl);font-weight:600;margin-bottom:4px">vs 去年同期节省</div>
+          <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:var(--greenl)">€ 11,797</div>
+          <div style="font-size:10px;color:var(--ink3);margin-top:2px" data-ghost-ignore>碳强度 1.82→1.62</div>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="submitDeclaration()">
+        提交至欧盟 CBAM Registry →
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="toast"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="var(--teall)" stroke-width="1.5" stroke-linecap="round"/></svg><span id="toast-msg"></span></div>
+<script>
+function startDeclaration(){showToast('新建申报已打开 · 数据正在从 MAT 网关读取')}
+function submitDeclaration(){
+  const btn=document.querySelector('.submit-btn');
+  btn.disabled=true;btn.textContent='提交中…';
+  setTimeout(()=>{btn.textContent='提交至欧盟 CBAM Registry →';btn.disabled=false;showToast('✓ 已提交至 EU CBAM Registry · 实时确认 · 无需等待审核');},2000);
+}
+function showToast(msg){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.style.opacity='1';t.style.transform='translateY(0)';clearTimeout(window._tt);window._tt=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)'},2800);}
+</script>
+<script>
+(function () {
+  function applyEuPipeline(p) {
+    if (!p) return;
+    var company = p.company || {};
+    var impact = p.impact || {};
+    var el;
+    var stage = String(company.stageLabel || company.stage_label || company.stage || '').toLowerCase();
+    var online = stage.indexOf('certified') >= 0 || stage.indexOf('lv.4') >= 0 || stage.indexOf('物理') >= 0;
+    if ((el = document.getElementById('eu-status-label'))) {
+      el.textContent = online ? '通道在线' : '待激活';
+      el.className = 'pill ' + (online ? 'pl-g' : 'pl-gray');
+    }
+    if ((el = document.getElementById('eu-declare-count'))) {
+      el.textContent = String((company.declareCount != null ? company.declareCount : 0));
+    }
+    if ((el = document.getElementById('eu-penalty-eur'))) {
+      var risk = Number(impact.riskExposureEur != null ? impact.riskExposureEur : company.cbamRiskRaw);
+      el.textContent = (!online && risk > 0) ? '€ ' + Math.round(risk * 0.05).toLocaleString('en-US') : '€ 0';
+    }
+    var customsLevel = online ? 'Lv.4 物理认证' : '待确权';
+    document.querySelectorAll('.dyn-customs-level').forEach(function (node) { node.textContent = customsLevel; });
+  }
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || ev.data.type !== 'HENGAI_HUB_PIPELINE') return;
+    applyEuPipeline(ev.data.payload);
+  });
+})();
+</script>
+<script src="hengai-module-pipeline.js"></script>
+</body>
+</html>

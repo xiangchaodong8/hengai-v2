@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · 生态共治委员会</title>
+<script>
+/* 嵌入模式：?embed=1 时隐藏原页 chrome (sidebar/topbar)，仅呈现内容模块 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<style>
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .sb,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] .main,
+html[data-embed="1"] .main-wrap { margin-left: 0 !important; }
+html[data-embed="1"] body { padding-left: 0 !important; background: var(--night, #06080f) !important; }
+</style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+:root{--night:#06080f;--dark:#0a0e1a;--panel:#0d1220;--p2:#111827;--b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);--ink:#e8edf5;--ink2:#8a95a8;--ink3:#4a5568;--gold:#c9a84c;--gl:#f0d080;--gd:rgba(201,168,76,0.11);--green:#3b9e4a;--greenl:#7dd98a;--greend:rgba(59,158,74,0.1);--teal:#1d9e75;--teall:#6dd5b0;--teald:rgba(29,158,117,0.09);--blue:#185fa5;--bluel:#93c5fd;--blued:rgba(24,95,165,0.1);--red:#e24b4a;--redl:#fca5a5;--redd:rgba(226,75,74,0.09);--purple:#7f77dd;--purpl:#c4b5fd;--purpd:rgba(127,119,221,0.09);}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--night);color:var(--ink);font-family:'Noto Sans SC',sans-serif;font-size:13px;line-height:1.6;min-height:100vh}
+.sb{width:200px;background:var(--dark);border-right:1px solid var(--b);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50}
+.sb-logo{padding:15px 14px 12px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:9px}
+.sb-li{width:28px;height:28px;border-radius:7px;background:var(--greend);border:1px solid rgba(59,158,74,0.35);display:flex;align-items:center;justify-content:center}
+.sb-tx{font-size:13px;font-weight:700}.sb-sub{font-size:9px;color:var(--ink3);margin-top:1px}
+.nav-s{padding:10px 13px 4px;font-size:9px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;font-weight:600}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 13px;font-size:12px;color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all 0.15s}
+.ni:hover{color:var(--ink);background:rgba(255,255,255,0.04)}
+.ni.on{color:var(--ink);background:rgba(255,255,255,0.06);border-left-color:var(--purpl)}
+.nd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-ft{margin-top:auto;padding:11px 13px;border-top:1px solid var(--b)}
+.u-av{width:28px;height:28px;border-radius:50%;background:var(--teald);border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--teall);flex-shrink:0}
+.main{margin-left:200px}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(6,8,15,0.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--b);padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.tl{display:flex;align-items:center;gap:10px}
+.tt{font-size:14px;font-weight:500}
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.pl-p{background:var(--purpd);color:var(--purpl);border:1px solid rgba(127,119,221,0.3)}
+.pl-g{background:var(--greend);color:var(--greenl);border:1px solid rgba(59,158,74,0.3)}
+.pl-y{background:var(--gd);color:var(--gl);border:1px solid rgba(201,168,76,0.3)}
+.pl-t{background:var(--teald);color:var(--teall);border:1px solid rgba(29,158,117,0.3)}
+.pl-b{background:var(--blued);color:var(--bluel);border:1px solid rgba(24,95,165,0.3)}
+.pl-gray{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--b)}
+.tr{display:flex;align-items:center;gap:8px}
+.tb-btn{padding:5px 13px;border-radius:7px;font-size:11.5px;font-weight:500;border:1px solid var(--b2);background:transparent;color:var(--ink);cursor:pointer;font-family:inherit;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.07)}
+.tb-btn.pri{background:var(--purpd);border-color:rgba(127,119,221,0.45);color:var(--purpl)}
+.page{padding:24px 28px 72px;max-width:1060px}
+.card{background:var(--panel);border:1px solid var(--b);border-radius:14px;padding:18px 20px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.div{border:none;border-top:1px solid var(--b);margin:14px 0}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-t{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.1px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sh-line{flex:1;height:1px;background:var(--b)}
+.sh-a{font-size:11px;color:var(--teall);cursor:pointer;white-space:nowrap}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu 0.4s ease both}
+.fu1{animation-delay:.05s}.fu2{animation-delay:.12s}.fu3{animation-delay:.18s}.fu4{animation-delay:.24s}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--p2);border:1px solid rgba(127,119,221,0.4);border-radius:11px;padding:11px 16px;display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--purpl);z-index:9999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;min-width:240px}
+
+/* GOVERNANCE HERO */
+.gov-hero{background:var(--panel);border:1px solid rgba(127,119,221,0.28);border-radius:16px;overflow:hidden;margin-bottom:18px;position:relative}
+.gov-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(127,119,221,0.65),rgba(201,168,76,0.45),transparent)}
+.gh-inner{padding:22px 26px 20px;background:linear-gradient(135deg,rgba(127,119,221,0.07) 0%,transparent 60%);display:flex;align-items:flex-start;gap:20px}
+.gh-left{flex:1}
+.gh-ey{font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--purpl);margin-bottom:8px}
+.gh-title{font-size:18px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.gh-sub{font-size:12px;color:var(--ink2);line-height:1.75;max-width:560px;margin-bottom:14px}
+.gh-right{flex-shrink:0;min-width:180px;display:flex;flex-direction:column;gap:9px}
+.gh-stat{background:rgba(0,0,0,0.3);border:1px solid var(--b);border-radius:10px;padding:11px 14px;text-align:center}
+.gh-stat-v{font-family:'DM Mono',monospace;font-size:22px;font-weight:700;letter-spacing:-0.5px;line-height:1;margin-bottom:3px}
+.gh-stat-l{font-size:10px;color:var(--ink3)}
+
+/* SEAT CARD */
+.seat-card{background:rgba(127,119,221,0.07);border:1px solid rgba(127,119,221,0.28);border-radius:13px;padding:16px 18px;display:flex;align-items:center;gap:14px;margin-bottom:14px;position:relative;overflow:hidden}
+.seat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--purpl),transparent)}
+.seat-badge{width:52px;height:52px;border-radius:50%;background:var(--purpd);border:2px solid var(--purpl);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.seat-body{flex:1}
+.seat-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.seat-sub{font-size:11.5px;color:var(--ink2)}
+.seat-tags{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+
+/* PROPOSAL CARD */
+.prop-card{background:rgba(0,0,0,0.22);border:1px solid var(--b);border-radius:12px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all 0.18s}
+.prop-card:last-child{margin-bottom:0}
+.prop-card:hover{border-color:var(--b2);background:rgba(255,255,255,0.02)}
+.pc-top{display:flex;align-items:flex-start;gap:11px;margin-bottom:8px}
+.pc-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pc-head{flex:1}
+.pc-title{font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pc-sub{font-size:10.5px;color:var(--ink2)}
+.pc-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.pc-desc{font-size:11.5px;color:var(--ink2);line-height:1.65;margin-bottom:8px}
+.vote-bar{height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-bottom:5px}
+.vote-fill-y{height:100%;border-radius:3px;float:left}
+.vote-fill-n{height:100%;border-radius:3px;float:right}
+.vote-labels{display:flex;justify-content:space-between;font-size:10px}
+.vote-btns{display:flex;gap:6px;margin-top:8px}
+.vb{padding:5px 14px;border-radius:7px;font-size:11.5px;font-weight:600;border:none;cursor:pointer;font-family:inherit;transition:all 0.15s}
+.vb-y{background:var(--greend);border:1px solid rgba(59,158,74,0.35);color:var(--greenl)}
+.vb-y:hover{background:rgba(59,158,74,0.2)}
+.vb-n{background:var(--redd);border:1px solid rgba(226,75,74,0.3);color:var(--redl)}
+.vb-n:hover{background:rgba(226,75,74,0.18)}
+.vb-abs{background:rgba(255,255,255,0.05);border:1px solid var(--b2);color:var(--ink2)}
+.vb-abs:hover{background:rgba(255,255,255,0.09)}
+.vb-voted{background:var(--purpd);border:1px solid rgba(127,119,221,0.35);color:var(--purpl);cursor:default}
+
+/* MEMBER TABLE */
+.mem-table{width:100%;border-collapse:collapse}
+.mem-table th{font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;border-bottom:1px solid var(--b);text-align:left}
+.mem-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12.5px;vertical-align:middle}
+.mem-table tr:last-child td{border-bottom:none}
+.mem-table tr:hover td{background:rgba(255,255,255,0.02)}
+.mem-table tr.me td{background:rgba(127,119,221,0.05)}
+
+/* TIMELINE */
+.gov-tl{display:flex;flex-direction:column;gap:9px}
+.gt-item{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;background:rgba(0,0,0,0.2);border:1px solid var(--b);border-radius:9px}
+.gt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.gt-body{flex:1}
+.gt-title{font-size:12px;font-weight:500;color:var(--ink);margin-bottom:2px}
+.gt-desc{font-size:11px;color:var(--ink2);line-height:1.55}
+.gt-date{font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace;margin-top:3px}
+
+/* submit form */
+.f-group{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+.f-label{font-size:11.5px;font-weight:500;color:var(--ink)}
+.f-input{background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;transition:border-color 0.2s;width:100%}
+.f-input:focus{border-color:rgba(127,119,221,0.5)}
+.f-ta{background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12px;color:var(--ink);outline:none;width:100%;resize:vertical;min-height:80px;transition:border-color 0.2s}
+.f-ta:focus{border-color:rgba(127,119,221,0.5)}
+.sub-btn{width:100%;padding:11px;border-radius:10px;font-size:13px;font-weight:600;border:1px solid rgba(127,119,221,0.4);cursor:pointer;font-family:inherit;background:var(--purpd);color:var(--purpl);transition:all 0.2s}
+.sub-btn:hover{background:rgba(127,119,221,0.2)}
+</style>
+<style id="qa-sidebar-css">
+/* HengAI V2.0 QA · 全站统一侧栏基线
+   设计原则：
+   1. 容器级规则使用 :where() 零特异性 —— 页面自己的 .sidebar{} 原生规则优先
+   2. 内部元素 (.sb-brand/.sb-item/...) 使用普通选择器 —— 提供基线视觉
+   3. 不动 .main —— 每页主区偏移由自家 CSS 决定（不污染 flex 布局）
+*/
+:where(.sidebar#sidebar[data-qa-version="2.0"]){width:200px;background:#0b0f19;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;overflow-y:auto;font-family:inherit}
+.sidebar .sb-brand{padding:17px 15px 13px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sidebar .sb-brand-ic{width:32px;height:32px;border-radius:9px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar .sb-brand-name{font-size:14px;font-weight:700;letter-spacing:.2px;color:#e6e9f2}
+.sidebar .sb-brand-sub{font-size:9.5px;color:#8a92a8;margin-top:1px}
+.sidebar .sb-group-title{font-size:9.5px;text-transform:uppercase;color:#8a92a8;letter-spacing:.6px;padding:14px 18px 6px;font-weight:600}
+.sidebar .sb-item{padding:9px 18px;font-size:12.5px;color:#c3cbdc;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .12s;border-left:2px solid transparent;font-family:inherit;line-height:1.3}
+.sidebar .sb-item:hover{background:rgba(255,255,255,0.03);color:#e6e9f2}
+.sidebar .sb-item.active{background:rgba(16,185,129,0.08);border-left-color:#10b981;color:#e6e9f2;font-weight:600}
+.sidebar .sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* 嵌入模式（?embed=1）：只露内容，侧栏/顶栏/老 .sb 全部隐藏，主区 margin 归零 */
+html[data-embed="1"] .sidebar,html[data-embed="1"] .sb,html[data-embed="1"] .topbar{display:none !important}
+html[data-embed="1"] body{padding-left:0 !important}
+html[data-embed="1"] .main,html[data-embed="1"] .main-wrap,html[data-embed="1"] .main-content{margin-left:0 !important}
+</style>
+</head>
+<body>
+<!-- 🚨 任务 4D · 演示数据 Banner —— 明确告知用户：当前模块的委员/数字为生态样例 -->
+<div id="demo-data-watermark" style="position:fixed;top:0;left:0;right:0;z-index:9998;background:linear-gradient(90deg,rgba(201,168,76,0.18) 0%,rgba(127,119,221,0.12) 100%);border-bottom:1px solid rgba(201,168,76,0.35);color:#f0d080;padding:7px 18px;font-size:11.5px;display:flex;align-items:center;gap:10px;line-height:1.5;backdrop-filter:blur(8px)">
+  <svg width="13" height="13" viewBox="0 0 14 14" fill="none" style="flex-shrink:0"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="#f0d080" stroke-width="1.1" fill="rgba(201,168,76,0.12)"/><text x="7" y="9" text-anchor="middle" font-size="7" font-weight="700" fill="#f0d080">!</text></svg>
+  <div><b>生态参考样例</b> · 本页委员席位与贡献数字为界面结构示意。完成企业数字档案后，将以您在全域中心绑定的真实身份与数据接入。</div>
+  <span style="margin-left:auto;cursor:pointer;color:rgba(240,208,128,.6);font-size:14px" onclick="document.getElementById('demo-data-watermark').style.display='none'">×</span>
+</div>
+<style>body{padding-top:36px}</style>
+<!-- CANONICAL SIDEBAR — HengAI V2.0 QA 统一版 -->
+<div class="sidebar" id="sidebar" data-qa-version="2.0">
+  <div class="sb-brand">
+    <div class="sb-brand-ic">
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+    </div>
+    <div>
+      <div class="sb-brand-name">HengAI</div>
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+    </div>
+  </div>
+
+  <!-- 逃生舱：返回 HengAI 对话大厅 -->
+  <div style="padding:12px 14px 4px;">
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      返回 HengAI 对话
+    </div>
+  </div>
+
+  <div class="sb-group-title">个人工作台</div>
+  <div class="sb-item" data-page="overview"   onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+  <div class="sb-item" data-page="achieve"    onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+  <div class="sb-item" data-page="calc"       onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+  <div class="sb-item" data-page="resource"   onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+  <div class="sb-item" data-page="knowledge"  onclick="window.location.href='HengAI_法规知识库.html'"><div class="sb-dot" style="background:#c4b5fd"></div>企业法规库</div>
+
+  <div class="sb-group-title">企业工作台</div>
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+  <div class="sb-item" data-page="supply"     onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" style="background:#6dd5b0"></div>供应链协同</div>
+  <div class="sb-item" data-page="report"     onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+  <div class="sb-item" data-page="decision"   onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-group-title">大国重器</div>
+  <div class="sb-item" data-page="honor"      onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+  <div class="sb-item" data-page="gov"        onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:#6dd5b0"></div>生态共治委员会</div>
+
+  <div class="sb-group-title">深潜模块</div>
+  <div class="sb-item" data-page="wallet"     onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+  <div class="sb-item" data-page="eu"         onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:#93c5fd"></div>欧盟海关直连</div>
+  <div class="sb-item" data-page="dld"        onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:#10b981"></div>DLD 绿色信贷</div>
+  <div class="sb-item" data-page="acf"        onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:#6dd5b0"></div>ACF 大湾区认证</div>
+</div>
+<script id="qa-sidebar-active-script">
+/* 基于当前文件名自动高亮对应菜单项（全站共用） */
+(function(){
+  var map = {"全域中心.html":"overview","index.html":"overview","HengAI_星火成就档案.html":"achieve","HengAI_CBAM测算工具.html":"calc","HengAI_算力资源.html":"resource","HengAI_法规知识库.html":"knowledge","HengAI_企业数字档案.html":"enterprise","HengAI_供应链协同.html":"supply","HengAI_全域诊断报告.html":"report","HengAI_决策层呈送包生成器.html":"decision","HengAI_荣誉体系.html":"honor","HengAI_Governance.html":"gov","HengAI_GM_Wallet.html":"wallet","HengAI_EU_Customs.html":"eu","HengAI_DLD_Credit.html":"dld","HengAI_ACF_Cert.html":"acf"};
+  try {
+    var fn = decodeURIComponent((location.pathname.split("/").pop() || "").split("?")[0]);
+    var id = map[fn]; if (!id) return;
+    document.querySelectorAll(".sidebar .sb-item[data-page]").forEach(function(el){
+      if (el.getAttribute("data-page") === id) el.classList.add("active");
+    });
+  } catch(e){}
+})();
+</script>
+
+<div class="main">
+<div class="topbar">
+  <div class="tl">
+    <span class="tt">生态共治委员会</span>
+    <span class="pill pl-p">顾问委员席位 #---</span>
+    <span class="pill pl-y">本季度投票权 × 3</span>
+  </div>
+  <div class="tr">
+    <button class="tb-btn" onclick="showToast('委员会章程已打开')">查看章程</button>
+    <button class="tb-btn pri" onclick="showProp()">提交提案 →</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="gov-hero fu fu1">
+    <div class="gh-inner">
+      <div class="gh-left">
+        <div class="gh-ey">Co2Lion · 生态共治委员会 · Ecosystem Governance Council</div>
+        <div class="gh-title">共治不是管理，是共同书写规则</div>
+        <div class="gh-sub">生态共治委员会由 Lv.4+ 贡献者组成，负责对平台核心规则（GM 机制、等级门槛、荣誉标准、合规参数）进行投票治理。每一票都上链存证，不可篡改。你在这里的每一个决定，都会影响参与这个生态的每一个人。</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="pill pl-p">第 3 届委员会</span>
+          <span class="pill pl-g">31 名委员</span>
+          <span class="pill pl-y">4 个活跃提案</span>
+          <span class="pill pl-t">下次大会 2026-07-01</span>
+        </div>
+      </div>
+      <div class="gh-right">
+        <div class="gh-stat"><div class="gh-stat-v" style="color:var(--purpl)">3</div><div class="gh-stat-l">本季投票权数量</div></div>
+        <div class="gh-stat"><div class="gh-stat-v" style="color:var(--gold)">1</div><div class="gh-stat-l">已提案通过</div></div>
+        <div class="gh-stat"><div class="gh-stat-v" style="color:var(--greenl)">100%</div><div class="gh-stat-l">参与率（本届）</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY SEAT -->
+  <div class="seat-card fu fu1">
+    <div class="seat-badge">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L22 7V15C22 20 17.5 23.5 12 25C6.5 23.5 2 20 2 15V7L12 2Z" stroke="var(--purpl)" stroke-width="1.3" fill="rgba(127,119,221,0.12)"/><path d="M8 9L10.5 11.5L16 7" stroke="var(--purpl)" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+    <div class="seat-body">
+      <div class="seat-title"><span id="gov-seat-head">顾问委员席位</span> · <span id="gov-seat-member"><span class="dyn-user-name">---</span></span></div>
+      <div class="seat-sub"><span id="gov-seat-sub">--- · 加入时间：— · 任期至：—</span></div>
+      <div class="seat-tags">
+        <span class="pill pl-p" id="gov-pill-level">Lv.5 生态领袖</span>
+        <span class="pill pl-y" id="gov-pill-gm">0 GM · 投票权 ×3</span>
+        <span class="pill pl-g" id="gov-pill-co2">0 tCO₂e 贡献</span>
+        <span class="pill pl-t">已通过提案 1 项</span>
+      </div>
+    </div>
+    <div style="flex-shrink:0;font-size:11px;color:var(--ink3);text-align:right;line-height:1.9">
+      <div>席位哈希</div>
+      <div style="font-family:'DM Mono',monospace;color:var(--purpl)">#GOV-0412-E87D</div>
+      <div style="margin-top:4px"><span class="pill pl-g">席位有效</span></div>
+    </div>
+  </div>
+
+  <div class="g2 fu fu2">
+    <!-- ACTIVE PROPOSALS -->
+    <div>
+      <div class="sh"><div class="sh-t">活跃提案 <div class="sh-line"></div></div><span class="sh-a">全部提案 →</span></div>
+
+      <div class="prop-card">
+        <div class="pc-top">
+          <div class="pc-icon" style="background:var(--gd);border:1px solid rgba(201,168,76,0.3)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L13 4.5V10.5L7 13L1 10.5V4.5L7 1Z" stroke="var(--gold)" stroke-width="1" fill="var(--gd)"/></svg></div>
+          <div class="pc-head">
+            <div class="pc-title">GCP-2026-008 <span class="pill pl-y">核心规则</span> <span class="pill" style="background:var(--redd);color:var(--redl);border:1px solid rgba(226,75,74,0.3)">紧急</span></div>
+            <div class="pc-sub">提案人：---（---）· --- 发起 · 截止 ---</div>
+          </div>
+        </div>
+        <div class="pc-desc">将 Lv.4 → Lv.5 的 GM 门槛从 5,000 调整为 8,000，以应对 GM 增速过快导致的等级通胀问题。新门槛适用于未来新晋用户，当前 Lv.5 用户不受影响。</div>
+        <div class="vote-bar" style="overflow:hidden">
+          <div class="vote-fill-y" style="width:74%;background:var(--greenl)"></div>
+          <div class="vote-fill-n" style="width:18%;background:var(--redl)"></div>
+        </div>
+        <div class="vote-labels"><span style="color:var(--greenl)">支持 74% · 23票</span><span style="color:var(--ink3)">弃权 8%</span><span style="color:var(--redl)">反对 18% · 6票</span></div>
+        <div class="vote-btns">
+          <button class="vb vb-voted">✓ 已投支持</button>
+          <span style="font-size:11px;color:var(--ink3);align-self:center;margin-left:4px">你的投票已链上记录</span>
+        </div>
+      </div>
+
+      <div class="prop-card">
+        <div class="pc-top">
+          <div class="pc-icon" style="background:var(--blued);border:1px solid rgba(24,95,165,0.3)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="var(--bluel)" stroke-width="1"/><line x1="7" y1="4" x2="7" y2="7.5" stroke="var(--bluel)" stroke-width="1.1"/></svg></div>
+          <div class="pc-head">
+            <div class="pc-title">GCP-2026-009 <span class="pill pl-b">机制优化</span></div>
+            <div class="pc-sub">提案人：---（---）· --- 发起 · 截止 ---</div>
+          </div>
+        </div>
+        <div class="pc-desc">新增"180天休眠保护"豁免机制：对于正在推动企业升级（有进行中的提案呈送记录）的用户，休眠计时暂停，直至决策层回应。避免因等待决策导致 GM 休眠惩罚。</div>
+        <div class="vote-bar" style="overflow:hidden">
+          <div class="vote-fill-y" style="width:89%;background:var(--greenl)"></div>
+          <div class="vote-fill-n" style="width:5%;background:var(--redl)"></div>
+        </div>
+        <div class="vote-labels"><span style="color:var(--greenl)">支持 89% · 27票</span><span style="color:var(--ink3)">弃权 6%</span><span style="color:var(--redl)">反对 5%</span></div>
+        <div class="vote-btns">
+          <button class="vb vb-y" onclick="castVote(this,'支持','GCP-2026-009')">👍 支持</button>
+          <button class="vb vb-n" onclick="castVote(this,'反对','GCP-2026-009')">👎 反对</button>
+          <button class="vb vb-abs" onclick="castVote(this,'弃权','GCP-2026-009')">— 弃权</button>
+        </div>
+      </div>
+
+      <div class="prop-card">
+        <div class="pc-top">
+          <div class="pc-icon" style="background:var(--greend);border:1px solid rgba(59,158,74,0.3)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="2" stroke="var(--greenl)" stroke-width="1"/><polyline points="4.5,7 6.5,9 9.5,5" stroke="var(--greenl)" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+          <div class="pc-head">
+            <div class="pc-title">GCP-2026-010 <span class="pill pl-g">荣誉标准</span></div>
+            <div class="pc-sub">提案人：<span class="dyn-user-name">---</span>（---）· --- 发起 · 截止 ---</div>
+          </div>
+        </div>
+        <div class="pc-desc">在「地球公民荣誉勋章」评选中增加"代际贡献系数"加权：推动超过 5 个节点完成填报的用户，其 tCO₂e 计算加权 ×1.2。激励节点激活而非单点贡献。<span style="color:var(--purpl);font-size:10.5px;margin-left:4px">（你提交的）</span></div>
+        <div class="vote-bar" style="overflow:hidden">
+          <div class="vote-fill-y" style="width:61%;background:var(--greenl)"></div>
+          <div class="vote-fill-n" style="width:26%;background:var(--redl)"></div>
+        </div>
+        <div class="vote-labels"><span style="color:var(--greenl)">支持 61% · 19票</span><span style="color:var(--ink3)">弃权 13%</span><span style="color:var(--redl)">反对 26% · 8票</span></div>
+        <div style="margin-top:8px;font-size:11px;color:var(--ink2)">需达到 66% 通过 · 距通过还差 <strong style="color:var(--gold)">2 票</strong> · 截止前还有 18 天</div>
+      </div>
+
+      <div class="prop-card">
+        <div class="pc-top">
+          <div class="pc-icon" style="background:var(--purpd);border:1px solid rgba(127,119,221,0.3)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="var(--purpl)" stroke-width="1"/><line x1="7" y1="4" x2="7" y2="9.5" stroke="var(--purpl)" stroke-width="1"/><line x1="4.5" y1="7" x2="9.5" y2="7" stroke="var(--purpl)" stroke-width="1"/></svg></div>
+          <div class="pc-head">
+            <div class="pc-title">GCP-2026-011 <span class="pill pl-p">生态扩展</span> <span class="pill pl-g">新</span></div>
+            <div class="pc-sub">提案人：---（---）· --- 发起 · 截止 ---</div>
+          </div>
+        </div>
+        <div class="pc-desc">开放 ACF 大湾区认证通道，将广东实时碳因子 API 正式接入 Co2Lion 系统。需委员会授权后方可推进与深圳/广东监管局的对接谈判。</div>
+        <div class="vote-bar" style="overflow:hidden">
+          <div class="vote-fill-y" style="width:42%;background:var(--greenl)"></div>
+        </div>
+        <div class="vote-labels"><span style="color:var(--greenl)">支持 42% · 13票</span><span style="color:var(--ink3)">弃权 19%</span><span style="color:var(--redl)">反对 39%</span></div>
+        <div class="vote-btns">
+          <button class="vb vb-y" onclick="castVote(this,'支持','GCP-2026-011')">👍 支持</button>
+          <button class="vb vb-n" onclick="castVote(this,'反对','GCP-2026-011')">👎 反对</button>
+          <button class="vb vb-abs" onclick="castVote(this,'弃权','GCP-2026-011')">— 弃权</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <!-- MEMBER LIST -->
+      <div class="sh"><div class="sh-t">委员名录 <div class="sh-line"></div></div><span class="sh-a">全部 31 名 →</span></div>
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:14px">
+        <table class="mem-table">
+          <thead><tr><th>委员</th><th>等级</th><th>贡献</th><th>投票率</th></tr></thead>
+          <tbody>
+            <tr><td><div style="font-weight:500">---</div><div style="font-size:10.5px;color:var(--ink3)">--- · ---</div></td><td><span class="pill pl-p">---</span></td><td style="font-family:'DM Mono',monospace;color:var(--greenl)">---</td><td style="color:var(--greenl);font-family:'DM Mono',monospace">---</td></tr>
+            <tr><td><div style="font-weight:500">---</div><div style="font-size:10.5px;color:var(--ink3)">--- · ---</div></td><td><span class="pill" style="background:rgba(29,158,117,0.1);color:var(--teall);border:1px solid rgba(29,158,117,0.28)">---</span></td><td style="font-family:'DM Mono',monospace;color:var(--greenl)">---</td><td style="color:var(--greenl);font-family:'DM Mono',monospace">---</td></tr>
+            <tr class="me"><td><div style="font-weight:600;color:var(--purpl)"><span class="dyn-user-name">---</span> · 我</div><div style="font-size:10.5px;color:var(--purpl)">--- · ---</div></td><td><span class="pill pl-p">Lv.5</span></td><td style="font-family:'DM Mono',monospace;color:var(--teall)"><span class="dyn-total-co2">—</span> t</td><td style="color:var(--greenl);font-family:'DM Mono',monospace">100%</td></tr>
+            <tr><td><div style="font-weight:500">---</div><div style="font-size:10.5px;color:var(--ink3)">--- · ---</div></td><td><span class="pill" style="background:rgba(29,158,117,0.1);color:var(--teall);border:1px solid rgba(29,158,117,0.28)">---</span></td><td style="font-family:'DM Mono',monospace;color:var(--greenl)">---</td><td style="color:var(--gl);font-family:'DM Mono',monospace">---</td></tr>
+            <tr><td><div style="font-weight:500">…（27 名）</div><div style="font-size:10.5px;color:var(--ink3)">Lv.4 以上委员</div></td><td><span class="pill pl-gray">混合</span></td><td style="color:var(--ink3)">—</td><td style="color:var(--ink3)">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- GOVERNANCE TIMELINE -->
+      <div class="sh"><div class="sh-t">治理记录 <div class="sh-line"></div></div></div>
+      <div class="gov-tl">
+        <div class="gt-item"><div class="gt-dot" style="background:var(--greenl)"></div><div class="gt-body"><div class="gt-title">GCP-2026-007 通过：代际收益率从 15% 提升至 20%</div><div class="gt-desc">27票支持 / 4票反对 · 已于 2026-04-01 生效</div><div class="gt-date">2026-03-28 · 已链上存证</div></div></div>
+        <div class="gt-item"><div class="gt-dot" style="background:var(--gold)"></div><div class="gt-body"><div class="gt-title">GCP-2026-006 通过：企业文明进步奖评选标准修订</div><div class="gt-desc">Scope 3 覆盖率要求从 70% 提升至 80%</div><div class="gt-date">2026-03-10 · 已链上存证</div></div></div>
+        <div class="gt-item"><div class="gt-dot" style="background:var(--purpl)"></div><div class="gt-body"><div class="gt-title">第 3 届委员会正式成立</div><div class="gt-desc">31 名 Lv.4+ 委员就任 · 新任 Lv.5 顾问委员加入</div><div class="gt-date">2026-04-01 · 已链上存证</div></div></div>
+      </div>
+
+      <!-- SUBMIT PROPOSAL (inline mini form) -->
+      <div id="prop-form" style="display:none;margin-top:14px">
+        <div class="sh"><div class="sh-t">提交新提案 <div class="sh-line"></div></div></div>
+        <div class="card">
+          <div class="f-group"><div class="f-label">提案类型</div>
+            <select style="background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;width:100%;appearance:none">
+              <option>机制优化</option><option>荣誉标准</option><option>核心规则</option><option>生态扩展</option><option>其他</option>
+            </select>
+          </div>
+          <div class="f-group"><div class="f-label">提案标题</div><input class="f-input" placeholder="简明扼要，不超过 30 字"></div>
+          <div class="f-group"><div class="f-label">提案内容</div><textarea class="f-ta" placeholder="详细描述提案内容、预期影响和执行方案…"></textarea></div>
+          <div class="f-group"><div class="f-label">投票截止日期</div><input class="f-input" type="date" value="2026-05-30"></div>
+          <button class="sub-btn" onclick="submitProp()">提交提案 · 链上存证 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="toast"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="var(--purpl)" stroke-width="1.5" stroke-linecap="round"/></svg><span id="toast-msg"></span></div>
+<script>
+function castVote(btn, type, id){
+  const p=btn.closest('.prop-card');
+  const btns=p.querySelectorAll('.vb');
+  btns.forEach(b=>b.style.display='none');
+  const v=document.createElement('button');
+  v.className='vb vb-voted';
+  v.textContent='✓ 已投'+type;
+  p.querySelector('.vote-btns').appendChild(v);
+  showToast('✓ 已对 '+id+' 投票：'+type+' · 链上记录中');
+}
+function showProp(){
+  const f=document.getElementById('prop-form');
+  f.style.display=f.style.display==='none'?'block':'none';
+  if(f.style.display==='block') f.scrollIntoView({behavior:'smooth'});
+}
+function submitProp(){showToast('提案已提交 · 链上存证 · 将在 24 小时内开放委员投票')}
+function showToast(msg){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.style.opacity='1';t.style.transform='translateY(0)';clearTimeout(window._tt);window._tt=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)'},2800);}
+</script>
+<script>
+(function () {
+  function applyGovPipeline(p) {
+    if (!p) return;
+    var user = p.user || {};
+    var company = p.company || {};
+    var name = user.name || '新用户';
+    var gm = Number(user.gmBalance != null ? user.gmBalance : user.gm_balance != null ? user.gm_balance : 0);
+    var co2 = Number(user.tCO2e_total != null ? user.tCO2e_total : user.tco2e_total != null ? user.tco2e_total : 0);
+    var level = user.currentLevel || '未激活';
+    var el;
+    if ((el = document.getElementById('gov-seat-member'))) {
+      var nm = el.querySelector('.dyn-user-name');
+      if (nm) nm.textContent = name;
+      else el.textContent = name;
+    }
+    if ((el = document.getElementById('gov-seat-sub')))
+      el.textContent = (company.name || '未绑定企业') + (user.regLabel ? ' · ' + user.regLabel : '');
+    if ((el = document.getElementById('gov-pill-level'))) el.textContent = level;
+    if ((el = document.getElementById('gov-pill-gm'))) el.textContent = gm.toLocaleString() + ' GM · 投票权 ×3';
+    if ((el = document.getElementById('gov-pill-co2'))) el.textContent = co2.toLocaleString() + ' tCO₂e 贡献';
+  }
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || ev.data.type !== 'HENGAI_HUB_PIPELINE') return;
+    applyGovPipeline(ev.data.payload);
+  });
+})();
+</script>
+</body>
+</html>

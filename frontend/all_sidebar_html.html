@@ -1,0 +1,196 @@
+﻿<!--
+
+  HengAI V3.5 · 三权分立侧边栏唯一真源 (all_sidebar_html)
+
+  ─────────────────────────────────────────────────────────
+
+  分组 id:
+
+    g-personal  个人空间
+
+    g-business  企业工作台
+
+    g-sovereign 大国重器 / 生态
+
+
+
+  身份感知：SME → nav-supply · ORIGIN → n-origin-audit（由 applyIdentityAwareNav 驱动）
+
+
+
+  维护：改此文件后运行 backend/scripts/rebuild_sidebar_v3.py
+
+-->
+
+
+
+<!-- ═══ MPA 片段（HengAI_*.html 独立页） ═══ -->
+
+<!-- BEGIN:MPA_SIDEBAR -->
+
+<!-- CANONICAL SIDEBAR — HengAI V3.5 工业主权网络 · MPA 统一版 -->
+
+<div class="sidebar" id="sidebar" data-qa-version="3.5">
+
+  <div class="sb-brand">
+
+    <div class="sb-brand-ic">
+
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+
+    </div>
+
+    <div>
+
+      <div class="sb-brand-name">HengAI</div>
+
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+
+    </div>
+
+  </div>
+
+
+
+  <div style="padding:12px 14px 4px;">
+
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+      返回 HengAI 对话
+
+    </div>
+
+  </div>
+
+
+
+  <div class="sb-group-title" id="g-personal">个人空间</div>
+
+  <div class="sb-item" data-page="overview" onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+
+  <div class="sb-item" data-page="achieve" onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+
+  <div class="sb-item" data-page="calc" onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+
+  <div class="sb-item" data-page="wallet" onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+
+  <div class="sb-item" data-page="resource" onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+
+  <div class="sb-item" data-page="knowledge" onclick="window.location.href='HengAI_法规知识库.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业法规库</div>
+
+  <div class="sb-item locked" data-page="factor-auth" id="n-factor-auth" data-role-nav="origin-only" onclick="window.location.href='HengAI_工业原厂精算.html'"><div class="sb-dot" id="dot-factor-auth" style="background:var(--ink3)"></div>原厂因子精算</div>
+
+
+
+  <div class="sb-group-title" id="g-business">企业工作台</div>
+
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+
+  <div class="sb-item" data-page="report" onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+
+  <div class="sb-item" data-page="decision" onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-item locked" data-page="supply" id="nav-supply" data-role-nav="sme-only" onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" id="dot-supply" style="background:var(--ink3)"></div>供应链协同</div>
+
+  <div class="sb-item locked" data-page="batch-verify" id="nav-batch-verify" data-role-nav="sme-only" onclick="window.location.href='HengAI_核验.html'"><div class="sb-dot" id="dot-batch-verify" style="background:var(--ink3)"></div>产业链核验</div>
+
+  <div class="sb-item locked" data-page="origin-audit" id="n-origin-audit" data-role-nav="origin-only" onclick="window.location.href='HengAI_HeavyIndustry_Suite.html'"><div class="sb-dot" id="dot-origin-audit" style="background:var(--ink3)"></div>产业主权看板</div>
+
+
+
+  <div class="sb-group-title" id="g-sovereign">大国重器 / 生态</div>
+
+  <div class="sb-item" data-page="honor" onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+
+  <div class="sb-item locked" data-page="eu" onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:var(--ink3)"></div>欧盟海关直连</div>
+
+  <div class="sb-item locked" data-page="dld" onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:var(--ink3)"></div>DLD 绿色信贷</div>
+
+  <div class="sb-item locked" data-page="acf" onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:var(--ink3)"></div>ACF 认证通道</div>
+
+  <div class="sb-item locked" data-page="gov" onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:var(--ink3)"></div>生态共治委员会</div>
+
+</div>
+
+<script id="qa-sidebar-active-script">
+
+(function(){
+
+  var map = {"全域中心.html":"overview","index.html":"overview","HengAI_CBAM测算工具.html":"calc","HengAI_星火成就档案.html":"achieve","HengAI_GM_Wallet.html":"wallet","HengAI_算力资源.html":"resource","HengAI_法规知识库.html":"knowledge","HengAI_工业原厂精算.html":"factor-auth","HengAI_企业数字档案.html":"enterprise","HengAI_供应链协同.html":"supply","HengAI_核验.html":"batch-verify","HengAI_全域诊断报告.html":"report","HengAI_决策层呈送包生成器.html":"decision","HengAI_HeavyIndustry_Suite.html":"origin-audit","HengAI_荣誉体系.html":"honor","HengAI_EU_Customs.html":"eu","HengAI_DLD_Credit.html":"dld","HengAI_ACF_Cert.html":"acf","HengAI_Governance.html":"gov"};
+
+  try {
+
+    var fn = decodeURIComponent((location.pathname.split("/").pop() || "").split("?")[0]);
+
+    var id = map[fn]; if (!id) return;
+
+    document.querySelectorAll(".sidebar .sb-item[data-page]").forEach(function(el){
+
+      if (el.getAttribute("data-page") === id) el.classList.add("active");
+
+    });
+
+  } catch(e){}
+
+})();
+
+</script>
+
+<!-- END:MPA_SIDEBAR -->
+
+
+
+<!-- ═══ 全域中心 Hub SPA 片段 ═══ -->
+
+<!-- BEGIN:HUB_SIDEBAR_NAV -->
+
+  <div class="sb-group-title" id="g-personal">个人空间</div>
+
+  <div class="sb-item" data-page="overview" id="nav-overview" onclick="navTo('overview', this)"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+
+  <div class="sb-item" data-page="achieve" id="nav-achieve" onclick="navTo('achieve', this)"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+
+  <div class="sb-item" data-page="calc" id="nav-calc" onclick="navTo('calc', this)"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+
+  <div class="sb-item" data-page="wallet" id="nav-wallet" onclick="navTo('wallet', this)"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+
+  <div class="sb-item" data-page="resource" id="nav-resource" onclick="navTo('resource', this)"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+
+  <div class="sb-item" data-page="knowledge" id="nav-knowledge" onclick="navTo('knowledge', this)"><div class="sb-dot" style="background:#6dd5b0"></div>企业法规库</div>
+
+  <div class="sb-item locked" data-page="factor-auth" id="nav-factor-auth" data-role-nav="origin-only" onclick="navLocked('factor-auth', this)"><div class="sb-dot" id="dot-factor-auth" style="background:var(--ink3)"></div>原厂因子精算</div>
+
+
+
+  <div class="sb-group-title" id="g-business">企业工作台</div>
+
+  <div class="sb-item locked" data-page="enterprise" id="nav-enterprise" onclick="navLocked('enterprise', this)"><div class="sb-dot" style="background:var(--ink3)"></div>企业数字档案</div>
+
+  <div class="sb-item locked" data-page="report" id="nav-report" onclick="navLocked('report', this)"><div class="sb-dot" style="background:var(--ink3)"></div>全域诊断报告</div>
+
+  <div class="sb-item locked" data-page="decision" id="nav-decision" onclick="navLocked('decision', this)"><div class="sb-dot" style="background:var(--ink3)"></div>决策层呈送包</div>
+
+  <div class="sb-item locked" data-page="supply" id="nav-supply" data-role-nav="sme-only" onclick="navLocked('supply', this)"><div class="sb-dot" id="dot-supply" style="background:var(--ink3)"></div>供应链协同</div>
+
+  <div class="sb-item locked" data-page="batch-verify" id="nav-batch-verify" data-role-nav="sme-only" onclick="navLocked('batch-verify', this)"><div class="sb-dot" id="dot-batch-verify" style="background:var(--ink3)"></div>产业链核验</div>
+
+  <div class="sb-item locked" data-page="origin-audit" id="n-origin-audit" data-role-nav="origin-only" onclick="navLocked('origin-audit', this)"><div class="sb-dot" id="dot-origin-audit" style="background:var(--ink3)"></div>产业主权看板</div>
+
+
+
+  <div class="sb-group-title" id="g-sovereign">大国重器 / 生态</div>
+
+  <div class="sb-item" data-page="honor" id="nav-honor" onclick="navTo('honor', this)"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+
+  <div class="sb-item locked" data-page="eu" id="nav-eu" onclick="navLocked('eu', this)"><div class="sb-dot" style="background:var(--ink3)"></div>欧盟海关直连</div>
+
+  <div class="sb-item locked" data-page="dld" id="nav-dld" onclick="navLocked('dld', this)"><div class="sb-dot" style="background:var(--ink3)"></div>DLD 绿色信贷</div>
+
+  <div class="sb-item locked" data-page="acf" id="nav-acf" onclick="navLocked('acf', this)"><div class="sb-dot" style="background:var(--ink3)"></div>ACF 认证通道</div>
+
+  <div class="sb-item locked" data-page="gov" id="nav-gov" onclick="navLocked('gov', this)"><div class="sb-dot" style="background:var(--ink3)"></div>生态共治委员会</div>
+
+<!-- END:HUB_SIDEBAR_NAV -->
+

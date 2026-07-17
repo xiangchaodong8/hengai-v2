@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · CBAM 碳税测算工具</title>
+<script>
+/* 嵌入模式：?embed=1 时（被全域中心 iframe 引用）隐藏自身 V3.2 外壳，
+   避免双层侧栏把内容挤到左侧菜单旁。必须在 CSS 应用前打 data-embed 标记。 */
+if (/[?&]embed=1/.test(location.search)) {
+  document.documentElement.setAttribute('data-embed', '1');
+}
+</script>
+<script src="AppState.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared-shell.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --night:#06080f; --dark:#0a0e1a; --panel:#0d1220; --panel2:#111827;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --ink:#e8edf5; --ink2:#8a95a8; --ink3:#4a5568;
+  --green:#3b9e4a; --green-l:#7dd98a; --green-d:rgba(59,158,74,0.11);
+  --teal:#1d9e75; --teal-l:#6dd5b0; --teal-d:rgba(29,158,117,0.1);
+  --gold:#c9a84c; --gold-l:#f0d080; --gold-d:rgba(201,168,76,0.12);
+  --blue:#185fa5; --blue-l:#93c5fd; --blue-d:rgba(24,95,165,0.12);
+  --red:#e24b4a; --red-l:#fca5a5; --red-d:rgba(226,75,74,0.1);
+  --purple:#7f77dd; --purple-l:#c4b5fd; --purple-d:rgba(127,119,221,0.1);
+  --amber:#c9a84c; --amber-l:#fcd34d;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;background:var(--night);color:var(--ink);
+  font-family:'Noto Sans SC',sans-serif;font-size:13px;line-height:1.6}
+
+/* ── SHELL ── */
+.shell{display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{width:200px;background:var(--dark);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0;padding:0}
+.logo-area{padding:16px 14px 12px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:9px}
+.logo-ic{width:28px;height:28px;border-radius:7px;background:var(--green-d);
+  border:1px solid rgba(59,158,74,0.35);display:flex;align-items:center;justify-content:center}
+.logo-tx{font-size:13px;font-weight:700}
+.logo-sub{font-size:9px;color:var(--ink3);margin-top:1px}
+.nav-s{padding:11px 13px 5px;font-size:9px;color:var(--ink3);letter-spacing:1px;
+  text-transform:uppercase;font-weight:600}
+.nav-i{display:flex;align-items:center;gap:8px;padding:7px 13px;font-size:12px;
+  color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all 0.15s}
+.nav-i:hover{color:var(--ink);background:rgba(255,255,255,0.04)}
+.nav-i.active{color:var(--ink);background:rgba(255,255,255,0.06);border-left-color:var(--teal)}
+.nav-d{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sf{margin-top:auto;padding:11px 13px;border-top:1px solid var(--border)}
+.u-row{display:flex;align-items:center;gap:8px}
+.u-av{width:28px;height:28px;border-radius:50%;background:var(--teal-d);
+  border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:var(--teal-l);flex-shrink:0}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;overflow-y:auto}
+
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:20;background:rgba(6,8,15,0.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);
+  padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.tb-l{display:flex;align-items:center;gap:12px}
+.tb-title{font-size:14px;font-weight:500}
+.tb-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;
+  letter-spacing:0.8px;text-transform:uppercase;
+  background:var(--gold-d);color:var(--gold-l);border:1px solid rgba(201,168,76,0.3)}
+.tb-r{display:flex;align-items:center;gap:9px}
+.gm-chip{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;
+  background:var(--gold-d);border:1px solid rgba(201,168,76,0.3);
+  font-size:11px;font-weight:600;color:var(--gold-l);cursor:default}
+.gm-val{font-size:13px;font-weight:700;color:var(--gold);font-family:'DM Mono',monospace}
+.tb-btn{padding:5px 12px;border-radius:7px;font-size:11.5px;font-weight:500;
+  border:1px solid var(--border2);background:transparent;color:var(--ink);
+  cursor:pointer;font-family:inherit;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.07)}
+
+/* ── CONTENT ── */
+.content{padding:22px 28px 60px;max-width:960px}
+
+/* ── STEP HEADER ── */
+.step-head{display:flex;align-items:center;gap:0;margin-bottom:22px;overflow-x:auto;padding-bottom:2px}
+.sh-item{display:flex;align-items:center;gap:0;flex-shrink:0}
+.sh-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;z-index:1}
+.sh-done{background:var(--green-d);border:1.5px solid var(--green);color:var(--green-l)}
+.sh-active{background:var(--blue-d);border:1.5px solid var(--blue-l);color:var(--blue-l)}
+.sh-lock{background:rgba(255,255,255,0.03);border:1.5px solid var(--border2);color:var(--ink3)}
+.sh-line{width:36px;height:1px;background:var(--border)}
+.sh-line.done{background:rgba(59,158,74,0.4)}
+.sh-info{display:flex;flex-direction:column;align-items:center;gap:3px;margin:0 4px}
+.sh-label{font-size:9.5px;font-weight:500;color:var(--ink3)}
+.sh-label.done{color:var(--green)}
+.sh-label.active{color:var(--blue-l)}
+
+/* ── CARDS ── */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
+.card-title{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:1.1px;
+  text-transform:uppercase;margin-bottom:14px;
+  display:flex;align-items:center;justify-content:space-between}
+.card-title::after{display:none}
+
+/* ── FORM INPUTS ── */
+.input-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.input-group:last-child{margin-bottom:0}
+.i-label{font-size:12px;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:6px}
+.i-hint{font-size:10px;color:var(--ink3);cursor:pointer;text-decoration:underline;
+  text-decoration-style:dotted;text-underline-offset:2px}
+.i-hint:hover{color:var(--ink2)}
+.i-row{display:flex;gap:8px;align-items:center}
+.i-field{flex:1;display:flex;align-items:center;background:rgba(0,0,0,0.35);
+  border:1px solid var(--border2);border-radius:9px;overflow:hidden;
+  transition:border-color 0.15s}
+.i-field:focus-within{border-color:rgba(29,158,117,0.5)}
+.i-field input{flex:1;background:transparent;border:none;outline:none;
+  font-family:'DM Mono',monospace;font-size:14px;font-weight:500;
+  color:var(--ink);padding:10px 13px}
+.i-field input::placeholder{color:var(--ink3);font-size:13px;font-family:'Noto Sans SC',sans-serif;font-weight:400}
+.i-unit{padding:0 13px 0 0;font-size:11px;color:var(--ink3);white-space:nowrap;flex-shrink:0}
+.i-desc{font-size:10.5px;color:var(--ink3);line-height:1.5;padding:4px 13px 8px;display:none}
+.i-desc.show{display:block}
+
+/* select */
+.i-select{flex:1;background:rgba(0,0,0,0.35);border:1px solid var(--border2);
+  border-radius:9px;padding:10px 13px;font-family:'Noto Sans SC',sans-serif;
+  font-size:13px;color:var(--ink);outline:none;cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%234a5568' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center}
+.i-select:focus{border-color:rgba(29,158,117,0.5)}
+
+/* grid */
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+
+/* ── SENSITIVITY SLIDER ── */
+.slider-wrap{display:flex;flex-direction:column;gap:5px}
+.slider-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--ink3)}
+input[type=range]{width:100%;height:5px;appearance:none;background:rgba(255,255,255,0.08);
+  border-radius:3px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:16px;height:16px;
+  border-radius:50%;background:var(--teal);border:2px solid var(--night);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;
+  background:var(--teal);border:2px solid var(--night);cursor:pointer;border:none}
+
+/* ── CALC BUTTON ── */
+.calc-btn{width:100%;padding:14px;border-radius:11px;font-size:14px;font-weight:600;
+  font-family:inherit;border:none;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;
+  background:linear-gradient(135deg,var(--teal) 0%,var(--green) 100%);
+  color:#fff;margin-top:6px}
+.calc-btn:hover{opacity:0.9;transform:translateY(-1px)}
+.calc-btn:active{transform:translateY(0)}
+.calc-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+/* ── RESULT PANEL ── */
+.result-wrap{display:none}
+.result-wrap.show{display:block}
+
+/* top number showcase */
+.result-hero{
+  background:var(--panel);border:1px solid rgba(226,75,74,0.3);
+  border-radius:16px;padding:0;overflow:hidden;margin-bottom:16px;
+  position:relative;
+}
+.result-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(226,75,74,0.6),transparent)}
+.rh-inner{padding:22px 24px 20px;display:flex;align-items:flex-start;gap:20px}
+.rh-left{flex:1}
+.rh-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(252,165,165,0.7);margin-bottom:8px}
+.rh-num{font-size:52px;font-weight:700;font-family:'DM Mono',monospace;
+  letter-spacing:-2px;line-height:1;color:var(--red);margin-bottom:4px}
+.rh-unit{font-size:14px;font-weight:400;color:var(--ink2);margin-left:4px}
+.rh-equiv{font-size:11.5px;color:rgba(252,165,165,0.75);margin-top:8px;line-height:1.6}
+.rh-breakdown{flex-shrink:0;display:flex;flex-direction:column;gap:8px;
+  padding:16px;background:rgba(0,0,0,0.3);border-radius:11px;min-width:180px}
+.rbd-row{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.rbd-label{color:var(--ink2)}
+.rbd-val{font-weight:600;font-family:'DM Mono',monospace}
+.rbd-divider{border:none;border-top:1px solid rgba(255,255,255,0.07);margin:4px 0}
+
+/* compare vs optimized */
+.compare-strip{
+  display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;
+  align-items:center;gap:4px;
+  background:rgba(0,0,0,0.25);padding:12px 14px;
+}
+.cs-box{border-radius:10px;padding:12px 14px;text-align:center}
+.cs-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;
+  letter-spacing:-0.5px;line-height:1;margin-bottom:3px}
+.cs-label{font-size:9.5px;font-weight:500}
+.cs-note{font-size:9px;opacity:0.6;margin-top:2px}
+.cs-arrow{display:flex;align-items:center;justify-content:center;color:var(--ink3)}
+
+/* year projection */
+.year-proj{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.yp-box{background:var(--panel);border:1px solid var(--border);border-radius:11px;padding:13px 14px;text-align:center}
+.yp-year{font-size:10px;color:var(--ink3);margin-bottom:5px;font-weight:500}
+.yp-price{font-size:10px;color:var(--ink3);margin-bottom:8px}
+.yp-bar-wrap{height:48px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:8px}
+.yp-bar{width:32px;border-radius:3px 3px 0 0}
+.yp-val{font-size:15px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:-0.5px;line-height:1}
+.yp-label{font-size:9px;color:var(--ink2);margin-top:3px}
+
+/* scope breakdown */
+.scope-bars{display:flex;flex-direction:column;gap:9px}
+.scope-row{display:flex;align-items:center;gap:10px}
+.scope-label{font-size:11.5px;color:var(--ink2);width:72px;flex-shrink:0}
+.scope-bar-track{flex:1;height:7px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden}
+.scope-bar-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.scope-val{font-size:11.5px;font-weight:600;font-family:'DM Mono',monospace;width:70px;text-align:right;flex-shrink:0}
+.scope-pct{font-size:10px;color:var(--ink3);width:30px;text-align:right;flex-shrink:0}
+
+/* action cards */
+.action-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.ac-card{border-radius:13px;padding:16px 16px;cursor:pointer;transition:all 0.2s;
+  border:1px solid;text-align:left}
+.ac-card:hover{transform:translateY(-2px)}
+.ac-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;margin-bottom:11px}
+.ac-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.ac-desc{font-size:11px;line-height:1.6;opacity:0.8}
+.ac-arrow{font-size:11px;margin-top:8px;font-weight:500}
+
+/* GM reward toast inside page */
+.gm-earned{
+  display:none;
+  background:var(--gold-d);border:1px solid rgba(201,168,76,0.3);
+  border-radius:10px;padding:10px 14px;
+  align-items:center;gap:10px;margin-bottom:16px;
+}
+.gm-earned.show{display:flex}
+
+/* insight */
+.insight{padding:11px 14px;border-radius:9px;font-size:11.5px;line-height:1.7;
+  display:flex;gap:9px;align-items:flex-start;margin-bottom:14px}
+.ins-teal{background:var(--teal-d);border:1px solid rgba(29,158,117,0.2);color:var(--teal-l)}
+.ins-gold{background:var(--gold-d);border:1px solid rgba(201,168,76,0.2);color:var(--gold-l)}
+.ins-red{background:var(--red-d);border:1px solid rgba(226,75,74,0.2);color:var(--red-l)}
+.ins-purple{background:var(--purple-d);border:1px solid rgba(127,119,221,0.2);color:var(--purple-l)}
+
+/* sensitivity note */
+.sensitivity-wrap{background:rgba(0,0,0,0.25);border:1px solid var(--border);
+  border-radius:11px;padding:12px 14px;margin-bottom:16px}
+.sv-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.sv-title{font-size:11.5px;font-weight:600;color:var(--ink)}
+.sv-val{font-size:13px;font-weight:700;font-family:'DM Mono',monospace;color:var(--gold)}
+.sv-rows{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.sv-col{text-align:center;padding:8px;background:rgba(0,0,0,0.3);border-radius:8px}
+.sv-price{font-size:9.5px;color:var(--ink3);margin-bottom:4px}
+.sv-amount{font-size:13px;font-weight:700;font-family:'DM Mono',monospace}
+
+/* confidence level */
+.conf-strip{display:flex;gap:5px;margin-top:6px}
+.conf-step{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,0.07)}
+.conf-step.active{background:var(--teal)}
+.conf-label{font-size:10px;color:var(--ink3);margin-top:4px;text-align:center}
+
+/* tooltip */
+.tooltip-box{
+  position:absolute;z-index:100;background:var(--panel2);
+  border:1px solid var(--border2);border-radius:10px;
+  padding:10px 13px;font-size:11.5px;color:var(--ink2);
+  line-height:1.6;max-width:260px;display:none;pointer-events:none;
+}
+.tooltip-box.show{display:block}
+
+/* page steps */
+.step-section{display:none}
+.step-section.active{display:block}
+
+/* history */
+.hist-row{display:flex;align-items:center;justify-content:space-between;
+  padding:9px 12px;background:rgba(0,0,0,0.25);border-radius:8px;
+  border:1px solid var(--border);margin-bottom:7px}
+.hist-row:last-child{margin-bottom:0}
+
+/* divider */
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+
+/* badge */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:20px;white-space:nowrap}
+.bdg-g{background:var(--green-d);color:var(--green-l);border:1px solid rgba(59,158,74,0.3)}
+.bdg-r{background:var(--red-d);color:var(--red-l);border:1px solid rgba(226,75,74,0.3)}
+.bdg-y{background:var(--gold-d);color:var(--gold-l);border:1px solid rgba(201,168,76,0.3)}
+.bdg-b{background:var(--blue-d);color:var(--blue-l);border:1px solid rgba(24,95,165,0.3)}
+.bdg-gray{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--border)}
+
+/* animate number */
+@keyframes countUp {from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:countUp 0.5s ease both}
+
+/* save modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);
+  z-index:200;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--panel2);border:1px solid var(--border2);border-radius:16px;
+  padding:24px 26px;max-width:420px;width:90%;position:relative}
+.modal-close{position:absolute;top:14px;right:16px;cursor:pointer;color:var(--ink3);font-size:18px;
+  background:none;border:none;color:var(--ink3);font-family:inherit}
+
+
+    #app {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      grid-template-rows: var(--topbar-h) 1fr;
+      grid-template-areas: "topbar topbar" "sidebar main";
+      height: 100vh;
+      overflow: hidden;
+    }
+    #hg-topbar { grid-area: topbar; }
+    #hg-sidebar { grid-area: sidebar; }
+    #hg-main {
+      grid-area: main;
+      overflow-y: auto;
+      overflow-x: hidden;
+      min-height: 0;
+      background: var(--bg-void, #06080f);
+      color: var(--text-1, #e8edf5);
+    }
+    #hg-main .content { max-width: 960px; margin: 0 auto; }
+
+    /* ═══════════════ 嵌入模式（?embed=1）专用复位 ═══════════════
+       场景：被 全域中心.html 通过 iframe 引用时，外层已经渲染了一套
+       侧栏 + 顶栏；如果本页继续渲染自己的 V3.2 #hg-sidebar / #hg-topbar，
+       就会出现「双侧栏堆在左边、内容被挤成窄条」的现象。
+       这里把外壳全部消隐，让 #hg-main 直接铺满 iframe。 */
+    html[data-embed="1"],
+    html[data-embed="1"] body {
+      height: auto !important;
+      min-height: 0 !important;
+      overflow: visible !important;
+      background: var(--night) !important;
+    }
+    html[data-embed="1"] #hg-topbar,
+    html[data-embed="1"] #hg-sidebar,
+    html[data-embed="1"] .sidebar,
+    html[data-embed="1"] .sb { display: none !important; }
+    html[data-embed="1"] #app {
+      display: block !important;
+      height: auto !important;
+      overflow: visible !important;
+    }
+    html[data-embed="1"] #hg-main {
+      grid-area: unset !important;
+      height: auto !important;
+      overflow: visible !important;
+      background: transparent !important;
+      margin: 0 !important;
+    }
+    html[data-embed="1"] #hg-main .content {
+      max-width: none;
+      margin: 0;
+    }
+
+</style>
+</head>
+<body data-page-title="CBAM 测算工具">
+<div id="app">
+  <header id="hg-topbar">
+
+    <!-- 左区：Logo + Phase Badge -->
+    <div class="hg-tb-left">
+      <div class="hg-tb-logo">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 1.5L16 5V11.5C16 14.5 12.8 17 9 18C5.2 17 2 14.5 2 11.5V5L9 1.5Z"
+                fill="rgba(0,229,160,0.12)" stroke="var(--accent)" stroke-width="1.3"/>
+          <polyline points="5.5,9.2 8,11.5 12.5,6.8"
+                    stroke="var(--accent-bright)" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Heng<em>AI</em></span>
+      </div>
+
+      <div class="hg-tb-phase ph1" id="hg-phase-badge">
+        <span class="hg-phase-dot"></span>
+        <span class="dyn-phase-code">P1</span>
+      </div>
+
+      <!-- 当前页面标题（各模块通过 data-page-title 覆盖） -->
+      <div class="hg-tb-title" id="hg-page-title">全域合规中心</div>
+    </div>
+
+    <!-- 中区：数据芯片 -->
+    <div class="hg-tb-chips">
+      <div class="hg-chip hg-chip-gm" title="GreenMark 绿印余额">
+        <span class="hg-chip-ico">🪙</span>
+        <span class="hg-chip-lbl">GM</span>
+        <span class="hg-chip-val dyn-gm-balance-num" id="headerTopGMValue">--</span>
+      </div>
+      <div class="hg-chip hg-chip-risk" title="CBAM 风险敞口">
+        <span class="hg-chip-lbl">风险</span>
+        <span class="hg-chip-val hg-danger dyn-risk-eur">--</span>
+      </div>
+      <div class="hg-chip hg-chip-co2" title="总碳排放">
+        <span class="hg-chip-lbl">tCO₂e</span>
+        <span class="hg-chip-val dyn-tco2e-topbar">--</span>
+      </div>
+      <div class="hg-chip hg-chip-tok" title="算力剩余">
+        <span class="hg-chip-lbl">Token</span>
+        <span class="hg-chip-val dyn-tokens-left">--</span>
+      </div>
+    </div>
+
+    <!-- 右区：用户头像 + 模式标识 -->
+    <div class="hg-tb-right">
+      <div class="hg-tb-mode-badge" id="hg-mode-badge" title="数据来源">MOCK</div>
+      <div class="hg-tb-avatar" id="headerIdentityAvatar"
+           onclick="window.location.href='HengAI_星火成就档案.html'"
+           title="查看个人档案">
+        ?
+      </div>
+      <span class="hg-tb-uname dyn-user-name" id="headerIdentityName">访客</span>
+    </div>
+
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       SIDEBAR
+       ═══════════════════════════════════════════════════════════════════ -->
+  <nav id="hg-sidebar">
+
+    <!-- Brand -->
+    <div class="hg-sb-brand">
+      <div class="hg-sb-brand-ic">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M11 2L20 6.5V14C20 17.5 16 20.5 11 22C6 20.5 2 17.5 2 14V6.5L11 2Z"
+                fill="rgba(0,229,160,0.10)" stroke="var(--accent)" stroke-width="1.3"/>
+          <polyline points="6.5,11.5 9.5,14.5 15.5,8.5"
+                    stroke="var(--accent-bright)" stroke-width="1.6"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="hg-sb-name">HengAI</div>
+        <div class="hg-sb-sub">Co2Lion 全域合规中心</div>
+      </div>
+    </div>
+
+    <!-- Phase Strip -->
+    <div class="hg-sb-phase-strip" id="hg-phase-strip">
+      <div class="hg-sb-phase-dot"></div>
+      <span id="sb-phase-text" class="dyn-phase-label">Phase 1 · 启蒙期</span>
+    </div>
+
+    <!-- User mini card -->
+    <div class="hg-sb-usercard">
+      <div class="hg-sb-uavatar dyn-user-name-initial">?</div>
+      <div class="hg-sb-uinfo">
+        <div class="hg-sb-uname dyn-user-name">访客</div>
+        <div class="hg-sb-utier" id="sb-urole">--</div>
+      </div>
+      <div class="hg-sb-ugm">
+        <span class="dyn-gm-balance-num">--</span>
+        <span class="hg-sb-ugm-unit">GM</span>
+      </div>
+    </div>
+
+    <!-- 返回对话 -->
+    <div class="hg-sb-back" onclick="window.location.href='index.html'">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <path d="M1 6H11M1 6L4 3M1 6L4 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      返回 HengAI 对话
+    </div>
+
+    <!-- ── 个人工作台 ── -->
+    <div class="hg-sb-label">个人工作台</div>
+
+    <div class="hg-nav" data-slug="overview"
+         onclick="window.location.href='全域中心.html'">
+      <span class="hg-nav-ico">⚡</span>
+      <span class="hg-nav-lbl">全域总览</span>
+    </div>
+    <div class="hg-nav" data-slug="achieve"
+         onclick="window.location.href='HengAI_星火成就档案.html'">
+      <span class="hg-nav-ico">🏆</span>
+      <span class="hg-nav-lbl">星火成就档案</span>
+    </div>
+    <div class="hg-nav" data-slug="cbam"
+         onclick="window.location.href='HengAI_CBAM测算工具.html'">
+      <span class="hg-nav-ico">🔴</span>
+      <span class="hg-nav-lbl">CBAM 测算</span>
+    </div>
+    <div class="hg-nav" data-slug="compute"
+         onclick="window.location.href='HengAI_算力资源.html'">
+      <span class="hg-nav-ico">⚙️</span>
+      <span class="hg-nav-lbl">算力资源</span>
+    </div>
+    <div class="hg-nav" data-slug="regulation"
+         onclick="window.location.href='HengAI_法规知识库.html'">
+      <span class="hg-nav-ico">📜</span>
+      <span class="hg-nav-lbl">法规库</span>
+    </div>
+
+    <!-- ── 企业工作台 ── -->
+    <div class="hg-sb-label" style="margin-top:6px">企业工作台</div>
+
+    <div class="hg-nav" data-slug="company"
+         onclick="window.location.href='HengAI_企业数字档案.html'">
+      <span class="hg-nav-ico">🏢</span>
+      <span class="hg-nav-lbl">企业档案</span>
+    </div>
+    <div class="hg-nav" data-slug="supplychain"
+         onclick="window.location.href='HengAI_供应链协同.html'">
+      <span class="hg-nav-ico">🔗</span>
+      <span class="hg-nav-lbl">供应链协同</span>
+    </div>
+    <div class="hg-nav" data-slug="diagnosis"
+         onclick="window.location.href='HengAI_全域诊断报告.html'">
+      <span class="hg-nav-ico">🩺</span>
+      <span class="hg-nav-lbl">诊断报告</span>
+    </div>
+    <div class="hg-nav" data-slug="package"
+         onclick="window.location.href='HengAI_决策层呈送包生成器.html'">
+      <span class="hg-nav-ico">📦</span>
+      <span class="hg-nav-lbl">呈送包生成</span>
+    </div>
+
+    <!-- ── 大国重器 ── -->
+    <div class="hg-sb-label" style="margin-top:6px">大国重器</div>
+
+    <div class="hg-nav" data-slug="honor"
+         onclick="window.location.href='HengAI_荣誉体系.html'">
+      <span class="hg-nav-ico">🎖️</span>
+      <span class="hg-nav-lbl">荣誉体系</span>
+    </div>
+    <div class="hg-nav" data-slug="governance"
+         onclick="window.location.href='HengAI_Governance.html'">
+      <span class="hg-nav-ico">🌐</span>
+      <span class="hg-nav-lbl">共治委员会</span>
+    </div>
+
+    <!-- ── 深潜模块 ── -->
+    <div class="hg-sb-label" style="margin-top:6px">深潜模块</div>
+
+    <div class="hg-nav" data-slug="wallet"
+         onclick="window.location.href='HengAI_GM_Wallet.html'">
+      <span class="hg-nav-ico">🪙</span>
+      <span class="hg-nav-lbl">GM 绿印钱包</span>
+      <span class="hg-nav-badge dyn-gm-balance-num">--</span>
+    </div>
+    <div class="hg-nav" data-slug="customs"
+         onclick="window.location.href='HengAI_EU_Customs.html'">
+      <span class="hg-nav-ico">🛃</span>
+      <span class="hg-nav-lbl">欧盟海关直连</span>
+    </div>
+    <div class="hg-nav" data-slug="dld"
+         onclick="window.location.href='HengAI_DLD_Credit.html'">
+      <span class="hg-nav-ico">💎</span>
+      <span class="hg-nav-lbl">DLD 绿色信贷</span>
+    </div>
+    <div class="hg-nav" data-slug="acf"
+         onclick="window.location.href='HengAI_ACF_Cert.html'">
+      <span class="hg-nav-ico">🎗️</span>
+      <span class="hg-nav-lbl">ACF 大湾区认证</span>
+    </div>
+
+    <!-- 底部留白 -->
+    <div style="height:32px"></div>
+
+  </nav>
+
+  <main id="hg-main">
+    <div class="cbam-inner">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-l">
+      <span class="tb-title">CBAM 碳税测算工具</span>
+      <span class="tb-badge">粗测模式</span>
+    </div>
+    <div class="tb-r">
+      <div class="gm-chip" onclick="window.location.href='HengAI_GM_Wallet.html'">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+          <path d="M5.5 1L10 3.5V8.5L5.5 10L1 8.5V3.5L5.5 1Z" stroke="#c9a84c" stroke-width="0.9" fill="rgba(201,168,76,0.15)"/>
+        </svg>
+        <span style="font-size:10px;color:var(--ink2)">GM</span>
+        <span class="gm-val dyn-gm-balance-num">--</span>
+      </div>
+      <button class="tb-btn" onclick="showHistory()">历史记录</button>
+      <button class="tb-btn" style="background:var(--teal-d);border-color:rgba(29,158,117,0.4);color:var(--teal-l)" onclick="resetAll()">新建测算</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- STEP INDICATOR -->
+    <div class="step-head" id="step-head">
+      <div class="sh-item">
+        <div class="sh-info">
+          <div class="sh-dot sh-active" id="sd1">1</div>
+          <div class="sh-label active" id="sl1">基础信息</div>
+        </div>
+        <div class="sh-line" id="sline1"></div>
+      </div>
+      <div class="sh-item">
+        <div class="sh-info">
+          <div class="sh-dot sh-lock" id="sd2">2</div>
+          <div class="sh-label" id="sl2">能源数据</div>
+        </div>
+        <div class="sh-line" id="sline2"></div>
+      </div>
+      <div class="sh-item">
+        <div class="sh-info">
+          <div class="sh-dot sh-lock" id="sd3">3</div>
+          <div class="sh-label" id="sl3">供应链</div>
+        </div>
+        <div class="sh-line" id="sline3"></div>
+      </div>
+      <div class="sh-item">
+        <div class="sh-info">
+          <div class="sh-dot sh-lock" id="sd4">★</div>
+          <div class="sh-label" id="sl4">测算结果</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 1: BASIC INFO ── -->
+    <div class="step-section active" id="sec1">
+      <div class="insight ins-teal">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;margin-top:1px">
+          <circle cx="7.5" cy="7.5" r="6.5" stroke="var(--teal-l)" stroke-width="1"/>
+          <line x1="7.5" y1="4.5" x2="7.5" y2="7.5" stroke="var(--teal-l)" stroke-width="1.1"/>
+          <circle cx="7.5" cy="9.5" r="0.7" fill="var(--teal-l)"/>
+        </svg>
+        <div>这是一份 <strong style="color:var(--teal-l)">粗测工具</strong>——5 分钟内完成，数据来自账单和常识，不需要专业碳排放知识。测算结果将作为您的首份企业碳档案快照，同时为您积累 GreenMark 绿印资产。</div>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">企业基本信息</div>
+          <div class="input-group">
+            <div class="i-label">企业名称</div>
+            <div class="i-row">
+              <div class="i-field"><input id="f-company" class="dyn-company-name-inp" placeholder="例：待完善企业档案汽配制造厂" value=""></div>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="i-label">主要出口产品类别</div>
+            <div class="i-row">
+              <select class="i-select" id="f-product">
+                <option value="">请选择产品类别</option>
+                <option value="steel" data-factor="1.85">钢铁及钢铁制品</option>
+                <option value="aluminum" selected data-factor="1.82">铝及铝制品</option>
+                <option value="cement">水泥及熟料</option>
+                <option value="fertilizer">化肥</option>
+                <option value="electricity">电力</option>
+                <option value="hydrogen">氢</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="i-label">年出口欧盟数量
+              <span class="i-hint" onclick="toggleHint('h-vol')">在哪里找？</span>
+            </div>
+            <div class="i-row">
+              <div class="i-field">
+                <input id="f-volume" type="number" placeholder="例：1920" value="1920">
+                <span class="i-unit">吨 / 年</span>
+              </div>
+            </div>
+            <div class="i-desc" id="h-vol">查看您的出口报关单，找到发往欧盟国家的货物净重总计（单位：吨）。通常在货代公司的年度报表中可以找到。</div>
+          </div>
+          <div class="input-group">
+            <div class="i-label">欧盟主要目的国</div>
+            <div class="i-row">
+              <select class="i-select" id="f-country">
+                <option>德国</option><option>法国</option><option>意大利</option>
+                <option>荷兰</option><option>西班牙</option><option>其他欧盟国家</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">CBAM 参数设定</div>
+          <div class="input-group">
+            <div class="i-label">碳价参考（€/tCO₂e）
+              <span class="i-hint" onclick="toggleHint('h-price')">什么是碳价？</span>
+            </div>
+            <div class="i-row">
+              <div class="i-field">
+                <input id="f-price" type="number" value="75.36">
+                <span class="i-unit">€ / tCO₂e</span>
+              </div>
+            </div>
+            <div class="i-desc" id="h-price">⚡ 实时挂钩 EU ETS 官方牌价：€75.36（更新于 2026-04-20）。高阶用户可直接修改上方数值进行极端情境模拟。</div>
+          </div>
+          <div class="input-group">
+            <div class="i-label">汇率（CNY/€）</div>
+            <div class="i-row">
+              <div class="i-field">
+                <input id="f-fx" type="number" step="0.01" value="7.85">
+                <span class="i-unit">CNY / €</span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="i-label">数据申报方式
+              <span class="i-hint" onclick="toggleHint('h-mode')">有什么区别？</span>
+            </div>
+            <div class="i-row">
+              <select class="i-select" id="f-mode" onchange="updateConfidence()">
+                <option value="manual" selected>人工凭证申报（当前）</option>
+                <option value="mat">MAT 物理传感器（推荐）</option>
+                <option value="third">第三方审计报告</option>
+              </select>
+            </div>
+            <div class="i-desc" id="h-mode">欧盟海关对不同方式的数据可信度评级不同。人工凭证（Lv.2）会被上浮 35% 的不确定性溢价；MAT 传感器（Lv.4）则按实际数据核算，免除溢价。</div>
+          </div>
+          <!-- Confidence level indicator -->
+          <div style="margin-top:4px">
+            <div style="display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:6px">
+              <span style="color:var(--ink2)">数据置信度</span>
+              <span id="conf-text" style="color:var(--amber);font-weight:600">Lv.2 · 人工凭证 · 惩罚系数 ×1.35</span>
+            </div>
+            <div class="conf-strip">
+              <div class="conf-step active"></div>
+              <div class="conf-step active"></div>
+              <div class="conf-step" id="conf3"></div>
+              <div class="conf-step" id="conf4"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:4px">
+        <button class="calc-btn" style="width:auto;padding:11px 32px;font-size:13px" onclick="goStep(2)">
+          下一步：填写能源数据 →
+        </button>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: ENERGY ── -->
+    <div class="step-section" id="sec2">
+      <div class="insight ins-gold">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;margin-top:1px">
+          <path d="M7.5 1L14 4.5V11.5L7.5 13L1 11.5V4.5L7.5 1Z" stroke="var(--gold-l)" stroke-width="1" fill="var(--gold-d)"/>
+          <line x1="7.5" y1="4.5" x2="7.5" y2="8" stroke="var(--gold-l)" stroke-width="1.1"/>
+          <circle cx="7.5" cy="9.5" r="0.7" fill="var(--gold-l)"/>
+        </svg>
+        <div><strong style="color:var(--gold-l)">这步最关键。</strong>能源消耗是 Scope 1+2 排放的主要来源，也是 CBAM 计算的核心依据。数据来源：生产车间电费账单 + 天然气采购记录。不确定的字段可以填写估算值，系统会标注置信区间。</div>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">Scope 1 · 直接排放</div>
+          <div class="input-group">
+            <div class="i-label">天然气消耗
+              <span class="i-hint" onclick="toggleHint('h-gas')">查看方式</span>
+            </div>
+            <div class="i-row">
+              <div class="i-field">
+                <input id="f-gas" type="number" placeholder="0" value="0">
+                <span class="i-unit">立方米 / 年</span>
+              </div>
+            </div>
+            <div class="i-desc" id="h-gas">查看天然气账单，统计全年用量。熔炉、烘干设备是主要消耗源。没有天然气可填 0。</div>
+          </div>
+          <div class="input-group">
+            <div class="i-label">燃煤消耗</div>
+            <div class="i-row">
+              <div class="i-field">
+                <input id="f-coal" type="number" placeholder="0" value="0">
+                <span class="i-unit">吨 / 年</span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="i-label">柴油 / 重油消耗</div>
+            <div class="i-row">
+              <div class="i-field">
+                <input id="f-oil" type="number" placeholder="0" value="0">
+                <span class="i-unit">升 / 年</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Scope 2 · 间接排放（外购电力）</div>
+          <div class="input-group">
+            <div class="i-label">年度总用电量
+              <span class="i-hint" onclick="toggleHint('h-elec')">在账单哪里？</span>
+            </div>
+            <div class="i-row">
+              <div class="i-field">
+                <input id="f-elec" type="number" placeholder="填写 kWh（来自账单）">
+                <span class="i-unit">度 (kWh)</span>
+              </div>
+            </div>
+            <div class="i-desc" id="h-elec">查看工厂电费账单"本期用电量"一栏，将全年 12 个月加总。通常年报或财务部门有汇总数据。</div>
+          </div>
+          <div class="input-group">
+            <div class="i-label">电网区域
+              <span class="i-hint" onclick="toggleHint('h-grid')">影响碳因子</span>
+            </div>
+            <div class="i-row">
+              <select class="i-select" id="f-grid">
+                <option value="0.581" selected>华东电网（浙江/上海/江苏）</option>
+                <option value="0.554">华南电网（广东/广西）</option>
+                <option value="0.610">华北电网（北京/天津）</option>
+                <option value="0.374">云南（水电为主）</option>
+                <option value="0.620">东北电网</option>
+              </select>
+            </div>
+            <div class="i-desc" id="h-grid">不同地区电网的碳排放强度不同，云南水电最低（0.374），东北煤电最高。这个选择会直接影响您的碳强度计算结果。</div>
+          </div>
+          <div class="input-group">
+            <div class="i-label">绿电证书（GEC）用量</div>
+            <div class="i-row">
+              <div class="i-field">
+                <input id="f-gec" type="number" placeholder="0（若无请填0）" value="0">
+                <span class="i-unit">度 (kWh)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="g2" style="margin-top:16px">
+        <div class="card">
+          <div class="card-title">原材料来源（Scope 3 上游）
+            <span class="badge bdg-b">影响较大</span>
+          </div>
+          <div class="input-group">
+            <div class="i-label">主要原材料采购来源
+              <span class="i-hint" onclick="toggleHint('h-mat')">为什么重要？</span>
+            </div>
+            <div class="i-row">
+              <select class="i-select" id="f-material">
+                <option value="11.2">中铝集团 · 河南产铝锭（碳因子 11.2）</option>
+                <option value="4.1">云南水电铝（碳因子 4.1）★ 低碳</option>
+                <option value="6.8">进口铝锭（LME 均值）</option>
+                <option value="18.0">煤电铝（高碳区域）</option>
+                <option value="9.5">其他 / 不确定</option>
+              </select>
+            </div>
+            <div class="i-desc" id="h-mat">原材料的碳排放强度（碳因子）直接影响产品的 Scope 3 排放计算。选择低碳铝锭（云南水电铝）可显著降低整体碳强度，是最经济的减碳路径之一。</div>
+          </div>
+          <div class="input-group">
+            <div class="i-label">年用量</div>
+            <div class="i-row">
+              <div class="i-field">
+                <input id="f-mat-vol" type="number" placeholder="例：480" value="480">
+                <span class="i-unit">吨 / 年</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">快速估算辅助</div>
+          <div style="font-size:11.5px;color:var(--ink2);line-height:1.75;margin-bottom:12px">
+            不确定用电量？可以用以下方式估算：
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="padding:9px 12px;background:rgba(0,0,0,0.25);border-radius:8px;border:1px solid var(--border)">
+              <div style="font-size:11px;color:var(--ink2);margin-bottom:3px">压铸厂参考值</div>
+              <div style="font-size:12.5px;color:var(--ink)">约 <strong style="color:var(--blue-l)">250-350 kWh</strong> / 吨产品</div>
+            </div>
+            <div style="padding:9px 12px;background:rgba(0,0,0,0.25);border-radius:8px;border:1px solid var(--border)">
+              <div style="font-size:11px;color:var(--ink2);margin-bottom:3px">铝型材加工参考值</div>
+              <div style="font-size:12.5px;color:var(--ink)">约 <strong style="color:var(--blue-l)">180-250 kWh</strong> / 吨产品</div>
+            </div>
+            <div style="padding:9px 12px;background:rgba(0,0,0,0.25);border-radius:8px;border:1px solid var(--border)">
+              <div style="font-size:11px;color:var(--ink2);margin-bottom:3px">快速计算</div>
+              <div style="font-size:11.5px;color:var(--ink)">年产量(t) × 行业参考值 ≈ 年用电量</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:16px;gap:10px">
+        <button class="calc-btn" style="width:auto;padding:11px 24px;font-size:13px;background:transparent;border:1px solid var(--border2);color:var(--ink)" onclick="goStep(1)">← 返回</button>
+        <button class="calc-btn" style="width:auto;padding:11px 32px;font-size:13px" onclick="goStep(3)">下一步：供应链信息 →</button>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: SUPPLY CHAIN ── -->
+    <div class="step-section" id="sec3">
+      <div class="insight ins-teal">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;margin-top:1px">
+          <circle cx="7.5" cy="7.5" r="6.5" stroke="var(--teal-l)" stroke-width="1"/>
+          <line x1="7.5" y1="4.5" x2="7.5" y2="7.5" stroke="var(--teal-l)" stroke-width="1.1"/>
+          <circle cx="7.5" cy="9.5" r="0.7" fill="var(--teal-l)"/>
+        </svg>
+        <div>供应链数据（Scope 3）通常占总碳排放的 <strong style="color:var(--teal-l)">60-80%</strong>，却是最难收集的部分。这里只需要粗估，系统会用行业默认值填补空缺。真实数据越多，测算越准确，GM 奖励也越高。</div>
+      </div>
+
+      <div class="g2">
+        <div class="card">
+          <div class="card-title">供应商数据现状</div>
+          <div class="input-group">
+            <div class="i-label">一级供应商总数</div>
+            <div class="i-row">
+              <div class="i-field">
+                <input id="f-sup-total" type="number" placeholder="例：17" value="17">
+                <span class="i-unit">家</span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="i-label">已完成碳数据填报</div>
+            <div class="i-row">
+              <div class="i-field">
+                <input id="f-sup-done" type="number" placeholder="例：2" value="2">
+                <span class="i-unit">家</span>
+              </div>
+            </div>
+          </div>
+          <div class="input-group">
+            <div class="i-label">Scope 3 在总采购额中的占比（估算）
+              <span class="i-hint" onclick="toggleHint('h-s3')">如何估算？</span>
+            </div>
+            <div class="i-row">
+              <div class="i-field">
+                <input id="f-s3-pct" type="number" placeholder="例：65" value="65">
+                <span class="i-unit">%</span>
+              </div>
+            </div>
+            <div class="i-desc" id="h-s3">原材料采购成本 ÷ 总成本 × 100%，通常制造业在 50-80% 之间。不确定可填 65%（行业均值）。</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">碳价敏感性测试</div>
+          <div style="font-size:11.5px;color:var(--ink2);margin-bottom:14px;line-height:1.7">拖动滑块预览不同碳价情境下的税负变化，帮助您判断风险敞口。</div>
+          <div class="slider-wrap">
+            <input type="range" min="40" max="150" value="75" id="slider-price" step="5" oninput="updateSensitivity(this.value)">
+            <div class="slider-labels">
+              <span>€40（保守）</span>
+              <span id="slider-display" style="color:var(--teal-l);font-weight:600">€75.36（当前）</span>
+              <span>€150（极端）</span>
+            </div>
+          </div>
+          <div class="sv-rows" id="sv-rows" style="margin-top:12px">
+            <div class="sv-col">
+              <div class="sv-price">€40</div>
+              <div class="sv-amount" style="color:var(--green-l)" id="sv-40">--</div>
+            </div>
+            <div class="sv-col" style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2)">
+              <div class="sv-price" style="color:var(--gold)">€75.36（当前）</div>
+              <div class="sv-amount" style="color:var(--gold)" id="sv-65">--</div>
+            </div>
+            <div class="sv-col">
+              <div class="sv-price">€80</div>
+              <div class="sv-amount" style="color:var(--amber-l)" id="sv-80">--</div>
+            </div>
+            <div class="sv-col">
+              <div class="sv-price">€100</div>
+              <div class="sv-amount" style="color:var(--red)" id="sv-100">--</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:16px;gap:10px">
+        <button class="calc-btn" style="width:auto;padding:11px 24px;font-size:13px;background:transparent;border:1px solid var(--border2);color:var(--ink)" onclick="goStep(2)">← 返回</button>
+        <button class="calc-btn" style="width:auto;padding:11px 36px;font-size:14px" onclick="runCalc()" id="final-btn">
+          立即测算 → 生成碳税诊断
+        </button>
+      </div>
+    </div>
+
+    <!-- ── STEP 4: RESULTS ── -->
+    <div class="step-section" id="sec4">
+
+      <!-- GM Earned notification -->
+      <div class="gm-earned" id="gm-earned">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2L18 7V15L10 18L2 15V7L10 2Z" fill="rgba(201,168,76,0.2)" stroke="var(--gold)" stroke-width="1.2"/>
+          <polyline points="6,10 9,13.5 14.5,7" stroke="var(--gold-l)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <div style="font-size:12.5px;font-weight:600;color:var(--gold-l)">测算完成 · 获得 <span id="gm-reward-val">+28</span> GM</div>
+          <div style="font-size:10.5px;color:var(--gold);margin-top:1px">累计 GreenMark：<span id="gm-new-total">156</span> GM · 此次测算已记录至您的星火成就档案</div>
+        </div>
+      </div>
+
+      <!-- HERO RESULT -->
+      <div class="result-hero">
+        <div class="rh-inner">
+          <div class="rh-left">
+            <div class="rh-eyebrow">2026 年度 CBAM 碳税预测敞口</div>
+            <div>
+              <span class="rh-num animate-in dyn-risk-eur" id="res-tax-exposure">--</span>
+            </div>
+            <div class="rh-equiv animate-in" id="r-equiv">计算中...</div>
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+              <span class="badge dyn-carbon-intensity" id="r-badge-ci" style="background:var(--red-d);color:var(--red-l);border:1px solid rgba(226,75,74,0.3)">—</span>
+              <span class="badge" id="r-badge-lv" style="background:var(--gold-d);color:var(--gold-l);border:1px solid rgba(201,168,76,0.3)">Lv.2 · 惩罚 ×1.35</span>
+              <span class="badge bdg-gray" id="r-badge-cov">供应链覆盖率 12%</span>
+            </div>
+          </div>
+          <div class="rh-breakdown">
+            <div style="font-size:9.5px;color:var(--ink3);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px">计算明细</div>
+            <div class="rbd-row">
+              <span class="rbd-label">年出口量</span>
+              <span class="rbd-val" id="rb-vol">1,920 t</span>
+            </div>
+            <div class="rbd-row">
+              <span class="rbd-label">综合碳强度</span>
+              <span class="rbd-val" id="rb-ci" style="color:var(--red-l)"><span class="dyn-carbon-intensity">—</span></span>
+            </div>
+            <div class="rbd-row">
+              <span class="rbd-label">CBAM 碳价</span>
+              <span class="rbd-val" id="rb-price">€75.36</span>
+            </div>
+            <div class="rbd-row">
+              <span class="rbd-label">置信度溢价</span>
+              <span class="rbd-val" style="color:var(--amber-l)" id="rb-penalty">×1.35</span>
+            </div>
+            <div class="rbd-divider"></div>
+            <div class="rbd-row">
+              <span class="rbd-label" style="font-weight:600">基础税额</span>
+              <span class="rbd-val" id="rb-base" style="color:var(--red-l)">€ 0</span>
+            </div>
+            <div class="rbd-row">
+              <span class="rbd-label" style="font-weight:600;color:var(--red)">含溢价税额</span>
+              <span class="rbd-val" id="rb-total" style="color:var(--red)">€ 0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Compare strip -->
+        <div class="compare-strip">
+          <div class="cs-box" style="background:var(--red-d);border:1px solid rgba(226,75,74,0.2)">
+            <div class="cs-val" style="color:var(--red)" id="cs-now">待测算</div>
+            <div class="cs-label" style="color:rgba(252,165,165,0.7)">当前不处理</div>
+            <div class="cs-note" style="color:rgba(252,165,165,0.5)">Lv.2 惩罚计算</div>
+          </div>
+          <div class="cs-arrow">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
+              <path d="M1 6h13M14 6l-5-4M14 6l-5 4" stroke="var(--ink3)" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="cs-box" style="background:rgba(0,0,0,0.3);border:1px solid var(--border)">
+            <div class="cs-val" style="color:var(--ink2)" id="cs-invest">¥ 22k</div>
+            <div class="cs-label" style="color:var(--ink3)">三项方案投入</div>
+            <div class="cs-note" style="color:var(--ink3)">MAT + ZCP + 供应链</div>
+          </div>
+          <div class="cs-arrow">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
+              <path d="M1 6h13M14 6l-5-4M14 6l-5 4" stroke="var(--ink3)" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="cs-box" style="background:var(--green-d);border:1px solid rgba(59,158,74,0.2)">
+            <div class="cs-val" style="color:var(--green-l)" id="cs-roi">ROI 待测算</div>
+            <div class="cs-label" style="color:rgba(125,217,138,0.7)">优化后净节税</div>
+            <div class="cs-note" style="color:rgba(125,217,138,0.5)" id="cs-save">净节税 ¥364k</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scope breakdown + Year projection -->
+      <div class="g2 mb-14" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-title">排放来源拆解</div>
+          <div class="scope-bars" id="scope-bars">
+            <div class="scope-row">
+              <span class="scope-label">Scope 1<br><span style="font-size:9px">直接燃烧</span></span>
+              <div class="scope-bar-track"><div class="scope-bar-fill" style="width:5%;background:var(--red)" id="bar-s1"></div></div>
+              <span class="scope-val" id="val-s1" style="color:var(--red-l)">0 t</span>
+              <span class="scope-pct" id="pct-s1">5%</span>
+            </div>
+            <div class="scope-row">
+              <span class="scope-label">Scope 2<br><span style="font-size:9px">外购电力</span></span>
+              <div class="scope-bar-track"><div class="scope-bar-fill" style="width:38%;background:var(--amber)" id="bar-s2"></div></div>
+              <span class="scope-val" id="val-s2" style="color:var(--amber-l)">0 t</span>
+              <span class="scope-pct" id="pct-s2">38%</span>
+            </div>
+            <div class="scope-row">
+              <span class="scope-label">Scope 3<br><span style="font-size:9px">供应链上游</span></span>
+              <div class="scope-bar-track"><div class="scope-bar-fill" style="width:57%;background:var(--gold)" id="bar-s3"></div></div>
+              <span class="scope-val" id="val-s3" style="color:var(--gold-l)">0 t</span>
+              <span class="scope-pct" id="pct-s3">57%</span>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:11.5px;color:var(--ink2)">总排放量</span>
+            <span style="font-size:16px;font-weight:700;font-family:'DM Mono',monospace" id="total-emit">0 tCO₂e</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">三年碳税预测</div>
+          <div class="year-proj" id="year-proj">
+            <div class="yp-box">
+              <div class="yp-year">2026</div>
+              <div class="yp-price">碳价 €75.36</div>
+              <div class="yp-bar-wrap"><div class="yp-bar" id="yb-26" style="height:32px;background:var(--red)"></div></div>
+              <div class="yp-val" id="yv-26" style="color:var(--red)">€ 0</div>
+              <div class="yp-label">当前预测</div>
+            </div>
+            <div class="yp-box">
+              <div class="yp-year">2027</div>
+              <div class="yp-price">碳价 €80</div>
+              <div class="yp-bar-wrap"><div class="yp-bar" id="yb-27" style="height:40px;background:var(--red)"></div></div>
+              <div class="yp-val" id="yv-27" style="color:var(--red)">€ 0</div>
+              <div class="yp-label">上升趋势</div>
+            </div>
+            <div class="yp-box">
+              <div class="yp-year">2028</div>
+              <div class="yp-price">碳价 €95</div>
+              <div class="yp-bar-wrap"><div class="yp-bar" id="yb-28" style="height:48px;background:var(--red)"></div></div>
+              <div class="yp-val" id="yv-28" style="color:var(--red)">€ 0</div>
+              <div class="yp-label">高风险</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sensitivity table -->
+      <div class="sensitivity-wrap mb-14" id="sens-wrap" style="margin-bottom:16px">
+        <div class="sv-head">
+          <span class="sv-title">碳价敏感性分析</span>
+          <span class="sv-val" id="sens-current">当前碳价 €75.36</span>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:10px">调整碳价情景，实时查看税负变化</div>
+        <input type="range" min="40" max="150" value="75" id="result-slider" step="5" oninput="updateResultSensitivity(this.value)">
+        <div class="sv-rows" style="margin-top:10px">
+          <div class="sv-col"><div class="sv-price">€40</div><div class="sv-amount" style="color:var(--green-l)" id="rs-40">--</div></div>
+          <div class="sv-col" style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2)">
+            <div class="sv-price" style="color:var(--gold)">€75.36</div><div class="sv-amount" style="color:var(--gold)" id="rs-65">--</div>
+          </div>
+          <div class="sv-col"><div class="sv-price">€80</div><div class="sv-amount" style="color:var(--amber-l)" id="rs-80">--</div></div>
+          <div class="sv-col"><div class="sv-price">€100</div><div class="sv-amount" style="color:var(--red)" id="rs-100">--</div></div>
+        </div>
+      </div>
+
+      <!-- Key insight -->
+      <div class="insight ins-gold" style="margin-bottom:16px">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style="flex-shrink:0;margin-top:1px">
+          <path d="M7.5 1L14 4.5V11.5L7.5 13L1 11.5V4.5L7.5 1Z" stroke="var(--gold-l)" stroke-width="1" fill="var(--gold-d)"/>
+          <line x1="7.5" y1="4.5" x2="7.5" y2="8" stroke="var(--gold-l)" stroke-width="1.1"/>
+          <circle cx="7.5" cy="9.5" r="0.7" fill="var(--gold-l)"/>
+        </svg>
+        <div id="key-insight">以当前个人权限，数据诊断已完成。若要实质性对冲此税务敞口，需要为企业启用 MAT 边缘感知网关与 ZCP 零碳签证。您可一键生成《全域升级报告》，由决策层定夺。</div>
+      </div>
+
+      <!-- Action cards -->
+      <div class="action-grid" style="margin-bottom:16px">
+        <div class="ac-card" style="background:var(--teal-d);border-color:rgba(29,158,117,0.3)" onclick="showSaveModal()">
+          <div class="ac-icon" style="background:rgba(29,158,117,0.2)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="1.5" width="12" height="13" rx="2" stroke="var(--teal-l)" stroke-width="1.1"/><line x1="5" y1="6" x2="11" y2="6" stroke="var(--teal-l)" stroke-width="1"/><line x1="5" y1="8.5" x2="11" y2="8.5" stroke="var(--teal-l)" stroke-width="1"/><line x1="5" y1="11" x2="8" y2="11" stroke="var(--teal-l)" stroke-width="1"/></svg>
+          </div>
+          <div class="ac-title" style="color:var(--teal-l)">保存为企业档案</div>
+          <div class="ac-desc" style="color:rgba(109,213,176,0.7)">将此次测算结果保存为企业碳档案快照，解锁供应链协同功能</div>
+          <div class="ac-arrow" style="color:var(--teal-l)">建立企业档案 →</div>
+        </div>
+        <div class="ac-card" style="background:var(--gold-d);border-color:rgba(201,168,76,0.3)" onclick="genReport()">
+          <div class="ac-icon" style="background:rgba(201,168,76,0.15)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="1.5" width="12" height="13" rx="2" stroke="var(--gold-l)" stroke-width="1.1"/><line x1="5" y1="5.5" x2="11" y2="5.5" stroke="var(--gold-l)" stroke-width="1"/><line x1="5" y1="8" x2="9" y2="8" stroke="var(--gold-l)" stroke-width="1"/><path d="M10 11.5L12 13.5L15 10.5" stroke="var(--gold-l)" stroke-width="1" stroke-linecap="round"/></svg>
+          </div>
+          <div class="ac-title" style="color:var(--gold-l)">生成决策呈送报告</div>
+          <div class="ac-desc" style="color:rgba(240,208,128,0.7)">将测算结果打包为可向老板呈送的 PDF 报告，附 ROI 拆解与升级建议</div>
+          <div class="ac-arrow" style="color:var(--gold-l)">一键生成报告 →</div>
+        </div>
+        <div class="ac-card" style="background:var(--purple-d);border-color:rgba(127,119,221,0.3)" onclick="shareResult()">
+          <div class="ac-icon" style="background:rgba(127,119,221,0.15)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="13" cy="3.5" r="1.7" stroke="var(--purple-l)" stroke-width="1"/><circle cx="3.5" cy="8" r="1.7" stroke="var(--purple-l)" stroke-width="1"/><circle cx="13" cy="12.5" r="1.7" stroke="var(--purple-l)" stroke-width="1"/><line x1="5.1" y1="7.1" x2="11.4" y2="4.4" stroke="var(--purple-l)" stroke-width="0.9"/><line x1="5.1" y1="8.9" x2="11.4" y2="11.6" stroke="var(--purple-l)" stroke-width="0.9"/></svg>
+          </div>
+          <div class="ac-title" style="color:var(--purple-l)">邀请供应商填报</div>
+          <div class="ac-desc" style="color:rgba(196,181,253,0.7)">向供应商发送数据填报邀请，提升供应链穿透率，降低 Scope 3 估算偏差</div>
+          <div class="ac-arrow" style="color:var(--purple-l)">生成邀请链接 →</div>
+        </div>
+      </div>
+
+      <!-- Recalc -->
+      <div style="display:flex;gap:10px">
+        <button class="calc-btn" style="width:auto;padding:9px 20px;font-size:12.5px;background:transparent;border:1px solid var(--border2);color:var(--ink)" onclick="goStep(1)">重新填写</button>
+        <button class="calc-btn" style="flex:1;padding:9px;font-size:12.5px" onclick="showSaveModal()">立即建立企业档案，开启供应链协同 →</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+    </div>
+  </main>
+
+</div>
+
+<!-- Save Modal -->
+<div class="modal-overlay" id="save-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('save-modal').classList.remove('show')">✕</button>
+    <div style="display:flex;align-items:center;gap:11px;margin-bottom:16px">
+      <div style="width:40px;height:40px;border-radius:10px;background:var(--teal-d);border:1px solid rgba(29,158,117,0.3);display:flex;align-items:center;justify-content:center">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4.5" width="14" height="11" rx="2" stroke="var(--teal-l)" stroke-width="1.2"/><path d="M6 4.5V3.5a3 3 0 016 0v1" stroke="var(--teal-l)" stroke-width="1.1"/><polyline points="6,9.5 8.5,12 12.5,8" stroke="var(--teal-l)" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:2px">建立企业数字档案</div>
+        <div style="font-size:11px;color:var(--ink2)">将此次测算保存为企业碳档案起点</div>
+      </div>
+    </div>
+    <div style="background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:16px">
+      <div style="font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">建立后即时解锁</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></div>供应链协同模块（发送穿透卡片）</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px"><div style="width:6px;height:6px;border-radius:50%;background:var(--blue-l);flex-shrink:0"></div>精确碳税敞口诊断报告</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px"><div style="width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0"></div>GreenMark +50 GM 奖励</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px"><div style="width:6px;height:6px;border-radius:50%;background:var(--purple-l);flex-shrink:0"></div>向决策层呈送包生成权限</div>
+      </div>
+    </div>
+    <button class="calc-btn" style="margin-top:0" onclick="confirmSave()">确认建立企业档案 →</button>
+    <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--ink3)">无需额外付费 · 个人会员权益范围内</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div style="position:fixed;bottom:22px;right:22px;background:var(--panel2);border:1px solid rgba(29,158,117,0.4);border-radius:11px;padding:11px 15px;display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--teal-l);z-index:999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;min-width:240px" id="toast">
+  <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><polyline points="2,6.5 5.5,10 11,3.5" stroke="var(--teal-l)" stroke-width="1.4" stroke-linecap="round"/></svg>
+  <span id="toast-msg">操作成功</span>
+</div>
+
+
+
+<script>
+let calcResult = null;
+let currentStep = 1;
+
+function getMacroOracle() {
+  if (typeof window.getMacroOracle === "function") return window.getMacroOracle();
+  const fb = { cbam_current_price: 75.36, eur_cny_rate: 7.85, last_updated: "2026-04-20" };
+  if (!window.AppState) window.AppState = {};
+  if (!window.AppState.macro) window.AppState.macro = { ...fb };
+  return window.AppState.macro;
+}
+
+function syncMacroUi() {
+  if (typeof window.syncMacroUi === "function") {
+    window.syncMacroUi();
+    return;
+  }
+  const macro = getMacroOracle();
+  const price = Number(macro.cbam_current_price) || 75.36;
+  const fx = Number(macro.eur_cny_rate) || 7.85;
+  const p = document.getElementById("f-price");
+  const f = document.getElementById("f-fx");
+  const hp = document.getElementById("h-price");
+  if (p) p.value = price.toFixed(2);
+  if (f) f.value = fx.toFixed(2);
+  if (hp) hp.textContent = `⚡ 实时挂钩 EU ETS 官方牌价：€${price.toFixed(2)}（更新于 ${macro.last_updated || "N/A"}）。高阶用户可直接修改上方数值进行极端情境模拟。`;
+  const slider = document.getElementById("slider-price");
+  if (slider) slider.value = String(Math.round(price));
+  const rSlider = document.getElementById("result-slider");
+  if (rSlider) rSlider.value = String(Math.round(price));
+  const sDisp = document.getElementById("slider-display");
+  if (sDisp) sDisp.textContent = `€${price.toFixed(2)}（当前）`;
+}
+
+function goStep(n) {
+  if (n === 2) {
+    const vol = parseFloat(document.getElementById("f-volume").value);
+    if (!vol || vol <= 0) { showToast("请填写年出口欧盟数量"); return; }
+    if (!document.getElementById("f-product").value) { showToast("请选择产品类别"); return; }
+  }
+  currentStep = n;
+  document.querySelectorAll(".step-section").forEach((s, i) => {
+    s.classList.toggle("active", i + 1 === n);
+  });
+  if (n === 3) previewSensitivity();
+  updateStepIndicator(n);
+  if (window.AppState && typeof window.AppState.updateField === "function") {
+    try { window.AppState.updateField("company.cbamStep", n); } catch (e) {}
+  }
+  const el = document.getElementById("hg-main");
+  if (el) el.scrollTop = 0;
+}
+
+function updateStepIndicator(n) {
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById("sd" + i);
+    const lbl = document.getElementById("sl" + i);
+    if (!dot) continue;
+    if (i < n) {
+      dot.className = "sh-dot sh-done";
+      dot.innerHTML = `<svg width="11" height="9" viewBox="0 0 11 9" fill="none"><polyline points="1,4.5 4,7.5 10,1.5" stroke="#7dd98a" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+      if (lbl) lbl.className = "sh-label done";
+    } else if (i === n) {
+      dot.className = "sh-dot sh-active";
+      dot.textContent = i === 4 ? "★" : String(i);
+      if (lbl) lbl.className = "sh-label active";
+    } else {
+      dot.className = "sh-dot sh-lock";
+      dot.textContent = i === 4 ? "★" : String(i);
+      if (lbl) lbl.className = "sh-label";
+    }
+    const line = document.getElementById("sline" + i);
+    if (line) line.className = "sh-line" + (i < n ? " done" : "");
+  }
+  const sd4 = document.getElementById("sd4");
+  if (sd4) {
+    if (n === 4) {
+      sd4.className = "sh-dot sh-active";
+      sd4.textContent = "★";
+      const sl4 = document.getElementById("sl4");
+      if (sl4) sl4.className = "sh-label active";
+    } else if (n > 4) {
+      sd4.className = "sh-dot sh-done";
+    }
+  }
+}
+
+function updateConfidence() {
+  const mode = document.getElementById("f-mode").value;
+  const c3 = document.getElementById("conf3");
+  const c4 = document.getElementById("conf4");
+  const txt = document.getElementById("conf-text");
+  if (mode === "mat") {
+    c3.style.background = "var(--teal)";
+    c4.style.background = "var(--teal)";
+    txt.style.color = "var(--green-l)";
+    txt.textContent = "Lv.4 · 物理传感器 · 免除惩罚溢价";
+  } else if (mode === "third") {
+    c3.style.background = "var(--blue-l)";
+    c4.style.background = "rgba(255,255,255,0.07)";
+    txt.style.color = "var(--blue-l)";
+    txt.textContent = "Lv.3 · 第三方审计 · 惩罚系数 ×1.15";
+  } else {
+    c3.style.background = "rgba(255,255,255,0.07)";
+    c4.style.background = "rgba(255,255,255,0.07)";
+    txt.style.color = "var(--amber)";
+    txt.textContent = "Lv.2 · 人工凭证 · 惩罚系数 ×1.35";
+  }
+}
+
+function toggleHint(id) {
+  document.getElementById(id).classList.toggle("show");
+}
+
+function previewSensitivity() {
+  const vol = parseFloat(document.getElementById("f-volume").value) || 1920;
+  const elec = parseFloat(document.getElementById("f-elec").value) || 0;
+  const gridFactor = parseFloat(document.getElementById("f-grid").value) || 0.581;
+  const matVol = parseFloat(document.getElementById("f-mat-vol").value) || 480;
+  const matFactor = parseFloat(document.getElementById("f-material").value) || 11.2;
+  const gec = parseFloat(document.getElementById("f-gec").value) || 0;
+  const mode = document.getElementById("f-mode").value;
+  const penalty = mode === "mat" ? 1.0 : mode === "third" ? 1.15 : 1.35;
+  const s2 = (elec - gec) * gridFactor / 1000;
+  const s3 = matVol * matFactor;
+  const totalEmit = (s2 + s3) / vol;
+  const macroPrice = Number(getMacroOracle().cbam_current_price) || 75.36;
+  const prices = [40, macroPrice, 80, 100];
+  const ids = ["sv-40", "sv-65", "sv-80", "sv-100"];
+  prices.forEach((p, i) => {
+    const tax = totalEmit * vol * penalty * p;
+    document.getElementById(ids[i]).textContent = "€" + fmtK(tax);
+  });
+  document.getElementById("slider-display").textContent = "€" + macroPrice.toFixed(2) + "（当前）";
+}
+
+function updateSensitivity(v) {
+  const macro = getMacroOracle();
+  const n = Number(v) || Number(macro.cbam_current_price) || 75.36;
+  if (typeof window.publishMacroSync === "function") {
+    window.publishMacroSync({ cbam_current_price: n });
+  }
+  document.getElementById("f-price").value = n.toFixed(2);
+  document.getElementById("slider-display").textContent = "€" + n.toFixed(2) + "（当前）";
+  previewSensitivity();
+}
+
+function runCalc() {
+  const btn = document.getElementById("final-btn");
+  btn.disabled = true;
+  btn.textContent = "计算中...";
+
+  setTimeout(() => {
+    const vol = parseFloat(document.getElementById("f-volume").value) || 1920;
+    const macro = getMacroOracle();
+    const price = parseFloat(document.getElementById("f-price").value) || Number(macro.cbam_current_price) || 75.36;
+    const fx = parseFloat(document.getElementById("f-fx").value) || Number(macro.eur_cny_rate) || 7.85;
+    if (typeof window.publishMacroSync === "function") {
+      window.publishMacroSync({ cbam_current_price: price, eur_cny_rate: fx });
+    }
+    const mode = document.getElementById("f-mode").value;
+    const penalty = mode === "mat" ? 1.0 : mode === "third" ? 1.15 : 1.35;
+    const gridFactor = parseFloat(document.getElementById("f-grid").value) || 0.581;
+    const elec = parseFloat(document.getElementById("f-elec").value) || 0;
+    const gec = parseFloat(document.getElementById("f-gec").value) || 0;
+    const gas = parseFloat(document.getElementById("f-gas").value) || 0;
+    const coal = parseFloat(document.getElementById("f-coal").value) || 0;
+    const oil = parseFloat(document.getElementById("f-oil").value) || 0;
+    const matVol = parseFloat(document.getElementById("f-mat-vol").value) || 480;
+    const matFactor = parseFloat(document.getElementById("f-material").value) || 11.2;
+    const supTotal = parseFloat(document.getElementById("f-sup-total").value) || 17;
+    const supDone = parseFloat(document.getElementById("f-sup-done").value) || 2;
+
+    const s1 = gas * 0.00202 + coal * 2.66 + oil * 0.00268;
+    const s2 = Math.max(0, (elec - gec) * gridFactor / 1000);
+    const s3 = matVol * matFactor;
+    const totalEmit = s1 + s2 + s3;
+    const ci = totalEmit / vol;
+
+    const baseTax = ci * vol * price;
+    const totalTax = baseTax * penalty;
+    const totalTaxCNY = totalTax * fx;
+
+    const coverage = supDone / supTotal;
+
+    const t27 = ci * vol * penalty * 80;
+    const t28 = ci * vol * penalty * 95;
+
+    calcResult = { vol, price, fx, penalty, s1, s2, s3, totalEmit, ci, baseTax, totalTax, totalTaxCNY, coverage, supDone, supTotal, t27, t28, mode };
+
+    const gmReward = 28;
+    document.getElementById("gm-reward-val").textContent = "+" + gmReward;
+    const gmn = document.getElementById("gm-new-total");
+    if (gmn && window.AppState && window.AppState.user) {
+      gmn.textContent = String(window.AppState.user.gmBalance || 0);
+    }
+
+    goStep(4);
+    renderResults(calcResult);
+    btn.disabled = false;
+    btn.textContent = "立即测算 → 生成碳税诊断";
+
+    setTimeout(() => {
+      document.getElementById("gm-earned").classList.add("show");
+    }, 600);
+  }, 800);
+}
+
+function renderResults(r) {
+  const { vol, price, fx, penalty, s1, s2, s3, totalEmit, ci, baseTax, totalTax, totalTaxCNY, coverage, t27, t28, mode } = r;
+
+  const equiv_trees = Math.round(totalTax / 0.038);
+  const equiv_cars = Math.round(totalEmit / 4.6);
+  document.getElementById("r-equiv").innerHTML =
+    `相当于 <strong style="color:var(--red-l)">${equiv_trees.toLocaleString()} 棵树</strong> 一年固碳量 &nbsp;·&nbsp; 或 <strong style="color:var(--red-l)">${equiv_cars.toLocaleString()} 辆汽车</strong> 行驶一年排放量`;
+
+  document.getElementById("r-badge-ci").textContent = "碳强度 " + ci.toFixed(2) + " t/t";
+  document.getElementById("r-badge-lv").textContent =
+    mode === "mat" ? "Lv.4 · 物理认证 · 无溢价" : mode === "third" ? "Lv.3 · 三方审计 · ×1.15" : "Lv.2 · 人工凭证 · ×1.35";
+  document.getElementById("r-badge-cov").textContent = "供应链覆盖率 " + (coverage * 100).toFixed(0) + "%";
+
+  document.getElementById("rb-vol").textContent = vol.toLocaleString() + " t";
+  document.getElementById("rb-ci").textContent = ci.toFixed(3) + " t/t";
+  document.getElementById("rb-price").textContent = "€" + price;
+  document.getElementById("rb-penalty").textContent = "×" + penalty.toFixed(2);
+  document.getElementById("rb-base").textContent = "€ " + fmtK(baseTax);
+  document.getElementById("rb-total").textContent = "€ " + fmtK(totalTax);
+
+  document.getElementById("cs-now").textContent = "€ " + fmtK(totalTax);
+  const invest = 22000;
+  const netSave = totalTaxCNY - invest;
+  document.getElementById("cs-invest").textContent = "¥ " + fmtK(invest / fx);
+  document.getElementById("cs-roi").textContent = "ROI 1:" + (netSave / invest).toFixed(1);
+  document.getElementById("cs-save").textContent = "净节税 ¥" + fmtK(netSave);
+
+  const total = s1 + s2 + s3 || 1;
+  const p1 = (s1 / total) * 100, p2 = (s2 / total) * 100, p3 = (s3 / total) * 100;
+  document.getElementById("bar-s1").style.width = Math.max(p1, 2) + "%";
+  document.getElementById("bar-s2").style.width = Math.max(p2, 2) + "%";
+  document.getElementById("bar-s3").style.width = Math.max(p3, 2) + "%";
+  document.getElementById("val-s1").textContent = s1.toFixed(1) + " t";
+  document.getElementById("val-s2").textContent = s2.toFixed(1) + " t";
+  document.getElementById("val-s3").textContent = s3.toFixed(1) + " t";
+  document.getElementById("pct-s1").textContent = p1.toFixed(0) + "%";
+  document.getElementById("pct-s2").textContent = p2.toFixed(0) + "%";
+  document.getElementById("pct-s3").textContent = p3.toFixed(0) + "%";
+  document.getElementById("total-emit").textContent = totalEmit.toFixed(1) + " tCO₂e";
+
+  const maxTax = Math.max(totalTax, t27, t28);
+  document.getElementById("yb-26").style.height = Math.max(12, (totalTax / maxTax) * 48) + "px";
+  document.getElementById("yb-27").style.height = Math.max(12, (t27 / maxTax) * 48) + "px";
+  document.getElementById("yb-28").style.height = Math.max(12, (t28 / maxTax) * 48) + "px";
+  document.getElementById("yv-26").textContent = "€ " + fmtK(totalTax);
+  document.getElementById("yv-27").textContent = "€ " + fmtK(t27);
+  document.getElementById("yv-28").textContent = "€ " + fmtK(t28);
+
+  updateResultSensitivity(getMacroOracle().cbam_current_price);
+
+  const insEl = document.getElementById("key-insight");
+  if (mode === "mat") {
+    insEl.innerHTML =
+      '您已选择 MAT 物理传感器申报模式，置信度 Lv.4，<strong style="color:var(--gold-l)">惩罚溢价已消除</strong>。当前税负已是最优状态。建议下一步建立企业档案，推动供应链填报以进一步降低 Scope 3 估算偏差。';
+  } else {
+    insEl.innerHTML =
+      `以当前人工凭证申报方式，每年额外承担 <strong style="color:var(--red-l)">€${fmtK(baseTax * (penalty - 1))}</strong> 惩罚溢价。接驳 MAT 物理网关可立即消除这部分损耗。<strong style="color:var(--gold-l)">一键生成《全域升级报告》，由决策层定夺。</strong>`;
+  }
+
+  const cname = (document.getElementById("f-company") && document.getElementById("f-company").value) || "";
+  const roiRatio = invest > 0 ? netSave / invest : 0;
+  if (typeof window.patchAppState === "function") {
+    window.patchAppState(
+      {
+        company: {
+          name: cname,
+          exportTons: vol,
+          roiRatio: String(roiRatio.toFixed(1)) + "×",
+          netSavings: "¥" + fmtK(netSave),
+          cbamRiskRaw: totalTax,
+        },
+        metrics: {
+          riskExposureEur: totalTax,
+          tCO2eTotal: totalEmit,
+          supplyChainCoverage: coverage,
+          supplierCount: r.supTotal,
+          supplierSubmitted: r.supDone,
+          carbonIntensity: ci,
+          scope1: s1,
+          scope2: s2,
+          scope3: s3,
+        },
+        macro: {
+          cbam_current_price: price,
+          eur_cny_rate: fx,
+          last_updated: getMacroOracle().last_updated,
+        },
+      },
+      {}
+    );
+  } else if (typeof window.syncAppState === "function") {
+    window.syncAppState();
+  }
+}
+
+function updateResultSensitivity(v) {
+  if (!calcResult) return;
+  const { ci, vol, penalty } = calcResult;
+  const macro = getMacroOracle();
+  const current = Number(v) || Number(macro.cbam_current_price) || 75.36;
+  if (typeof window.publishMacroSync === "function") {
+    window.publishMacroSync({ cbam_current_price: current });
+  }
+  document.getElementById("f-price").value = current.toFixed(2);
+  const rs = document.getElementById("result-slider");
+  if (rs) rs.value = String(Math.round(current));
+  document.getElementById("sens-current").textContent = "当前碳价 €" + current.toFixed(2);
+  const prices = [40, current, 80, 100];
+  const ids = ["rs-40", "rs-65", "rs-80", "rs-100"];
+  prices.forEach((p, i) => {
+    const tax = ci * vol * penalty * p;
+    document.getElementById(ids[i]).textContent = "€" + fmtK(tax);
+  });
+}
+
+function fmtK(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + "M";
+  if (n >= 1000) return Math.round(n / 1000) + "k";
+  return Math.round(n).toLocaleString();
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  document.getElementById("toast-msg").textContent = msg;
+  t.style.opacity = "1";
+  t.style.transform = "translateY(0)";
+  setTimeout(() => {
+    t.style.opacity = "0";
+    t.style.transform = "translateY(8px)";
+  }, 2600);
+}
+
+function showSaveModal() {
+  document.getElementById("save-modal").classList.add("show");
+  if (window.AppState && typeof window.AppState.updateField === "function") {
+    try { window.AppState.updateField("company.cbamDraftSaved", true); } catch (e) {}
+  }
+}
+function genReport() {
+  showToast("《全域升级报告》生成中，+15 GM");
+}
+function shareResult() {
+  if (typeof openH5ShareModal === "function") openH5ShareModal();
+  else showToast("供应商邀请链接已生成，可分享至微信");
+}
+
+async function confirmSave() {
+  document.getElementById("save-modal").classList.remove("show");
+  if (!calcResult) {
+    showToast("请先完成测算后再保存到底座");
+    return;
+  }
+  var AS = (window.parent && window.parent.AppState) || window.AppState;
+  if (!AS || typeof AS.commit !== "function") {
+    showToast("AppState.commit 不可用，请从全域中心或首页进入");
+    return;
+  }
+  var d = new Date();
+  var q = Math.floor(d.getMonth() / 3) + 1;
+  var period = d.getFullYear() + "-Q" + q;
+  var payload = {
+    reportingPeriod: period,
+    riskExposureEur: calcResult.totalTax,
+    tco2eTotal: calcResult.totalEmit,
+    payloadJson: JSON.stringify(calcResult),
+  };
+  try {
+    var resp = await AS.commit("cbam", payload);
+    var ge = Number(resp && (resp.gmEarned != null ? resp.gmEarned : resp.gm_earned)) || 0;
+    showToast(ge > 0 ? "测算已写入企业底座 · +" + ge + " GM · 全域已同步" : "测算已写入企业底座 · 全域已同步");
+  } catch (err) {
+    showToast("保存失败：" + (err && err.message ? err.message : err));
+  }
+}
+
+function showHistory() {
+  showToast("历史测算记录：共 1 条（当前）");
+}
+function resetAll() {
+  goStep(1);
+  document.getElementById("gm-earned").classList.remove("show");
+  calcResult = null;
+}
+
+function renderCalcState(state) {
+  if (!state) return;
+  syncMacroUi();
+  const cn = document.getElementById("f-company");
+  if (cn && state.company && state.company.name && !cn.value) cn.value = state.company.name;
+  if (cn && state.company && state.company.name) cn.placeholder = state.company.name;
+  previewSensitivity();
+}
+
+updateConfidence();
+</script>
+
+
+
+<script>
+(function initShell() {
+  const PAGE_SLUG_MAP = {
+    '全域中心.html':'overview','index.html':'overview',
+    'HengAI_星火成就档案.html':'achieve',
+    'HengAI_CBAM测算工具.html':'cbam',
+    'HengAI_算力资源.html':'compute',
+    'HengAI_法规知识库.html':'regulation',
+    'HengAI_企业数字档案.html':'company',
+    'HengAI_供应链协同.html':'supplychain',
+    'HengAI_全域诊断报告.html':'diagnosis',
+    'HengAI_决策层呈送包生成器.html':'package',
+    'HengAI_荣誉体系.html':'honor',
+    'HengAI_Governance.html':'governance',
+    'HengAI_GM_Wallet.html':'wallet',
+    'HengAI_EU_Customs.html':'customs',
+    'HengAI_DLD_Credit.html':'dld',
+    'HengAI_ACF_Cert.html':'acf',
+  };
+  const PAGE_TITLE_MAP = {
+    overview:'全域总览', achieve:'星火成就档案', cbam:'CBAM 测算工具',
+    compute:'算力资源',  regulation:'法规知识库',  company:'企业数字档案',
+    supplychain:'供应链协同', diagnosis:'全域诊断报告', package:'决策层呈送包',
+    honor:'荣誉体系', governance:'共治委员会', wallet:'GM 绿印钱包',
+    customs:'欧盟海关直连', dld:'DLD 绿色信贷', acf:'ACF 大湾区认证',
+  };
+  try {
+    const fn   = decodeURIComponent((location.pathname.split('/').pop()||'').split('?')[0]);
+    const slug = PAGE_SLUG_MAP[fn] || '';
+    const te   = document.getElementById('hg-page-title');
+    if (te && slug) te.textContent = document.body?.dataset?.pageTitle || PAGE_TITLE_MAP[slug] || '全域合规中心';
+    if (slug) {
+      document.querySelectorAll('#hg-sidebar .hg-nav[data-slug]').forEach(el => {
+        el.classList.toggle('active', el.dataset.slug === slug);
+      });
+    }
+  } catch(e){}
+
+  function hookBus() {
+    if (!window.EventBus) return setTimeout(hookBus, 80);
+    EventBus.on('STATE_SYNCED', s => {
+      const ph    = s?.flags?.currentPhase||'Phase1';
+      const badge = document.getElementById('hg-phase-badge');
+      if (badge) {
+        badge.className = 'hg-tb-phase '+(ph==='Phase3'?'ph3':ph==='Phase2'?'ph2':'ph1');
+      }
+      const mb = document.getElementById('hg-mode-badge');
+      if (mb) {
+        const m = s?._mode==='live'?'LIVE':'MOCK';
+        mb.textContent = m;
+        mb.style.background = m==='LIVE'?'rgba(0,229,160,0.15)':'rgba(167,139,250,0.15)';
+        mb.style.color = m==='LIVE'?'var(--accent)':'var(--purple)';
+        mb.style.borderColor = m==='LIVE'?'rgba(0,229,160,0.35)':'rgba(167,139,250,0.35)';
+      }
+    });
+  }
+  hookBus();
+})();
+</script>
+
+
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  window.HengAI = window.HengAI || {};
+  if (!window.HengAI.init) window.HengAI.init = window.initAppState;
+  initAppState(function onReady(state) {
+    renderCalcState(state);
+    document.querySelectorAll('#f-price,#f-fx').forEach(el => {
+      el.addEventListener('change', function () {
+        if (typeof window.publishMacroSync === 'function') {
+          window.publishMacroSync({
+            cbam_current_price: Number(document.getElementById('f-price')?.value),
+            eur_cny_rate: Number(document.getElementById('f-fx')?.value),
+          });
+        }
+      });
+    });
+  });
+});
+</script>
+
+
+<!-- ═══════════════════════════════════════════
+     H5 裂变二维码弹窗 — 核武器派发入口
+═══════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════
+     H5 裂变二维码弹窗 · 客户端 qr-lib.js 渲染 · V2.0 QA
+═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="h5-share-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); z-index:99999; align-items:center; justify-content:center;">
+  <div style="background:#0f1320; border:1px solid #7f77dd; border-radius:16px; padding:24px; width:340px; text-align:center; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(127,119,221,0.25); color:#e6e9f2; font-family:inherit;">
+    <button onclick="document.getElementById('h5-share-modal').style.display='none'" style="position:absolute; top:12px; right:16px; background:none; border:none; color:#8a92a8; font-size:18px; cursor:pointer; line-height:1; font-family:inherit;">✕</button>
+    <div style="font-size:14px; font-weight:bold; color:#e6e9f2; margin-bottom:8px;">邀请供应商完成 CL-IVC 极速填报</div>
+    <div style="font-size:11px; color:#8a92a8; margin-bottom:16px; line-height:1.5;">对方扫码打开移动端安全页面，BOM 数据保留本地，仅向您反馈最终碳强度。</div>
+    <div id="h5-qr-container" style="width:160px; height:160px; background:#fff; border-radius:12px; margin:0 auto 16px; display:flex; align-items:center; justify-content:center; border:4px solid #7f77dd; overflow:hidden; padding:4px;"><div style="font-size:10px;color:#444">加载中...</div></div>
+    <div id="h5-invite-url" style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; font-size:11px; color:#93c5fd; word-break:break-all; margin-bottom:10px; font-family:ui-monospace,Consolas,monospace;">…</div>
+    <div id="h5-invite-tip" style="font-size:10px; color:#f0c96b; margin-bottom:14px; line-height:1.5; display:none; text-align:left; background:rgba(240,201,107,0.08); border:1px solid rgba(240,201,107,0.25); border-radius:6px; padding:8px 10px;"></div>
+    <button id="h5-copy-btn" style="width:100%; background:#7f77dd; color:#fff; border:none; border-radius:8px; padding:11px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s;" onmouseenter="this.style.transform='translateY(-1px)'" onmouseleave="this.style.transform='translateY(0)'" onclick="copyH5InviteLink()">复制专属邀请链接</button>
+  </div>
+</div>
+<script src="qr-lib.js"></script>
+<script>
+(function(){
+  function buildInviteUrl(){
+    var loc = window.location;
+    var base = loc.href;
+    try {
+      if (window.parent && window.parent !== window && window.parent.location && window.parent.location.origin === loc.origin) {
+        base = window.parent.location.href;
+      }
+    } catch(e) {}
+    var hashIdx = base.indexOf('#'); if (hashIdx >= 0) base = base.substring(0, hashIdx);
+    var qIdx = base.indexOf('?'); if (qIdx >= 0) base = base.substring(0, qIdx);
+    var slashIdx = base.lastIndexOf('/');
+    if (slashIdx >= 0) base = base.substring(0, slashIdx + 1);
+    var inviteId = 'WL' + Date.now().toString(36).slice(-5).toUpperCase();
+    return { url: base + 'HengAI_Supplier_H5.html?invite_id=' + inviteId, isFile: loc.protocol === 'file:' };
+  }
+  function renderQR(container, url){
+    container.innerHTML = '';
+    if (typeof qrcode !== 'function') {
+      container.innerHTML = '<div style="padding:12px;font-size:10px;color:#444;text-align:center;line-height:1.5;">QR 库未加载<br/>请用链接手动分享</div>';
+      return;
+    }
+    try {
+      var qr = qrcode(0, 'M');
+      qr.addData(url);
+      qr.make();
+      // 使用 SVG 而非 img，完全本地化渲染
+      var cellSize = 4, margin = 0;
+      container.innerHTML = qr.createSvgTag({cellSize: cellSize, margin: margin, scalable: true});
+      var svg = container.querySelector('svg');
+      if (svg) { svg.setAttribute('width', '148'); svg.setAttribute('height', '148'); svg.style.display = 'block'; }
+    } catch(e) {
+      container.innerHTML = '<div style="padding:12px;font-size:10px;color:#b00;text-align:center;line-height:1.5;">二维码生成失败<br/>'+ (e && e.message ? e.message : '') +'</div>';
+    }
+  }
+  window.openH5ShareModal = function(){
+    var modal = document.getElementById('h5-share-modal');
+    if (!modal) return;
+    var info = buildInviteUrl();
+    var container = document.getElementById('h5-qr-container');
+    if (container) renderQR(container, info.url);
+    var linkEl = document.getElementById('h5-invite-url');
+    if (linkEl) linkEl.textContent = info.url;
+    var tipEl = document.getElementById('h5-invite-tip');
+    if (tipEl){
+      if (info.isFile){
+        tipEl.innerHTML = '⚠️ 当前为 <code style="color:#7f77dd">file://</code> 模式，手机扫码后无法访问本地文件。<br/>请在项目目录运行 <code style="color:#7f77dd;background:rgba(127,119,221,0.1);padding:1px 4px;border-radius:3px;">python -m http.server 8000</code>，再用 <code style="color:#7f77dd">http://局域网IP:8000</code> 访问本站。';
+        tipEl.style.display = 'block';
+      } else {
+        tipEl.style.display = 'none';
+      }
+    }
+    modal.style.display = 'flex';
+  };
+  window.copyH5InviteLink = function(){
+    var linkEl = document.getElementById('h5-invite-url');
+    var url = linkEl ? linkEl.textContent : '';
+    if (!url || url === '…') return;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).then(
+        function(){ alert('✓ 链接已复制！请发送给供应商。'); },
+        function(){ window.prompt('请手动复制链接：', url); }
+      );
+    } else {
+      window.prompt('请手动复制链接：', url);
+    }
+  };
+})();
+</script>
+<!-- ═════════ END H5 MODAL ═════════ -->
+
+</body>
+</html>
+
+</body>
+</html>

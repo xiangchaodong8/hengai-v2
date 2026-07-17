@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · 本地 UI 预览台</title>
+<script src="hengai-dev-preview.js"></script>
+<script src="hengai-embed-boot.js"></script>
+<style>
+:root{--bg:#06080f;--card:rgba(255,255,255,.04);--border:rgba(255,255,255,.1);--ink:#e2e8f4;--ink2:#8896aa;--ink3:#5c6b82;--teal:#14b8a6;--gold:#c9a84c;--orange:#f97316}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:var(--bg);color:var(--ink);font-family:"Noto Sans SC",system-ui,sans-serif;font-size:14px;line-height:1.6;padding:28px 20px 48px}
+.wrap{max-width:920px;margin:0 auto}
+h1{font-size:22px;font-weight:700;margin-bottom:6px}
+.lead{color:var(--ink2);font-size:13px;margin-bottom:20px;max-width:720px}
+.warn{padding:10px 14px;border-radius:10px;border:1px solid rgba(249,115,22,.35);background:rgba(249,115,22,.1);color:#fdba74;font-size:12px;margin-bottom:22px}
+section{margin-bottom:24px}
+.sec-title{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+a.card{display:block;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:inherit;text-decoration:none;transition:border-color .15s,transform .12s}
+a.card:hover{border-color:rgba(20,184,166,.45);transform:translateY(-1px)}
+.card-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.card-sub{font-size:11px;color:var(--ink3);line-height:1.5}
+.card-tag{display:inline-block;margin-top:8px;font-size:10px;padding:2px 8px;border-radius:999px;background:rgba(20,184,166,.12);color:var(--teal)}
+code{font-family:"DM Mono",monospace;font-size:11px;color:#93c5fd}
+.steps{font-size:12px;color:var(--ink2);padding-left:18px}
+.steps li{margin-bottom:6px}
+.foot{margin-top:28px;font-size:11px;color:var(--ink3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>本地 UI 预览台</h1>
+  <p class="lead">供前端改样式、调交互使用。所有链接自动带 <code>?dev=1</code>，注入演示用 AppState，并<strong>跳过产业主权看板的原厂角色拦截</strong>。</p>
+  <div class="warn">须通过 HTTP 打开（不要用 file:// 双击 HTML）。改代码后请强制刷新（Ctrl+F5）。</div>
+
+  <section>
+    <div class="sec-title">启动本地服务（二选一）</div>
+    <ol class="steps">
+      <li><strong>Docker 全栈</strong>：项目根目录 <code>cd frontend &amp;&amp; npm run docker:go-live</code> → 打开 <code>http://127.0.0.1:8000/static/HengAI_本地UI预览台.html</code></li>
+      <li><strong>仅静态</strong>：<code>cd frontend</code> 后执行 <code>python -m http.server 8080</code> → 打开 <code>http://127.0.0.1:8080/HengAI_本地UI预览台.html</code></li>
+    </ol>
+  </section>
+
+  <section>
+    <div class="sec-title">产业主权看板 · 场景</div>
+    <div class="grid" id="grid-origin"></div>
+  </section>
+
+  <section>
+    <div class="sec-title">原厂因子精算 · VO 布局草稿（隔离页）</div>
+    <div class="grid" id="grid-vo-draft"></div>
+  </section>
+
+  <section>
+    <div class="sec-title">其他模块（原厂工作流）</div>
+    <div class="grid" id="grid-modules"></div>
+  </section>
+
+  <section>
+    <div class="sec-title">全域中心嵌入预览</div>
+    <div class="grid" id="grid-embed"></div>
+  </section>
+
+  <p class="foot">详细说明见 <code>docs/本地UI预览与开发调试.md</code> · 手动加参：<code>?dev=1&amp;scenario=origin-pending</code></p>
+</div>
+<script>
+(function () {
+  var scenarios = [
+    { id: 'origin-preview', file: 'HengAI_HeavyIndustry_Suite.html', title: '预览模式（未认领）', sub: '驾驶舱 + 认领引导横幅' },
+    { id: 'origin-pending', file: 'HengAI_HeavyIndustry_Suite.html', title: '审核中', sub: '主权档案弹窗 · 待人工审核' },
+    { id: 'origin-approved', file: 'HengAI_HeavyIndustry_Suite.html', title: '已通过', sub: '完整执行总览 · 已有碳强度' },
+    { id: 'origin-rejected', file: 'HengAI_HeavyIndustry_Suite.html', title: '认领驳回', sub: '重新提交认领向导' },
+    { id: 'sme', file: 'HengAI_HeavyIndustry_Suite.html', title: '下游 SME（对比）', sub: '正常模式会拦截；dev=1 仍可看 UI' },
+  ];
+  var voDraft = [
+    { file: 'HengAI_工业原厂精算.vo-draft.html', scenario: 'origin-preview', title: 'VO 草稿 · 全域壳层', sub: '左菜单 + 右内容区 · 7:5 矩阵|结果 · embed 试嵌' },
+    { file: 'HengAI_工业原厂精算.vo-draft.html', scenario: 'origin-preview', title: 'VO 草稿 embed', sub: '全域中心 iframe 试嵌', extra: 'embed=1' },
+    { file: 'HengAI_工业原厂精算.html', scenario: 'origin-preview', title: '现网 · 原厂因子精算', sub: '对比用 · 当前生产布局' },
+  ];
+  var modules = [
+    { file: 'HengAI_工业原厂精算.html', scenario: 'origin-preview', title: '原厂因子精算', sub: '工序矩阵 · 入池 · 精算结果' },
+    { file: 'HengAI_供应链协同.html', scenario: 'sme', title: '供应链协同', sub: '下游视角 · 共振与穿透卡片' },
+    { file: 'HengAI_核验.html', scenario: 'origin-approved', title: '产业链核验', sub: '批次签发流' },
+    { file: 'HengAI_CBAM测算工具.html', scenario: 'sme', title: 'CBAM 测算工具', sub: '粗测与认领入口' },
+    { file: '全域中心.html', scenario: 'origin-preview', title: '全域中心（整站）', sub: '侧栏 + 多页 iframe' },
+  ];
+  var embeds = [
+    { file: 'HengAI_HeavyIndustry_Suite.html', scenario: 'origin-pending', title: '产业主权看板 embed', extra: 'embed=1' },
+    { file: 'HengAI_工业原厂精算.html', scenario: 'origin-preview', title: '原厂因子精算 embed', extra: 'embed=1' },
+    { file: 'HengAI_供应链协同.html', scenario: 'sme', title: '供应链 embed', extra: 'embed=1' },
+  ];
+
+  function link(file, scenario, extra) {
+    var q = ['dev=1'];
+    if (scenario) q.push('scenario=' + encodeURIComponent(scenario));
+    if (extra) q.push(extra);
+    return file + '?' + q.join('&');
+  }
+
+  function card(item, useScenario) {
+    var href = link(item.file, useScenario ? item.id : item.scenario, item.extra);
+    return '<a class="card" href="' + href + '" target="_blank" rel="noopener">'
+      + '<div class="card-title">' + item.title + '</div>'
+      + '<div class="card-sub">' + item.sub + '</div>'
+      + '<span class="card-tag">' + (useScenario ? item.id : (item.scenario || 'dev')) + '</span></a>';
+  }
+
+  document.getElementById('grid-origin').innerHTML = scenarios.map(function (s) { return card(s, true); }).join('');
+  document.getElementById('grid-vo-draft').innerHTML = voDraft.map(function (m) { return card(m, false); }).join('');
+  document.getElementById('grid-modules').innerHTML = modules.map(function (m) { return card(m, false); }).join('');
+  document.getElementById('grid-embed').innerHTML = embeds.map(function (e) { return card(e, false); }).join('');
+})();
+</script>
+</body>
+</html>

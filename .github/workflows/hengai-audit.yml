@@ -1,0 +1,46 @@
+name: HengAI Preflight CI
+
+on:
+  push:
+    paths:
+      - 'frontend/**'
+      - 'backend/hub_engine.py'
+      - 'backend/chat.py'
+      - 'backend/tests/**'
+      - 'docs/**'
+      - 'docker-compose.yml'
+      - 'backend/Dockerfile'
+      - '.github/workflows/hengai-audit.yml'
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - 'backend/hub_engine.py'
+      - 'backend/chat.py'
+      - 'backend/tests/**'
+      - 'docs/**'
+      - 'docker-compose.yml'
+      - 'backend/Dockerfile'
+
+jobs:
+  placeholder-audit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preflight (audit + contract + E2E + backend unittest)
+        run: npm run preflight
+        env:
+          CI: 'true'
+          SKIP_BROWSER: '1'
+      - name: Sync static_dist from frontend
+        run: npm run sync:dist
+      - name: Verify static_dist AppState in sync
+        run: node -e "const fs=require('fs');const a=fs.readFileSync('AppState.js','utf8');const b=fs.readFileSync('../static_dist/AppState.js','utf8');if(a!==b){console.error('static_dist stale');process.exit(1)}console.log('static_dist OK')"

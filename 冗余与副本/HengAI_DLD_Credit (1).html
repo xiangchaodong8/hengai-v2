@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · DLD 绿色信贷确权</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+:root{--night:#06080f;--dark:#0a0e1a;--panel:#0d1220;--p2:#111827;--b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);--ink:#e8edf5;--ink2:#8a95a8;--ink3:#4a5568;--gold:#c9a84c;--gl:#f0d080;--gd:rgba(201,168,76,0.11);--green:#3b9e4a;--greenl:#7dd98a;--greend:rgba(59,158,74,0.1);--teal:#1d9e75;--teall:#6dd5b0;--teald:rgba(29,158,117,0.09);--blue:#185fa5;--bluel:#93c5fd;--blued:rgba(24,95,165,0.1);--red:#e24b4a;--redl:#fca5a5;--redd:rgba(226,75,74,0.09);--purple:#7f77dd;--purpl:#c4b5fd;--purpd:rgba(127,119,221,0.09);}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--night);color:var(--ink);font-family:'Noto Sans SC',sans-serif;font-size:13px;line-height:1.6;min-height:100vh}
+.sb{width:200px;background:var(--dark);border-right:1px solid var(--b);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50}
+.sb-logo{padding:15px 14px 12px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:9px}
+.sb-li{width:28px;height:28px;border-radius:7px;background:var(--greend);border:1px solid rgba(59,158,74,0.35);display:flex;align-items:center;justify-content:center}
+.sb-tx{font-size:13px;font-weight:700}.sb-sub{font-size:9px;color:var(--ink3);margin-top:1px}
+.nav-s{padding:10px 13px 4px;font-size:9px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;font-weight:600}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 13px;font-size:12px;color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all 0.15s}
+.ni:hover{color:var(--ink);background:rgba(255,255,255,0.04)}
+.ni.on{color:var(--ink);background:rgba(255,255,255,0.06);border-left-color:var(--greenl)}
+.nd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-ft{margin-top:auto;padding:11px 13px;border-top:1px solid var(--b)}
+.u-av{width:28px;height:28px;border-radius:50%;background:var(--teald);border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--teall);flex-shrink:0}
+.main{margin-left:200px}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(6,8,15,0.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--b);padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.tl{display:flex;align-items:center;gap:10px}
+.tt{font-size:14px;font-weight:500}
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.pl-g{background:var(--greend);color:var(--greenl);border:1px solid rgba(59,158,74,0.3)}
+.pl-b{background:var(--blued);color:var(--bluel);border:1px solid rgba(24,95,165,0.3)}
+.pl-t{background:var(--teald);color:var(--teall);border:1px solid rgba(29,158,117,0.3)}
+.pl-y{background:var(--gd);color:var(--gl);border:1px solid rgba(201,168,76,0.3)}
+.pl-gray{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--b)}
+.tr{display:flex;align-items:center;gap:8px}
+.tb-btn{padding:5px 13px;border-radius:7px;font-size:11.5px;font-weight:500;border:1px solid var(--b2);background:transparent;color:var(--ink);cursor:pointer;font-family:inherit;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.07)}
+.tb-btn.pri{background:var(--greend);border-color:rgba(59,158,74,0.45);color:var(--greenl)}
+.page{padding:24px 28px 72px;max-width:1060px}
+.card{background:var(--panel);border:1px solid var(--b);border-radius:14px;padding:18px 20px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.div{border:none;border-top:1px solid var(--b);margin:14px 0}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-t{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.1px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sh-line{flex:1;height:1px;background:var(--b)}
+.sh-a{font-size:11px;color:var(--teall);cursor:pointer;white-space:nowrap}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu 0.4s ease both}
+.fu1{animation-delay:.05s}.fu2{animation-delay:.12s}.fu3{animation-delay:.18s}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--p2);border:1px solid rgba(29,158,117,0.4);border-radius:11px;padding:11px 16px;display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--teall);z-index:9999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;min-width:240px}
+
+/* DLD specific */
+.asset-hero{background:var(--panel);border:1px solid rgba(59,158,74,0.28);border-radius:16px;padding:0;overflow:hidden;margin-bottom:18px;position:relative}
+.asset-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,158,74,0.6),rgba(29,158,117,0.5),transparent)}
+.ah-inner{padding:22px 26px;background:linear-gradient(135deg,rgba(59,158,74,0.07) 0%,transparent 60%)}
+.ah-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--b);border-top:1px solid var(--b)}
+.ahk{background:rgba(8,12,22,0.95);padding:13px 16px;text-align:center}
+.ahk-v{font-family:'DM Mono',monospace;font-size:19px;font-weight:700;letter-spacing:-0.5px;line-height:1;margin-bottom:3px}
+.ahk-l{font-size:10px;color:var(--ink3)}
+.ahk-s{font-size:9.5px;font-weight:600;margin-top:3px}
+
+/* Credit cards */
+.credit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.credit-card{border-radius:13px;padding:16px 16px;border:1px solid;position:relative;overflow:hidden}
+.credit-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.cc-tag{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.cc-val{font-family:'DM Mono',monospace;font-size:26px;font-weight:700;letter-spacing:-1px;line-height:1;margin-bottom:3px}
+.cc-unit{font-size:11px;font-weight:400;margin-left:2px}
+.cc-label{font-size:11px;margin-bottom:10px}
+.cc-bar-track{height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;margin-bottom:6px}
+.cc-bar-fill{height:100%;border-radius:3px}
+.cc-sub{font-size:10px;opacity:0.6}
+
+/* Asset table */
+.asset-table{width:100%;border-collapse:collapse}
+.asset-table th{font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;border-bottom:1px solid var(--b);text-align:left}
+.asset-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12.5px;vertical-align:middle}
+.asset-table tr:last-child td{border-bottom:none}
+.asset-table tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* Apply form */
+.apply-card{background:var(--greend);border:1px solid rgba(59,158,74,0.25);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden}
+.apply-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,158,74,0.6),transparent)}
+.f-group{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+.f-label{font-size:11.5px;font-weight:500;color:var(--ink)}
+.f-input{background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;transition:border-color 0.2s;width:100%}
+.f-input:focus{border-color:rgba(59,158,74,0.5)}
+.f-select{background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;width:100%;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%234a5568' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.apply-btn{width:100%;padding:12px;border-radius:10px;font-size:13px;font-weight:600;border:1px solid rgba(59,158,74,0.5);cursor:pointer;font-family:inherit;background:rgba(59,158,74,0.2);color:var(--greenl);transition:all 0.2s;margin-top:4px}
+.apply-btn:hover{background:rgba(59,158,74,0.3)}
+</style>
+</head>
+<body>
+<div class="sb">
+  <div class="sb-logo"><div class="sb-li"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L13 4.5V10.5L7 13L1 10.5V4.5L7 1Z" stroke="#3b9e4a" stroke-width="1.1" fill="rgba(59,158,74,0.15)"/><polyline points="4.5,7 6.5,9.5 10,5.5" stroke="#7dd98a" stroke-width="1.2" stroke-linecap="round"/></svg></div><div><div class="sb-tx">HengAI</div><div class="sb-sub">全域合规中心</div></div></div>
+  <div class="nav-s">生态枢纽</div>
+  <div class="ni"><div class="nd" style="background:var(--bluel)"></div>欧盟海关直连</div>
+  <div class="ni on"><div class="nd" style="background:var(--greenl)"></div>DLD 绿色信贷</div>
+  <div class="ni"><div class="nd" style="background:var(--purpl)"></div>生态共治委员会</div>
+  <div class="nav-s">工作台</div>
+  <div class="ni"><div class="nd" style="background:var(--teal)"></div>全域总览</div>
+  <div class="ni"><div class="nd" style="background:var(--gold)"></div>企业数字档案</div>
+  <div class="sb-ft"><div style="display:flex;align-items:center;gap:8px"><div class="u-av">王L</div><div><div style="font-size:12px;font-weight:500">王磊</div><div style="font-size:10px;color:var(--ink3)">Lv.5 生态领袖</div></div></div></div>
+</div>
+
+<div class="main">
+<div class="topbar">
+  <div class="tl">
+    <span class="tt">DLD · 碳资产绿色信贷确权</span>
+    <span class="pill pl-g">碳资产已确权</span>
+    <span class="pill pl-y">信贷额度 ¥ 280万</span>
+  </div>
+  <div class="tr">
+    <button class="tb-btn" onclick="showToast('信贷申请记录已打开')">申请记录</button>
+    <button class="tb-btn pri" onclick="showToast('新建绿色信贷申请已打开')">申请绿色信贷 →</button>
+  </div>
+</div>
+
+<div class="page">
+  <!-- ASSET HERO -->
+  <div class="asset-hero fu fu1">
+    <div class="ah-inner">
+      <div style="font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--greenl);margin-bottom:8px">DLD · Digital Low-carbon Data</div>
+      <div style="font-size:18px;font-weight:600;margin-bottom:6px">碳减排资产已通过 DLD 确权，可用于申请绿色信贷优惠</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.75;max-width:600px;margin-bottom:14px">Co2Lion 链上存证的真实减排数据，经 DLD（数字低碳数据）机构认定后，可向合作金融机构申请绿色信贷优惠利率和专项授信额度。这不是补贴，是你用真实减排行动换来的金融议价权。</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <span class="pill pl-g">142 tCO₂e 已确权</span>
+        <span class="pill pl-t">CL-IVC 链上可核验</span>
+        <span class="pill pl-y">3 家银行已接受数据</span>
+      </div>
+    </div>
+    <div class="ah-kpis">
+      <div class="ahk"><div class="ahk-v" style="color:var(--greenl)">¥ 280万</div><div class="ahk-l">绿色信贷额度</div><div class="ahk-s" style="color:var(--greenl)">已授信</div></div>
+      <div class="ahk"><div class="ahk-v" style="color:var(--teall)">-0.45%</div><div class="ahk-l">利率优惠</div><div class="ahk-s" style="color:var(--teall)">较基准利率</div></div>
+      <div class="ahk"><div class="ahk-v" style="color:var(--gold)">¥ 12,600</div><div class="ahk-l">年利息节省</div><div class="ahk-s" style="color:var(--gold)">280万 × 0.45%</div></div>
+      <div class="ahk"><div class="ahk-v" style="color:var(--bluel)">3</div><div class="ahk-l">合作金融机构</div><div class="ahk-s" style="color:var(--bluel)">工行 · 建行 · 绿色银行</div></div>
+    </div>
+  </div>
+
+  <!-- CREDIT CARDS -->
+  <div class="sh fu fu2"><div class="sh-t">碳资产信贷额度 <div class="sh-line"></div></div></div>
+  <div class="credit-grid fu fu2">
+    <div class="credit-card" style="background:rgba(59,158,74,0.07);border-color:rgba(59,158,74,0.3)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--green)"></div>
+      <div class="cc-tag" style="color:var(--greenl)">中国工商银行</div>
+      <div class="cc-val" style="color:var(--greenl)">¥ 120<span class="cc-unit" style="color:var(--ink2)">万</span></div>
+      <div class="cc-label" style="color:rgba(125,217,138,0.7)">绿色流动资金贷款</div>
+      <div class="cc-bar-track"><div class="cc-bar-fill" style="width:0%;background:var(--green)"></div></div>
+      <div class="cc-sub" style="color:var(--greenl)">已授信 · 未使用 · 利率 LPR-0.45%</div>
+      <button style="width:100%;margin-top:10px;padding:7px;border-radius:8px;background:rgba(59,158,74,0.15);border:1px solid rgba(59,158,74,0.35);color:var(--greenl);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit" onclick="showToast('工行绿色信贷申请通道已打开')">立即申请 →</button>
+    </div>
+    <div class="credit-card" style="background:rgba(24,95,165,0.07);border-color:rgba(24,95,165,0.28)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--bluel)"></div>
+      <div class="cc-tag" style="color:var(--bluel)">中国建设银行</div>
+      <div class="cc-val" style="color:var(--bluel)">¥ 100<span class="cc-unit" style="color:var(--ink2)">万</span></div>
+      <div class="cc-label" style="color:rgba(147,197,253,0.7)">绿色设备融资</div>
+      <div class="cc-bar-track"><div class="cc-bar-fill" style="width:42%;background:var(--blue)"></div></div>
+      <div class="cc-sub" style="color:var(--bluel)">已使用 ¥42万 · 余 ¥58万</div>
+      <button style="width:100%;margin-top:10px;padding:7px;border-radius:8px;background:rgba(24,95,165,0.13);border:1px solid rgba(24,95,165,0.3);color:var(--bluel);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit" onclick="showToast('建行账单明细已打开')">查看明细 →</button>
+    </div>
+    <div class="credit-card" style="background:rgba(29,158,117,0.07);border-color:rgba(29,158,117,0.28)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--teal)"></div>
+      <div class="cc-tag" style="color:var(--teall)">绿色发展银行</div>
+      <div class="cc-val" style="color:var(--teall)">¥ 60<span class="cc-unit" style="color:var(--ink2)">万</span></div>
+      <div class="cc-label" style="color:rgba(109,213,176,0.7)">碳减排专项信贷</div>
+      <div class="cc-bar-track"><div class="cc-bar-fill" style="width:100%;background:var(--teal)"></div></div>
+      <div class="cc-sub" style="color:var(--teall)">已足额使用 · 还款中</div>
+      <button style="width:100%;margin-top:10px;padding:7px;border-radius:8px;background:rgba(29,158,117,0.12);border:1px solid rgba(29,158,117,0.28);color:var(--teall);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit" onclick="showToast('还款计划已打开')">还款计划 →</button>
+    </div>
+  </div>
+
+  <!-- DLD TABS -->
+  <div style="display:flex;gap:0;border-bottom:1px solid var(--b);margin-bottom:18px" class="fu fu2">
+    <div id="dtab-credit" onclick="switchDTab('credit')" style="padding:10px 18px;font-size:12.5px;font-weight:500;cursor:pointer;color:var(--ink);border-bottom:2px solid var(--greenl);transition:all 0.18s">绿色信贷确权</div>
+    <div id="dtab-pledge" onclick="switchDTab('pledge')" style="padding:10px 18px;font-size:12.5px;font-weight:500;cursor:pointer;color:var(--ink2);border-bottom:2px solid transparent;transition:all 0.18s">GEC 质押快贷</div>
+    <div id="dtab-gec" onclick="switchDTab('gec')" style="padding:10px 18px;font-size:12.5px;font-weight:500;cursor:pointer;color:var(--ink2);border-bottom:2px solid transparent;transition:all 0.18s">GEC 集采撮合</div>
+  </div>
+
+  <!-- GEC PLEDGE TAB -->
+  <div id="dview-pledge" style="display:none;margin-bottom:18px">
+    <div style="background:var(--panel);border:1px solid rgba(201,168,76,0.28);border-radius:14px;padding:20px 22px;margin-bottom:14px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.6),transparent)"></div>
+      <div style="font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">GEC 质押快贷 · 碳资产保理升级</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">GEC 变成了硬通货——用它来融资</div>
+      <div style="font-size:11.5px;color:var(--ink2);line-height:1.75;margin-bottom:14px">欧盟认可 GEC 后，GEC 成为出口刚需，银行开始接受 GEC 质押。Co2Lion 系统在链上锁定 GEC 的外贸用途（防止重复质押），生成银行可识别的质押凭证，帮助你用碳资产换取流动资金。<strong style="color:var(--gl)">质押期间 GEC 仍可用于 CBAM 申报</strong>——银行融资的是你未来的税务节省现金流，不是 GEC 本身。</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <div style="padding:11px 14px;background:rgba(0,0,0,0.25);border:1px solid var(--b);border-radius:10px;text-align:center"><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:3px">24,000</div><div style="font-size:10px;color:var(--ink3)">GEC 持仓 (kWh)</div></div>
+        <div style="padding:11px 14px;background:rgba(0,0,0,0.25);border:1px solid var(--b);border-radius:10px;text-align:center"><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--greenl);line-height:1;margin-bottom:3px">¥ 2.16</div><div style="font-size:10px;color:var(--ink3)">当前 GEC 均价 /kWh</div></div>
+        <div style="padding:11px 14px;background:rgba(0,0,0,0.25);border:1px solid var(--b);border-radius:10px;text-align:center"><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--bluel);line-height:1;margin-bottom:3px">¥ 5.18万</div><div style="font-size:10px;color:var(--ink3)">估算质押总价值</div></div>
+        <div style="padding:11px 14px;background:rgba(0,0,0,0.25);border:1px solid var(--b);border-radius:10px;text-align:center"><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--purpl);line-height:1;margin-bottom:3px">70%</div><div style="font-size:10px;color:var(--ink3)">质押率（银行认定）</div></div>
+      </div>
+    </div>
+
+    <div class="g2">
+      <div style="background:var(--panel);border:1px solid var(--b);border-radius:14px;padding:16px 18px">
+        <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">发起质押申请</div>
+        <div class="f-group"><div class="f-label">质押 GEC 数量（kWh）</div><input class="f-input" type="number" value="18000" id="pledge-qty" oninput="calcPledge()"><div style="font-size:10.5px;color:var(--ink3);margin-top:3px">可质押上限：24,000 kWh（已预留申报用量）</div></div>
+        <div class="f-group"><div class="f-label">质押期限</div>
+          <select style="background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;width:100%;appearance:none">
+            <option>3 个月</option><option>6 个月</option><option selected>12 个月</option>
+          </select>
+        </div>
+        <div class="f-group"><div class="f-label">合作银行</div>
+          <select style="background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;width:100%;appearance:none">
+            <option>中国工商银行 · 绿色金融部</option><option>兴业银行 · 碳金融专项</option><option>广发银行 · GEC质押通道</option>
+          </select>
+        </div>
+        <div style="padding:11px 14px;background:rgba(59,158,74,0.07);border:1px solid rgba(59,158,74,0.2);border-radius:9px;margin-bottom:12px">
+          <div style="font-size:10px;color:var(--greenl);font-weight:600;margin-bottom:5px">预计融资方案</div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--ink2)">GEC 质押价值</span><span style="font-family:'DM Mono',monospace;color:var(--ink)" id="p-val">¥ 38,880</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--ink2)">融资额度（70%）</span><span style="font-family:'DM Mono',monospace;color:var(--greenl);font-weight:700" id="p-loan">¥ 27,216</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--ink2)">年化利率</span><span style="font-family:'DM Mono',monospace;color:var(--gold)">LPR-0.6% = 2.85%</span></div>
+        </div>
+        <button style="width:100%;padding:11px;border-radius:10px;font-size:13px;font-weight:600;border:1px solid rgba(201,168,76,0.4);cursor:pointer;font-family:inherit;background:var(--gd);color:var(--gl);transition:all 0.2s" onclick="showToast('GEC 质押凭证已生成 · 链上锁定 · 银行审核预计 2 小时')">生成质押凭证 · 提交银行 →</button>
+      </div>
+      <div>
+        <div style="background:var(--panel);border:1px solid var(--b);border-radius:14px;padding:16px 18px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">在途质押记录</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="padding:9px 12px;background:rgba(0,0,0,0.2);border:1px solid var(--b);border-radius:9px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span style="font-weight:500">GEC-PLEDGE-0412</span><span class="pill" style="background:var(--blued);color:var(--bluel);border:1px solid rgba(24,95,165,0.3);font-size:9px">审核中</span></div>
+              <div style="font-size:11px;color:var(--ink2)">6,000 kWh · ¥12,960 · 工行 · 质押至 2027-04</div>
+              <div style="font-size:10.5px;color:var(--greenl);margin-top:3px">CBAM 申报功能不受影响 ✓</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:12px 14px;background:rgba(127,119,221,0.06);border:1px solid rgba(127,119,221,0.2);border-radius:10px;font-size:11.5px;color:var(--purpl);line-height:1.75">
+          <strong>重要说明：</strong>GEC 质押期间，Co2Lion 系统在链上标记其外贸用途，防止重复质押或重复抵税。你仍可正常使用 GEC 进行 CBAM 申报——银行融资的是你<strong>未来税务节省的现金流</strong>，不是 GEC 的物理交割权。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GEC MARKET TAB -->
+  <div id="dview-gec" style="display:none;margin-bottom:18px">
+    <div style="background:var(--panel);border:1px solid rgba(59,158,74,0.25);border-radius:14px;padding:20px 22px;margin-bottom:14px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,158,74,0.55),transparent)"></div>
+      <div style="font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--greenl);margin-bottom:8px">GEC 集采撮合 · Green-Fi 交易平台</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px">GEC 成出口刚需——团购比自采便宜 18%</div>
+      <div style="font-size:11.5px;color:var(--ink2);line-height:1.75;margin-bottom:14px">欧盟认可 GEC 后，中国 GEC 价格将因出口刚需上涨。Co2Lion 平台聚合数千家企业的采购需求，向大型绿电运营商团购，将差价和手续费返还给用户。你的 CBAM 申报算法已计算出下季度最优采购量。</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <div style="padding:11px 14px;background:rgba(0,0,0,0.25);border:1px solid rgba(59,158,74,0.2);border-radius:10px;text-align:center"><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--redl);line-height:1;margin-bottom:3px">¥ 2.16</div><div style="font-size:10px;color:var(--ink3)">市场现货价 /kWh</div><div style="font-size:9.5px;color:var(--redl);margin-top:2px">↑ +23% 月涨幅</div></div>
+        <div style="padding:11px 14px;background:rgba(0,0,0,0.25);border:1px solid rgba(59,158,74,0.2);border-radius:10px;text-align:center"><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--greenl);line-height:1;margin-bottom:3px">¥ 1.77</div><div style="font-size:10px;color:var(--ink3)">Co2Lion 团购价</div><div style="font-size:9.5px;color:var(--greenl);margin-top:2px">节省 18%</div></div>
+        <div style="padding:11px 14px;background:rgba(0,0,0,0.25);border:1px solid rgba(59,158,74,0.2);border-radius:10px;text-align:center"><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:3px">856</div><div style="font-size:10px;color:var(--ink3)">本期团购参与企业</div></div>
+        <div style="padding:11px 14px;background:rgba(0,0,0,0.25);border:1px solid rgba(59,158,74,0.2);border-radius:10px;text-align:center"><div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--bluel);line-height:1;margin-bottom:3px">2.1M</div><div style="font-size:10px;color:var(--ink3)">本期采购总量 kWh</div></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div style="background:var(--panel);border:1px solid var(--b);border-radius:14px;padding:16px 18px">
+        <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">加入本期团购</div>
+        <div style="padding:9px 12px;background:var(--gd);border:1px solid rgba(201,168,76,0.25);border-radius:9px;margin-bottom:12px;font-size:11.5px;color:var(--gl)">
+          算法推荐下季度采购量：<strong>28,000 kWh</strong>（基于预测出口量 × 1.2 安全系数）
+        </div>
+        <div class="f-group"><div class="f-label">采购数量 (kWh)</div><input class="f-input" type="number" value="28000"></div>
+        <div class="f-group"><div class="f-label">采购类型</div>
+          <select style="background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;width:100%;appearance:none">
+            <option>现货 · 即时到账</option><option>期货 · 锁定 Q3 价格（¥1.65/kWh 预售）</option>
+          </select>
+        </div>
+        <div style="padding:11px 14px;background:var(--greend);border:1px solid rgba(59,158,74,0.2);border-radius:9px;margin-bottom:12px;font-size:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--ink2)">团购总价</span><span style="font-family:'DM Mono',monospace;color:var(--greenl)">¥ 49,560</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--ink2)">vs 自行采购</span><span style="font-family:'DM Mono',monospace;color:var(--redl)">¥ 60,480</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--ink2);font-weight:600">节省金额</span><span style="font-family:'DM Mono',monospace;color:var(--greenl);font-weight:700">¥ 10,920</span></div>
+        </div>
+        <button style="width:100%;padding:11px;border-radius:10px;font-size:13px;font-weight:600;border:1px solid rgba(59,158,74,0.4);cursor:pointer;font-family:inherit;background:var(--greend);color:var(--greenl);transition:all 0.2s" onclick="showToast('已加入本期团购 · 截止日期 2026-05-31 · 到账后自动入库')">加入本期团购 →</button>
+      </div>
+      <div>
+        <div style="background:var(--panel);border:1px solid var(--b);border-radius:14px;padding:16px 18px;margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">GEC 价格走势（近 90 天）</div>
+          <div style="height:80px;background:rgba(0,0,0,0.2);border-radius:8px;position:relative;overflow:hidden;border:1px solid var(--b)">
+            <svg width="100%" height="100%" viewBox="0 0 400 80" preserveAspectRatio="none">
+              <polyline points="0,60 40,58 80,52 120,50 160,45 200,42 240,38 280,30 320,22 360,18 400,14"
+                fill="none" stroke="var(--greenl)" stroke-width="1.5"/>
+              <polyline points="0,60 40,58 80,52 120,50 160,45 200,42 240,38 280,30 320,22 360,18 400,14 400,80 0,80"
+                fill="rgba(59,158,74,0.08)" stroke="none"/>
+            </svg>
+            <div style="position:absolute;right:8px;top:8px;font-family:'DM Mono',monospace;font-size:10px;color:var(--redl)">+23% ↑</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink3);margin-top:5px"><span>2026-01</span><span>2026-04</span></div>
+        </div>
+        <div style="padding:11px 14px;background:rgba(0,0,0,0.2);border:1px solid var(--b);border-radius:10px;font-size:11.5px;color:var(--ink2);line-height:1.75">
+          <strong style="color:var(--ink)">期货锁价策略：</strong>当前 Q3 期货价格 ¥1.65/kWh，低于现货 24%。若预测出口量稳定，建议锁定 Q3 期货。Co2Lion 将为你的期货 GEC 自动匹配未来的 CBAM 申报批次。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dview-credit">
+    <!-- Asset confirmation list -->
+    <div>
+      <div class="sh"><div class="sh-t">碳资产确权记录 <div class="sh-line"></div></div></div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="asset-table">
+          <thead><tr><th>确权批次</th><th>减排量</th><th>确权机构</th><th>有效期</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div style="font-weight:500">DLD-2026-0412</div><div style="font-size:10.5px;color:var(--ink3)">2026-04-01 确权</div></td>
+              <td style="font-family:'DM Mono',monospace;color:var(--greenl)">142 tCO₂e</td>
+              <td style="font-size:11.5px;color:var(--ink2)">DLD 国家认证</td>
+              <td style="font-size:11.5px;font-family:'DM Mono',monospace">2027-03-31</td>
+              <td><span class="pill pl-g">有效</span></td>
+            </tr>
+            <tr>
+              <td><div style="font-weight:500;color:var(--gold)">DLD-2026-Q2</div><div style="font-size:10.5px;color:var(--ink3)">预计 2026-07 确权</div></td>
+              <td style="font-family:'DM Mono',monospace;color:var(--ink3)">~110 t</td>
+              <td style="font-size:11.5px;color:var(--ink3)">预测值</td>
+              <td style="font-size:11.5px;color:var(--ink3)">—</td>
+              <td><span class="pill" style="background:var(--gd);color:var(--gl);border:1px solid rgba(201,168,76,0.3)">待生成</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;padding:11px 14px;background:rgba(0,0,0,0.2);border:1px solid var(--b);border-radius:9px;font-size:11.5px;color:var(--ink2);line-height:1.75">
+        <strong style="color:var(--ink)">DLD 确权机制：</strong>CL-IVC 链上减排数据每季度自动发送至 DLD 国家认证中心，核验通过后生成碳资产证书，金融机构直接调用链上数据进行信贷评估，无需人工提交材料。
+      </div>
+    </div>
+
+    <!-- Apply form -->
+    <div>
+      <div class="sh"><div class="sh-t">申请新增绿色信贷 <div class="sh-line"></div></div></div>
+      <div class="apply-card">
+        <div style="font-size:12.5px;color:var(--greenl);margin-bottom:14px;line-height:1.7">
+          基于当前 <strong>142 tCO₂e</strong> 确权资产，预计可新增授信额度 <strong style="color:var(--gl)">¥ 50–80万</strong>，利率优惠区间 <strong>LPR-0.3% 至 -0.6%</strong>。
+        </div>
+        <div class="f-group">
+          <div class="f-label">目标金融机构</div>
+          <select class="f-select"><option>工商银行 · 绿色信贷部</option><option>农业银行 · ESG 专项</option><option>兴业银行 · 绿色金融</option><option>其他金融机构</option></select>
+        </div>
+        <div class="f-group">
+          <div class="f-label">申请用途</div>
+          <select class="f-select"><option>MAT 物理网关采购（合规设备）</option><option>绿电设备改造</option><option>供应链数字化升级</option><option>流动资金</option></select>
+        </div>
+        <div class="f-group">
+          <div class="f-label">申请金额（万元）</div>
+          <input class="f-input" type="number" value="80" placeholder="例：80">
+        </div>
+        <div style="padding:9px 12px;background:rgba(0,0,0,0.2);border-radius:8px;font-size:11px;color:var(--greenl);margin-bottom:10px">
+          预计利率：LPR（3.45%）- 0.45% = <strong>3.0%</strong> · 80万×3年×3% ≈ 节省利息 <strong>¥10,800</strong> vs 普通贷款
+        </div>
+        <button class="apply-btn" onclick="showToast('绿色信贷申请材料已自动生成 · 数据来自链上 · 无需纸质材料')">
+          一键生成申请材料 · 无需纸质文件 →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="toast"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="var(--teall)" stroke-width="1.5" stroke-linecap="round"/></svg><span id="toast-msg"></span></div>
+<script>
+function switchDTab(t){['credit','pledge','gec'].forEach(id=>{const tab=document.getElementById('dtab-'+id);const view=document.getElementById('dview-'+id);if(tab){tab.style.color=id===t?'var(--ink)':'var(--ink2)';tab.style.borderBottomColor=id===t?'var(--greenl)':'transparent';}if(view){view.style.display=id===t?(id==='credit'?'block':'block'):'none';}});}
+function calcPledge(){const qty=parseFloat(document.getElementById('pledge-qty').value)||0;const pv=document.getElementById('p-val');const pl=document.getElementById('p-loan');if(pv)pv.textContent='¥ '+(qty*2.16).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');if(pl)pl.textContent='¥ '+(qty*2.16*0.7).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+function showToast(msg){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.style.opacity='1';t.style.transform='translateY(0)';clearTimeout(window._tt);window._tt=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)'},2800);}
+
+  ['credit','pledge','gec'].forEach(id=>{
+    const tab=document.getElementById('dtab-'+id);
+    const view=document.getElementById('dview-'+id);
+    if(tab){tab.style.color=id===t?'var(--ink)':'var(--ink2)';tab.style.borderBottomColor=id===t?'var(--greenl)':'transparent';}
+    if(view){view.style.display=id===t?'block':'none';}
+  });
+}
+function calcPledge(){
+  const qty=parseFloat(document.getElementById('pledge-qty').value)||0;
+  const val=(qty*2.16*0.7).toLocaleString('zh-CN',{minimumFractionDigits:0,maximumFractionDigits:0});
+  const pv=document.getElementById('p-val');const pl=document.getElementById('p-loan');
+  if(pv)pv.textContent='¥ '+(qty*2.16).toLocaleString('zh-CN',{minimumFractionDigits:0,maximumFractionDigits:0});
+  if(pl)pl.textContent='¥ '+val;
+}
+</script>
+</body>
+</html>

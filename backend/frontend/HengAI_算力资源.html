@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · 算力资源</title>
+<script>
+/* 嵌入模式：?embed=1 时隐藏原页 chrome (sidebar/topbar)，仅呈现内容模块 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<style>
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .sb,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] .main,
+html[data-embed="1"] .main-wrap { margin-left: 0 !important; }
+html[data-embed="1"] body { padding-left: 0 !important; background: var(--night, #06080f) !important; }
+</style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --night:#06080f;--dark:#0a0e1a;--panel:#0d1220;--panel2:#111827;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --ink:#e8edf5;--ink2:#8a95a8;--ink3:#4a5568;--ink4:#2d3748;
+  --gold:#c9a84c;--gold-l:#f0d080;--gold-d:rgba(201,168,76,0.11);
+  --green:#3b9e4a;--green-l:#7dd98a;--green-d:rgba(59,158,74,0.11);
+  --teal:#1d9e75;--teal-l:#6dd5b0;--teal-d:rgba(29,158,117,0.1);
+  --blue:#185fa5;--blue-l:#93c5fd;--blue-d:rgba(24,95,165,0.11);
+  --red:#e24b4a;--red-l:#fca5a5;--red-d:rgba(226,75,74,0.1);
+  --purple:#7f77dd;--purple-l:#c4b5fd;--purple-d:rgba(127,119,221,0.1);
+  --amber:#c9a84c;--amber-l:#fcd34d;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--night);color:var(--ink);
+  font-family:'Noto Sans SC',sans-serif;font-size:13px;line-height:1.6;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{width:200px;background:var(--dark);border-right:1px solid var(--border);
+  position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50;
+  overflow-y:auto}
+.logo-area{padding:16px 14px 12px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:9px;flex-shrink:0}
+.logo-ic{width:28px;height:28px;border-radius:7px;background:var(--green-d);
+  border:1px solid rgba(59,158,74,0.35);display:flex;align-items:center;justify-content:center}
+.logo-tx{font-size:13px;font-weight:700}
+.logo-sub{font-size:9px;color:var(--ink3);margin-top:1px}
+.nav-s{padding:10px 13px 4px;font-size:9px;color:var(--ink3);letter-spacing:1px;
+  text-transform:uppercase;font-weight:600}
+.nav-i{display:flex;align-items:center;gap:8px;padding:7px 13px;font-size:12px;
+  color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all 0.15s}
+.nav-i:hover{color:var(--ink);background:rgba(255,255,255,0.04)}
+.nav-i.active{color:var(--ink);background:rgba(255,255,255,0.06);border-left-color:var(--teal)}
+.nav-d{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sf{margin-top:auto;padding:11px 13px;border-top:1px solid var(--border);flex-shrink:0}
+.u-av{width:28px;height:28px;border-radius:50%;background:var(--teal-d);
+  border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:var(--teal-l);flex-shrink:0}
+
+/* ── MAIN ── */
+.main{margin-left:200px;min-height:100vh}
+
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:40;background:rgba(6,8,15,0.94);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--border);
+  padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.tb-l{display:flex;align-items:center;gap:10px}
+.tb-title{font-size:14px;font-weight:500}
+.tb-r{display:flex;align-items:center;gap:8px}
+.gm-chip{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;
+  background:var(--gold-d);border:1px solid rgba(201,168,76,0.3);cursor:pointer;transition:all .18s}
+.gm-chip:hover{background:rgba(201,168,76,0.18)}
+.gm-v{font-size:13px;font-weight:700;color:var(--gold);font-family:'DM Mono',monospace}
+.tb-btn{padding:5px 13px;border-radius:7px;font-size:11.5px;font-weight:500;
+  border:1px solid var(--border2);background:transparent;color:var(--ink);
+  cursor:pointer;font-family:inherit;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.07)}
+.tb-btn.pri{background:var(--teal-d);border-color:rgba(29,158,117,0.4);color:var(--teal-l)}
+.tb-btn.pri:hover{background:rgba(29,158,117,0.22)}
+
+/* ── CONTAINER ── */
+.page-content{padding:24px 28px 72px;max-width:1160px}
+
+/* ── SECTION HEAD ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-t{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.1px;
+  text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sh-line{flex:1;height:1px;background:var(--border)}
+.sh-a{font-size:11px;color:var(--teal-l);cursor:pointer;white-space:nowrap}
+.sh-a:hover{color:var(--teal)}
+
+/* ── PILL ── */
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:20px;white-space:nowrap}
+.pl-g{background:var(--green-d);color:var(--green-l);border:1px solid rgba(59,158,74,0.3)}
+.pl-y{background:var(--gold-d);color:var(--gold-l);border:1px solid rgba(201,168,76,0.3)}
+.pl-b{background:var(--blue-d);color:var(--blue-l);border:1px solid rgba(24,95,165,0.3)}
+.pl-t{background:var(--teal-d);color:var(--teal-l);border:1px solid rgba(29,158,117,0.3)}
+.pl-r{background:var(--red-d);color:var(--red-l);border:1px solid rgba(226,75,74,0.3)}
+.pl-p{background:var(--purple-d);color:var(--purple-l);border:1px solid rgba(127,119,221,0.3)}
+.pl-gray{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--border)}
+
+/* ── WORKSPACE STATUS STRIP (SANDBOX vs CERTIFIED) ── */
+.ws-strip{
+  background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(127,119,221,0.06));
+  border:1px solid rgba(201,168,76,0.22);
+  border-radius:12px;padding:11px 16px;margin-bottom:16px;
+  display:flex;align-items:center;gap:12px;
+}
+.ws-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);
+  box-shadow:0 0 10px rgba(201,168,76,0.6);flex-shrink:0;animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.55}}
+.ws-body{flex:1}
+.ws-title{font-size:12px;font-weight:600;color:var(--gold-l);margin-bottom:2px}
+.ws-desc{font-size:11px;color:var(--ink2);line-height:1.55}
+.ws-btn{flex-shrink:0;padding:6px 13px;border-radius:8px;font-size:11px;font-weight:600;
+  border:1px solid rgba(201,168,76,0.4);background:var(--gold-d);color:var(--gold-l);
+  cursor:pointer;font-family:inherit;transition:all 0.15s}
+.ws-btn:hover{background:rgba(201,168,76,0.2)}
+
+/* ── VALUE HERO ── */
+.value-hero{
+  background:var(--panel);border:1px solid rgba(29,158,117,0.28);
+  border-radius:16px;padding:0;overflow:hidden;margin-bottom:16px;position:relative;
+}
+.value-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(29,158,117,0.65),rgba(201,168,76,0.5),transparent)}
+.vh-inner{padding:22px 26px;display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.vh-left{flex:1;min-width:320px}
+.vh-ey{font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--teal);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.vh-ey::before{content:'';width:16px;height:1px;background:var(--teal);display:inline-block}
+.vh-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:12px}
+.vh-title .hl{color:var(--teal-l)}
+.vh-kpis{display:grid;grid-template-columns:repeat(3,auto);gap:28px}
+.vh-kpi{display:flex;flex-direction:column;gap:3px}
+.vh-kpi-val{font-family:'DM Mono',monospace;font-size:28px;font-weight:700;
+  letter-spacing:-1px;line-height:1;color:var(--teal-l)}
+.vh-kpi-val.gold{color:var(--gold-l)}
+.vh-kpi-val.ink{color:var(--ink)}
+.vh-kpi-unit{font-size:11px;font-weight:400;opacity:0.6;margin-left:2px;color:var(--ink2)}
+.vh-kpi-label{font-size:10.5px;color:var(--ink2)}
+.vh-right{flex-shrink:0;min-width:220px}
+.vh-compare{background:rgba(0,0,0,0.3);border:1px solid var(--border);
+  border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;gap:9px}
+.vc-row{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.vc-label{color:var(--ink2)}
+.vc-val{font-weight:600;font-family:'DM Mono',monospace}
+
+/* ── RESOURCE RINGS ── */
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.res-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;
+  padding:16px 18px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s}
+.res-card:hover{border-color:var(--border2)}
+.res-top{display:flex;align-items:flex-start;justify-content:space-between}
+.res-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.res-name{font-size:12.5px;font-weight:600;margin-bottom:2px}
+.res-sub{font-size:10.5px;color:var(--ink2)}
+.res-ring-wrap{display:flex;align-items:center;gap:14px}
+.res-ring{position:relative;width:78px;height:78px;flex-shrink:0}
+.res-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.res-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;pointer-events:none}
+.rrc-pct{font-family:'DM Mono',monospace;font-size:17px;font-weight:700;line-height:1}
+.rrc-label{font-size:8.5px;color:var(--ink3);margin-top:2px}
+.res-stats{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.rs-row{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;gap:8px}
+.rs-l{color:var(--ink2)}
+.rs-v{font-weight:600;font-family:'DM Mono',monospace}
+.res-bar-track{height:5px;background:rgba(255,255,255,0.06);border-radius:3px;margin-top:4px;overflow:hidden}
+.res-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.res-foot{display:flex;align-items:center;justify-content:space-between;
+  padding-top:10px;border-top:1px dashed var(--border)}
+.res-foot-l{font-size:10.5px;color:var(--ink3)}
+.res-foot-b{font-size:11px;color:var(--teal-l);cursor:pointer;font-weight:500}
+.res-foot-b:hover{color:var(--teal)}
+
+/* ── PLAN CARD ── */
+.plan-card{
+  background:var(--panel);border:1px solid var(--border);border-radius:14px;
+  padding:16px 18px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap
+}
+.plan-ic{width:42px;height:42px;border-radius:10px;background:var(--teal-d);
+  border:1px solid rgba(29,158,117,0.35);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.plan-body{flex:1;min-width:260px}
+.plan-name{font-size:13.5px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.plan-desc{font-size:11px;color:var(--ink2);line-height:1.6}
+.plan-meta{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:4px}
+.plan-meta-i{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--ink2)}
+.plan-meta-i strong{color:var(--ink);font-family:'DM Mono',monospace}
+.plan-act{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ── LOG LIST ── */
+.log-list{display:flex;flex-direction:column;gap:7px}
+.log-item{display:flex;align-items:flex-start;gap:10px;
+  padding:11px 14px;background:rgba(0,0,0,0.22);border:1px solid var(--border);
+  border-radius:10px;transition:all 0.15s;cursor:pointer}
+.log-item:hover{border-color:var(--border2);background:rgba(0,0,0,0.32)}
+.log-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:1px}
+.log-body{flex:1;min-width:0}
+.log-title{font-size:12.5px;font-weight:500;color:var(--ink);margin-bottom:2px;
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.log-desc{font-size:11px;color:var(--ink2);line-height:1.55}
+.log-right{text-align:right;flex-shrink:0;min-width:94px}
+.log-cost{font-size:11px;font-family:'DM Mono',monospace;color:var(--ink3);margin-bottom:3px}
+.log-save{font-size:11.5px;font-weight:700;font-family:'DM Mono',monospace}
+.log-save.pos{color:var(--green-l)}
+.log-save.neu{color:var(--ink2)}
+.log-time{font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace;margin-top:3px}
+
+/* ── UPGRADE CARD ── */
+.upgrade-card{
+  background:linear-gradient(135deg,rgba(127,119,221,0.06),rgba(201,168,76,0.05));
+  border:1px solid rgba(201,168,76,0.28);
+  border-radius:14px;padding:18px 20px;margin-top:18px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:relative;overflow:hidden
+}
+.upgrade-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,0.6),rgba(127,119,221,0.5),transparent)}
+.uc-icon{width:48px;height:48px;border-radius:12px;background:var(--gold-d);
+  border:1px solid rgba(201,168,76,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.uc-body{flex:1;min-width:260px}
+.uc-title{font-size:13.5px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.uc-desc{font-size:11.5px;color:var(--ink2);line-height:1.7}
+.uc-desc strong{color:var(--gold-l)}
+.uc-btn{padding:9px 20px;border-radius:9px;font-size:12.5px;font-weight:600;
+  border:1px solid rgba(201,168,76,0.4);background:var(--gold-d);
+  color:var(--gold-l);cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.15s}
+.uc-btn:hover{background:rgba(201,168,76,0.22);transform:translateY(-1px)}
+
+/* ── STORE GRID ── */
+.store-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.store-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:16px;transition:all 0.18s;display:flex;flex-direction:column;gap:10px;cursor:pointer;position:relative}
+.store-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.store-card.best{border-color:rgba(29,158,117,0.45)}
+.store-card.best::before{content:'最受欢迎';position:absolute;top:-9px;right:14px;
+  font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:20px;
+  background:var(--teal-d);color:var(--teal-l);border:1px solid rgba(29,158,117,0.4);letter-spacing:0.5px}
+.store-name{font-size:12.5px;font-weight:600}
+.store-price{display:flex;align-items:baseline;gap:3px}
+.store-price-v{font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:var(--teal-l);line-height:1}
+.store-price-u{font-size:10.5px;color:var(--ink2)}
+.store-feats{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--ink2)}
+.store-feats div{display:flex;align-items:flex-start;gap:5px}
+.store-feats .dot{width:4px;height:4px;border-radius:50%;background:var(--teal);margin-top:6px;flex-shrink:0}
+.store-btn{margin-top:auto;padding:8px 12px;border-radius:8px;font-size:11.5px;font-weight:500;
+  border:1px solid var(--border2);background:transparent;color:var(--ink);
+  cursor:pointer;font-family:inherit;transition:all .15s;text-align:center}
+.store-btn:hover{background:rgba(255,255,255,0.07)}
+.store-btn.pri{background:var(--teal-d);border-color:rgba(29,158,117,0.4);color:var(--teal-l)}
+.store-btn.pri:hover{background:rgba(29,158,117,0.22)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--panel2);
+  border:1px solid rgba(29,158,117,0.45);border-radius:11px;
+  padding:11px 16px;display:flex;align-items:center;gap:9px;
+  font-size:12.5px;color:var(--teal-l);z-index:9999;
+  opacity:0;transform:translateY(8px);transition:all 0.3s;
+  pointer-events:none;min-width:240px}
+#toast.gm{border-color:rgba(201,168,76,0.5);color:var(--gold-l)}
+
+/* ── GM FLOATING REWARD ── */
+.gm-float{position:fixed;pointer-events:none;z-index:9998;
+  font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--gold-l);
+  text-shadow:0 0 12px rgba(201,168,76,0.6);
+  opacity:0;animation:floatUp 1.2s ease-out forwards}
+@keyframes floatUp{
+  0%{opacity:0;transform:translateY(0) scale(0.8)}
+  20%{opacity:1;transform:translateY(-6px) scale(1.05)}
+  100%{opacity:0;transform:translateY(-46px) scale(1)}
+}
+
+/* ── LOADING ARTIFACT (Aha Moment) ── */
+.loading-overlay{position:fixed;inset:0;background:rgba(6,8,15,0.78);
+  backdrop-filter:blur(6px);z-index:9997;
+  display:none;align-items:center;justify-content:center}
+.loading-overlay.on{display:flex;animation:fade .25s ease both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.loading-art{background:var(--panel);border:1px solid rgba(29,158,117,0.32);
+  border-radius:16px;padding:28px 34px;display:flex;flex-direction:column;align-items:center;gap:14px;min-width:280px}
+.lart-spin{width:44px;height:44px;border-radius:50%;border:2.5px solid rgba(29,158,117,0.18);
+  border-top-color:var(--teal);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lart-msg{font-size:12.5px;color:var(--teal-l);letter-spacing:0.5px}
+.lart-sub{font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp 0.4s ease both}
+.fu1{animation-delay:.05s}.fu2{animation-delay:.12s}.fu3{animation-delay:.19s}
+.fu4{animation-delay:.26s}.fu5{animation-delay:.33s}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 960px){
+  .res-grid{grid-template-columns:1fr}
+  .store-grid{grid-template-columns:1fr}
+  .vh-kpis{grid-template-columns:repeat(3,1fr);gap:16px}
+}
+</style>
+<style id="qa-sidebar-css">
+/* HengAI V2.0 QA · 全站统一侧栏基线
+   设计原则：
+   1. 容器级规则使用 :where() 零特异性 —— 页面自己的 .sidebar{} 原生规则优先
+   2. 内部元素 (.sb-brand/.sb-item/...) 使用普通选择器 —— 提供基线视觉
+   3. 不动 .main —— 每页主区偏移由自家 CSS 决定（不污染 flex 布局）
+*/
+:where(.sidebar#sidebar[data-qa-version="2.0"]){width:200px;background:#0b0f19;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;overflow-y:auto;font-family:inherit}
+.sidebar .sb-brand{padding:17px 15px 13px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sidebar .sb-brand-ic{width:32px;height:32px;border-radius:9px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar .sb-brand-name{font-size:14px;font-weight:700;letter-spacing:.2px;color:#e6e9f2}
+.sidebar .sb-brand-sub{font-size:9.5px;color:#8a92a8;margin-top:1px}
+.sidebar .sb-group-title{font-size:9.5px;text-transform:uppercase;color:#8a92a8;letter-spacing:.6px;padding:14px 18px 6px;font-weight:600}
+.sidebar .sb-item{padding:9px 18px;font-size:12.5px;color:#c3cbdc;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .12s;border-left:2px solid transparent;font-family:inherit;line-height:1.3}
+.sidebar .sb-item:hover{background:rgba(255,255,255,0.03);color:#e6e9f2}
+.sidebar .sb-item.active{background:rgba(16,185,129,0.08);border-left-color:#10b981;color:#e6e9f2;font-weight:600}
+.sidebar .sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* 嵌入模式（?embed=1）：只露内容，侧栏/顶栏/老 .sb 全部隐藏，主区 margin 归零 */
+html[data-embed="1"] .sidebar,html[data-embed="1"] .sb,html[data-embed="1"] .topbar{display:none !important}
+html[data-embed="1"] body{padding-left:0 !important}
+html[data-embed="1"] .main,html[data-embed="1"] .main-wrap,html[data-embed="1"] .main-content{margin-left:0 !important}
+</style>
+</head>
+<body>
+
+<!-- CANONICAL SIDEBAR — HengAI V2.0 QA 统一版 -->
+<div class="sidebar" id="sidebar" data-qa-version="2.0">
+  <div class="sb-brand">
+    <div class="sb-brand-ic">
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+    </div>
+    <div>
+      <div class="sb-brand-name">HengAI</div>
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+    </div>
+  </div>
+
+  <!-- 逃生舱：返回 HengAI 对话大厅 -->
+  <div style="padding:12px 14px 4px;">
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      返回 HengAI 对话
+    </div>
+  </div>
+
+  <div class="sb-group-title">个人工作台</div>
+  <div class="sb-item" data-page="overview"   onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+  <div class="sb-item" data-page="achieve"    onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+  <div class="sb-item" data-page="calc"       onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+  <div class="sb-item" data-page="resource"   onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+  <div class="sb-item" data-page="knowledge"  onclick="window.location.href='HengAI_法规知识库.html'"><div class="sb-dot" style="background:#c4b5fd"></div>企业法规库</div>
+
+  <div class="sb-group-title">企业工作台</div>
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+  <div class="sb-item" data-page="supply"     onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" style="background:#6dd5b0"></div>供应链协同</div>
+  <div class="sb-item" data-page="report"     onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+  <div class="sb-item" data-page="decision"   onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-group-title">大国重器</div>
+  <div class="sb-item" data-page="honor"      onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+  <div class="sb-item" data-page="gov"        onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:#6dd5b0"></div>生态共治委员会</div>
+
+  <div class="sb-group-title">深潜模块</div>
+  <div class="sb-item" data-page="wallet"     onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+  <div class="sb-item" data-page="eu"         onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:#93c5fd"></div>欧盟海关直连</div>
+  <div class="sb-item" data-page="dld"        onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:#10b981"></div>DLD 绿色信贷</div>
+  <div class="sb-item" data-page="acf"        onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:#6dd5b0"></div>ACF 大湾区认证</div>
+</div>
+<script id="qa-sidebar-active-script">
+/* 基于当前文件名自动高亮对应菜单项（全站共用） */
+(function(){
+  var map = {"全域中心.html":"overview","index.html":"overview","HengAI_星火成就档案.html":"achieve","HengAI_CBAM测算工具.html":"calc","HengAI_算力资源.html":"resource","HengAI_法规知识库.html":"knowledge","HengAI_企业数字档案.html":"enterprise","HengAI_供应链协同.html":"supply","HengAI_全域诊断报告.html":"report","HengAI_决策层呈送包生成器.html":"decision","HengAI_荣誉体系.html":"honor","HengAI_Governance.html":"gov","HengAI_GM_Wallet.html":"wallet","HengAI_EU_Customs.html":"eu","HengAI_DLD_Credit.html":"dld","HengAI_ACF_Cert.html":"acf"};
+  try {
+    var fn = decodeURIComponent((location.pathname.split("/").pop() || "").split("?")[0]);
+    var id = map[fn]; if (!id) return;
+    document.querySelectorAll(".sidebar .sb-item[data-page]").forEach(function(el){
+      if (el.getAttribute("data-page") === id) el.classList.add("active");
+    });
+  } catch(e){}
+})();
+</script>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-l">
+      <span class="tb-title">算力资源</span>
+      <span class="pill pl-t" style="margin-left:4px">Pro · 月付</span>
+    </div>
+    <div class="tb-r">
+      <div class="gm-chip" onclick="window.location.href='HengAI_GM_Wallet.html'" title="查看 GreenMark 钱包">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+          <path d="M5.5 1L10 3.5V8.5L5.5 10L1 8.5V3.5L5.5 1Z" stroke="#c9a84c" stroke-width="0.9" fill="rgba(201,168,76,0.15)"/>
+        </svg>
+        <span style="font-size:10px;color:var(--ink2)">GM</span>
+        <span class="gm-v" id="gm-val">128</span>
+      </div>
+      <button class="tb-btn" onclick="handleAction('VIEW_BILLING',{msg:'已打开账单明细'})">账单明细</button>
+      <button class="tb-btn pri" onclick="handleAction('BUY_COMPUTE_PACK',{msg:'已进入算力包续费'})">续费算力包</button>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- Workspace status strip (SANDBOX) -->
+    <div class="ws-strip fu fu1">
+      <div class="ws-dot"></div>
+      <div class="ws-body">
+        <div class="ws-title">当前工作区：个人沙盒（SANDBOX）</div>
+        <div class="ws-desc">沙盒中的算力与测算结果仅供您个人使用。一旦企业完成官方认证，<strong style="color:var(--gold-l)">算力配额可升至企业金库</strong>并被防篡改保护。</div>
+      </div>
+      <button class="ws-btn" onclick="handleAction('GEN_BOSS_REPORT',{msg:'已为您生成『向老板的升级请示报告』草稿'})">一键请示老板</button>
+    </div>
+
+    <!-- ═════ VALUE HERO ═════ -->
+    <div class="value-hero fu fu1">
+      <div class="vh-inner">
+        <div class="vh-left">
+          <div class="vh-ey">Value Saved · 算力为您省下</div>
+          <div class="vh-title">过去 30 天，HengAI 的底座引擎累计为您节省 <span class="hl">46.8 小时</span> 与 <span class="hl">¥ 12,400</span> 外包成本</div>
+          <div class="vh-kpis">
+            <div class="vh-kpi">
+              <div class="vh-kpi-val gold">128<span class="vh-kpi-unit">GM</span></div>
+              <div class="vh-kpi-label">本月累计绿印积分</div>
+            </div>
+            <div class="vh-kpi">
+              <div class="vh-kpi-val">46.8<span class="vh-kpi-unit">h</span></div>
+              <div class="vh-kpi-label">节省的人工工时</div>
+            </div>
+            <div class="vh-kpi">
+              <div class="vh-kpi-val ink">¥ 12,400</div>
+              <div class="vh-kpi-label">等效外包成本</div>
+            </div>
+          </div>
+        </div>
+        <div class="vh-right">
+          <div class="vh-compare">
+            <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-bottom:2px">本月用量对比</div>
+            <div class="vc-row"><span class="vc-label">已用算力 token</span><span class="vc-val" style="color:var(--teal-l)">214,580</span></div>
+            <div class="vc-row"><span class="vc-label">触发测算次数</span><span class="vc-val" style="color:var(--ink)">28 / 100</span></div>
+            <div class="vc-row"><span class="vc-label">生成的报表</span><span class="vc-val" style="color:var(--ink)">12 份</span></div>
+            <div class="vc-row"><span class="vc-label">消耗配额占比</span><span class="vc-val" style="color:var(--gold-l)">43%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════ CURRENT PLAN ═════ -->
+    <div class="plan-card fu fu2">
+      <div class="plan-ic">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2L17 5.5V12.5L10 17.5L3 12.5V5.5L10 2Z" stroke="var(--teal-l)" stroke-width="1.2" fill="rgba(29,158,117,0.12)"/>
+          <path d="M7 10L9 12L13 8" stroke="var(--teal-l)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="plan-body">
+        <div class="plan-name">HengAI Pro · 月付
+          <span class="pill pl-t">当前套餐</span>
+          <span class="pill pl-g">自动续订中</span>
+        </div>
+        <div class="plan-desc">解锁全部高斯模糊图表 · 100 次/月深度测算 · 500k token 算力 · 2GB 企业档案存储</div>
+        <div class="plan-meta">
+          <div class="plan-meta-i">下次扣费：<strong>2026-05-02</strong></div>
+          <div class="plan-meta-i">扣费金额：<strong>¥ 99.00</strong></div>
+          <div class="plan-meta-i">年付立省：<strong style="color:var(--gold-l)">¥ 594</strong></div>
+        </div>
+      </div>
+      <div class="plan-act">
+        <button class="tb-btn" onclick="handleAction('MANAGE_PLAN',{msg:'套餐管理中心已打开'})">管理套餐</button>
+        <button class="tb-btn pri" onclick="handleAction('SWITCH_ANNUAL',{msg:'已切换至年付，立省 ¥594'})">升级年付 · 5折</button>
+      </div>
+    </div>
+
+    <!-- ═════ RESOURCE RINGS ═════ -->
+    <div class="sh fu fu2">
+      <div class="sh-t">实时配额 · Live Usage <div class="sh-line"></div></div>
+      <span class="sh-a" onclick="handleAction('REFRESH_QUOTA',{msg:'配额已同步至最新'})">↻ 刷新</span>
+    </div>
+
+    <div class="res-grid fu fu2">
+
+      <!-- 算力 token -->
+      <div class="res-card">
+        <div class="res-top">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="res-icon" style="background:var(--teal-d);border:1px solid rgba(29,158,117,0.3)">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M9 1.5L11.3 6.1L16.5 6.9L12.75 10.55L13.6 15.7L9 13.3L4.4 15.7L5.25 10.55L1.5 6.9L6.7 6.1L9 1.5Z" stroke="var(--teal-l)" stroke-width="1.1" fill="rgba(29,158,117,0.18)"/>
+              </svg>
+            </div>
+            <div>
+              <div class="res-name">算力 Token</div>
+              <div class="res-sub">Co2Lion 底座引擎推理</div>
+            </div>
+          </div>
+          <span class="pill pl-t">健康</span>
+        </div>
+        <div class="res-ring-wrap">
+          <div class="res-ring">
+            <svg viewBox="0 0 72 72">
+              <circle cx="36" cy="36" r="30" stroke="rgba(255,255,255,0.06)" stroke-width="6" fill="none"/>
+              <circle cx="36" cy="36" r="30" stroke="var(--teal)" stroke-width="6" fill="none"
+                stroke-dasharray="80.8 188.5" stroke-linecap="round"/>
+            </svg>
+            <div class="res-ring-center">
+              <div class="rrc-pct" style="color:var(--teal-l)">43%</div>
+              <div class="rrc-label">已用</div>
+            </div>
+          </div>
+          <div class="res-stats">
+            <div class="rs-row"><span class="rs-l">已用</span><span class="rs-v">214,580</span></div>
+            <div class="rs-row"><span class="rs-l">配额</span><span class="rs-v">500,000</span></div>
+            <div class="res-bar-track"><div class="res-bar-fill" style="width:43%;background:var(--teal)"></div></div>
+            <div class="rs-row" style="font-size:10.5px;color:var(--ink3)"><span>预计用完</span><span>2026-05-14</span></div>
+          </div>
+        </div>
+        <div class="res-foot">
+          <div class="res-foot-l">单 token 均价 ¥0.00008</div>
+          <div class="res-foot-b" onclick="handleAction('BUY_TOKEN_PACK',{msg:'Token 加油包 ¥29 / 10 万已添加'})">+ 加油包</div>
+        </div>
+      </div>
+
+      <!-- 深度测算 -->
+      <div class="res-card">
+        <div class="res-top">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="res-icon" style="background:var(--gold-d);border:1px solid rgba(201,168,76,0.3)">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <rect x="2.5" y="2.5" width="13" height="13" rx="2" stroke="var(--gold-l)" stroke-width="1.1"/>
+                <line x1="6" y1="9" x2="12" y2="9" stroke="var(--gold-l)" stroke-width="1.1"/>
+                <line x1="9" y1="6" x2="9" y2="12" stroke="var(--gold-l)" stroke-width="1.1"/>
+              </svg>
+            </div>
+            <div>
+              <div class="res-name">深度测算次数</div>
+              <div class="res-sub">CBAM / 全域诊断 / ROI 报告</div>
+            </div>
+          </div>
+          <span class="pill pl-y">需关注</span>
+        </div>
+        <div class="res-ring-wrap">
+          <div class="res-ring">
+            <svg viewBox="0 0 72 72">
+              <circle cx="36" cy="36" r="30" stroke="rgba(255,255,255,0.06)" stroke-width="6" fill="none"/>
+              <circle cx="36" cy="36" r="30" stroke="var(--gold)" stroke-width="6" fill="none"
+                stroke-dasharray="52.78 188.5" stroke-linecap="round"/>
+            </svg>
+            <div class="res-ring-center">
+              <div class="rrc-pct" style="color:var(--gold-l)">28%</div>
+              <div class="rrc-label">本月</div>
+            </div>
+          </div>
+          <div class="res-stats">
+            <div class="rs-row"><span class="rs-l">已用</span><span class="rs-v">28 次</span></div>
+            <div class="rs-row"><span class="rs-l">配额</span><span class="rs-v">100 次/月</span></div>
+            <div class="res-bar-track"><div class="res-bar-fill" style="width:28%;background:var(--gold)"></div></div>
+            <div class="rs-row" style="font-size:10.5px;color:var(--ink3)"><span>剩余</span><span>72 次 · 重置 2026-05-01</span></div>
+          </div>
+        </div>
+        <div class="res-foot">
+          <div class="res-foot-l">超额后单次 ¥5</div>
+          <div class="res-foot-b" onclick="handleAction('BUY_COMPUTE_COUNT',{msg:'测算加油包 ¥49 / 50 次已添加'})">+ 加油包</div>
+        </div>
+      </div>
+
+      <!-- 档案存储 -->
+      <div class="res-card">
+        <div class="res-top">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="res-icon" style="background:var(--blue-d);border:1px solid rgba(24,95,165,0.3)">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M9 2.5C6 2.5 3.5 3.5 3.5 5V13C3.5 14.5 6 15.5 9 15.5C12 15.5 14.5 14.5 14.5 13V5C14.5 3.5 12 2.5 9 2.5Z" stroke="var(--blue-l)" stroke-width="1.1" fill="rgba(24,95,165,0.15)"/>
+                <ellipse cx="9" cy="5" rx="5.5" ry="2" stroke="var(--blue-l)" stroke-width="1.1"/>
+                <path d="M3.5 9C3.5 10.5 6 11.5 9 11.5C12 11.5 14.5 10.5 14.5 9" stroke="var(--blue-l)" stroke-width="1.1"/>
+              </svg>
+            </div>
+            <div>
+              <div class="res-name">企业档案存储</div>
+              <div class="res-sub">单据 / 报表 / 底稿</div>
+            </div>
+          </div>
+          <span class="pill pl-b">充足</span>
+        </div>
+        <div class="res-ring-wrap">
+          <div class="res-ring">
+            <svg viewBox="0 0 72 72">
+              <circle cx="36" cy="36" r="30" stroke="rgba(255,255,255,0.06)" stroke-width="6" fill="none"/>
+              <circle cx="36" cy="36" r="30" stroke="var(--blue)" stroke-width="6" fill="none"
+                stroke-dasharray="41.4 188.5" stroke-linecap="round"/>
+            </svg>
+            <div class="res-ring-center">
+              <div class="rrc-pct" style="color:var(--blue-l)">22%</div>
+              <div class="rrc-label">已用</div>
+            </div>
+          </div>
+          <div class="res-stats">
+            <div class="rs-row"><span class="rs-l">已用</span><span class="rs-v">450 MB</span></div>
+            <div class="rs-row"><span class="rs-l">配额</span><span class="rs-v">2 GB</span></div>
+            <div class="res-bar-track"><div class="res-bar-fill" style="width:22%;background:var(--blue)"></div></div>
+            <div class="rs-row" style="font-size:10.5px;color:var(--ink3)"><span>文件数</span><span>186 份</span></div>
+          </div>
+        </div>
+        <div class="res-foot">
+          <div class="res-foot-l">企业版永久归档</div>
+          <div class="res-foot-b" onclick="handleAction('VIEW_ARCHIVE',{msg:'企业档案库已打开'})">查看归档 →</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═════ USAGE LOG ═════ -->
+    <div class="sh fu fu3">
+      <div class="sh-t">最近算力流水 · Action Ledger <div class="sh-line"></div></div>
+      <span class="sh-a" onclick="handleAction('EXPORT_LEDGER',{msg:'GreenMark 流水 CSV 导出已开始'})">↓ 导出流水 CSV</span>
+    </div>
+
+    <div class="log-list fu fu3">
+
+      <div class="log-item" onclick="handleAction('OPEN_LOG',{msg:'打开 CBAM 申报底稿详情',gm:15})">
+        <div class="log-ic" style="background:var(--teal-d);border:1px solid rgba(29,158,117,0.3)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M7 1.5L12.5 4.5V9.5L7 12.5L1.5 9.5V4.5L7 1.5Z" stroke="var(--teal-l)" stroke-width="1"/>
+            <polyline points="4,7 6,9 10,5" stroke="var(--teal-l)" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="log-body">
+          <div class="log-title">生成 CBAM 申报底稿（2026Q1）<span class="pill pl-g">GENERATE_CFO_REPORT</span></div>
+          <div class="log-desc">调用 12,480 token · 附带 3 个证据链核验 · 节省外包律师 3.5h</div>
+        </div>
+        <div class="log-right">
+          <div class="log-cost">-12.5k token</div>
+          <div class="log-save pos">+15 GM</div>
+          <div class="log-time">2026-04-18 11:23</div>
+        </div>
+      </div>
+
+      <div class="log-item" onclick="handleAction('OPEN_LOG',{msg:'打开供应商穿透卡片',gm:20})">
+        <div class="log-ic" style="background:var(--gold-d);border:1px solid rgba(201,168,76,0.3)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="7" cy="5" r="2.2" stroke="var(--gold-l)" stroke-width="1"/>
+            <path d="M2.5 12.5C2.5 10.5 4.5 9 7 9C9.5 9 11.5 10.5 11.5 12.5" stroke="var(--gold-l)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="log-body">
+          <div class="log-title">邀请供应商填报碳数据 · 瑞丰铝业<span class="pill pl-y">INVITE_SUPPLIER</span></div>
+          <div class="log-desc">Co2Lion 穿透卡片已送达 · 响应率触发 +10 GM 加成</div>
+        </div>
+        <div class="log-right">
+          <div class="log-cost">-2.1k token</div>
+          <div class="log-save pos">+20 GM</div>
+          <div class="log-time">2026-04-18 09:41</div>
+        </div>
+      </div>
+
+      <div class="log-item" onclick="handleAction('OPEN_LOG',{msg:'打开发票识别结果',gm:8})">
+        <div class="log-ic" style="background:var(--blue-d);border:1px solid rgba(24,95,165,0.3)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <rect x="2" y="2.5" width="10" height="9" rx="1.2" stroke="var(--blue-l)" stroke-width="1"/>
+            <line x1="4.5" y1="5.5" x2="9.5" y2="5.5" stroke="var(--blue-l)" stroke-width="0.9"/>
+            <line x1="4.5" y1="7.5" x2="8" y2="7.5" stroke="var(--blue-l)" stroke-width="0.9"/>
+          </svg>
+        </div>
+        <div class="log-body">
+          <div class="log-title">上传单据并自动识别 · 电费发票 ×6<span class="pill pl-b">UPLOAD_BILL</span></div>
+          <div class="log-desc">OCR + 字段自动归档至 Scope 2 能耗档案 · 每张 +2 GM</div>
+        </div>
+        <div class="log-right">
+          <div class="log-cost">-3.4k token</div>
+          <div class="log-save pos">+12 GM</div>
+          <div class="log-time">2026-04-17 16:58</div>
+        </div>
+      </div>
+
+      <div class="log-item" onclick="handleAction('OPEN_LOG',{msg:'打开 ROI 自动化报告',gm:25})">
+        <div class="log-ic" style="background:var(--purple-d);border:1px solid rgba(127,119,221,0.3)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 11L5 7L8 9.5L12 4" stroke="var(--purple-l)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="4" r="1.3" fill="var(--purple-l)"/>
+          </svg>
+        </div>
+        <div class="log-body">
+          <div class="log-title">一键生成 ROI 自动化报告<span class="pill pl-p">GENERATE_CFO_REPORT</span></div>
+          <div class="log-desc">含 5 年现金流预测 · 对应决策层呈送包已同步生成</div>
+        </div>
+        <div class="log-right">
+          <div class="log-cost">-18.7k token</div>
+          <div class="log-save pos">+25 GM</div>
+          <div class="log-time">2026-04-16 14:12</div>
+        </div>
+      </div>
+
+      <div class="log-item" onclick="handleAction('OPEN_LOG',{msg:'打开法规解读摘要',gm:5})">
+        <div class="log-ic" style="background:rgba(255,255,255,0.04);border:1px solid var(--border)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <rect x="3" y="2" width="8" height="10" rx="1" stroke="var(--ink2)" stroke-width="1"/>
+            <line x1="5" y1="5" x2="9" y2="5" stroke="var(--ink2)" stroke-width="0.9"/>
+            <line x1="5" y1="7" x2="9" y2="7" stroke="var(--ink2)" stroke-width="0.9"/>
+            <line x1="5" y1="9" x2="7.5" y2="9" stroke="var(--ink2)" stroke-width="0.9"/>
+          </svg>
+        </div>
+        <div class="log-body">
+          <div class="log-title">阅读 CBAM 2026 执行细则解读<span class="pill pl-gray">READ_KB</span></div>
+          <div class="log-desc">阅读完成度 65% · HengAI 自动整理 4 条关键条款并推送</div>
+        </div>
+        <div class="log-right">
+          <div class="log-cost">-0.8k token</div>
+          <div class="log-save pos">+5 GM</div>
+          <div class="log-time">2026-04-15 10:07</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═════ COMPUTE PACK STORE ═════ -->
+    <div class="sh fu fu4" style="margin-top:22px">
+      <div class="sh-t">算力加油站 · Compute Packs <div class="sh-line"></div></div>
+      <span style="font-size:10.5px;color:var(--ink3)">按需购买，不限有效期</span>
+    </div>
+
+    <div class="store-grid fu fu4">
+
+      <div class="store-card" onclick="handleAction('BUY_PACK_S',{msg:'Token 轻享包加入购物车'})">
+        <div class="store-name">Token 轻享包</div>
+        <div class="store-price"><span class="store-price-v">¥ 29</span><span class="store-price-u">/ 10 万 token</span></div>
+        <div class="store-feats">
+          <div><div class="dot"></div>约等于 12 次深度测算</div>
+          <div><div class="dot"></div>永久有效，随时抵扣</div>
+          <div><div class="dot"></div>购买即赠 +10 GM</div>
+        </div>
+        <div class="store-btn">立即购买</div>
+      </div>
+
+      <div class="store-card best" onclick="handleAction('BUY_PACK_M',{msg:'标准测算包加入购物车'})">
+        <div class="store-name">标准测算包</div>
+        <div class="store-price"><span class="store-price-v">¥ 99</span><span class="store-price-u">/ 50 次测算</span></div>
+        <div class="store-feats">
+          <div><div class="dot"></div>CBAM / 全域诊断 通用</div>
+          <div><div class="dot"></div>含 50 万 token 配额</div>
+          <div><div class="dot"></div>购买即赠 +40 GM · <strong style="color:var(--teal-l)">Lv.3 起 8.5 折</strong></div>
+        </div>
+        <div class="store-btn pri">立即购买</div>
+      </div>
+
+      <div class="store-card" onclick="handleAction('BUY_PACK_L',{msg:'旗舰无忧包加入购物车'})">
+        <div class="store-name">旗舰无忧包</div>
+        <div class="store-price"><span class="store-price-v">¥ 299</span><span class="store-price-u">/ 200 次测算</span></div>
+        <div class="store-feats">
+          <div><div class="dot"></div>含 200 万 token · 5GB 存储</div>
+          <div><div class="dot"></div>优先队列 · 报告 3× 提速</div>
+          <div><div class="dot"></div>购买即赠 +150 GM</div>
+        </div>
+        <div class="store-btn">立即购买</div>
+      </div>
+
+    </div>
+
+    <!-- ═════ UPGRADE TO ENTERPRISE ═════ -->
+    <div class="upgrade-card fu fu5">
+      <div class="uc-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M11 2L19 6V13L11 18L3 13V6L11 2Z" stroke="var(--gold-l)" stroke-width="1.2" fill="rgba(201,168,76,0.15)"/>
+          <circle cx="11" cy="10" r="2.5" stroke="var(--gold-l)" stroke-width="1.1"/>
+          <path d="M7 14.5C7 12.5 9 11 11 11C13 11 15 12.5 15 14.5" stroke="var(--gold-l)" stroke-width="1.1"/>
+        </svg>
+      </div>
+      <div class="uc-body">
+        <div class="uc-title">解锁企业金库 · CERTIFIED Workspace
+          <span class="pill pl-y">需企业授权</span>
+        </div>
+        <div class="uc-desc">
+          升级为官方企业金库后，<strong>算力配额扩容 10×</strong>、<strong>全供应链协同看板</strong>解锁、所有档案接入 <strong>MAT 物理核验</strong>防篡改保护。
+          您的打工人等级将自动锁定为 <strong>Lv.5 官方智库顾问</strong>。
+        </div>
+      </div>
+      <button class="uc-btn" onclick="handleAction('REQUEST_CERTIFIED',{msg:'已为您生成向老板呈送的企业认证请示报告',gm:30})">一键请示老板</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast">
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  <span id="toast-msg"></span>
+</div>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loading">
+  <div class="loading-art">
+    <div class="lart-spin"></div>
+    <div class="lart-msg" id="lart-msg">正在调用 Co2Lion 底座引擎解析…</div>
+    <div class="lart-sub" id="lart-sub">Matrix bootstrap · token streaming</div>
+  </div>
+</div>
+
+<script>
+/* ──────────────────────────────────────
+   HengAI · 算力资源页脚本
+   严格遵循 .cursorrules 的 4 步事件生命周期：
+   1) Paywall check  2) Loading artifact  3) API call  4) Reward toast + state update
+────────────────────────────────────────── */
+
+// 模拟全局 AppState（与数据字典对齐）
+const AppState = {
+  user: {
+    user_id:'u_wangLei_001',
+    account_tier:'PRO',            // GUEST | PRO
+    gm_balance: 128,
+    champion_level: 3,             // Lv.1 ~ Lv.5
+    current_workspace_id:'ws_sandbox_001',
+  },
+  workspace: {
+    workspace_id:'ws_sandbox_001',
+    workspace_type:'SANDBOX',      // SANDBOX | CERTIFIED
+    owner_id:'u_wangLei_001',
+  },
+  updateGM(delta){
+    this.user.gm_balance += delta;
+    const el = document.getElementById('gm-val');
+    if(el) el.textContent = this.user.gm_balance;
+  }
+};
+
+// 权限拦截（Paywall Check）
+const AuthGuard = {
+  checkPermission(actionType){
+    // 需要 CERTIFIED 才能执行的操作
+    const certifiedOnly = ['MODIFY_PHYSICAL_PATH','CONNECT_MAT_GATEWAY'];
+    if(certifiedOnly.includes(actionType) && AppState.workspace.workspace_type!=='CERTIFIED'){
+      return false;
+    }
+    return true;
+  }
+};
+
+// 事件总线 · 主控
+function handleAction(actionType, payload){
+  payload = payload || {};
+
+  // Step 1 · Paywall check
+  if(!AuthGuard.checkPermission(actionType)){
+    showToast('此操作需企业级物理网关（MAT）支持','gm');
+    return;
+  }
+
+  // Step 2 · Loading artifact (Aha Moment)
+  showLoading(payload.loading || '正在调用 Co2Lion 底座引擎解析…');
+
+  // Step 3 · 模拟后端请求
+  setTimeout(()=>{
+    hideLoading();
+
+    // Step 4 · Reward toast & state update
+    const gmEarned = typeof payload.gm==='number' ? payload.gm : 0;
+    showToast(payload.msg || '操作成功');
+    if(gmEarned>0){
+      setTimeout(()=>{
+        AppState.updateGM(gmEarned);
+        showGMReward(gmEarned);
+      }, 220);
+    }
+  }, 520);
+}
+
+// Toast
+let _toastTimer = null;
+function showToast(msg, flavor){
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.toggle('gm', flavor==='gm');
+  t.style.opacity = '1';
+  t.style.transform = 'translateY(0)';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(()=>{
+    t.style.opacity = '0';
+    t.style.transform = 'translateY(8px)';
+  }, 2400);
+}
+
+// GM 发光浮字
+function showGMReward(gm){
+  const chip = document.querySelector('.gm-chip');
+  const rect = chip ? chip.getBoundingClientRect() : {left:window.innerWidth-120, top:40, width:80};
+  const el = document.createElement('div');
+  el.className = 'gm-float';
+  el.textContent = '+' + gm + ' GM';
+  el.style.left = (rect.left + rect.width/2 - 22) + 'px';
+  el.style.top  = (rect.top + rect.height + 2)    + 'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 1300);
+}
+
+// Loading overlay
+function showLoading(msg){
+  document.getElementById('lart-msg').textContent = msg;
+  document.getElementById('loading').classList.add('on');
+}
+function hideLoading(){
+  document.getElementById('loading').classList.remove('on');
+}
+
+// 欢迎提示（沉溺感）
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{
+    showToast('本月已累计节省 46.8 小时 · 继续冲 Lv.4');
+  }, 600);
+});
+</script>
+<script>
+(function () {
+  function applyComputePipeline(p) {
+    if (!p) return;
+    var user = p.user || {};
+    var gm = Number(user.gmBalance != null ? user.gmBalance : user.gm_balance != null ? user.gm_balance : 0);
+    var el = document.getElementById('gm-val');
+    if (el) el.textContent = String(Math.max(0, Math.round(gm)));
+  }
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || ev.data.type !== 'HENGAI_HUB_PIPELINE') return;
+    applyComputePipeline(ev.data.payload);
+  });
+})();
+</script>
+</body>
+</html>

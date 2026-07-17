@@ -1,0 +1,766 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · 荣誉体系</title>
+<script>
+/* 嵌入模式：?embed=1 时隐藏原页 chrome (sidebar/topbar)，仅呈现内容模块 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<style>
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .sb,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] .main,
+html[data-embed="1"] .main-wrap { margin-left: 0 !important; }
+html[data-embed="1"] body { padding-left: 0 !important; background: var(--night, #06080f) !important; }
+</style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@600;700&family=DM+Mono:wght@400;500;600&display=swap');
+:root{
+  --night:#06080f;--dark:#0a0e1a;--panel:#0d1220;--p2:#111827;
+  --b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);
+  --ink:#e8edf5;--ink2:#8a95a8;--ink3:#4a5568;
+  --gold:#c9a84c;--gl:#f0d080;--gd:rgba(201,168,76,0.11);
+  --green:#3b9e4a;--greenl:#7dd98a;--greend:rgba(59,158,74,0.1);
+  --teal:#1d9e75;--teall:#6dd5b0;--teald:rgba(29,158,117,0.09);
+  --blue:#185fa5;--bluel:#93c5fd;--blued:rgba(24,95,165,0.1);
+  --red:#e24b4a;--redl:#fca5a5;--redd:rgba(226,75,74,0.09);
+  --purple:#7f77dd;--purpl:#c4b5fd;--purpd:rgba(127,119,221,0.09);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--night);color:var(--ink);
+  font-family:'Noto Sans SC',sans-serif;font-size:13px;line-height:1.6;min-height:100vh}
+.sb{width:200px;background:var(--dark);border-right:1px solid var(--b);
+  position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50}
+.sb-logo{padding:15px 14px 12px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:9px}
+.sb-li{width:28px;height:28px;border-radius:7px;background:var(--greend);border:1px solid rgba(59,158,74,0.35);display:flex;align-items:center;justify-content:center}
+.sb-tx{font-size:13px;font-weight:700}.sb-sub{font-size:9px;color:var(--ink3);margin-top:1px}
+.nav-s{padding:10px 13px 4px;font-size:9px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;font-weight:600}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 13px;font-size:12px;color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all 0.15s}
+.ni:hover{color:var(--ink);background:rgba(255,255,255,0.04)}
+.ni.on{color:var(--ink);background:rgba(255,255,255,0.06);border-left-color:var(--gold)}
+.nd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-ft{margin-top:auto;padding:11px 13px;border-top:1px solid var(--b)}
+.u-av{width:28px;height:28px;border-radius:50%;background:var(--teald);border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--teall);flex-shrink:0}
+.main{margin-left:0}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(6,8,15,0.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--b);padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.tl{display:flex;align-items:center;gap:10px}
+.tt{font-size:14px;font-weight:500}
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.pl-y{background:var(--gd);color:var(--gl);border:1px solid rgba(201,168,76,0.3)}
+.pl-g{background:var(--greend);color:var(--greenl);border:1px solid rgba(59,158,74,0.3)}
+.pl-t{background:var(--teald);color:var(--teall);border:1px solid rgba(29,158,117,0.3)}
+.pl-p{background:var(--purpd);color:var(--purpl);border:1px solid rgba(127,119,221,0.3)}
+.pl-b{background:var(--blued);color:var(--bluel);border:1px solid rgba(24,95,165,0.3)}
+.pl-r{background:var(--redd);color:var(--redl);border:1px solid rgba(226,75,74,0.3)}
+.pl-gray{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--b)}
+.tr{display:flex;align-items:center;gap:8px}
+.tb-btn{padding:5px 13px;border-radius:7px;font-size:11.5px;font-weight:500;border:1px solid var(--b2);background:transparent;color:var(--ink);cursor:pointer;font-family:inherit;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.07)}
+.tb-btn.pri{background:var(--gd);border-color:rgba(201,168,76,0.4);color:var(--gl)}
+.page{padding:0 0 80px}
+.card{background:var(--panel);border:1px solid var(--b);border-radius:14px;padding:18px 20px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.div{border:none;border-top:1px solid var(--b);margin:14px 0}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-t{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.1px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sh-line{flex:1;height:1px;background:var(--b)}
+.sh-a{font-size:11px;color:var(--teall);cursor:pointer;white-space:nowrap}
+.sec{padding:24px 28px 0}
+
+/* ── HONOR HERO ── */
+.honor-hero{
+  background:var(--dark);padding:40px 36px 32px;
+  position:relative;overflow:hidden;border-bottom:1px solid var(--b);
+}
+.honor-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent 5%,var(--gold) 35%,var(--teall) 65%,transparent 95%)}
+.hh-glow{position:absolute;top:-40px;right:-40px;width:300px;height:300px;
+  border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.06),transparent 70%);
+  pointer-events:none}
+.hh-top{display:flex;align-items:flex-start;gap:20px;margin-bottom:24px;position:relative;z-index:1}
+.hh-left{flex:1}
+.hh-ey{font-size:9.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:8px}
+.hh-title{font-family:'Noto Serif SC',serif;font-size:28px;font-weight:700;
+  color:var(--ink);line-height:1.2;margin-bottom:6px;letter-spacing:-0.5px}
+.hh-sub{font-size:13px;color:var(--ink2);margin-bottom:16px;line-height:1.7}
+.hh-co2{display:inline-flex;flex-direction:column;gap:2px;
+  padding:14px 20px;background:rgba(29,158,117,0.08);border:1px solid rgba(29,158,117,0.25);
+  border-radius:13px}
+.hh-co2-val{font-family:'DM Mono',monospace;font-size:36px;font-weight:700;
+  color:var(--teall);letter-spacing:-1.5px;line-height:1}
+.hh-co2-label{font-size:11px;color:var(--teal)}
+.hh-right{flex-shrink:0;display:flex;flex-direction:column;gap:12px;min-width:180px}
+.hh-cert{background:rgba(201,168,76,0.07);border:1px solid rgba(201,168,76,0.25);
+  border-radius:12px;padding:14px 16px;text-align:center}
+.hh-cert-icon{width:44px;height:44px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
+.hh-cert-name{font-size:12.5px;font-weight:600;color:var(--gl);margin-bottom:3px}
+.hh-cert-meta{font-size:10px;color:var(--gold)}
+
+/* ── MEDAL WALL ── */
+.medal-wall{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.medal-card{border-radius:16px;padding:20px 16px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  position:relative;overflow:hidden;border:1px solid;transition:transform 0.2s}
+.medal-card:hover{transform:translateY(-2px)}
+.medal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.mc-earned{cursor:default}
+.mc-locked{opacity:0.4;cursor:not-allowed}
+.mc-locked::after{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(-45deg,transparent,transparent 7px,rgba(255,255,255,0.015) 7px,rgba(255,255,255,0.015) 14px)}
+.medal-icon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative}
+.medal-glow{position:absolute;inset:-4px;border-radius:50%;border:1px solid;opacity:0.35}
+.medal-name{font-size:13px;font-weight:600;line-height:1.3}
+.medal-desc{font-size:10.5px;line-height:1.55}
+.medal-date{font-size:10px;font-family:'DM Mono',monospace}
+.medal-gm{font-size:11px;font-weight:700;font-family:'DM Mono',monospace}
+.medal-prog-wrap{width:100%;display:flex;flex-direction:column;gap:4px}
+.medal-prog{height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden}
+.medal-pfill{height:100%;border-radius:2px}
+.medal-proglabel{font-size:9.5px}
+
+/* ── MILESTONE SECTION ── */
+.milestone-strip{
+  background:var(--dark);border-bottom:1px solid var(--b);
+  padding:0 28px;
+}
+.ms-nav{display:flex;gap:0;border-bottom:1px solid var(--b)}
+.ms-tab{padding:14px 20px;font-size:12.5px;font-weight:500;cursor:pointer;
+  color:var(--ink2);border-bottom:2px solid transparent;transition:all 0.18s;
+  display:flex;align-items:center;gap:8px}
+.ms-tab:hover{color:var(--ink)}
+.ms-tab.active{color:var(--ink);border-bottom-color:var(--gold)}
+
+.ms-content{display:none;padding:0 28px 28px}
+.ms-content.active{display:block}
+
+.ms-hero{
+  padding:28px 30px;border-radius:18px;margin:20px 0 16px;
+  position:relative;overflow:hidden;border:1px solid;
+}
+.ms-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;opacity:0.7}
+.ms-code{font-size:9.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:10px}
+.ms-num{font-family:'DM Mono',monospace;font-size:40px;font-weight:700;
+  letter-spacing:-1.5px;line-height:1;margin-bottom:4px}
+.ms-name{font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;margin-bottom:6px}
+.ms-name-en{font-size:11px;letter-spacing:2px;margin-bottom:14px}
+.ms-equiv{font-size:12px;line-height:1.7;max-width:500px}
+.ms-status-row{display:flex;align-items:center;gap:12px;margin-top:16px}
+.ms-status-badge{display:inline-flex;align-items:center;gap:6px;
+  padding:5px 13px;border-radius:20px;font-size:11px;font-weight:600}
+
+/* progress */
+.ms-prog-wrap{margin:14px 0}
+.ms-prog-head{display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:5px}
+.ms-prog-track{height:8px;background:rgba(255,255,255,0.07);border-radius:4px;overflow:hidden}
+.ms-prog-fill{height:100%;border-radius:4px}
+
+/* event timeline inside milestone */
+.ms-events{display:flex;flex-direction:column;gap:10px}
+.ms-ev{display:flex;gap:11px;align-items:flex-start;
+  padding:10px 13px;background:rgba(0,0,0,0.2);border:1px solid var(--b);border-radius:10px}
+.ms-ev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.ms-ev-body{flex:1}
+.ms-ev-title{font-size:12px;font-weight:500;color:var(--ink);margin-bottom:2px}
+.ms-ev-desc{font-size:11px;color:var(--ink2);line-height:1.6}
+
+/* witness cert preview */
+.cert-preview{
+  background:var(--night);border:1px solid;border-radius:14px;
+  padding:18px 20px;margin-top:14px;position:relative;overflow:hidden;
+}
+.cert-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:1px}
+.cp-tag{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.cp-name{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;margin-bottom:4px}
+.cp-sub{font-size:11.5px;color:var(--ink2);margin-bottom:10px}
+.cp-stats{display:flex;gap:16px;flex-wrap:wrap}
+.cp-stat-val{font-family:'DM Mono',monospace;font-size:15px;font-weight:700;line-height:1}
+.cp-stat-label{font-size:10px;color:var(--ink3);margin-top:2px}
+.cp-chain{font-family:'DM Mono',monospace;font-size:10px;margin-top:10px}
+
+/* ── EPOCH REGISTRY ── */
+.epoch-hero{
+  background:var(--panel);border:1px solid rgba(127,119,221,0.25);
+  border-radius:16px;padding:24px 26px;margin-bottom:16px;
+  position:relative;overflow:hidden;
+}
+.epoch-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(127,119,221,0.6),transparent)}
+.eh-ey{font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--purpl);margin-bottom:10px}
+.eh-title{font-family:'Noto Serif SC',serif;font-size:22px;font-weight:700;
+  color:var(--ink);margin-bottom:6px}
+.eh-sub{font-size:12px;color:var(--ink2);line-height:1.75;max-width:560px;margin-bottom:14px}
+.eh-locked{display:inline-flex;align-items:center;gap:8px;
+  padding:9px 14px;background:rgba(127,119,221,0.07);border:1px solid rgba(127,119,221,0.2);
+  border-radius:9px;font-size:11.5px;color:var(--purpl)}
+
+/* ── RANK TABLE ── */
+.rank-table{width:100%;border-collapse:collapse}
+.rank-table th{font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;
+  letter-spacing:0.5px;padding:8px 12px;border-bottom:1px solid var(--b);text-align:left}
+.rank-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04);
+  font-size:12.5px;vertical-align:middle}
+.rank-table tr:last-child td{border-bottom:none}
+.rank-table tr.mine{background:rgba(201,168,76,0.05)}
+.rank-table tr:hover td{background:rgba(255,255,255,0.02)}
+.rank-num{font-family:'DM Mono',monospace;font-size:14px;font-weight:700}
+
+#toast{position:fixed;bottom:22px;right:22px;background:var(--p2);
+  border:1px solid rgba(29,158,117,0.4);border-radius:11px;
+  padding:11px 16px;display:flex;align-items:center;gap:9px;
+  font-size:12.5px;color:var(--teall);z-index:9999;
+  opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;min-width:240px}
+
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu 0.4s ease both}
+.fu1{animation-delay:.05s}.fu2{animation-delay:.12s}.fu3{animation-delay:.19s}.fu4{animation-delay:.26s}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.pulse{animation:pulse 2s ease-in-out infinite}
+</style>
+<style>
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:220px;background:#0f1720;
+  border-right:1px solid rgba(255,255,255,0.08);padding:16px 14px;overflow:auto;z-index:50;
+}
+.sidebar .sb-brand{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.sidebar .sb-brand-ic{width:28px;height:28px;border-radius:7px;background:rgba(59,158,74,0.14);border:1px solid rgba(59,158,74,0.35);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar .sb-brand-name{font-size:16px;font-weight:700;color:#e5e7eb}
+.sidebar .sb-brand-sub{font-size:11px;color:#8aa0b6;margin-top:2px}
+.sidebar .sb-group-title{font-size:11px;color:#7f8ea3;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.6px}
+.sidebar .sb-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;color:#c7d2df;cursor:pointer;font-size:12px}
+.sidebar .sb-item:hover{background:rgba(255,255,255,0.03)}
+.sidebar .sb-item.active{background:rgba(59,158,74,0.14);color:#d4f5dc}
+.sidebar .sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+body{padding-left:220px}
+html[data-embed="1"] body{padding-left:0 !important}
+</style>
+<script src="hengai-embed-boot.js"></script>
+<script src="hengai-load-appstate.js"></script>
+<script src="hengai-trust-journey.js"></script>
+</head>
+<body>
+
+<!-- CANONICAL SIDEBAR — HengAI V3.5 工业主权网络 · MPA 统一版 -->
+
+<div class="sidebar" id="sidebar" data-qa-version="3.5">
+
+  <div class="sb-brand">
+
+    <div class="sb-brand-ic">
+
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+
+    </div>
+
+    <div>
+
+      <div class="sb-brand-name">HengAI</div>
+
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+
+    </div>
+
+  </div>
+
+
+
+  <div style="padding:12px 14px 4px;">
+
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+      返回 HengAI 对话
+
+    </div>
+
+  </div>
+
+
+
+  <div class="sb-group-title" id="g-personal">个人空间</div>
+
+  <div class="sb-item" data-page="overview" onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+
+  <div class="sb-item" data-page="achieve" onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+
+  <div class="sb-item" data-page="calc" onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+
+  <div class="sb-item" data-page="wallet" onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+
+  <div class="sb-item" data-page="resource" onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+
+
+
+  <div class="sb-group-title" id="g-business">企业工作台</div>
+
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+
+  <div class="sb-item" data-page="report" onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+
+  <div class="sb-item" data-page="decision" onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-item locked" data-page="supply" id="nav-supply" data-role-nav="sme-only" onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" id="dot-supply" style="background:var(--ink3)"></div>供应链协同</div>
+
+  <div class="sb-item locked" data-page="origin-audit" id="n-origin-audit" data-role-nav="origin-only" onclick="window.location.href='HengAI_HeavyIndustry_Suite.html'"><div class="sb-dot" id="dot-origin-audit" style="background:var(--ink3)"></div>产业主权看板</div>
+
+
+
+  <div class="sb-group-title" id="g-sovereign">大国重器 / 生态</div>
+
+  <div class="sb-item" data-page="honor" onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+
+  <div class="sb-item locked" data-page="eu" onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:var(--ink3)"></div>欧盟海关直连</div>
+
+  <div class="sb-item locked" data-page="dld" onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:var(--ink3)"></div>DLD 绿色信贷</div>
+
+  <div class="sb-item locked" data-page="acf" onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:var(--ink3)"></div>ACF 认证通道</div>
+
+  <div class="sb-item locked" data-page="gov" onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:var(--ink3)"></div>生态共治委员会</div>
+
+</div>
+
+<script id="qa-sidebar-active-script">
+
+(function(){
+
+  var map = {"全域中心.html":"overview","index.html":"overview","HengAI_CBAM测算工具.html":"calc","HengAI_星火成就档案.html":"achieve","HengAI_GM_Wallet.html":"wallet","HengAI_算力资源.html":"resource","HengAI_企业数字档案.html":"enterprise","HengAI_供应链协同.html":"supply","HengAI_全域诊断报告.html":"report","HengAI_决策层呈送包生成器.html":"decision","HengAI_HeavyIndustry_Suite.html":"origin-audit","HengAI_荣誉体系.html":"honor","HengAI_EU_Customs.html":"eu","HengAI_DLD_Credit.html":"dld","HengAI_ACF_Cert.html":"acf","HengAI_Governance.html":"gov"};
+
+  try {
+
+    var fn = decodeURIComponent((location.pathname.split("/").pop() || "").split("?")[0]);
+
+    var id = map[fn]; if (!id) return;
+
+    document.querySelectorAll(".sidebar .sb-item[data-page]").forEach(function(el){
+
+      if (el.getAttribute("data-page") === id) el.classList.add("active");
+
+    });
+
+  } catch(e){}
+
+})();
+
+</script>
+<div class="main">
+<div class="page">
+
+  <!-- HONOR HERO -->
+  <div class="honor-hero fu fu1">
+    <div class="hh-glow"></div>
+    <div class="hh-top">
+      <div class="hh-left">
+        <div class="hh-ey">Co2Lion · HengAI 荣誉体系</div>
+        <div class="hh-title">每一吨减排，都有主人</div>
+        <div class="hh-sub">荣誉不是颁发的，是赢得的。这里记录的每一个数字都是链上可追溯的真实行动——不是自我声明，是对企业、行业、社会可量化贡献的永久见证。</div>
+        <div class="hh-co2">
+          <div class="hh-co2-val"><span id="honor-co2-val" class="dyn-total-co2">0</span> <span style="font-size:16px;font-weight:400;color:var(--teal)">tCO₂e</span></div>
+          <div class="hh-co2-label"><span id="honor-name" class="dyn-user-name"></span>累计推动减排量 · 链上存证 · 不可篡改</div>
+        </div>
+      </div>
+      <div class="hh-right">
+        <div class="hh-cert">
+          <div class="hh-cert-icon">
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+              <path d="M22 3L40 12V26C40 35 32 42 22 44C12 42 4 35 4 26V12L22 3Z" fill="rgba(201,168,76,0.12)" stroke="#c9a84c" stroke-width="1.5"/>
+              <path d="M22 8L37 15.5V26C37 33 30.5 39 22 41C13.5 39 7 33 7 26V15.5L22 8Z" fill="none" stroke="rgba(201,168,76,0.3)" stroke-width="0.7"/>
+              <path d="M15 12L18.5 15.5L22 10L25.5 15.5L29 12" fill="none" stroke="#c9a84c" stroke-width="1" stroke-linecap="round"/>
+              <text x="22" y="30" text-anchor="middle" font-size="14" font-weight="700" fill="#c9a84c" font-family="sans-serif" letter-spacing="-0.5">3</text>
+              <text x="22" y="39" text-anchor="middle" font-size="5.5" font-weight="600" fill="rgba(201,168,76,0.55)" font-family="sans-serif" letter-spacing="1.2">LEVEL</text>
+            </svg>
+          </div>
+          <div class="hh-cert-name" id="honor-level">Lv.3 架构师</div>
+          <div class="hh-cert-meta">Architect · ---</div>
+        </div>
+        <div style="background:rgba(29,158,117,0.08);border:1px solid rgba(29,158,117,0.22);border-radius:11px;padding:12px 14px;text-align:center">
+          <div style="font-size:10px;color:var(--teal);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px">距地球公民勋章</div>
+          <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:var(--teall);line-height:1">已满足</div>
+          <div style="font-size:10px;color:var(--teal);margin-top:3px"><span class="dyn-total-co2">0</span> tCO₂e ≥ 10 tCO₂e</div>
+          <button style="margin-top:9px;width:100%;padding:7px;border-radius:7px;background:rgba(29,158,117,0.15);border:1px solid rgba(29,158,117,0.35);color:var(--teall);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit" onclick="showToast('地球公民勋章申请已提交 · 链上核验中')">立即申领 →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 产业链主权先行登记 · PIONEER -->
+  <div class="sec fu fu2" id="honor-pioneer-registry" hidden>
+    <div class="sh">
+      <div class="sh-t">产业链主权先行登记 <div class="sh-line"></div></div>
+      <span class="pill pl-y" id="honor-pioneer-tier-pill">主权先行者</span>
+    </div>
+    <div class="card" style="border-color:rgba(201,168,76,.28);background:rgba(201,168,76,.05)">
+      <div style="font-size:13px;font-weight:600;color:var(--gl);margin-bottom:6px" id="honor-pioneer-title">您已迈出实证承诺第一步</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.7;margin-bottom:10px" id="honor-pioneer-copy">
+        信任承诺度已达 COMMITTED · 系统已记录您的自愿公开姿态。完成主权确权后，将自动升入 Carbon Ownership Summit 三大榜单候选池。
+      </div>
+      <div style="font-size:10.5px;color:var(--ink3)" id="honor-pioneer-trust">TrustCommitmentLevel · —</div>
+    </div>
+  </div>
+
+  <!-- SECTION: MEDAL WALL -->
+  <div class="sec fu fu2">
+    <div class="sh">
+      <div class="sh-t">个人成就徽章 <div class="sh-line"></div></div>
+      <span style="font-size:11px;color:var(--ink3)">已获得 4 枚 · 待解锁 8 枚</span>
+    </div>
+    <div class="medal-wall" style="margin-bottom:16px">
+      <!-- earned -->
+      <div class="medal-card mc-earned" style="background:rgba(59,158,74,0.07);border-color:rgba(59,158,74,0.3)">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--green)"></div>
+        <div class="medal-icon" style="background:rgba(59,158,74,0.13)">
+          <div class="medal-glow" style="border-color:var(--green)"></div>
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><path d="M15 2L27 8V18C27 24 21.5 28.5 15 30C8.5 28.5 3 24 3 18V8L15 2Z" stroke="#3b9e4a" stroke-width="1.3" fill="rgba(59,158,74,0.12)"/><polyline points="9,15 13,19 21,11" stroke="#7dd98a" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="medal-name" style="color:var(--greenl)">CBAM 申报架构师</div>
+        <div class="medal-desc" style="color:rgba(125,217,138,0.7)">3 次通关预演 · Lv.4 置信度</div>
+        <div class="medal-date" style="color:var(--ink3)"><span data-empty="待记录">---</span></div>
+        <span class="pill pl-g">已获得</span>
+      </div>
+      <div class="medal-card mc-earned" style="background:rgba(24,95,165,0.07);border-color:rgba(24,95,165,0.3)">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--bluel)"></div>
+        <div class="medal-icon" style="background:rgba(24,95,165,0.13)">
+          <div class="medal-glow" style="border-color:var(--blue)"></div>
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><circle cx="15" cy="15" r="12" stroke="#185fa5" stroke-width="1.3"/><circle cx="15" cy="15" r="5" stroke="#93c5fd" stroke-width="1.1"/><line x1="15" y1="3" x2="15" y2="10" stroke="#185fa5" stroke-width="1"/><line x1="15" y1="20" x2="15" y2="27" stroke="#185fa5" stroke-width="1"/><line x1="3" y1="15" x2="10" y2="15" stroke="#185fa5" stroke-width="1"/><line x1="20" y1="15" x2="27" y2="15" stroke="#185fa5" stroke-width="1"/></svg>
+        </div>
+        <div class="medal-name" style="color:var(--bluel)">Scope 3 穿透专家</div>
+        <div class="medal-desc" style="color:rgba(147,197,253,0.7)">8 家供应商接入 · 覆盖率 47%</div>
+        <div class="medal-date" style="color:var(--ink3)"><span data-empty="待记录">---</span></div>
+        <span class="pill pl-b">已获得</span>
+      </div>
+      <div class="medal-card mc-earned" style="background:rgba(127,119,221,0.07);border-color:rgba(127,119,221,0.3)">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--purpl)"></div>
+        <div class="medal-icon" style="background:rgba(127,119,221,0.13)">
+          <div class="medal-glow" style="border-color:var(--purple)"></div>
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><path d="M15 2L17.5 10L26 11L20 17L22 25.5L15 21.5L8 25.5L10 17L4 11L12.5 10L15 2Z" stroke="#7f77dd" stroke-width="1.3" fill="rgba(127,119,221,0.12)"/></svg>
+        </div>
+        <div class="medal-name" style="color:var(--purpl)">生态先行者 · ---</div>
+        <div class="medal-desc" style="color:rgba(196,181,253,0.7)">首批 1,000 名会员 · 早鸟认证</div>
+        <div class="medal-date dyn-cert-date" style="color:var(--ink3)">待确权</div>
+        <span class="pill pl-p">已获得</span>
+      </div>
+      <div class="medal-card mc-earned" style="background:var(--gd);border-color:rgba(201,168,76,0.3)">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold)"></div>
+        <div class="medal-icon" style="background:rgba(201,168,76,0.13)">
+          <div class="medal-glow" style="border-color:var(--gold)"></div>
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect x="4" y="8" width="22" height="17" rx="2.5" stroke="#c9a84c" stroke-width="1.3"/><path d="M9 8V6.5a6 6 0 0112 0V8" stroke="#c9a84c" stroke-width="1.2"/><polyline points="10,16 13.5,19.5 20,13.5" stroke="#f0d080" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="medal-name" style="color:var(--gl)">首份真实碳档案</div>
+        <div class="medal-desc" style="color:rgba(240,208,128,0.7)">企业 CBAM 精确测算 · 存证</div>
+        <div class="medal-date" style="color:var(--ink3)"><span data-empty="待记录">---</span></div>
+        <span class="pill pl-y">已获得</span>
+      </div>
+    </div>
+
+    <!-- Locked badges -->
+    <div style="font-size:10px;font-weight:700;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      待解锁 <div style="flex:1;height:1px;background:var(--b)"></div>
+    </div>
+    <div class="medal-wall">
+      <div class="medal-card mc-locked" style="background:rgba(29,158,117,0.04);border-color:rgba(29,158,117,0.15)">
+        <div class="medal-icon" style="background:rgba(29,158,117,0.07);border:1.5px dashed rgba(29,158,117,0.2)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 2L23.5 7V17C23.5 22 19 25.5 13 27C7 25.5 2.5 22 2.5 17V7L13 2Z" stroke="rgba(29,158,117,0.5)" stroke-width="1.2"/><text x="13" y="17.5" text-anchor="middle" font-size="9" font-weight="700" fill="rgba(29,158,117,0.5)" font-family="sans-serif">15</text></svg>
+        </div>
+        <div class="medal-name" style="color:var(--ink3)">供应链协同大师</div>
+        <div class="medal-prog-wrap">
+          <div class="medal-prog"><div class="medal-pfill" style="width:53%;background:var(--teal)"></div></div>
+          <div class="medal-proglabel" style="color:var(--ink3)">8 / 15 家 · 还差 7 家</div>
+        </div>
+      </div>
+      <div class="medal-card mc-locked" style="background:rgba(29,158,117,0.04);border-color:rgba(201,168,76,0.15)">
+        <div class="medal-icon" style="background:rgba(201,168,76,0.07);border:1.5px dashed rgba(201,168,76,0.2)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="11" stroke="rgba(201,168,76,0.4)" stroke-width="1.2" stroke-dasharray="3 2"/></svg>
+        </div>
+        <div class="medal-name" style="color:var(--ink3)">地球公民勋章</div>
+        <div class="medal-prog-wrap">
+          <div class="medal-prog"><div class="medal-pfill" style="width:100%;background:var(--teal)"></div></div>
+          <div class="medal-proglabel" style="color:var(--teall);font-weight:600">条件已满足 · 申领中</div>
+        </div>
+      </div>
+      <div class="medal-card mc-locked" style="background:rgba(24,95,165,0.04);border-color:rgba(24,95,165,0.15)">
+        <div class="medal-icon" style="background:rgba(24,95,165,0.07);border:1.5px dashed rgba(24,95,165,0.2)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect x="3" y="7" width="20" height="15" rx="2.5" stroke="rgba(24,95,165,0.4)" stroke-width="1.2"/><path d="M8 7V6a5 5 0 0110 0v1" stroke="rgba(24,95,165,0.4)" stroke-width="1.1"/></svg>
+        </div>
+        <div class="medal-name" style="color:var(--ink3)">企业升级推动者</div>
+        <div class="medal-prog-wrap">
+          <div class="medal-prog"><div class="medal-pfill" style="width:40%;background:var(--gold)"></div></div>
+          <div class="medal-proglabel" style="color:var(--ink3)">呈送报告中 · 等待决策层</div>
+        </div>
+      </div>
+      <div class="medal-card mc-locked" style="background:rgba(127,119,221,0.04);border-color:rgba(127,119,221,0.15)">
+        <div class="medal-icon" style="background:rgba(127,119,221,0.07);border:1.5px dashed rgba(127,119,221,0.2)">
+          <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M13 2L15 8.5L22 9.5L17 15L18.5 22L13 19L7.5 22L9 15L4 9.5L11 8.5L13 2Z" stroke="rgba(127,119,221,0.4)" stroke-width="1.2"/></svg>
+        </div>
+        <div class="medal-name" style="color:var(--ink3)">破晓见证者</div>
+        <div class="medal-prog-wrap">
+          <div class="medal-prog"><div class="medal-pfill" style="width:100%;background:var(--greenl)"></div></div>
+          <div class="medal-proglabel" style="color:var(--greenl);font-weight:600">全局已突破 · 待系统颁发</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: MILESTONE CEREMONIES -->
+  <div class="sec fu fu3" id="honor-summit-milestones" style="margin-top:24px">
+    <div id="honor-summit-lock" hidden style="margin:0 28px 12px;padding:12px 16px;border-radius:12px;border:1px solid rgba(59,130,246,.3);background:rgba(59,130,246,.08);font-size:12px;color:var(--bluel);line-height:1.65">
+      Carbon Ownership Summit 三大里程碑榜单候选资格需 <strong>HonorEligibilityTier = CERTIFIED_BUILDER</strong>（历史上曾达成主权确权）。当前为先行登记阶段，完成确权后将自动解锁。
+    </div>
+    <div class="milestone-strip">
+      <div style="padding:20px 0 0;font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.1px;text-transform:uppercase;display:flex;align-items:center;gap:8px">
+        里程碑庆典 <div style="flex:1;height:1px;background:var(--b)"></div>
+        <span style="font-size:11px;color:var(--ink3);font-weight:400;letter-spacing:0">当前进度：燎原已突破 · 距纪元还差 8.15M tCO₂e</span>
+      </div>
+      <div class="ms-nav">
+        <div class="ms-tab active" onclick="setMs(this,'dawn')">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,4.5 4,7.5 9,1.5" stroke="var(--greenl)" stroke-width="1.3" stroke-linecap="round"/></svg>
+          破晓 · DAWN
+        </div>
+        <div class="ms-tab" onclick="setMs(this,'wildfire')">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,4.5 4,7.5 9,1.5" stroke="var(--gold)" stroke-width="1.3" stroke-linecap="round"/></svg>
+          燎原 · WILDFIRE
+        </div>
+        <div class="ms-tab" onclick="setMs(this,'era')">
+          <div class="pulse" style="width:7px;height:7px;border-radius:50%;background:var(--bluel);flex-shrink:0"></div>
+          纪元 · NEW ERA
+        </div>
+      </div>
+    </div>
+
+    <!-- DAWN -->
+    <div class="ms-content active" id="ms-dawn">
+      <div class="ms-hero" style="background:rgba(59,158,74,0.06);border-color:rgba(59,158,74,0.28)">
+        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,158,74,0.6),transparent)"></div>
+        <div class="ms-code" style="color:var(--green)">MILESTONE I · DAWN · 已突破</div>
+        <div class="ms-num" style="color:var(--greenl)">10 万 <span style="font-size:18px;font-weight:400;color:var(--ink2)">tCO₂e</span></div>
+        <div class="ms-name" style="color:var(--greenl)">破晓</div>
+        <div class="ms-name-en" style="color:var(--green)">The First Light</div>
+        <div class="ms-equiv" style="color:rgba(125,217,138,0.8)">等效于 <strong style="color:var(--greenl)">167 万棵树</strong>生长一年的固碳量——中国供应链第一次用可追溯的数字向世界证明了自己。</div>
+        <div class="ms-status-row">
+          <div class="ms-status-badge" style="background:var(--greend);border:1px solid rgba(59,158,74,0.35);color:var(--greenl)">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="var(--greenl)" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <span class="dyn-milestone-time" data-milestone="register" data-time-fmt="md" data-empty="待记录">---</span> · 09:17 突破
+          </div>
+          <span style="font-size:11.5px;color:var(--ink2)">全体见证者已获「破晓见证者」链上证书</span>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card" style="padding:16px 18px">
+          <div style="font-size:10.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">庆典事件回顾</div>
+          <div class="ms-events">
+            <div class="ms-ev"><div class="ms-ev-dot" style="background:var(--greenl)"></div><div class="ms-ev-body"><div class="ms-ev-title">全平台「破晓动画」72小时展示</div><div class="ms-ev-desc">中国东海岸绿色光点地球图，每个光点代表一个活跃供应链节点</div></div></div>
+            <div class="ms-ev"><div class="ms-ev-dot" style="background:var(--bluel)"></div><div class="ms-ev-body"><div class="ms-ev-title">「第一份供应链减排真实账单」发布</div><div class="ms-ev-desc">向欧盟 CBAM 主管机构发送里程碑通报函，正式进入国际视野</div></div></div>
+            <div class="ms-ev"><div class="ms-ev-dot" style="background:var(--gold)"></div><div class="ms-ev-body"><div class="ms-ev-title">全体活跃用户获 +200 GM「破晓见证者」奖励</div><div class="ms-ev-desc">链上证书永久存证，不可撤销</div></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="cert-preview" style="border-color:rgba(59,158,74,0.35)">
+            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,158,74,0.5),transparent)"></div>
+            <div class="cp-tag" style="color:var(--green)"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1,4.5 3.5,7 8,2" stroke="var(--greenl)" stroke-width="1.2" stroke-linecap="round"/></svg> 破晓见证者证书 · CL-IVC 存证</div>
+            <div class="cp-name dyn-user-name" style="color:var(--greenl)"></div>
+            <div class="cp-sub">于 10 万 tCO₂e 突破时刻见证 · 贡献了其中的 <span class="dyn-total-co2">0</span> tCO₂e</div>
+            <div class="cp-stats">
+              <div><div class="cp-stat-val dyn-total-co2" style="color:var(--teall)">0</div><div class="cp-stat-label">贡献 tCO₂e</div></div>
+              <div><div class="cp-stat-val" style="color:var(--gold)">---%</div><div class="cp-stat-label">占全球总量</div></div>
+              <div><div class="cp-stat-val"><span class="dyn-global-rank">#--</span></div><div class="cp-stat-label">全球排名</div></div>
+            </div>
+            <div class="cp-chain dyn-chain-hash" style="color:var(--ink3)">待确权</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WILDFIRE -->
+    <div class="ms-content" id="ms-wildfire">
+      <div class="ms-hero" style="background:rgba(201,168,76,0.06);border-color:rgba(201,168,76,0.28)">
+        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.65),transparent)"></div>
+        <div class="ms-code" style="color:var(--gold)">MILESTONE II · WILDFIRE · 已突破</div>
+        <div class="ms-num" style="color:var(--gl)">100 万 <span style="font-size:18px;font-weight:400;color:var(--ink2)">tCO₂e</span></div>
+        <div class="ms-name" style="color:var(--gl)">燎原</div>
+        <div class="ms-name-en" style="color:var(--gold)">The Spreading Fire</div>
+        <div class="ms-equiv" style="color:rgba(240,208,128,0.8)">等效于关停一座 <strong style="color:var(--gl)">中型燃煤电厂运行一整年</strong>——这已经不是一家公司的成就，这是一场运动的证明。</div>
+        <div class="ms-status-row">
+          <div class="ms-status-badge" style="background:var(--gd);border:1px solid rgba(201,168,76,0.35);color:var(--gl)">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="var(--gl)" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <span class="dyn-milestone-time" data-milestone="cbamCalc" data-time-fmt="md" data-empty="待记录">---</span> · 23:41 突破
+          </div>
+          <span style="font-size:11.5px;color:var(--ink2)">「点火者」已永久载入名录</span>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card" style="padding:16px 18px">
+          <div style="font-size:10.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">庆典事件回顾</div>
+          <div class="ms-events">
+            <div class="ms-ev"><div class="ms-ev-dot" style="background:var(--gold)"></div><div class="ms-ev-body"><div class="ms-ev-title">全球同步直播倒计时 · 72 国同步</div><div class="ms-ev-desc">最后推动突破的供应商工作人员成为「点火者」，永久载入</div></div></div>
+            <div class="ms-ev"><div class="ms-ev-dot" style="background:var(--redl)"></div><div class="ms-ev-body"><div class="ms-ev-title">向全球 100 家跨国企业发出「燎原邀请函」</div><div class="ms-ev-desc">苹果、特斯拉、宜家等跨国企业供应链合规合作邀请</div></div></div>
+            <div class="ms-ev"><div class="ms-ev-dot" style="background:var(--bluel)"></div><div class="ms-ev-body"><div class="ms-ev-title">向 COP 气候大会提交「中国民间碳行动报告」</div><div class="ms-ev-desc">首份由链上数据支撑的中国供应链减排报告</div></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="cert-preview" style="border-color:rgba(201,168,76,0.35)">
+            <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.55),transparent)"></div>
+            <div class="cp-tag" style="color:var(--gold)"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1,4.5 3.5,7 8,2" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round"/></svg> 燎原见证者证书 · CL-IVC 存证</div>
+            <div class="cp-name dyn-user-name" style="color:var(--gl)"></div>
+            <div class="cp-sub">于 100 万 tCO₂e 突破时刻见证 · 全球 <span class="dyn-global-rank">#--</span> 贡献者</div>
+            <div class="cp-stats">
+              <div><div class="cp-stat-val dyn-total-co2" style="color:var(--teall)">0</div><div class="cp-stat-label">贡献 tCO₂e</div></div>
+              <div><div class="cp-stat-val" style="color:var(--gold)">---%</div><div class="cp-stat-label">占全球总量</div></div>
+              <div><div class="cp-stat-val"><span class="dyn-global-rank">#--</span></div><div class="cp-stat-label">全球排名</div></div>
+            </div>
+            <div class="cp-chain dyn-chain-hash" style="color:var(--ink3)">待确权</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW ERA -->
+    <div class="ms-content" id="ms-era">
+      <div class="ms-hero" style="background:rgba(24,95,165,0.06);border-color:rgba(55,138,221,0.25)">
+        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(55,138,221,0.5),transparent)"></div>
+        <div class="ms-code" style="color:var(--bluel)">MILESTONE III · NEW ERA · 进行中</div>
+        <div class="ms-num" style="color:var(--bluel)">1,000 万 <span style="font-size:18px;font-weight:400;color:var(--ink2)">tCO₂e</span></div>
+        <div class="ms-name" style="color:var(--bluel)">纪元</div>
+        <div class="ms-name-en" style="color:var(--blue)">The Beginning of a New Age</div>
+        <div class="ms-equiv" style="color:rgba(147,197,253,0.8)">等效于关停 <strong style="color:var(--bluel)">3 座大型燃煤电厂运行一年</strong>——这是人类历史上第一次，自下而上的供应链行动在规模上进入了国家级气候叙事。</div>
+        <div class="ms-prog-wrap">
+          <div class="ms-prog-head">
+            <span style="color:var(--ink2)">当前进度</span>
+            <span style="color:var(--bluel);font-weight:600">1,847,293 / 10,000,000 tCO₂e · 18.5%</span>
+          </div>
+          <div class="ms-prog-track"><div class="ms-prog-fill" style="width:18.5%;background:var(--bluel)"></div></div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="card" style="padding:16px 18px">
+          <div style="font-size:10.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">突破后将触发的事件</div>
+          <div class="ms-events">
+            <div class="ms-ev"><div class="ms-ev-dot" style="background:var(--purpl)"></div><div class="ms-ev-body"><div class="ms-ev-title">「纪元名录」：所有贡献者永久刻入链上</div><div class="ms-ev-desc">提交联合国气候变化框架公约 (UNFCCC) 秘书处，巴黎协定数据库存档</div></div></div>
+            <div class="ms-ev"><div class="ms-ev-dot" style="background:var(--gold)"></div><div class="ms-ev-body"><div class="ms-ev-title">《地球公民减排史》第一卷印制</div><div class="ms-ev-desc">联合国图书馆、中国国家图书馆永久馆藏，你的名字在第 412 行</div></div></div>
+            <div class="ms-ev"><div class="ms-ev-dot" style="background:var(--teall)"></div><div class="ms-ev-body"><div class="ms-ev-title">首届「地球公民荣誉勋章」全球颁奖典礼</div><div class="ms-ev-desc">在中国举办，不只有 CEO，更有普通工厂的合规工作人员——他们是主角</div></div></div>
+          </div>
+        </div>
+        <div>
+          <div class="epoch-hero">
+            <div class="eh-ey">纪元名录 · 预注册</div>
+            <div class="eh-title">你的名字将在第 <span class="dyn-global-rank">#--</span> 行</div>
+            <div class="eh-sub">当纪元里程碑突破时，所有累计推动超过 1 tCO₂e 减排的贡献者，姓名将被永久写入链上「纪元名录」。这份名录不属于任何公司，它属于历史。</div>
+            <div class="eh-locked">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="var(--purpl)" stroke-width="1"/><line x1="6" y1="3.5" x2="6" y2="6.5" stroke="var(--purpl)" stroke-width="1"/><circle cx="6" cy="8.5" r="0.6" fill="var(--purpl)"/></svg>
+              纪元未突破，名录锁定中 · 您的预留位：<span class="dyn-global-rank">#--</span>
+            </div>
+          </div>
+
+          <!-- Preview ranking table -->
+          <div class="card" style="padding:0;overflow:hidden;margin-top:12px">
+            <div style="padding:10px 14px;background:rgba(0,0,0,0.2);font-size:9.5px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--b)">纪元名录预览（当前贡献排名）</div>
+            <table class="rank-table">
+              <thead><tr><th>排名</th><th>贡献者</th><th>贡献量</th><th>行业</th></tr></thead>
+              <tbody>
+                <tr><td><span class="rank-num" style="color:var(--gold)">#1</span></td><td style="font-weight:500">---</td><td style="font-family:'DM Mono',monospace;color:var(--greenl)">---</td><td style="color:var(--ink2)">---</td></tr>
+                <tr><td><span class="rank-num" style="color:var(--ink2)">#2</span></td><td style="font-weight:500">---</td><td style="font-family:'DM Mono',monospace;color:var(--greenl)">---</td><td style="color:var(--ink2)">---</td></tr>
+                <tr><td><span class="rank-num" style="color:var(--ink2)">#3</span></td><td style="font-weight:500">---</td><td style="font-family:'DM Mono',monospace;color:var(--greenl)">---</td><td style="color:var(--ink2)">---</td></tr>
+                <tr class="mine"><td><span class="rank-num" style="color:var(--gold)"><span class="dyn-global-rank">#--</span></span></td><td style="font-weight:600;color:var(--gold)"><span class="dyn-user-name"></span> · 我</td><td style="font-family:'DM Mono',monospace;color:var(--teall)"><span class="dyn-total-co2">0</span> tCO₂e</td><td style="color:var(--ink2)">---</td></tr>
+                <tr><td><span class="rank-num" style="color:var(--ink3)">---</span></td><td style="color:var(--ink3)">---</td><td style="font-family:'DM Mono',monospace;color:var(--ink3)">---</td><td style="color:var(--ink3)">---</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div id="toast"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="var(--teall)" stroke-width="1.5" stroke-linecap="round"/></svg><span id="toast-msg"></span></div>
+
+<script>
+function setMs(el, id) {
+  document.querySelectorAll('.ms-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.ms-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('ms-'+id).classList.add('active');
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.style.opacity='1';t.style.transform='translateY(0)';
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)'},2600);
+}
+</script>
+<script>
+(function () {
+  function applyHonorPipeline(p) {
+    if (!p) return;
+    var user = p.user || {};
+    var company = p.company || {};
+    var cbam = p.cbam || {};
+    var ev = cbam.evidence || {};
+    var honorTier = String(
+      company.honorEligibilityTier || ev.honorEligibilityTier || 'INELIGIBLE'
+    ).toUpperCase();
+    var trustLevel = String(
+      company.trustCommitmentLevel || ev.trustCommitmentLevel || 'NOT_STARTED'
+    ).toUpperCase();
+    if (typeof window.ensureEvidenceContractShape === 'function' && window.AppState) {
+      try { window.ensureEvidenceContractShape(window.AppState); } catch (_) {}
+      var co = window.AppState.company || {};
+      var ev2 = (window.AppState.cbam && window.AppState.cbam.evidence) || {};
+      honorTier = String(co.honorEligibilityTier || ev2.honorEligibilityTier || honorTier).toUpperCase();
+      trustLevel = String(co.trustCommitmentLevel || ev2.trustCommitmentLevel || trustLevel).toUpperCase();
+    }
+    var pioneer = document.getElementById('honor-pioneer-registry');
+    if (pioneer) {
+      var showPioneer = honorTier === 'PIONEER' || honorTier === 'CERTIFIED_BUILDER';
+      pioneer.hidden = !showPioneer;
+      var trustEl = document.getElementById('honor-pioneer-trust');
+      if (trustEl) trustEl.textContent = 'TrustCommitmentLevel · ' + trustLevel + ' · HonorEligibilityTier · ' + honorTier;
+    }
+    var summitLock = document.getElementById('honor-summit-lock');
+    if (summitLock) {
+      summitLock.hidden = honorTier === 'CERTIFIED_BUILDER';
+    }
+    var name = user.name || '新用户';
+    var co2 = Number(user.tCO2e_total != null ? user.tCO2e_total : user.tco2e_total != null ? user.tco2e_total : 0);
+    if (!Number.isFinite(co2)) co2 = 0;
+    var level = user.currentLevel || '未激活';
+    var gm = Number(user.gmBalance != null ? user.gmBalance : user.gm_balance != null ? user.gm_balance : 0);
+    if (!Number.isFinite(gm)) gm = 0;
+    var globalRank = '#--';
+    if (co2 > 0) {
+      globalRank = '#' + String(Math.max(1, Math.round(5000 - Math.min(co2, 4999))));
+    }
+    var wallet = (p.wallet && p.wallet.address) ? String(p.wallet.address) : '';
+    var el;
+    if ((el = document.getElementById('honor-name'))) el.textContent = name;
+    if ((el = document.getElementById('honor-co2-val'))) el.textContent = co2.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    if ((el = document.getElementById('honor-level'))) el.textContent = level;
+    document.querySelectorAll('.dyn-user-name').forEach(function (n) { n.textContent = name; });
+    document.querySelectorAll('.dyn-total-co2').forEach(function (n) { n.textContent = co2.toLocaleString(undefined, { maximumFractionDigits: 2 }); });
+    document.querySelectorAll('.dyn-gm-val').forEach(function (n) { n.textContent = gm.toLocaleString(); });
+    document.querySelectorAll('.dyn-global-rank').forEach(function (n) { n.textContent = globalRank; });
+    document.querySelectorAll('.dyn-chain-hash').forEach(function (n) {
+      n.textContent = wallet ? wallet.replace(/\n/g, ' · ') : '待确权';
+    });
+  }
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || ev.data.type !== 'HENGAI_HUB_PIPELINE') return;
+    applyHonorPipeline(ev.data.payload);
+  });
+  if (typeof window.whenHengaiAppStateReady === 'function') {
+    window.whenHengaiAppStateReady(function () {
+      if (window.AppState) applyHonorPipeline({ user: window.AppState.user, company: window.AppState.company, cbam: window.AppState.cbam });
+    });
+  }
+})();
+</script>
+<script src="hengai-module-pipeline.js"></script>
+</body>
+</html>

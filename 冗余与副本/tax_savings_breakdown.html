@@ -1,0 +1,343 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'SF Pro Text',sans-serif;background:transparent;color:var(--color-text-primary)}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:16px 18px}
+.lbl{font-size:11px;color:var(--color-text-secondary);letter-spacing:0.4px;text-transform:uppercase;font-weight:500}
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.bg-green{background:#eaf3de;color:#27500a}
+.bg-amber{background:#faeeda;color:#633806}
+.bg-blue{background:#e6f1fb;color:#0c447c}
+.bg-red{background:#fcebeb;color:#791f1f}
+.bg-purple{background:#eeedfe;color:#3c3489}
+.bg-teal{background:#e1f5ee;color:#085041}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;font-size:12px;font-weight:500;padding:7px 14px;border-radius:8px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);cursor:pointer;transition:background 0.15s;white-space:nowrap}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-primary{background:#185fa5;border-color:#185fa5;color:#fff}
+.btn-primary:hover{background:#0c447c}
+.divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:13px 0}
+.formula{background:var(--color-background-secondary);border-radius:8px;padding:10px 13px;font-size:12px;color:var(--color-text-secondary);line-height:1.8;font-family:monospace}
+.step-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.contrib-bar{height:7px;border-radius:4px}
+</style>
+
+<div style="display:flex;flex-direction:column;gap:14px;padding:2px 0">
+
+  <!-- 页头：基础参数 -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <div>
+        <div class="lbl" style="margin-bottom:6px">计算基础参数</div>
+        <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">以下数据来自你上传的企业信息及 2025-Q3 填报结果，所有计算过程公开透明。</div>
+      </div>
+      <span class="badge bg-blue">可交叉验证</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px">
+      <div style="background:var(--color-background-secondary);border-radius:8px;padding:10px 12px">
+        <div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:4px">年出口欧盟量</div>
+        <div style="font-size:17px;font-weight:500;color:var(--color-text-primary)">1,920 t</div>
+        <div style="font-size:10px;color:var(--color-text-secondary);margin-top:2px">铝压铸零部件</div>
+      </div>
+      <div style="background:var(--color-background-secondary);border-radius:8px;padding:10px 12px">
+        <div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:4px">当前碳强度</div>
+        <div style="font-size:17px;font-weight:500;color:#854f0b">1.82 <span style="font-size:11px">tCO₂e/t</span></div>
+        <div style="font-size:10px;color:var(--color-text-secondary);margin-top:2px">Lv.2 置信度</div>
+      </div>
+      <div style="background:var(--color-background-secondary);border-radius:8px;padding:10px 12px">
+        <div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:4px">CBAM 碳价</div>
+        <div style="font-size:17px;font-weight:500;color:var(--color-text-primary)">€ 65 <span style="font-size:11px">/tCO₂e</span></div>
+        <div style="font-size:10px;color:var(--color-text-secondary);margin-top:2px">2025 年基准价</div>
+      </div>
+      <div style="background:var(--color-background-secondary);border-radius:8px;padding:10px 12px">
+        <div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:4px">汇率参考</div>
+        <div style="font-size:17px;font-weight:500;color:var(--color-text-primary)">7.85 <span style="font-size:11px">CNY/€</span></div>
+        <div style="font-size:10px;color:var(--color-text-secondary);margin-top:2px">2025 年均值</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 基准税负计算 -->
+  <div class="card">
+    <div class="step-head">
+      <div style="width:24px;height:24px;border-radius:50%;background:#fcebeb;border:1.5px solid #a32d2d;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#a32d2d;flex-shrink:0">0</div>
+      <div>
+        <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">基准：当前不做任何优化的税负</div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Lv.2 置信度下，海关默认采用行业最高碳因子惩罚计算</div>
+      </div>
+    </div>
+    <div class="formula">
+      年出口量 × 碳强度 × Lv.2惩罚系数 × CBAM碳价 × 汇率<br>
+      = 1,920 t × 1.82 tCO₂e/t × <span style="color:#a32d2d">1.35</span> × €65 × 7.85<br>
+      = <span style="color:#a32d2d;font-weight:500">¥ 1,247,600 ≈ 124.8 万</span>
+    </div>
+    <div style="margin-top:10px;padding:9px 12px;background:#fff8f8;border-radius:8px;border:0.5px solid #f09595">
+      <div style="font-size:11px;color:#791f1f;line-height:1.65">Lv.2 惩罚系数 1.35 的来源：人工凭证在欧盟海关系统中被视为高风险数据，自动上浮 35% 作为不确定性溢价。这是当前大多数中国出口商正在承受但不知情的隐性成本。</div>
+    </div>
+  </div>
+
+  <!-- MAT 网关贡献 -->
+  <div class="card">
+    <div class="step-head">
+      <div style="width:24px;height:24px;border-radius:50%;background:#e6f1fb;border:1.5px solid #185fa5;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#185fa5;flex-shrink:0">1</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">接驳 MAT 边缘感知网关</div>
+          <span class="badge bg-blue">置信度 Lv.2 → Lv.4</span>
+        </div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">物理级数据采集，消除人工凭证惩罚系数</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:12px">
+      <div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px">MAT 接驳后的变化</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+            <span style="color:var(--color-text-secondary)">惩罚系数</span>
+            <div style="display:flex;align-items:center;gap=6px">
+              <span style="color:#a32d2d;text-decoration:line-through">1.35</span>
+              <span style="margin:0 5px;color:var(--color-text-secondary)">→</span>
+              <span style="color:#3b6d11;font-weight:500">1.00</span>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+            <span style="color:var(--color-text-secondary)">数据可信级别</span>
+            <div style="display:flex;align-items:center">
+              <span style="color:#a32d2d;text-decoration:line-through">Lv.2</span>
+              <span style="margin:0 5px;color:var(--color-text-secondary)">→</span>
+              <span style="color:#3b6d11;font-weight:500">Lv.4</span>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
+            <span style="color:var(--color-text-secondary)">审计触发概率</span>
+            <div style="display:flex;align-items:center">
+              <span style="color:#a32d2d;text-decoration:line-through">67%</span>
+              <span style="margin:0 5px;color:var(--color-text-secondary)">→</span>
+              <span style="color:#3b6d11;font-weight:500">&lt; 3%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px">MAT 单项节税计算</div>
+        <div class="formula" style="font-size:11px">
+          节省 = 惩罚系数差 × 基础税负<br>
+          = (1.35−1.00) × ¥92,400<br>
+          = <span style="color:#3b6d11;font-weight:500">¥ 32,340 / 年</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#e6f1fb;border-radius:8px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:11px;color:#0c447c;margin-bottom:2px">MAT 网关年化节税贡献</div>
+        <div style="font-size:19px;font-weight:500;color:#0c447c">¥ 32,340</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:#185fa5;margin-bottom:2px">设备年化成本约</div>
+        <div style="font-size:14px;font-weight:500;color:#185fa5">¥ 8,400</div>
+        <div style="font-size:10px;color:#0c447c;margin-top:2px">投入产出比 <span style="font-weight:500">1 : 3.85</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZCP 零碳签证贡献 -->
+  <div class="card">
+    <div class="step-head">
+      <div style="width:24px;height:24px;border-radius:50%;background:#eeedfe;border:1.5px solid #534ab7;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#534ab7;flex-shrink:0">2</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">叠加 ZCP 零碳算力签证</div>
+          <span class="badge bg-purple">绿电时移套利</span>
+        </div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">动态识别低谷绿电时段，将高碳电力替换为零碳电力记录</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px">ZCP 工作原理：识别可转移的生产时段</div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+        <div style="padding:9px 11px;background:var(--color-background-secondary);border-radius:8px;text-align:center">
+          <div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:4px">可转移用电比例</div>
+          <div style="font-size:17px;font-weight:500;color:#534ab7">38%</div>
+          <div style="font-size:10px;color:var(--color-text-secondary);margin-top:2px">非连续生产工序</div>
+        </div>
+        <div style="padding:9px 11px;background:var(--color-background-secondary);border-radius:8px;text-align:center">
+          <div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:4px">绿电时段碳因子</div>
+          <div style="font-size:17px;font-weight:500;color:#3b6d11">0.03 <span style="font-size:10px">tCO₂/MWh</span></div>
+          <div style="font-size:10px;color:var(--color-text-secondary);margin-top:2px">vs 电网均值 0.58</div>
+        </div>
+        <div style="padding:9px 11px;background:var(--color-background-secondary);border-radius:8px;text-align:center">
+          <div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:4px">碳强度降幅</div>
+          <div style="font-size:17px;font-weight:500;color:#3b6d11">−0.21 <span style="font-size:10px">tCO₂e/t</span></div>
+          <div style="font-size:10px;color:var(--color-text-secondary);margin-top:2px">1.82 → 1.61</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula" style="margin-bottom:12px">
+      ZCP节税 = 碳强度降幅 × 年出口量 × CBAM碳价 × 汇率<br>
+      = 0.21 tCO₂e/t × 1,920 t × €65 × 7.85<br>
+      = <span style="color:#534ab7;font-weight:500">¥ 163,918 ≈ 16.4 万 / 年</span>
+    </div>
+
+    <div style="background:#eeedfe;border-radius:8px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:11px;color:#3c3489;margin-bottom:2px">ZCP 签证年化节税贡献</div>
+        <div style="font-size:19px;font-weight:500;color:#3c3489">¥ 163,918</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:#534ab7;margin-bottom:2px">ZCP 服务年费约</div>
+        <div style="font-size:14px;font-weight:500;color:#534ab7">¥ 28,000</div>
+        <div style="font-size:10px;color:#3c3489;margin-top:2px">投入产出比 <span style="font-weight:500">1 : 5.85</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 供应链优化贡献 -->
+  <div class="card">
+    <div class="step-head">
+      <div style="width:24px;height:24px;border-radius:50%;background:#eaf3de;border:1.5px solid #3b6d11;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#3b6d11;flex-shrink:0">3</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">供应链数据穿透（Scope 3）</div>
+          <span class="badge bg-green">进行中</span>
+        </div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">供应商实际碳强度替换行业默认因子，降低 Scope 3 估算偏差</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 11px;background:var(--color-background-secondary);border-radius:8px">
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:500;color:var(--color-text-primary)">浙江 XX 五金</div>
+          <div style="font-size:10px;color:var(--color-text-secondary);margin-top:2px">实际因子 0.45 vs 行业默认 0.82 · 已接入</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;font-weight:500;color:#3b6d11">−¥ 28,600</div>
+          <div style="font-size:10px;color:var(--color-text-secondary)">年度节税</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 11px;background:var(--color-background-secondary);border-radius:8px">
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:500;color:var(--color-text-primary)">无锡 XX 铝型材</div>
+          <div style="font-size:10px;color:#854f0b;margin-top:2px">实际因子 1.20 · 偏高 · 建议切换云南水电铝</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;font-weight:500;color:#854f0b">待优化</div>
+          <div style="font-size:10px;color:var(--color-text-secondary)">潜在 −¥ 19,400</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 11px;background:#fff8f8;border-radius:8px;border:0.5px dashed #f09595">
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:500;color:#a32d2d">广东 XX 压铸厂</div>
+          <div style="font-size:10px;color:#e24b4a;margin-top:2px">数据缺口 · 当前采用惩罚性默认因子 2.10</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;font-weight:500;color:#a32d2d">−¥ 0</div>
+          <div style="font-size:10px;color:#a32d2d">待填报才能解锁</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#eaf3de;border-radius:8px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:11px;color:#3b6d11;margin-bottom:2px">供应链穿透当前已实现节税</div>
+        <div style="font-size:19px;font-weight:500;color:#27500a">¥ 28,600</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:#3b6d11;margin-bottom:2px">全部接入后潜在节税</div>
+        <div style="font-size:14px;font-weight:500;color:#3b6d11">¥ 65,000+</div>
+        <div style="font-size:10px;color:#3b6d11;margin-top:2px">含广东压铸厂填报后释放</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 汇总对比 -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="lbl">全路径节税汇总</div>
+      <span class="badge bg-green">三项叠加效应</span>
+    </div>
+
+    <!-- 贡献条形图 -->
+    <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:14px">
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+          <span style="color:var(--color-text-secondary)">MAT 网关（消除惩罚系数）</span>
+          <span style="color:#185fa5;font-weight:500">¥ 32,340 · 8.4%</span>
+        </div>
+        <div style="height:7px;background:var(--color-border-tertiary);border-radius:4px">
+          <div class="contrib-bar" style="width:8.4%;background:#185fa5"></div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+          <span style="color:var(--color-text-secondary)">ZCP 零碳签证（绿电时移）</span>
+          <span style="color:#534ab7;font-weight:500">¥ 163,918 · 42.4%</span>
+        </div>
+        <div style="height:7px;background:var(--color-border-tertiary);border-radius:4px">
+          <div class="contrib-bar" style="width:42.4%;background:#534ab7"></div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+          <span style="color:var(--color-text-secondary)">供应链穿透（已实现）</span>
+          <span style="color:#3b6d11;font-weight:500">¥ 28,600 · 7.4%</span>
+        </div>
+        <div style="height:7px;background:var(--color-border-tertiary);border-radius:4px">
+          <div class="contrib-bar" style="width:7.4%;background:#3b6d11"></div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+          <span style="color:var(--color-text-secondary)">供应链穿透（待释放）</span>
+          <span style="color:#639922;font-weight:500">¥ 36,400+ · 9.4%</span>
+        </div>
+        <div style="height:7px;background:var(--color-border-tertiary);border-radius:4px">
+          <div class="contrib-bar" style="width:9.4%;background:#97c459"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border:0.5px solid var(--color-border-tertiary);border-radius:10px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr) 24px minmax(0,1fr)">
+        <div style="padding:13px 14px;text-align:center">
+          <div style="font-size:10px;color:#a32d2d;margin-bottom:5px;font-weight:500">当前税负</div>
+          <div style="font-size:22px;font-weight:500;color:#a32d2d;letter-spacing:-0.5px">¥124.8万</div>
+          <div style="font-size:10px;color:#791f1f;margin-top:3px">Lv.2 惩罚计算</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;background:var(--color-background-secondary)">
+          <svg width="10" height="14" viewBox="0 0 10 14" fill="none"><path d="M5 1v12M5 13l-4-4M5 13l4-4" stroke="var(--color-text-secondary)" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </div>
+        <div style="padding:13px 14px;text-align:center;background:var(--color-background-secondary)">
+          <div style="font-size:10px;color:#3b6d11;margin-bottom:5px;font-weight:500">三项叠加节税</div>
+          <div style="font-size:22px;font-weight:500;color:#27500a;letter-spacing:-0.5px">¥38.6万</div>
+          <div style="font-size:10px;color:#3b6d11;margin-top:3px">总投入 ¥3.6万</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;background:var(--color-background-secondary)">
+          <svg width="10" height="14" viewBox="0 0 10 14" fill="none"><path d="M5 1v12M5 13l-4-4M5 13l4-4" stroke="var(--color-text-secondary)" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </div>
+        <div style="padding:13px 14px;text-align:center">
+          <div style="font-size:10px;color:#185fa5;margin-bottom:5px;font-weight:500">优化后税负</div>
+          <div style="font-size:22px;font-weight:500;color:#185fa5;letter-spacing:-0.5px">¥86.2万</div>
+          <div style="font-size:10px;color:#0c447c;margin-top:3px">净收益 ¥35万+</div>
+        </div>
+      </div>
+      <div style="padding:10px 14px;background:#eaf3de;border-top:0.5px solid #97c459;text-align:center">
+        <span style="font-size:12px;color:#27500a;font-weight:500">总投入 ¥36,400 → 净节税 ¥350,000+ · 综合 ROI 1 : 9.6</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 行动出口 -->
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
+    <button class="btn btn-primary" style="padding:11px 16px;font-size:13px" onclick="sendPrompt('我已经理解了节税路径，帮我制定接入MAT网关和ZCP零碳签证的具体实施计划，包括时间节点和操作步骤')">
+      制定实施计划 ↗
+    </button>
+    <button class="btn" style="padding:11px 16px;font-size:13px;color:#185fa5;border-color:#b5d4f4" onclick="sendPrompt('帮我把这份节税测算报告整理成可以向决策层呈送的版本，语言简洁，突出ROI数据')">
+      整理为呈送报告 ↗
+    </button>
+  </div>
+
+</div>

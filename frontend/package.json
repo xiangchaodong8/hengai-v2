@@ -1,0 +1,29 @@
+{
+  "name": "hengai-frontend",
+  "private": true,
+  "version": "2.0.0",
+  "description": "HengAI V2 前端 · 占位符 CI 与模块审计",
+  "scripts": {
+    "audit:placeholders": "node audit-placeholders.js",
+    "audit:ci": "node audit-placeholders.js && node scripts/audit-syntax.js",
+    "sync:dist": "node scripts/sync-static-dist.js",
+    "test:contract": "node scripts/validate-actions-contract.js",
+    "test:tier-parity": "node scripts/check-tier-parity.js",
+    "test:e2e": "node scripts/e2e-resonance-check.js",
+    "test:e2e:browser": "playwright test",
+    "test:factor-vo": "node e2e/_factor-integration-ziteng.mjs && node e2e/_factor-consumption-ledger.mjs && node e2e/_factor-origin-ledger-ui.mjs",
+    "test:origin-audit": "node e2e/_origin-audit-vo.mjs && node e2e/_factor-consumption-ledger.mjs",
+    "test:backend:contract": "node scripts/run-backend-normalize-test.js",
+    "test:all": "npm run audit:ci && npm run test:contract && npm run test:e2e && npm run test:backend:contract",
+    "preflight": "node scripts/preflight-go-live.js",
+    "preflight:full": "node scripts/preflight-go-live.js --browser",
+    "smoke:live": "node scripts/smoke-live-stack.js",
+    "verify:console": "node scripts/console-zero-audit.js",
+    "verify:hub-api": "docker exec -w /app hengai_backend python scripts/verify_hub_api.py",
+    "docker:go-live": "node scripts/docker-go-live.js",
+    "postinstall": "echo HengAI frontend ready"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}

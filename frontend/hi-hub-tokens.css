@@ -1,0 +1,43 @@
+/* 全域中心设计 token — 供 #hi-suite 及 Hub embed 子页复用 */
+#hi-suite.hi-warroom {
+  --bg0: #06080f;
+  --bg1: #0a0d16;
+  --bg2: #0e1220;
+  --bg3: rgba(255, 255, 255, 0.04);
+  --bg4: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.08);
+  --border2: rgba(255, 255, 255, 0.14);
+  --ink: #e2e8f4;
+  --ink2: #8896aa;
+  --ink3: #475569;
+  --green: #10b981;
+  --green-l: #6ee7b7;
+  --green-d: rgba(16, 185, 129, 0.13);
+  --green-b: rgba(16, 185, 129, 0.3);
+  --gold: #c9a84c;
+  --gold-l: #f0d080;
+  --gold-d: rgba(201, 168, 76, 0.13);
+  --gold-b: rgba(201, 168, 76, 0.3);
+  --blue: #3b82f6;
+  --blue-l: #93c5fd;
+  --blue-d: rgba(59, 130, 246, 0.13);
+  --blue-b: rgba(59, 130, 246, 0.3);
+  --purple: #8b5cf6;
+  --purple-l: #c4b5fd;
+  --purple-d: rgba(139, 92, 246, 0.13);
+  --purple-b: rgba(139, 92, 246, 0.3);
+  --teal: #14b8a6;
+  --teal-l: #5eead4;
+  --teal-d: rgba(20, 184, 166, 0.13);
+  --teal-b: rgba(20, 184, 166, 0.3);
+  --orange: #f97316;
+  --orange-l: #fdba74;
+  --orange-d: rgba(249, 115, 22, 0.13);
+  --orange-b: rgba(249, 115, 22, 0.3);
+  --red: #ef4444;
+  --red-l: #fca5a5;
+  --red-d: rgba(239, 68, 68, 0.13);
+  --red-b: rgba(239, 68, 68, 0.3);
+  --tb-h: 52px;
+  --sb-w: 218px;
+}

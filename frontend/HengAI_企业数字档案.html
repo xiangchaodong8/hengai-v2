@@ -1,0 +1,943 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · 企业数字档案</title>
+<script>
+/* 嵌入模式：?embed=1 时隐藏原页 chrome (sidebar/topbar)，仅呈现内容模块 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<style>
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .sb,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] .main,
+html[data-embed="1"] .main-wrap { margin-left: 0 !important; }
+html[data-embed="1"] body { padding-left: 0 !important; background: var(--night, #06080f) !important; }
+html[data-embed="1"] .page, html[data-embed="1"] .main { padding-bottom: 60px !important; box-sizing: border-box; }
+#enterprise-profile-drawer-mask > div { max-height: calc(100vh - 80px); overflow-y: auto; }
+.ent-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+@media (max-width: 720px) { .ent-form-grid { grid-template-columns: 1fr; } }
+</style>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+:root {
+  --bg0:#06080f;--bg1:#0a0d16;--bg2:#0e1220;--bg3:rgba(255,255,255,.04);--bg4:rgba(255,255,255,.07);
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--border3:rgba(255,255,255,.2);
+  --ink:#e2e8f4;--ink2:#8896aa;--ink3:#44556a;
+  --green:#10b981;--green-l:#6ee7b7;--green-d:rgba(16,185,129,.13);--green-b:rgba(16,185,129,.30);
+  --gold:#c9a84c;--gold-l:#f0d080;--gold-d:rgba(201,168,76,.13);--gold-b:rgba(201,168,76,.30);
+  --blue:#3b82f6;--blue-l:#93c5fd;--blue-d:rgba(59,130,246,.13);--blue-b:rgba(59,130,246,.30);
+  --purple:#8b5cf6;--purple-l:#c4b5fd;--purple-d:rgba(139,92,246,.13);--purple-b:rgba(139,92,246,.30);
+  --red:#ef4444;--red-l:#fca5a5;--red-d:rgba(239,68,68,.13);--red-b:rgba(239,68,68,.30);
+  --teal:#14b8a6;--teal-l:#5eead4;--teal-d:rgba(20,184,166,.13);--teal-b:rgba(20,184,166,.30);
+  --orange:#f97316;--orange-l:#fdba74;--orange-d:rgba(249,115,22,.13);--orange-b:rgba(249,115,22,.30);
+  --sb-w:220px;--tb-h:52px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg0);color:var(--ink);font-family:"Noto Sans SC",sans-serif;font-size:13px;line-height:1.6;overflow:hidden;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+select,input,textarea{font-family:inherit}
+.app{display:flex;height:100vh}
+/* SIDEBAR */
+.sidebar{width:var(--sb-w);flex-shrink:0;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sb-brand{padding:17px 15px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sb-brand-ic{width:32px;height:32px;border-radius:9px;background:var(--green-d);border:1px solid var(--green-b);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-brand-name{font-size:14px;font-weight:700}
+.sb-brand-sub{font-size:9.5px;color:var(--ink3);margin-top:1px}
+.sb-group-title{padding:10px 14px 3px;font-size:9px;color:var(--ink3);letter-spacing:1.4px;text-transform:uppercase;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:12.5px;color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all .14s}
+.sb-item:hover{color:var(--ink);background:var(--bg4)}
+.sb-item.active{color:var(--ink);background:rgba(255,255,255,.07);border-left-color:var(--green)}
+.sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-footer{margin-top:auto;padding:12px 14px;border-top:1px solid var(--border);flex-shrink:0}
+.sb-user{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--teal-d);border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--teal-l);flex-shrink:0}
+.sb-uname{font-size:12.5px;font-weight:500}
+.sb-urole{font-size:10px;color:var(--ink3);margin-top:1px}
+.sb-gm-row{display:flex;align-items:center;gap:6px;padding:6px 9px;background:var(--gold-d);border:1px solid var(--gold-b);border-radius:8px;cursor:pointer}
+.sb-gm-val{font-family:"DM Mono",monospace;font-size:13px;font-weight:700;color:var(--gold-l)}
+/* TOPBAR */
+.main-wrap{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:var(--tb-h);flex-shrink:0;background:rgba(6,8,15,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.tb-left{display:flex;align-items:center;gap:12px}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-title{font-size:15px;font-weight:600}
+.tb-pill{font-size:9.5px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.6px;text-transform:uppercase}
+.gm-chip{display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;background:var(--gold-d);border:1px solid var(--gold-b);cursor:pointer;transition:background .2s}
+.gm-chip:hover{background:rgba(201,168,76,.22)}
+.gm-chip-lbl{font-size:10px;color:var(--gold);font-weight:500}
+.gm-chip-val{font-family:"DM Mono",monospace;font-size:14px;font-weight:700;color:var(--gold-l);letter-spacing:-.3px}
+.tb-btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;border:1px solid var(--border2);background:transparent;color:var(--ink);transition:background .15s}
+.tb-btn:hover{background:var(--bg4)}
+.tb-btn-primary{background:var(--green-d);border-color:var(--green-b);color:var(--green-l)}
+.tb-btn-primary:hover{background:rgba(16,185,129,.22)}
+/* SCROLL AREA */
+.main-scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.main-scroll::-webkit-scrollbar{width:4px}
+.main-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.main-pad{padding:24px 28px 72px}
+/* CARDS */
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:18px 20px;backdrop-filter:blur(8px)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+/* PILLS */
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;white-space:nowrap}
+.p-green{background:var(--green-d);color:var(--green-l);border:1px solid var(--green-b)}
+.p-gold{background:var(--gold-d);color:var(--gold-l);border:1px solid var(--gold-b)}
+.p-blue{background:var(--blue-d);color:var(--blue-l);border:1px solid var(--blue-b)}
+.p-purple{background:var(--purple-d);color:var(--purple-l);border:1px solid var(--purple-b)}
+.p-red{background:var(--red-d);color:var(--red-l);border:1px solid var(--red-b)}
+.p-teal{background:var(--teal-d);color:var(--teal-l);border:1px solid var(--teal-b)}
+.p-orange{background:var(--orange-d);color:var(--orange-l);border:1px solid var(--orange-b)}
+.p-gray{background:rgba(255,255,255,.05);color:var(--ink2);border:1px solid var(--border)}
+/* SECTION HEADER */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-t{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.2px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sh-line{flex:1;height:1px;background:var(--border)}
+.sh-a{font-size:11.5px;color:var(--green-l);cursor:pointer;white-space:nowrap}
+.sh-a:hover{text-decoration:underline}
+/* DIVIDER */
+.hr{border:none;border-top:1px solid var(--border);margin:14px 0}
+/* METRIC */
+.metric{background:rgba(0,0,0,.28);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.m-lbl{font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.m-val{font-family:"DM Mono",monospace;font-size:24px;font-weight:700;letter-spacing:-.5px;line-height:1}
+.m-unit{font-size:12px;font-weight:400;margin-left:2px;opacity:.7}
+.m-sub{font-size:11px;color:var(--ink2);margin-top:4px}
+/* INSIGHT */
+.ins{padding:11px 14px;border-radius:10px;font-size:12px;line-height:1.7;display:flex;gap:9px;align-items:flex-start;margin-bottom:14px}
+.ins-green{background:var(--green-d);border:1px solid var(--green-b);color:var(--green-l)}
+.ins-gold{background:var(--gold-d);border:1px solid var(--gold-b);color:var(--gold-l)}
+.ins-red{background:var(--red-d);border:1px solid var(--red-b);color:var(--red-l)}
+.ins-blue{background:var(--blue-d);border:1px solid var(--blue-b);color:var(--blue-l)}
+.ins-purple{background:var(--purple-d);border:1px solid var(--purple-b);color:var(--purple-l)}
+.ins svg{flex-shrink:0;margin-top:2px}
+/* PROGRESS */
+.prog{height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .8s ease}
+/* FORM */
+.f-grp{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.f-lbl{font-size:12px;font-weight:500;color:var(--ink)}
+.f-hint{font-size:10.5px;color:var(--ink3)}
+.f-inp,.f-sel{background:rgba(0,0,0,.4);border:1px solid var(--border2);border-radius:9px;padding:10px 13px;color:var(--ink);outline:none;width:100%;transition:border-color .2s;font-size:13px}
+.f-inp{font-family:"DM Mono",monospace}
+.f-inp:focus,.f-sel:focus{border-color:var(--green-b)}
+.f-inp::placeholder{color:var(--ink3);font-family:"Noto Sans SC",sans-serif;font-size:12px}
+.f-sel{font-family:"Noto Sans SC",sans-serif;font-size:12.5px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23475569' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+/* CTA */
+.cta{padding:11px 22px;border-radius:10px;font-size:13px;font-weight:600;border:none;transition:all .2s}
+.cta-green{background:linear-gradient(135deg,#0ea472,#10b981);color:#fff}
+.cta-green:hover{opacity:.9;transform:translateY(-1px)}
+.cta-gold{background:linear-gradient(135deg,#b8860b,#c9a84c 40%,#f0d080 80%,#c9a84c);color:#000}
+.cta-gold:hover{opacity:.9;transform:translateY(-1px)}
+.cta-outline{background:transparent;border:1px solid var(--border2);color:var(--ink)}
+.cta-outline:hover{background:var(--bg4)}
+/* ACT-BTN */
+.act-btn{display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:11px;border:1px solid var(--border2);background:rgba(0,0,0,.28);cursor:pointer;transition:all .18s;font-size:12.5px;color:var(--ink);text-decoration:none}
+.act-btn:hover{background:var(--bg4);transform:translateY(-1px)}
+.act-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* FADE IN */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .4s ease both}
+.d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}.d4{animation-delay:.26s}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(8,12,22,.97);border:1px solid var(--green-b);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--green-l);min-width:260px;max-width:380px;opacity:0;transform:translateY(14px);transition:all .36s cubic-bezier(.34,1.56,.64,1);pointer-events:none;backdrop-filter:blur(18px)}
+#toast.show{opacity:1;transform:translateY(0);pointer-events:auto}
+
+
+.ent-hero{background:var(--bg3);border:1px solid rgba(201,168,76,.25);border-radius:16px;padding:0;overflow:hidden;margin-bottom:18px;position:relative}
+.ent-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--gold) 40%,var(--teal-l) 70%,transparent 95%)}
+.eh-inner{padding:20px 22px;display:flex;align-items:flex-start;gap:16px;background:linear-gradient(135deg,rgba(201,168,76,.06) 0%,transparent 60%)}
+.eh-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border)}
+.ehs{background:rgba(8,12,22,.95);padding:13px 16px;text-align:center}
+.ehs-v{font-family:"DM Mono",monospace;font-size:19px;font-weight:700;letter-spacing:-.5px;line-height:1;margin-bottom:3px}
+.ehs-l{font-size:10px;color:var(--ink3)}
+.ehs-s{font-size:9.5px;font-weight:600;margin-top:3px}
+.scope-card{border-radius:14px;padding:16px 18px;border:1px solid}
+.scope-label{font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.scope-val{font-family:"DM Mono",monospace;font-size:28px;font-weight:700;letter-spacing:-1px;line-height:1;margin-bottom:3px}
+.scope-unit{font-size:12px;font-weight:400;margin-left:2px;opacity:.7}
+.scope-sub{font-size:11.5px;opacity:.75;margin-bottom:10px}
+.scope-bar-track{height:7px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin-bottom:5px}
+.scope-bar-fill{height:100%;border-radius:3px}
+.mat-status-card{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.mat-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;animation:pulse 2s infinite}
+.info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12.5px}
+.info-row:last-child{border-bottom:none}
+.info-lbl{color:var(--ink2)}
+.info-val{font-weight:500}
+.cert-chain{display:flex;flex-direction:column;gap:7px}
+.cc-item{display:flex;align-items:center;gap:9px;padding:9px 12px;background:rgba(0,0,0,.22);border:1px solid var(--border);border-radius:9px}
+.cc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cc-name{flex:1;font-size:12px}
+.cc-status{font-size:11px;font-weight:600}
+.cc-hash{font-family:"DM Mono",monospace;font-size:10px;color:var(--ink3)}
+.edit-form{background:var(--bg3);border:1px solid var(--border2);border-radius:14px;padding:18px 20px}
+
+</style>
+<script src="hengai-embed-boot.js"></script>
+</head>
+<body>
+<div class="app">
+
+<!-- CANONICAL SIDEBAR — HengAI V3.5 工业主权网络 · MPA 统一版 -->
+
+<div class="sidebar" id="sidebar" data-qa-version="3.5">
+
+  <div class="sb-brand">
+
+    <div class="sb-brand-ic">
+
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+
+    </div>
+
+    <div>
+
+      <div class="sb-brand-name">HengAI</div>
+
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+
+    </div>
+
+  </div>
+
+
+
+  <div style="padding:12px 14px 4px;">
+
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+      返回 HengAI 对话
+
+    </div>
+
+  </div>
+
+
+
+  <div class="sb-group-title" id="g-personal">个人空间</div>
+
+  <div class="sb-item" data-page="overview" onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+
+  <div class="sb-item" data-page="achieve" onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+
+  <div class="sb-item" data-page="calc" onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+
+  <div class="sb-item" data-page="wallet" onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+
+  <div class="sb-item" data-page="resource" onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+
+
+
+  <div class="sb-group-title" id="g-business">企业工作台</div>
+
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+
+  <div class="sb-item" data-page="report" onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+
+  <div class="sb-item" data-page="decision" onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-item locked" data-page="supply" id="nav-supply" data-role-nav="sme-only" onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" id="dot-supply" style="background:var(--ink3)"></div>供应链协同</div>
+
+  <div class="sb-item locked" data-page="origin-audit" id="n-origin-audit" data-role-nav="origin-only" onclick="window.location.href='HengAI_HeavyIndustry_Suite.html'"><div class="sb-dot" id="dot-origin-audit" style="background:var(--ink3)"></div>产业主权看板</div>
+
+
+
+  <div class="sb-group-title" id="g-sovereign">大国重器 / 生态</div>
+
+  <div class="sb-item" data-page="honor" onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+
+  <div class="sb-item locked" data-page="eu" onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:var(--ink3)"></div>欧盟海关直连</div>
+
+  <div class="sb-item locked" data-page="dld" onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:var(--ink3)"></div>DLD 绿色信贷</div>
+
+  <div class="sb-item locked" data-page="acf" onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:var(--ink3)"></div>ACF 认证通道</div>
+
+  <div class="sb-item locked" data-page="gov" onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:var(--ink3)"></div>生态共治委员会</div>
+
+</div>
+
+<script id="qa-sidebar-active-script">
+
+(function(){
+
+  var map = {"全域中心.html":"overview","index.html":"overview","HengAI_CBAM测算工具.html":"calc","HengAI_星火成就档案.html":"achieve","HengAI_GM_Wallet.html":"wallet","HengAI_算力资源.html":"resource","HengAI_企业数字档案.html":"enterprise","HengAI_供应链协同.html":"supply","HengAI_全域诊断报告.html":"report","HengAI_决策层呈送包生成器.html":"decision","HengAI_HeavyIndustry_Suite.html":"origin-audit","HengAI_荣誉体系.html":"honor","HengAI_EU_Customs.html":"eu","HengAI_DLD_Credit.html":"dld","HengAI_ACF_Cert.html":"acf","HengAI_Governance.html":"gov"};
+
+  try {
+
+    var fn = decodeURIComponent((location.pathname.split("/").pop() || "").split("?")[0]);
+
+    var id = map[fn]; if (!id) return;
+
+    document.querySelectorAll(".sidebar .sb-item[data-page]").forEach(function(el){
+
+      if (el.getAttribute("data-page") === id) el.classList.add("active");
+
+    });
+
+  } catch(e){}
+
+})();
+
+</script>
+<div class="main-wrap">
+  <div class="topbar">
+    <div class="tb-left">
+      <span class="tb-title">企业数字档案</span>
+      <span class="tb-pill" style="background:var(--gold-d);color:var(--gold-l);border:1px solid var(--gold-b)">CL-IVC 链上存证</span>
+    </div>
+    <div class="tb-right">
+      <div class="gm-chip" onclick="window.location.href='HengAI_GM_Wallet.html'">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L11 3.8V8.2L6 11L1 8.2V3.8L6 1Z" stroke="#c9a84c" stroke-width=".9" fill="rgba(201,168,76,.15)"/></svg>
+        <span class="gm-chip-lbl">GM</span>
+        <span class="gm-chip-val"><span class="dyn-gm-balance">--</span></span>
+      </div>
+      <button class="tb-btn tb-btn-primary" onclick="openEnterpriseProfileDrawer()">立即操作 →</button>
+    </div>
+  </div>
+  <div class="main-scroll">
+    <div class="main-pad">
+
+<!-- Enterprise Identity Hero -->
+<div class="ent-hero fu">
+  <div class="eh-inner">
+    <div style="width:54px;height:54px;border-radius:12px;background:var(--blue-d);border:2px solid var(--blue-b);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="8" width="20" height="14" rx="2.5" stroke="var(--blue-l)" stroke-width="1.3"/><path d="M7 8V6a5 5 0 0110 0v2" stroke="var(--blue-l)" stroke-width="1.2"/><polyline points="8,16 11,19 16,14" stroke="var(--blue-l)" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+    <div style="flex:1">
+      <div style="font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:5px">CL-IVC 认证企业档案</div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:2px"><span id="ent-company-name" class="dyn-ent-name">未录入</span></div>
+      <div style="font-size:11.5px;color:var(--ink2);margin-bottom:8px">统一社会信用代码：<span id="ent-credit-code" class="dyn-ent-code">未录入</span> · ---</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="pill p-green" id="ent-stage-label"><span class="dyn-ent-stage-label">待测算</span></span>
+        <span class="pill p-gold">MAT 网关在线</span>
+        <span class="pill p-teal">链上存证 待确权-9A1C</span>
+      </div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <button class="tb-btn" onclick="openEnterpriseProfileDrawer()" style="font-size:11.5px">编辑档案</button>
+    </div>
+  </div>
+  <div class="eh-stats">
+    <div class="ehs"><div class="ehs-v" style="color:var(--teal-l)"><span class="dyn-ent-export-tons">—</span><span style="font-size:11px;opacity:.6"> t</span></div><div class="ehs-l">年出口欧盟量</div><div class="ehs-s dyn-ent-product" style="color:var(--teal-l)">主营产品待录入</div></div>
+    <div class="ehs"><div class="ehs-v" style="color:var(--green-l)"><span class="dyn-ent-capacity">—</span></div><div class="ehs-l">年产能</div><div class="ehs-s dyn-ent-hs" style="color:var(--green-l)">HS 编码待录入</div></div>
+    <div class="ehs"><div class="ehs-v" style="color:var(--blue-l)"><span class="dyn-ent-power-kwh">—</span></div><div class="ehs-l">年用电量</div><div class="ehs-s dyn-ent-grid" style="color:var(--gold)">电网待录入</div></div>
+    <div class="ehs"><div class="ehs-v" style="color:var(--gold)"><span id="ent-cbam-risk" class="dyn-ent-cbam-risk ent-dyn-rep-tax">待测算</span></div><div class="ehs-l">碳税敞口</div><div class="ehs-s dyn-ent-export-countries" style="color:var(--red-l)">出口国待录入</div></div>
+  </div>
+</div>
+
+<!-- Scope emissions -->
+<div class="sh fu d1"><div class="sh-t">碳排放核算 <div class="sh-line"></div></div><span class="pill p-teal">CL-IVC 链上存证</span></div>
+<div class="g3 fu d1" style="margin-bottom:16px">
+  <div class="scope-card" style="background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.28)">
+    <div class="scope-label" style="color:var(--green)">Scope 1 · 直接排放</div>
+    <div><span class="scope-val" style="color:var(--green-l)">0</span><span class="scope-unit">tCO₂e</span></div>
+    <div class="scope-sub" style="color:rgba(110,231,183,.75)">无直接燃烧 · 纯电力驱动</div>
+    <div class="scope-bar-track"><div class="scope-bar-fill" style="width:0%;background:var(--green)"></div></div>
+    <div style="font-size:10px;color:var(--ink3)">占比 0%</div>
+  </div>
+  <div class="scope-card" style="background:rgba(59,130,246,.07);border-color:rgba(59,130,246,.28)">
+    <div class="scope-label" style="color:var(--blue-l)">Scope 2 · 间接排放</div>
+    <div><span class="scope-val" style="color:var(--blue-l)">72.1</span><span class="scope-unit">tCO₂e</span></div>
+    <div class="scope-sub" style="color:rgba(147,197,253,.75)">年用电 124,000 kWh × 0.581</div>
+    <div class="scope-bar-track"><div class="scope-bar-fill" style="width:22%;background:var(--blue-l)"></div></div>
+    <div style="font-size:10px;color:var(--ink3)">占比 22% · GEC 可降至 14.4 t</div>
+  </div>
+  <div class="scope-card" style="background:rgba(249,115,22,.07);border-color:rgba(249,115,22,.28)">
+    <div class="scope-label" style="color:var(--orange-l)">Scope 3 · 价值链</div>
+    <div><span class="scope-val" style="color:var(--orange-l)">243.8</span><span class="scope-unit">tCO₂e</span></div>
+    <div class="scope-sub" style="color:rgba(253,186,116,.75)">铝锭采购 480t × 0.508 估算</div>
+    <div class="scope-bar-track"><div class="scope-bar-fill" style="width:78%;background:var(--orange)"></div></div>
+    <div style="font-size:10px;color:var(--ink3)">占比 78% · 覆盖率仅 12%</div>
+  </div>
+</div>
+
+<!-- MAT Gateway + Info -->
+<div class="g2 fu d2" style="margin-bottom:16px">
+  <div class="card">
+    <div class="sh"><div class="sh-t">MAT 网关状态 <div class="sh-line"></div></div></div>
+    <div class="mat-status-card" style="border-color:rgba(16,185,129,.25)">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div class="mat-dot" style="background:var(--green)"></div>
+        <div>
+          <div style="font-size:13px;font-weight:600">方舟魔盒 · 在线</div>
+          <div style="font-size:10.5px;color:var(--ink3)">设备编号：MAT-ZJ-2024-0412</div>
+        </div>
+      </div>
+      <span class="pill p-green">Lv.4 认证</span>
+    </div>
+    <div class="cert-chain">
+      <div class="cc-item"><div class="cc-dot" style="background:var(--green)"></div><div class="cc-name">实时电表接驳</div><div class="cc-status" style="color:var(--green-l)">正常</div><div class="cc-hash">#MAT-E-001</div></div>
+      <div class="cc-item"><div class="cc-dot" style="background:var(--green)"></div><div class="cc-name">ZCP 时移算力签证</div><div class="cc-status" style="color:var(--green-l)">生效中</div><div class="cc-hash">#ZCP-0412</div></div>
+      <div class="cc-item"><div class="cc-dot" style="background:var(--blue-l)"></div><div class="cc-name">CL-IVC 链上同步</div><div class="cc-status" style="color:var(--blue-l)">实时</div><div class="cc-hash">待确权-9A1C</div></div>
+      <div class="cc-item"><div class="cc-dot" style="background:var(--gold)"></div><div class="cc-name">欧盟直连通道 CL-GTS</div><div class="cc-status" style="color:var(--gold-l)">就绪</div><div class="cc-hash">#GTS-EU-01</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="sh"><div class="sh-t">企业基础信息 <div class="sh-line"></div></div><span class="sh-a" onclick="openEnterpriseProfileDrawer()">编辑</span></div>
+    <div>
+      <div class="info-row"><span class="info-lbl">企业全称</span><span class="info-val"><span id="ent-company-name-dup" class="dyn-ent-name">未录入</span></span></div>
+      <div class="info-row"><span class="info-lbl">主营产品</span><span class="info-val dyn-ent-product">待录入</span></div>
+      <div class="info-row"><span class="info-lbl">HS 编码</span><span class="info-val dyn-ent-hs" style="font-family:'DM Mono',monospace">待录入</span></div>
+      <div class="info-row"><span class="info-lbl">年产能</span><span class="info-val dyn-ent-capacity">待录入</span></div>
+      <div class="info-row"><span class="info-lbl">年出口欧盟</span><span class="info-val dyn-ent-export-tons">待录入</span></div>
+      <div class="info-row"><span class="info-lbl">年用电量</span><span class="info-val dyn-ent-power-kwh" style="font-family:'DM Mono',monospace">待录入</span></div>
+      <div class="info-row"><span class="info-lbl">所在电网</span><span class="info-val dyn-ent-grid">待录入</span></div>
+      <div class="info-row"><span class="info-lbl">主要出口国</span><span class="info-val dyn-ent-export-countries">待录入</span></div>
+      <div class="info-row"><span class="info-lbl">合规邮箱</span><span class="info-val dyn-ent-email" style="font-family:'DM Mono',monospace">待录入</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Three-year forecast -->
+<div class="fu d3">
+  <div class="sh"><div class="sh-t">三年碳强度趋势预测 <div class="sh-line"></div></div><span class="pill p-gold" id="ent-forecast-roi-pill">ROI 待测算</span></div>
+  <div class="card" style="padding:14px 16px">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div style="padding:12px 14px;background:var(--red-d);border:1px solid var(--red-b);border-radius:11px;text-align:center">
+        <div style="font-size:10px;color:var(--red-l);margin-bottom:5px;font-weight:600">2026 · 当前</div>
+        <div id="ent-forecast-2026-val" style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:var(--red-l)">待测算</div>
+        <div id="ent-forecast-2026-sub" style="font-size:10px;color:rgba(252,165,165,.7);margin-top:3px">碳税敞口 · Lv.2</div>
+      </div>
+      <div style="padding:12px 14px;background:var(--gold-d);border:1px solid var(--gold-b);border-radius:11px;text-align:center">
+        <div style="font-size:10px;color:var(--gold-l);margin-bottom:5px;font-weight:600">2027 · MAT升级后</div>
+        <div id="ent-forecast-2027-val" style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:var(--gold-l)">待测算</div>
+        <div style="font-size:10px;color:rgba(240,208,128,.7);margin-top:3px">Lv.4 · 供应链 60%</div>
+      </div>
+      <div style="padding:12px 14px;background:var(--green-d);border:1px solid var(--green-b);border-radius:11px;text-align:center">
+        <div style="font-size:10px;color:var(--green-l);margin-bottom:5px;font-weight:600">2028 · 全面对冲后</div>
+        <div id="ent-forecast-2028-val" style="font-family:'DM Mono',monospace;font-size:22px;font-weight:700;color:var(--green-l)">待测算</div>
+        <div style="font-size:10px;color:rgba(110,231,183,.7);margin-top:3px">Lv.4 · 供应链 94%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    </div>
+  </div>
+</div>
+</div>
+<div id="enterprise-profile-drawer-mask" style="position:fixed;inset:0;background:rgba(2,6,12,0.72);backdrop-filter:blur(3px);z-index:9998;display:none;opacity:0;transition:opacity .22s ease" onclick="closeEnterpriseProfileDrawer()">
+  <div id="enterprise-profile-drawer" style="position:absolute;top:0;right:0;height:100%;width:min(540px,92vw);background:linear-gradient(180deg,#0b1320,#080e18);border-left:1px solid rgba(16,185,129,0.28);box-shadow:-24px 0 56px rgba(0,0,0,0.45);transform:translateX(100%);transition:transform .24s ease;padding:24px 22px 18px;display:flex;flex-direction:column;gap:14px" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(16,185,129,0.85)">Enterprise Profile Writer</div>
+        <div style="font-size:18px;font-weight:700;color:#ecfdf5;margin-top:2px">企业数字档案录入面板</div>
+      </div>
+      <button type="button" class="tb-btn" onclick="closeEnterpriseProfileDrawer()">✕</button>
+    </div>
+    <div style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px;padding-right:4px">
+      <!-- 组 1：合规身份（落库字段，写入 PostgreSQL workspaces 表） -->
+      <div style="display:flex;flex-direction:column;gap:11px;background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.18);border-radius:14px;padding:13px 12px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(110,231,183,0.85);font-weight:700">
+          <span>1 · 合规身份</span>
+          <span class="pill p-green" style="font-size:9px;letter-spacing:.4px">链上落库</span>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:11px;color:var(--ink2)">企业全称 <span style="color:var(--red-l)">*</span></span>
+          <input id="input-ent-name" type="text" class="f-inp" placeholder="请输入营业执照上的企业全称" style="width:100%">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:11px;color:var(--ink2)">所属行业 <span style="color:var(--red-l)">*</span></span>
+          <select id="input-ent-industry" class="f-sel" style="width:100%">
+            <option value="petro">石化/化工</option>
+            <option value="paper">造纸</option>
+            <option value="aviation">民航</option>
+            <option value="ceramic">陶瓷</option>
+            <option value="port">交通/港口</option>
+            <option value="idc">数据中心</option>
+            <option value="steel">钢铁</option>
+            <option value="cement">水泥</option>
+            <option value="aluminum">铝及铝合金</option>
+            <option value="fertilizer">化肥</option>
+            <option value="electricity">电力</option>
+            <option value="hydrogen">氢</option>
+            <option value="other">其他（请在主营产品中说明）</option>
+          </select>
+        </label>
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:11px;color:var(--ink2)">地域标签（GD-ETS 2026）</span>
+          <select id="input-ent-region" class="f-sel" style="width:100%">
+            <option value="">未指定</option>
+            <option value="gd">广东省 · 重点排放单位</option>
+            <option value="guangdong">广东（别名）</option>
+            <option value="other">其他省份</option>
+          </select>
+        </label>
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:11px;color:var(--ink2)">统一社会信用代码 <span style="color:var(--gold)">★ 首次填写 +50 GM</span></span>
+          <input id="input-ent-code" type="text" class="f-inp" placeholder="91XXXXXXXXXXXXXXXX（18 位）" maxlength="18" style="width:100%;font-family:'DM Mono',monospace;text-transform:uppercase">
+        </label>
+      </div>
+
+      <!-- 组 2：产品与出口（碳测算核心，缓存到浏览器，下一轮 schema 升级后落库） -->
+      <div style="display:flex;flex-direction:column;gap:11px;background:rgba(59,130,246,0.04);border:1px solid rgba(59,130,246,0.18);border-radius:14px;padding:13px 12px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--blue-l);font-weight:700">
+          <span>2 · 产品与出口</span>
+          <span class="pill p-blue" style="font-size:9px;letter-spacing:.4px">CBAM 测算输入</span>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:11px;color:var(--ink2)">主营产品（CBAM 类别）</span>
+          <input id="input-ent-product" type="text" class="f-inp" placeholder="如：铝压铸汽配零件" style="width:100%">
+        </label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:11px;color:var(--ink2)">HS 编码（主类）</span>
+            <input id="input-ent-hs" type="text" class="f-inp" placeholder="如：7604.10" style="width:100%;font-family:'DM Mono',monospace">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:11px;color:var(--ink2)">年产能（吨）</span>
+            <input id="input-ent-capacity" type="number" min="0" step="0.1" class="f-inp" placeholder="如：2400" style="width:100%;font-family:'DM Mono',monospace">
+          </label>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:11px;color:var(--ink2)">年出口欧盟量（吨）</span>
+          <input id="input-ent-export-volume" type="number" min="0" step="0.1" class="f-inp" placeholder="如：1920" style="width:100%;font-family:'DM Mono',monospace">
+        </label>
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:11px;color:var(--ink2)">主要出口国（多个用逗号分隔）</span>
+          <input id="input-ent-export-countries" type="text" class="f-inp" placeholder="如：德国, 法国, 荷兰" style="width:100%">
+        </label>
+      </div>
+
+      <!-- 组 3：能耗与电网（Scope2 测算核心） -->
+      <div style="display:flex;flex-direction:column;gap:11px;background:rgba(249,115,22,0.04);border:1px solid rgba(249,115,22,0.18);border-radius:14px;padding:13px 12px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--orange-l);font-weight:700">
+          <span>3 · 能耗与电网</span>
+          <span class="pill p-orange" style="font-size:9px;letter-spacing:.4px">Scope 2 测算</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:10px">
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:11px;color:var(--ink2)">年用电量（kWh）</span>
+            <input id="input-ent-power-kwh" type="number" min="0" step="1" class="f-inp" placeholder="年度 kWh" style="width:100%;font-family:'DM Mono',monospace">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:11px;color:var(--ink2)">所在电网</span>
+            <select id="input-ent-grid" class="f-sel" style="width:100%">
+              <option value="">请选择</option>
+              <option value="east">华东电网（0.581）</option>
+              <option value="north">华北电网（0.728）</option>
+              <option value="south">南方电网（0.391）</option>
+              <option value="northeast">东北电网（0.658）</option>
+              <option value="northwest">西北电网（0.493）</option>
+              <option value="central">华中电网（0.527）</option>
+            </select>
+          </label>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:11px;color:var(--ink2)">合规联系邮箱（CBAM 通报使用）</span>
+          <input id="input-ent-email" type="email" class="f-inp" placeholder="compliance@example.com" style="width:100%">
+        </label>
+      </div>
+
+      <div style="font-size:10.5px;color:var(--ink3);line-height:1.65;padding:6px 4px">
+        <span style="color:var(--gold-l)">说明：</span>组 1 字段实时落库到 PostgreSQL；组 2 / 组 3 字段先存入浏览器 IndexedDB（localStorage），下一轮 Workspace schema 升级后将自动迁移到主库（既有数据不丢失）。
+      </div>
+    </div>
+    <div style="margin-top:auto;display:flex;gap:10px">
+      <button type="button" class="tb-btn" style="flex:1;border-color:rgba(248,113,113,0.45);color:#fecaca;background:rgba(127,29,29,0.16)" onclick="closeEnterpriseProfileDrawer()">❌ 取消</button>
+      <button id="enterprise-save-btn" type="button" class="tb-btn tb-btn-primary" style="flex:1;justify-content:center;box-shadow:0 0 16px rgba(16,185,129,0.32) inset" onclick="saveEnterpriseProfile()">🛡️ 确认存入数字底座</button>
+    </div>
+  </div>
+</div>
+<div id="toast"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polyline points="2,7 5.5,10.5 12,4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span id="toast-msg"></span></div>
+<script>
+
+function showToast(msg,type){
+  var t=document.getElementById('toast');
+  var m=document.getElementById('toast-msg');
+  if(!t||!m)return;
+  m.textContent=msg;
+  if(type==='error'){t.style.borderColor='var(--red-b)';t.style.color='var(--red-l)';}
+  else if(type==='gold'){t.style.borderColor='var(--gold-b)';t.style.color='var(--gold-l)';}
+  else{t.style.borderColor='var(--green-b)';t.style.color='var(--green-l)';}
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt=setTimeout(function(){t.classList.remove('show');},2800);
+}
+
+var ENT_EXTRA_LS_KEY = 'hengai_enterprise_profile_extra_v1';
+
+function entExtraStorageKey() {
+  var uid = null;
+  try {
+    var root = (window.parent && window.parent !== window) ? window.parent : window;
+    if (typeof root.parseJwtSub === 'function') {
+      uid = root.parseJwtSub(localStorage.getItem('hengai_token') || localStorage.getItem('authToken') || '');
+    }
+    if (!uid && root.AppState && root.AppState.user) {
+      uid = root.AppState.user.id || root.AppState.user.userId;
+    }
+  } catch (_) {}
+  return uid ? (ENT_EXTRA_LS_KEY + ':' + uid) : ENT_EXTRA_LS_KEY;
+}
+
+function enterpriseExtraOwnerMatchesCurrent(extra) {
+  if (!extra || !extra._ownerUserId) return true;
+  var uid = null;
+  try {
+    var root = (window.parent && window.parent !== window) ? window.parent : window;
+    if (typeof root.currentAuthUserId === 'function') uid = root.currentAuthUserId();
+    else if (typeof root.parseJwtSub === 'function') {
+      uid = root.parseJwtSub(localStorage.getItem('hengai_token') || localStorage.getItem('authToken') || '');
+    }
+  } catch (_) {}
+  return !uid || String(extra._ownerUserId) === String(uid);
+}
+
+function loadEnterpriseExtra() {
+  var key = entExtraStorageKey();
+  try {
+    var extra = JSON.parse(localStorage.getItem(key) || '{}') || {};
+    if (!enterpriseExtraOwnerMatchesCurrent(extra)) return {};
+    if (key === ENT_EXTRA_LS_KEY && extra._ownerUserId) {
+      var scoped = localStorage.getItem(ENT_EXTRA_LS_KEY + ':' + extra._ownerUserId);
+      if (scoped) {
+        extra = JSON.parse(scoped) || {};
+        if (!enterpriseExtraOwnerMatchesCurrent(extra)) return {};
+      }
+    }
+    return extra;
+  } catch (_) { return {}; }
+}
+function saveEnterpriseExtraLocal(obj) {
+  var key = entExtraStorageKey();
+  var payload = Object.assign({}, obj || {});
+  var parts = key.split(':');
+  if (parts.length > 1) payload._ownerUserId = parts[parts.length - 1];
+  try { localStorage.setItem(key, JSON.stringify(payload)); } catch (_) {}
+  if (key !== ENT_EXTRA_LS_KEY) {
+    try { localStorage.removeItem(ENT_EXTRA_LS_KEY); } catch (_) {}
+  }
+}
+
+function openEnterpriseProfileDrawer() {
+  var mask = document.getElementById('enterprise-profile-drawer-mask');
+  var drawer = document.getElementById('enterprise-profile-drawer');
+  if (!mask || !drawer) return;
+  var companyName = (document.getElementById('ent-company-name') || {}).textContent || '';
+  var creditCode = (document.getElementById('ent-credit-code') || {}).textContent || '';
+  var nameEl = document.getElementById('input-ent-name');
+  var codeEl = document.getElementById('input-ent-code');
+  if (nameEl) nameEl.value = companyName === '未录入' ? '' : companyName;
+  if (codeEl) codeEl.value = creditCode === '未录入' ? '' : creditCode;
+
+  // 回填 extra 字段
+  var extra = loadEnterpriseExtra();
+  var setV = function (id, v) { var el = document.getElementById(id); if (el && v != null) el.value = v; };
+  setV('input-ent-industry', extra.industryCode || (window.AppState && window.AppState.company && window.AppState.company.industryCode));
+  var co = (window.AppState && window.AppState.company) || {};
+  setV('input-ent-region', extra.regionTag || co.regionTag || co.region_tag);
+  setV('input-ent-product', extra.mainProduct);
+  setV('input-ent-hs', extra.hsCode);
+  setV('input-ent-capacity', extra.annualCapacityTons);
+  setV('input-ent-export-volume', extra.annualExportTons);
+  setV('input-ent-export-countries', extra.exportCountries);
+  setV('input-ent-power-kwh', extra.annualPowerKwh);
+  setV('input-ent-grid', extra.powerGrid);
+  setV('input-ent-email', extra.contactEmail);
+
+  mask.style.display = 'block';
+  requestAnimationFrame(function () {
+    mask.style.opacity = '1';
+    drawer.style.transform = 'translateX(0)';
+  });
+}
+
+function closeEnterpriseProfileDrawer() {
+  var mask = document.getElementById('enterprise-profile-drawer-mask');
+  var drawer = document.getElementById('enterprise-profile-drawer');
+  if (!mask || !drawer) return;
+  mask.style.opacity = '0';
+  drawer.style.transform = 'translateX(100%)';
+  setTimeout(function () { mask.style.display = 'none'; }, 220);
+}
+
+async function saveEnterpriseProfile() {
+  var $v = function (id) { var el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; };
+  var $vNum = function (id) { var v = $v(id); return v === '' ? null : Number(v); };
+
+  var nameEl = document.getElementById('input-ent-name');
+  var codeEl = document.getElementById('input-ent-code');
+  var industryEl = document.getElementById('input-ent-industry');
+  var btn = document.getElementById('enterprise-save-btn');
+  if (!nameEl || !codeEl || !industryEl) return;
+
+  // V3.2 完整 11 字段全部走 API 落 PostgreSQL workspaces 表
+  var fullPayload = {
+    name: $v('input-ent-name'),
+    industryCode: $v('input-ent-industry'),
+    regionTag: $v('input-ent-region') || null,
+    creditCode: $v('input-ent-code'),
+    mainProduct: $v('input-ent-product') || null,
+    hsCode: $v('input-ent-hs') || null,
+    annualCapacityTons: $vNum('input-ent-capacity'),
+    annualExportTons: $vNum('input-ent-export-volume'),
+    exportCountries: $v('input-ent-export-countries') || null,
+    annualPowerKwh: $vNum('input-ent-power-kwh'),
+    powerGrid: $v('input-ent-grid') || null,
+    contactEmail: $v('input-ent-email') || null
+  };
+  if (!fullPayload.name) {
+    showToast('⚠️ 企业全称为必填', 'error');
+    nameEl.focus();
+    return;
+  }
+
+  if (btn) btn.disabled = true;
+  try {
+    // 🚨 任务 1B：所有表单提交统一走 AppState.commit —— 不再各自调 fetch
+    var AS = (window.parent && window.parent.AppState) || window.AppState;
+    if (!AS || typeof AS.commit !== 'function') {
+      throw new Error('AppState.commit 不可用 —— 请刷新页面让 AppState.js 重新加载');
+    }
+    var responseJson = await AS.commit('enterprise', fullPayload);
+
+    // 成功后清除本地兜底缓存
+    try {
+      localStorage.removeItem(entExtraStorageKey());
+      localStorage.removeItem(ENT_EXTRA_LS_KEY);
+    } catch (_) {}
+
+    try {
+      window.dispatchEvent(new CustomEvent('hengai:enterprise-saved', { detail: fullPayload }));
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'HENGAI_ENTERPRISE_SAVED', payload: fullPayload }, '*');
+      }
+      applyEnterpriseExtraToHero(fullPayload, fullPayload);
+    } catch (_) {}
+
+    var gmAwarded = (responseJson && (responseJson.gmEarned || responseJson.gm_earned)) || 0;
+    showToast(
+      gmAwarded > 0
+        ? ('✅ 企业档案已存入数字底座 · +' + gmAwarded + ' GM · 全域同步完毕')
+        : '✅ 企业档案已更新 · 全域 dyn-* 已刷新',
+      'gold'
+    );
+    closeEnterpriseProfileDrawer();
+  } catch (err) {
+    showToast('❌ 保存失败：' + (err && err.message ? err.message : err), 'error');
+    console.error('[Enterprise] saveEnterpriseProfile failed:', err);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+/**
+ * 自动迁移：如果浏览器有遗留的 extra 缓存且后端尚未落库，启动时自动上送一次。
+ * 该函数只在用户已登录且后端 company 字段为空时触发，迁移完毕清除本地缓存。
+ */
+async function tryMigrateLocalExtraToBackend(company) {
+  try {
+    var extra = loadEnterpriseExtra();
+    if (!extra || !extra._savedAt) return;
+    if (!enterpriseExtraOwnerMatchesCurrent(extra)) {
+      try { localStorage.removeItem(entExtraStorageKey()); localStorage.removeItem(ENT_EXTRA_LS_KEY); } catch (_) {}
+      return;
+    }
+    // 后端已落库则跳过
+    if (company && (company.mainProduct || company.main_product)) {
+      try { localStorage.removeItem(entExtraStorageKey()); localStorage.removeItem(ENT_EXTRA_LS_KEY); } catch (_) {}
+      return;
+    }
+    if (!company || !company.name) return;
+    var token = localStorage.getItem('hengai_token') || localStorage.getItem('authToken') || '';
+    if (!token) return;
+    var AS = (window.parent && window.parent.AppState) || window.AppState;
+    if (!AS || typeof AS.commit !== 'function') return;
+    var payload = {
+      name: company.name,
+      industryCode: extra.industryCode || company.industryCode || null,
+      regionTag: extra.regionTag || company.regionTag || company.region_tag || null,
+      creditCode: company.creditCode || null,
+      mainProduct: extra.mainProduct || null,
+      hsCode: extra.hsCode || null,
+      annualCapacityTons: extra.annualCapacityTons,
+      annualExportTons: extra.annualExportTons,
+      exportCountries: extra.exportCountries || null,
+      annualPowerKwh: extra.annualPowerKwh,
+      powerGrid: extra.powerGrid || null,
+      contactEmail: extra.contactEmail || null
+    };
+    try {
+      await AS.commit('enterprise', payload);
+      try { localStorage.removeItem(entExtraStorageKey()); localStorage.removeItem(ENT_EXTRA_LS_KEY); } catch (_) {}
+      console.log('[Enterprise] 本地遗留 extra 已通过 AppState.commit 迁移到 PostgreSQL');
+    } catch (_) {}
+  } catch (e) {
+    console.warn('[Enterprise] 自动迁移 extra 失败：', e);
+  }
+}
+
+/** 把 extra（含 API 返回 & localStorage 兜底）实时回灌到本页 hero 区与详情卡 */
+function applyEnterpriseExtraToHero(extra, core) {
+  // 优先 API（后端 V3.2 字段），其次 localStorage（旧版兜底）
+  var apiCo = (window.__lastCompanyPayload || {});
+  var fallback = loadEnterpriseExtra();
+  extra = Object.assign({}, fallback, apiCo, extra || {});
+  core  = core  || {};
+
+  var setText = function (sel, val) {
+    if (val == null || val === '') return;
+    document.querySelectorAll(sel).forEach(function (el) { el.textContent = val; });
+  };
+
+  // —— hero 顶部 4 格 ——
+  if (extra.annualExportTons != null) setText('.dyn-ent-export-tons', Number(extra.annualExportTons).toLocaleString());
+  if (extra.mainProduct)              setText('.dyn-ent-product', extra.mainProduct);
+  if (extra.annualPowerKwh != null)   setText('.dyn-ent-power-kwh', Number(extra.annualPowerKwh).toLocaleString() + ' kWh');
+  if (extra.hsCode)                   setText('.dyn-ent-hs', extra.hsCode);
+  if (extra.annualCapacityTons != null) setText('.dyn-ent-capacity', '约 ' + Number(extra.annualCapacityTons).toLocaleString() + ' 吨');
+  if (extra.powerGrid) {
+    var gridLabels = {east:'华东电网（0.581）',north:'华北电网（0.728）',south:'南方电网（0.391）',northeast:'东北电网（0.658）',northwest:'西北电网（0.493）',central:'华中电网（0.527）'};
+    setText('.dyn-ent-grid', gridLabels[extra.powerGrid] || extra.powerGrid);
+  }
+  if (extra.exportCountries) setText('.dyn-ent-export-countries', extra.exportCountries);
+  if (extra.contactEmail)    setText('.dyn-ent-email', extra.contactEmail);
+}
+
+
+</script>
+<script>
+(function () {
+  function parentApi() {
+    try {
+      if (window.parent && window.parent !== window) return window.parent;
+    } catch (_) {}
+    return window;
+  }
+
+  function resolveStageLabel(company, metrics, payload) {
+    company = company || {};
+    metrics = metrics || {};
+    var root = parentApi();
+    if (typeof root.resolveCompanyStageLabel === 'function') {
+      return root.resolveCompanyStageLabel(company, metrics, payload && payload.cbam);
+    }
+    var risk = Number(
+      metrics.riskExposureEur != null ? metrics.riskExposureEur
+        : metrics.cbamTaxEstimate != null ? metrics.cbamTaxEstimate
+          : company.cbamRiskRaw != null ? company.cbamRiskRaw
+            : company.riskExposureEur != null ? company.riskExposureEur : 0
+    );
+    if (company.stageLabel && company.stageLabel !== '待激活' && company.stageLabel !== 'sandbox') {
+      return company.stageLabel;
+    }
+    if (company.isComplete === true || company.is_complete === true || risk > 0) return 'CBAM 已测算';
+    if (company.name) return '数字孪生体建立中';
+    return '待激活';
+  }
+
+  function applyEnterpriseFinancialsLocal(p) {
+    var root = parentApi();
+    var st = null;
+    if (typeof root.stateFromHubPipeline === 'function') {
+      try { st = root.stateFromHubPipeline(p, root.AppState); } catch (_) {}
+    }
+    if (!st) {
+      st = {
+        user: p.user || {},
+        company: p.company || {},
+        metrics: p.metrics || {},
+        impact: p.impact || {},
+        cbam: p.cbam || {},
+        macro: p.macro || {},
+      };
+    }
+    /* 关键：必须在 iframe 自己的 document 上灌注，不能调父页函数后用父页 document（找不到 #ent-* 会直接 return） */
+    if (typeof root.applyEnterpriseFinancialsToDom === 'function') {
+      try {
+        var fin = root.applyEnterpriseFinancialsToDom(st, null, document);
+        if (fin) return;
+      } catch (_) {}
+    }
+    if (typeof root.computeRepFinancials !== 'function') return;
+    var f;
+    try { f = root.computeRepFinancials(st); } catch (_) { return; }
+    if (typeof root.applyEnterpriseFinancialsToDom === 'function') {
+      try { root.applyEnterpriseFinancialsToDom(st, f, document); return; } catch (_) {}
+    }
+  }
+
+  function applyEnterprisePipeline(p) {
+    if (!p) return;
+    var user = p.user || {};
+    var company = p.company || {};
+    var metrics = p.metrics || {};
+    window.__lastCompanyPayload = company;
+    var name = user.name || '新用户';
+    var gm = Number(user.gmBalance != null ? user.gmBalance : user.gm_balance != null ? user.gm_balance : 0);
+    var coName = String(company.name || '待完善企业档案');
+    var credit = String(company.creditCode || company.credit_code || '');
+    var stage = resolveStageLabel(company, metrics, p);
+
+    if (typeof tryMigrateLocalExtraToBackend === 'function') {
+      try { tryMigrateLocalExtraToBackend(company); } catch (_) {}
+    }
+
+    var el;
+    if ((el = document.getElementById('ent-company-name'))) el.textContent = coName;
+    if ((el = document.getElementById('ent-company-name-dup'))) el.textContent = coName;
+    if ((el = document.getElementById('ent-credit-code'))) el.textContent = credit || '未录入';
+    document.querySelectorAll('.dyn-ent-name').forEach(function (n) { n.textContent = coName; });
+    document.querySelectorAll('.dyn-ent-code').forEach(function (n) { n.textContent = credit || '未录入'; });
+    document.querySelectorAll('.dyn-ent-stage-label').forEach(function (n) { n.textContent = stage; });
+    document.querySelectorAll('.dyn-ent-email').forEach(function (n) {
+      n.textContent = company.contactEmail || company.contact_email || '待录入';
+    });
+
+    var chip = document.querySelector('.gm-chip-val');
+    if (chip) chip.textContent = gm.toLocaleString();
+
+    applyEnterpriseFinancialsLocal(p);
+
+    if (typeof applyEnterpriseExtraToHero === 'function') {
+      try { applyEnterpriseExtraToHero(company, company); } catch (_) {}
+    }
+  }
+
+  window.applyEnterprisePipeline = applyEnterprisePipeline;
+
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || !ev.data.type) return;
+    if (ev.data.type === 'HENGAI_HUB_PIPELINE') applyEnterprisePipeline(ev.data.payload);
+    if (ev.data.type === 'HENGAI_ENTERPRISE_EXTRA_SAVED' && typeof applyEnterpriseExtraToHero === 'function') {
+      applyEnterpriseExtraToHero(ev.data.payload);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof applyEnterpriseExtraToHero === 'function') {
+      try {
+        var ex = loadEnterpriseExtra();
+        if (enterpriseExtraOwnerMatchesCurrent(ex)) applyEnterpriseExtraToHero();
+      } catch (_) {}
+    }
+    try {
+      var root = parentApi();
+      if (root && root.__hubPipelineLastPayload) {
+        var pl = root.__hubPipelineLastPayload;
+        var uid = typeof root.currentAuthUserId === 'function' ? root.currentAuthUserId() : null;
+        var pUid = pl && pl.user && (pl.user.id || pl.user.userId);
+        if (!uid || !pUid || String(pUid) === String(uid)) {
+          applyEnterprisePipeline(pl);
+        }
+      }
+    } catch (_) {}
+  });
+})();
+</script>
+<script src="hengai-module-pipeline.js"></script>
+</body>
+</html>

@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · DLD 碳资产绿色信贷</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>/**
+ * ╔══════════════════════════════════════════════════════════════════════╗
+ * ║   HengAI Co2Lion · AppState 唯一真理引擎 · V3.2                      ║
+ * ║   全域 14 模块共用 · 严禁在各模块页面 Hardcode 任何业务数据            ║
+ * ║                                                                      ║
+ * ║   加载顺序：<script src="appstate.js"><\/script>（所有模块 <head> 首位）║
+ * ╚══════════════════════════════════════════════════════════════════════╝
+ *
+ *  暴露到 window：
+ *    window.AppState        — 唯一真理对象
+ *    window.EventBus        — 跨模块事件总线
+ *    window.ACCOUNT_TIER    — 账户等级枚举
+ *    window.F               — 格式化工具集
+ *    window.FM              — dyn-* CSS class → AppState 路径映射表
+ *    window.syncAppState()  — 全量 DOM 灌注
+ *    window.initAppState()  — 异步初始化入口（每页调用一次）
+ *    window.getMacroOracle()— 宏观价源读取
+ *    window.publishMacroSync()— 跨标签碳价同步
+ */
+
+'use strict';
+
+/* ═══════════════════════════════════════════════════════════════════════
+   0 · 常量
+   ═══════════════════════════════════════════════════════════════════════ */
+const API_BASE          = (window.APP_CONFIG && window.APP_CONFIG.api_base) || 'http://localhost:8000';
+const API_HUB_OVERVIEW  = `${API_BASE}/api/v1/hub/overview`;
+const API_TIMEOUT_MS    = 3000;
+
+const LS_TOKEN_KEY      = 'hengai_token';
+const LS_TOKEN_ALT      = 'authToken';
+const LS_CACHE_KEY      = 'hengai_hub_cache_v1';
+const LS_MACRO_KEY      = 'hengai_macro_sync_v1';
+const BC_MACRO_CHANNEL  = 'hengai_macro_sync_channel';
+
+/* ═══════════════════════════════════════════════════════════════════════
+   1 · 账户等级枚举
+   ═══════════════════════════════════════════════════════════════════════ */
+const ACCOUNT_TIER = Object.freeze({
+  GUEST:        'GUEST',
+  FREE_USER:    'FREE_USER',
+  PRO_PERSONAL: 'PRO_PERSONAL',
+  ENT_VERIFIED: 'ENT_VERIFIED',
+});
+window.ACCOUNT_TIER = ACCOUNT_TIER;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   2 · EventBus —— 跨模块事件总线
+   ═══════════════════════════════════════════════════════════════════════ */
+const EventBus = {
+  _ev: {},
+  on(event, fn)   { (this._ev[event] = this._ev[event] || []).push(fn); return this; },
+  off(event, fn)  { this._ev[event] = (this._ev[event] || []).filter(f => f !== fn); },
+  emit(event, d)  { (this._ev[event] || []).forEach(fn => { try { fn(d); } catch(e) { console.warn('[EventBus]', event, e); } }); },
+};
+window.EventBus = EventBus;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   3 · Token 工具
+   ═══════════════════════════════════════════════════════════════════════ */
+const getToken   = () => localStorage.getItem(LS_TOKEN_KEY) || localStorage.getItem(LS_TOKEN_ALT);
+const setToken   = t  => { localStorage.setItem(LS_TOKEN_KEY, t); localStorage.setItem(LS_TOKEN_ALT, t); };
+const clearToken = () => { localStorage.removeItem(LS_TOKEN_KEY); localStorage.removeItem(LS_TOKEN_ALT); };
+window.getToken  = getToken;
+window.clearToken = clearToken;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   4 · 认证辅助
+   ═══════════════════════════════════════════════════════════════════════ */
+function normalizeTierCode(input) {
+  const raw = String(input || '').trim();
+  if (!raw) return ACCOUNT_TIER.GUEST;
+  if (Object.values(ACCOUNT_TIER).includes(raw)) return raw;
+  if (/企业|共治|认证|旗舰|sovereign|ent/i.test(raw)) return ACCOUNT_TIER.ENT_VERIFIED;
+  if (/专业|pro|年付|月付/i.test(raw))                  return ACCOUNT_TIER.PRO_PERSONAL;
+  if (/免费|free|体验/i.test(raw))                      return ACCOUNT_TIER.FREE_USER;
+  return ACCOUNT_TIER.FREE_USER;
+}
+function oracleIsLoggedIn()  { return !!(AppState.auth && AppState.auth.user); }
+function currentTierCode()   {
+  if (!oracleIsLoggedIn()) return ACCOUNT_TIER.GUEST;
+  return normalizeTierCode((AppState.user && AppState.user.tier_code) || (AppState.user && AppState.user.tier));
+}
+window.oracleIsLoggedIn = oracleIsLoggedIn;
+window.currentTierCode  = currentTierCode;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   5 · MOCK_STATE —— 离线降级 / 演示数据
+       所有 dyn-* 节点 100% 可亮，无一横线兜底
+   ═══════════════════════════════════════════════════════════════════════ */
+const MOCK_STATE = {
+  user: {
+    name:           '---',
+    email:          'wanglei@demo.hengai.cn',
+    tier:           'Sovereign',
+    tier_code:      ACCOUNT_TIER.ENT_VERIFIED,
+    tierLevel:      5,
+    currentLevel:   5,
+    complianceScore:92,
+    gmBalance:      2840,
+    tokensLeft:     47250,
+    tokensUsed:     12750,
+    totalCo2eSaved: 142,
+    badgeCount:     8,
+    regDate:        '2026-01-12',
+    regLabel:       '2026-01-12 注册',
+    lastLoginAt:    '2026-05-07T14:00:00Z',
+    levels:         { 1:'Lv.1 观察员', 2:'Lv.3 架构师', 3:'Lv.5 智库顾问', 4:'Lv.4 物理认证', 5:'Lv.5 全域顾问' },
+  },
+  company: {
+    name:                   '---',
+    creditCode:             '91330000MA28XYZ123',
+    industryLabel:          '铝压铸 · 汽车零部件',
+    stage:                  'Certified',
+    stageLabel:             'Lv.4 物理认证',
+    employeeCount:          320,
+    complianceLevel:        4,
+    annualRevenue:          280000000,
+    declaredSupplierCount:  17,
+    exportTons:             1920,
+    productLine:            '铝压铸汽配零件',
+    factorMethod:           'CBAM v3.0 / GHG Protocol',
+    customsLevel:           'Lv.4 物理认证',
+    creditLimit:            '¥ 240万',
+    netSavings:             '¥ 372k',
+    roiRatio:               '6.4×',
+    interestSave:           '¥ 10,800',
+    declareCount:           3,
+    cbamRisk:               '€ 145,000',
+    cbamRiskRaw:            145000,
+  },
+  metrics: {
+    tCO2eTotal:             3494,
+    globalRank:             1247,
+    roiRatio:               0.64,
+    supplyChainCoverage:    0.65,
+    scope3Coverage:         0.65,
+    riskExposureEur:        145000,
+    cbamTaxEstimate:        73600,
+    reductionTarget:        240,
+    reductionAchieved:      142,
+    reductionProgress:      0.59,
+    energyTco2eSum:         72.1,
+    supplierCount:          17,
+    supplierSubmitted:      11,
+    supplierSubmittedCount: 11,
+    supplierPendingCount:   4,
+    scope1:                 0,
+    scope2:                 72,
+    scope3:                 3422,
+    taxSavingsWan:          38.6,
+    carbonIntensity:        1.82,
+    roiMultiple:            9.1,
+    industryBetterPct:      24.5,
+    barWidthPct:            75.5,
+    supplierPush:           8,
+    cbamDrills:             3,
+    paidPartners:           5,
+    coverageDeltaPct:       91,
+    emissionReductionT:     142,
+    gmMonthlyDelta:         320,
+    scope3Rate:             45,
+    shieldEn:               'Architect',
+  },
+  impact: {
+    riskExposureEur: 145000,
+    scope1: 0,
+    scope2: 72,
+    scope3: 3422,
+  },
+  macro: {
+    cbam_current_price: 75.36,
+    eur_cny_rate:       7.85,
+    last_updated:       '2026-04-20',
+  },
+  wallet: {
+    address: '#WL-WANGLEI-E87D-B4F2-9A1C',
+    balance: 2840,
+  },
+  flags: {
+    currentPhase:       'Phase3',
+    phaseLabel:         'Phase 3 · 企业共治期',
+    nextAction:         '建议向决策层呈送《Q2 CBAM 升级方案》以申领 ¥58k 预算',
+    unlockedMenusList:  [
+      'dashboard','achievement','cbam','compute','regulation',
+      'company','supplychain','diagnosis','package','wallet',
+      'customs','dld','acf','governance'
+    ],
+  },
+  recentReports: [
+    { reportingPeriod:'2026-Q1', status:'verified',  tCO2eTotal:802,  riskExposureEur:36288,  submittedAt:'2026-04-01' },
+    { reportingPeriod:'2025-Q4', status:'verified',  tCO2eTotal:908,  riskExposureEur:41837,  submittedAt:'2026-01-15' },
+    { reportingPeriod:'2025-Q3', status:'verified',  tCO2eTotal:837,  riskExposureEur:53586,  submittedAt:'2025-10-12' },
+    { reportingPeriod:'2026-Q2', status:'submitted', tCO2eTotal:null, riskExposureEur:null,   submittedAt:null },
+  ],
+  badges: [
+    { badgeName:'碳数据先锋',    earnedAt:'2026-01-12', gmReward:200,  locked:false },
+    { badgeName:'CBAM 测算员',   earnedAt:'2026-01-28', gmReward:300,  locked:false },
+    { badgeName:'供应链推动者',  earnedAt:'2026-02-15', gmReward:500,  locked:false },
+    { badgeName:'Lv.4 物理认证', earnedAt:'2026-03-01', gmReward:1000, locked:false },
+    { badgeName:'ZCP 绿电签证',  earnedAt:'2026-03-20', gmReward:200,  locked:false },
+    { badgeName:'企业文明候选',  earnedAt:'2026-04-01', gmReward:150,  locked:false },
+    { badgeName:'生态共治委员',  earnedAt:'2026-04-12', gmReward:500,  locked:false },
+    { badgeName:'代际收益领袖',  earnedAt:'2026-04-20', gmReward:400,  locked:false },
+  ],
+  suppliers: [
+    { name:'星辰五金',   category:'铝型材', status:'done',    completeness:'完整',      carbonIntensity:1.24, priority:'high' },
+    { name:'无锡YY铝材', category:'铝锭',   status:'partial', completeness:'Scope2缺失', carbonIntensity:null, priority:'high' },
+    { name:'广东ZZ压铸', category:'铸件',   status:'missing', completeness:'—',          carbonIntensity:null, priority:'high' },
+    { name:'山东AA锻造', category:'钢材',   status:'invited', completeness:'—',          carbonIntensity:null, priority:'mid'  },
+    { name:'江苏BB橡胶', category:'橡胶件', status:'invited', completeness:'—',          carbonIntensity:null, priority:'mid'  },
+    { name:'上海CC精工', category:'精密件', status:'none',    completeness:'—',          carbonIntensity:null, priority:'low'  },
+    { name:'宁波DD模具', category:'模具',   status:'none',    completeness:'—',          carbonIntensity:null, priority:'low'  },
+    { name:'温州EE电气', category:'电气件', status:'none',    completeness:'—',          carbonIntensity:null, priority:'low'  },
+    { name:'绍兴FF纺织', category:'辅料',   status:'none',    completeness:'—',          carbonIntensity:null, priority:'low'  },
+    { name:'杭州GG涂料', category:'涂料',   status:'none',    completeness:'—',          carbonIntensity:null, priority:'low'  },
+  ],
+  gmTransactions: [
+    { type:'代际收益',         desc:'供应商完成注册 × 20%',               amount:+200,  ts:'2026-04-13T14:22:00Z' },
+    { type:'CBAM 通关预演奖励', desc:'第3次通关预演完成 · 置信度升Lv.4',    amount:+500,  ts:'2026-04-13T14:22:00Z' },
+    { type:'企业档案建立奖励',  desc:'数字档案正式建立',                    amount:+150,  ts:'2026-04-12T09:41:00Z' },
+    { type:'月度会员开通',      desc:'个人月度会员 · ¥99',                  amount:+50,   ts:'2026-04-12T08:15:00Z' },
+    { type:'注册 · 首次AI问答', desc:'HengAI账户创建 · 完成7条CBAM问答',    amount:+50,   ts:'2026-04-11T09:31:00Z' },
+    { type:'CBAM测算奖励',      desc:'第1次CBAM测算完成',                   amount:+28,   ts:'2026-04-11T09:17:00Z' },
+  ],
+  compute: {
+    tokenQuota:      500000,
+    tokenUsed:       214580,
+    deepCalcQuota:   100,
+    deepCalcUsed:    43,
+    storageGB:       2,
+    storageUsedGB:   0.8,
+    ledger: [
+      { action:'全域诊断报告',   tokens:12500, ts:'2026-04-13T14:22:00Z', saving:'节省外包律师3.5h' },
+      { action:'CBAM风险测算',   tokens:2100,  ts:'2026-04-12T09:41:00Z', saving:'精准预算€14k' },
+      { action:'供应链穿透分析', tokens:3400,  ts:'2026-04-11T16:05:00Z', saving:'识别3家高优先级' },
+      { action:'ROI呈送包生成',  tokens:18700, ts:'2026-04-10T11:30:00Z', saving:'决策层通过预算' },
+      { action:'法规动态扫描',   tokens:800,   ts:'2026-04-09T08:00:00Z', saving:'无漏项风险' },
+    ],
+  },
+  euCustoms: {
+    level: 'Lv.4 物理认证',
+    declareCount: 3,
+    declarations: [
+      { period:'2026 Q1', product:'铝压铸件', exportTons:480, carbonEI:1.62, taxEur:36288, status:'accepted', submittedAt:'2026-04-01' },
+      { period:'2025 Q4', product:'铝压铸件', exportTons:510, carbonEI:1.78, taxEur:41837, status:'accepted', submittedAt:'2026-01-15' },
+      { period:'2025 Q3', product:'铝压铸件', exportTons:460, carbonEI:1.82, taxEur:53586, status:'accepted', submittedAt:'2025-10-12' },
+      { period:'2026 Q2', product:'铝压铸件', exportTons:null, carbonEI:null, taxEur:null, status:'draft',    submittedAt:null },
+    ],
+  },
+  dld: {
+    certifiedCO2e: 142,
+    creditLimit:   '¥ 240万',
+    creditStatus:  '已授信',
+    interestSave:  '¥ 10,800',
+    banks:         ['工商银行 · 绿色信贷部', '农业银行 · ESG专项', '兴业银行 · 绿色金融'],
+    assets: [
+      { batchId:'DLD-2026-0412', co2e:142, org:'DLD国家认证', expiry:'2027-03-31', status:'valid', certDate:'2026-04-01' },
+      { batchId:'DLD-2026-Q2',   co2e:'~110', org:'预测值',   expiry:'—',           status:'pending', certDate:null },
+    ],
+  },
+  acf: {
+    certStatus:     '认证通过',
+    productLine:    '铝压铸汽配零件',
+    factorMethod:   'CBAM v3.0 / GHG Protocol',
+    carbonFactor:   0.51,
+    certExpiry:     '2027-03-31',
+    progressSteps: [
+      { step:'数据录入', done:true },
+      { step:'MAT物理核验', done:true },
+      { step:'供应链Scope3', done:true },
+      { step:'广东省生态环境厅审核', done:true },
+      { step:'证书颁发', done:true },
+    ],
+  },
+  governance: {
+    seatTitle:        '顾问委员席位',
+    seatId:           '#0412',
+    seatRegion:       '---',
+    votesAvailable:   3,
+    passedProposals:  1,
+    totalMembers:     31,
+    activeProposals:  4,
+    proposals: [
+      {
+        id:'GCP-2026-008', title:'GM 代际收益率从 15% 提升至 20%',
+        proposer:'张磊（Lv.5 #0001）', initDate:'2026-04-10', deadline:'2026-04-30',
+        desc:'将供应商推荐带来的代际 GM 收益从 15% 提升至 20%，进一步激励供应链协同扩展。',
+        supportPct:74, supportVotes:23, abstainPct:8, opposePct:18,
+        threshold:66, status:'passing', myVote:'支持',
+      },
+      {
+        id:'GCP-2026-009', title:'休眠 GM 豁免：决策层等待期保护',
+        proposer:'李云（Lv.4 #0028）', initDate:'2026-04-12', deadline:'2026-05-05',
+        desc:'新增"180天休眠保护"豁免机制：对于正在推动企业升级（有进行中的提案呈送记录）的用户，休眠计时暂停，直至决策层回应。',
+        supportPct:89, supportVotes:27, abstainPct:6, opposePct:5,
+        threshold:66, status:'passing', myVote:null,
+      },
+      {
+        id:'GCP-2026-010', title:'Scope 3 黑盒供应商的 GM 惩罚机制',
+        proposer:'---', initDate:'---', deadline:'---',
+        desc:'对 Scope 3 覆盖率低于 30% 的企业，在生成诊断报告时自动触发 -50 GM/季度惩罚，以激励数据透明化。',
+        supportPct:61, supportVotes:19, abstainPct:13, opposePct:26,
+        threshold:66, status:'at_risk', myVote:null,
+        note:'需达到 66% 通过 · 距通过还差 2 票 · 截止前还有 18 天',
+      },
+      {
+        id:'GCP-2026-011', title:'开放 ACF 大湾区认证通道接入',
+        proposer:'陈子涵（Lv.4 #0089）', initDate:'2026-04-15', deadline:'2026-05-15',
+        desc:'开放 ACF 大湾区认证通道，将广东实时碳因子 API 正式接入 Co2Lion 系统。需委员会授权后方可推进与深圳/广东监管局的对接谈判。',
+        supportPct:42, supportVotes:13, abstainPct:19, opposePct:39,
+        threshold:66, status:'failing', myVote:null,
+      },
+    ],
+    members: [
+      { name:'张磊', id:'#0001', region:'山东', level:'Lv.5', contribution:3200, voteRate:'94%' },
+      { name:'李云', id:'#0028', region:'广东', level:'Lv.4', contribution:1800, voteRate:'87%' },
+      { name:'---', id:'---', region:'---', level:'---', contribution:0, voteRate:'---', isMe:true },
+      { name:'陈子涵', id:'#0089', region:'深圳', level:'Lv.4', contribution:1200, voteRate:'81%' },
+    ],
+    timeline: [
+      { id:'GCP-2026-007', title:'代际收益率从15%提升至20%', status:'passed', date:'2026-04-08' },
+      { id:'GCP-2026-006', title:'企业文明进步奖评选标准修订', status:'passed', date:'2026-03-25' },
+      { title:'第3届委员会正式成立', status:'milestone', date:'2026-03-01' },
+    ],
+  },
+  diagnostic: {
+    overallScore: 78,
+    riskLevel:    'mid',
+    generatedAt:  '2026-05-07T14:00:00Z',
+    dimensions: [
+      { name:'碳数据完整性',  status:'Scope3黑盒占比高',   riskLevel:'high', action:'启动供应链穿透计划' },
+      { name:'CBAM申报就绪', status:'缺少书面证据链',       riskLevel:'high', action:'完成3次通关预演' },
+      { name:'供应链覆盖率',  status:'65%已提交',          riskLevel:'mid',  action:'推动剩余6家填报' },
+      { name:'减排路径规划',  status:'59%目标完成',        riskLevel:'mid',  action:'制定Q3减排方案' },
+      { name:'合规文档存档',  status:'链上存证已完成',      riskLevel:'low',  action:'维持现有节奏' },
+    ],
+  },
+  cbam: {
+    step:               1,
+    productType:        '铝压铸件',
+    exportVolume:       480,
+    carbonIntensity:    1.62,
+    paidCarbonPrice:    0,
+    calcResult:         null,
+    sensitivityPrices:  [40, 75.36, 80, 100],
+  },
+  serverTime: new Date().toISOString(),
+};
+
+/* ═══════════════════════════════════════════════════════════════════════
+   6 · AppState 对象 —— 唯一真理
+   ═══════════════════════════════════════════════════════════════════════ */
+const AppState = {
+  /* 从 MOCK_STATE 获取初始默认值，在线时由 API 覆盖 */
+  ...JSON.parse(JSON.stringify(MOCK_STATE)),
+
+  /* 额外运行时字段 */
+  auth:         { user: null, token: null },
+  chat:         { messages:[], turnCount:0, isStreaming:false, guestLimit:5, lastUserText:'' },
+  contextTags:  [],
+  justSawROI:   false,
+  _mode:        'mock',   /* 'live' | 'mock' */
+
+  /* ── 方法 ── */
+  updateAuth(user, token) {
+    this.auth.user  = user;
+    this.auth.token = token;
+    if (token) setToken(token); else clearToken();
+    if (user) {
+      const u = this.user;
+      if (user.name)       u.name       = user.name;
+      if (user.email)      u.email      = user.email;
+      if (user.gmBalance != null) { u.gmBalance = Number(user.gmBalance); this.wallet.balance = u.gmBalance; }
+      if (user.tier)       u.tier       = user.tier;
+      if (user.tier_code)  u.tier_code  = normalizeTierCode(user.tier_code);
+    }
+    EventBus.emit('AUTH_CHANGED', this.auth.user);
+    syncAppState();
+  },
+
+  updateGM(delta) {
+    this.user.gmBalance    = Math.max(0, (this.user.gmBalance || 0) + delta);
+    this.wallet.balance    = this.user.gmBalance;
+    EventBus.emit('GM_UPDATED', this.user.gmBalance);
+    syncAppState();
+  },
+
+  setGM(val) {
+    this.user.gmBalance    = Number(val) || 0;
+    this.wallet.balance    = this.user.gmBalance;
+    EventBus.emit('GM_UPDATED', this.user.gmBalance);
+    syncAppState();
+  },
+
+  addContext(tag) {
+    if (!this.contextTags.includes(tag)) {
+      this.contextTags.push(tag);
+      EventBus.emit('CONTEXT_UPDATED', this.contextTags);
+    }
+  },
+
+  incrementTurn() {
+    this.chat.turnCount++;
+    const el = document.getElementById('turnCounter');
+    if (el) el.textContent = `第${this.chat.turnCount}轮`;
+  },
+};
+window.AppState = AppState;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   7 · 格式化工具集 F
+   ═══════════════════════════════════════════════════════════════════════ */
+const F = {
+  n:    (v, d=0) => v == null ? '—' : Number(v).toLocaleString('zh-CN', { minimumFractionDigits:d, maximumFractionDigits:d }),
+  t:    (v)      => v == null ? '—' : `${F.n(v,1)} tCO₂e`,
+  eur:  (v)      => {
+    if (v == null) return '—';
+    if (v >= 1e6)  return `€${(v/1e6).toFixed(2)}M`;
+    if (v >= 1e4)  return `€${F.n(v,0)}`;
+    return `€${F.n(v,2)}`;
+  },
+  cny:  (v)      => v == null ? '—' : `¥${F.n(v,0)}`,
+  pct:  (v, d=1) => v == null ? '—' : `${(Number(v)*100).toFixed(d)}%`,
+  gm:   (v)      => v == null ? '—' : `${F.n(v,0)} GM`,
+  dt:   (v)      => {
+    if (!v) return '—';
+    try { return new Date(v).toLocaleDateString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit' }); }
+    catch { return String(v); }
+  },
+  tier: (v)      => {
+    const map = {
+      [ACCOUNT_TIER.GUEST]:        '访客',
+      [ACCOUNT_TIER.FREE_USER]:    '免费体验版',
+      [ACCOUNT_TIER.PRO_PERSONAL]: '个人专业版',
+      [ACCOUNT_TIER.ENT_VERIFIED]: '企业共治版',
+      Sovereign: '全域主权版',
+    };
+    return map[String(v)] || String(v || '未知');
+  },
+  esc:  (v)      => String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'),
+};
+window.F = F;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   8 · FM —— dyn-* CSS class → AppState 路径映射表
+       { c: CSS-class, p: dot-path | null, compute: fn, f: formatter, a: attr }
+   ═══════════════════════════════════════════════════════════════════════ */
+const FM = [
+  /* ── user ── */
+  { c:'dyn-user-name',           p:'user.name' },
+  { c:'dyn-user-email',          p:'user.email' },
+  { c:'dyn-user-tier',           p:'user.tier',              f:F.tier },
+  { c:'dyn-user-level',          p:'user.currentLevel' },
+  { c:'dyn-user-reg-date',       p:'user.regDate',           f:F.dt },
+  { c:'dyn-user-last-login',     p:'user.lastLoginAt',       f:F.dt },
+  { c:'dyn-user-compliance',     p:'user.complianceScore' },
+  { c:'dyn-gm-balance',          p:'user.gmBalance',         f:F.gm },
+  { c:'dyn-gm-balance-num',      p:'user.gmBalance',         f:(v)=>F.n(v,0) },
+  { c:'dyn-tokens-left',         p:'user.tokensLeft',        f:F.n },
+  { c:'dyn-tokens-used',         p:'user.tokensUsed',        f:F.n },
+  { c:'dyn-tokens-total',        p:null, compute:(s)=>(s.user?.tokensLeft||0)+(s.user?.tokensUsed||0), f:F.n },
+  { c:'dyn-tokens-rounds',       p:null, compute:(s)=>Math.floor((s.user?.tokensLeft||0)/500), f:F.n },
+  { c:'dyn-tokens-pct',          p:null, compute:(s)=>{const t=(s.user?.tokensLeft||0)+(s.user?.tokensUsed||0);return t?s.user.tokensUsed/t:0}, f:F.pct },
+  { c:'dyn-co2e-saved',          p:'user.totalCo2eSaved',    f:F.t },
+  { c:'dyn-badge-count',         p:'user.badgeCount' },
+  { c:'dyn-user-name-initial',   p:'user.name',              f:(v)=>String(v||'?')[0].toUpperCase() },
+
+  /* ── company ── */
+  { c:'dyn-company-name',        p:'company.name' },
+  { c:'dyn-ent-name',            p:'company.name' },
+  { c:'dyn-company-credit',      p:'company.creditCode' },
+  { c:'dyn-company-industry',    p:'company.industryLabel' },
+  { c:'dyn-company-stage',       p:'company.stageLabel' },
+  { c:'dyn-ent-stage-label',     p:'company.stageLabel' },
+  { c:'dyn-company-employees',   p:'company.employeeCount',  f:F.n },
+  { c:'dyn-company-compliance',  p:'company.complianceLevel' },
+  { c:'dyn-company-revenue',     p:'company.annualRevenue',  f:(v)=>v?`¥${F.n(v/10000,0)}万`:'—' },
+  { c:'dyn-ent-code',            p:'company.creditCode' },
+  { c:'dyn-ent-export-tons',     p:'company.exportTons',     f:(v)=>v!=null?F.n(v,0)+' t':'—' },
+  { c:'dyn-acf-product',         p:'company.productLine' },
+  { c:'dyn-acf-method',          p:'company.factorMethod' },
+  { c:'dyn-customs-level',       p:'company.customsLevel' },
+  { c:'dyn-customs-declare-count',p:'company.declareCount',  f:F.n },
+  { c:'dyn-rep-roi',             p:'company.roiRatio' },
+  { c:'dyn-rep-save',            p:'company.netSavings' },
+  { c:'dyn-credit-limit',        p:'company.creditLimit' },
+  { c:'dyn-interest-save',       p:'company.interestSave' },
+
+  /* ── company form inputs ── */
+  { c:'dyn-company-name-inp',    p:'company.name',           a:'value' },
+  { c:'dyn-company-credit-inp',  p:'company.creditCode',     a:'value' },
+
+  /* ── metrics ── */
+  { c:'dyn-tco2e-total',         p:'metrics.tCO2eTotal',         f:F.t },
+  { c:'dyn-tco2e-topbar',        p:'metrics.tCO2eTotal',         f:F.t },
+  { c:'dyn-total-co2',           p:'metrics.tCO2eTotal',         f:(v)=>v!=null?F.n(v,1):'—' },
+  { c:'dyn-global-rank',         p:'metrics.globalRank',         f:(v)=>v?`#${F.n(v,0)}`:'—' },
+  { c:'dyn-roi-ratio',           p:'metrics.roiRatio',           f:(v)=>v!=null?F.pct(v):'—' },
+  { c:'dyn-supply-pct',          p:'metrics.supplyChainCoverage',f:F.pct },
+  { c:'dyn-sup-pct',             p:'metrics.supplyChainCoverage',f:F.pct },
+  { c:'dyn-scope3-pct',          p:'metrics.scope3Coverage',     f:F.pct },
+  { c:'dyn-risk-eur',            p:'metrics.riskExposureEur',    f:F.eur },
+  { c:'dyn-cbam-tax',            p:'metrics.cbamTaxEstimate',    f:F.eur },
+  { c:'dyn-reduction-target',    p:'metrics.reductionTarget',    f:F.t },
+  { c:'dyn-reduction-achieved',  p:'metrics.reductionAchieved',  f:F.t },
+  { c:'dyn-reduction-pct',       p:'metrics.reductionProgress',  f:F.pct },
+  { c:'dyn-energy-tco2e',        p:'metrics.energyTco2eSum',     f:F.t },
+  { c:'dyn-supplier-count',      p:'metrics.supplierCount',      f:F.n },
+  { c:'dyn-supplier-submitted',  p:'metrics.supplierSubmitted',  f:F.n },
+  { c:'dyn-sup-total',           p:'metrics.supplierCount',      f:F.n },
+  { c:'dyn-sup-count',           p:'metrics.supplierSubmitted',  f:F.n },
+  { c:'dyn-sup-pending',         p:'metrics.supplierPendingCount',f:F.n },
+  { c:'dyn-supplier-gap',        p:null, compute:(s)=>Math.max(0,(s.company?.declaredSupplierCount||0)-(s.metrics?.supplierSubmitted||0)), f:F.n },
+  { c:'dyn-tax-savings',         p:'metrics.taxSavingsWan',      f:(v)=>v!=null?`${v} 万`:'—' },
+  { c:'dyn-carbon-intensity',    p:'metrics.carbonIntensity',    f:(v)=>v!=null?`${v} t/t`:'—' },
+  { c:'dyn-roi-multiple',        p:'metrics.roiMultiple',        f:(v)=>v!=null?`${v}x`:'—' },
+  { c:'dyn-scope1-tco2',         p:'metrics.scope1',             f:(v)=>v!=null?F.n(v,1):'—' },
+  { c:'dyn-scope2-tco2',         p:'metrics.scope2',             f:(v)=>v!=null?F.n(v,1):'—' },
+  { c:'dyn-scope3-tco2',         p:'metrics.scope3',             f:(v)=>v!=null?F.n(v,1):'—' },
+  { c:'dyn-rep-tax',             p:'metrics.riskExposureEur',    f:F.eur },
+
+  /* ── radar (derived) ── */
+  { c:'dyn-radar-carbon',        p:null, compute:(s)=>Math.min(100,(s.metrics?.tCO2eTotal||0)>0?65:10), f:(v)=>v+'%' },
+  { c:'dyn-radar-supply',        p:'metrics.supplyChainCoverage', f:(v)=>F.pct(v,0) },
+  { c:'dyn-radar-compliance',    p:'user.complianceScore',         f:(v)=>v+'%' },
+  { c:'dyn-radar-reduction',     p:'metrics.reductionProgress',    f:(v)=>v!=null?F.pct(v,0):'0%' },
+  { c:'dyn-radar-roi',           p:'metrics.roiRatio',             f:(v)=>v!=null?F.pct(v,0):'0%' },
+  { c:'dyn-radar-quality',       p:'company.complianceLevel',      f:(v)=>v!=null?v*20+'%':'0%' },
+
+  /* ── progress bars (style.width) ── */
+  { c:'dyn-scope3-bar',          p:'metrics.scope3Coverage',     a:'style.width', f:(v)=>`${Math.min(100,(v||0)*100).toFixed(1)}%` },
+  { c:'dyn-supply-bar',          p:'metrics.supplyChainCoverage',a:'style.width', f:(v)=>`${Math.min(100,(v||0)*100).toFixed(1)}%` },
+  { c:'dyn-reduction-bar',       p:'metrics.reductionProgress',  a:'style.width', f:(v)=>`${Math.min(100,(v||0)*100).toFixed(1)}%` },
+  { c:'dyn-tier-bar',            p:'user.tierLevel',             a:'style.width', f:(v)=>`${((v-1)/4*100).toFixed(0)}%` },
+  { c:'dyn-tokens-bar',          p:null, compute:(s)=>{const t=(s.user?.tokensLeft||0)+(s.user?.tokensUsed||0);return t?s.user.tokensUsed/t:0}, a:'style.width', f:(v)=>`${Math.min(100,(v||0)*100).toFixed(1)}%` },
+  { c:'dyn-token-ring-pct',      p:null, compute:(s)=>{const t=(s.user?.tokensLeft||0)+(s.user?.tokensUsed||0);return t?s.user.tokensUsed/t:0}, f:(v)=>`${Math.min(100,(v||0)*100).toFixed(0)}%` },
+
+  /* ── flags ── */
+  { c:'dyn-phase-code',          p:'flags.currentPhase' },
+  { c:'dyn-phase-label',         p:'flags.phaseLabel' },
+  { c:'dyn-next-action',         p:'flags.nextAction' },
+
+  /* ── wallet ── */
+  { c:'dyn-wallet-balance',      p:'user.gmBalance',         f:(v)=>F.n(v,0) },
+  { c:'dyn-wallet-hash',         p:'wallet.address' },
+  { c:'dyn-gm-total-earned',     p:'user.gmBalance',         f:(v)=>F.n(v,0) },
+  { c:'dyn-gm-spent',            p:null, compute:()=>0,      f:F.n },
+
+  /* ── latest report ── */
+  { c:'dyn-rep-period',          p:'recentReports.0.reportingPeriod' },
+  { c:'dyn-rep-status',          p:'recentReports.0.status' },
+  { c:'dyn-rep-tco2e',           p:'recentReports.0.tCO2eTotal',      f:F.t },
+  { c:'dyn-rep-risk',            p:'recentReports.0.riskExposureEur', f:F.eur },
+
+  /* ── diagnostic ── */
+  { c:'dyn-diag-risk-level',     p:'metrics.riskExposureEur', f:(v)=>!v?'低风险':v>100000?'高风险':v>30000?'中等风险':'低风险' },
+  { c:'dyn-diag-risk-eur',       p:'metrics.riskExposureEur', f:F.eur },
+  { c:'dyn-diag-tco2e',          p:'metrics.tCO2eTotal',      f:F.t },
+  { c:'dyn-diag-score',          p:'diagnostic.overallScore' },
+
+  /* ── compute ── */
+  { c:'dyn-token-quota',         p:'compute.tokenQuota',     f:F.n },
+  { c:'dyn-token-used',          p:'compute.tokenUsed',      f:F.n },
+  { c:'dyn-deep-quota',          p:'compute.deepCalcQuota',  f:F.n },
+  { c:'dyn-deep-used',           p:'compute.deepCalcUsed',   f:F.n },
+
+  /* ── DLD / ACF / governance ── */
+  { c:'dyn-dld-co2',             p:'dld.certifiedCO2e',      f:(v)=>v?`${v} tCO₂e`:'—' },
+  { c:'dyn-dld-credit',          p:'dld.creditLimit' },
+  { c:'dyn-dld-status',          p:'dld.creditStatus' },
+  { c:'dyn-acf-status',          p:'acf.certStatus' },
+  { c:'dyn-gov-seat',            p:'governance.seatTitle' },
+  { c:'dyn-gov-votes',           p:'governance.votesAvailable', f:F.n },
+  { c:'dyn-gov-members',         p:'governance.totalMembers',   f:F.n },
+
+  /* ── decision package ── */
+  { c:'dyn-decision-tax-k',      p:'metrics.riskExposureEur', f:(v)=>v?`€ ${(v/1000).toFixed(0)}k`:'—' },
+
+  /* ── server time ── */
+  { c:'dyn-server-time',         p:'serverTime', f:(v)=>v?new Date(v).toLocaleTimeString('zh-CN'):'' },
+];
+window.FM = FM;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   9 · 路径解析 gp()
+   ═══════════════════════════════════════════════════════════════════════ */
+function gp(obj, path) {
+  if (!path) return undefined;
+  return path.split('.').reduce((cur, k) => {
+    if (cur == null) return null;
+    const i = parseInt(k, 10);
+    return isNaN(i) ? cur[k] : cur[i];
+  }, obj);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   10 · countUp 律动动画
+   ═══════════════════════════════════════════════════════════════════════ */
+function countUp(el, toStr, dur=700) {
+  const from = parseFloat(String(el.textContent||'').replace(/[^\d.-]/g,''));
+  const to   = parseFloat(String(toStr).replace(/[^\d.-]/g,''));
+  if (isNaN(from)||isNaN(to)||from===to) { el.textContent=toStr; return; }
+  const pre = String(toStr).match(/^[^\d-]*/)?.[0]||'';
+  const suf = String(toStr).match(/[^\d.,]+$/)?.[0]||'';
+  const dec = (String(toStr).split('.')?.[1]?.replace(/[^\d]/g,'')||'').length;
+  const t0  = performance.now();
+  el.classList.add('counting');
+  function fr(now) {
+    const p = Math.min((now-t0)/dur,1);
+    const e = 1 - Math.pow(1-p, 3);
+    const c = from+(to-from)*e;
+    el.textContent = pre+c.toLocaleString('zh-CN',{minimumFractionDigits:dec,maximumFractionDigits:dec})+(p<1?'':suf);
+    if (p<1) requestAnimationFrame(fr);
+    else { el.textContent=toStr; el.classList.remove('counting'); }
+  }
+  requestAnimationFrame(fr);
+}
+
+function setEl(el, val, attr) {
+  const d = (val==null||val==='')?'—':String(val);
+  if (attr) {
+    if (attr.startsWith('style.')) el.style[attr.slice(6)] = d;
+    else el.setAttribute(attr, d==='—'?'':d);
+    return;
+  }
+  if (el.textContent===d) return;
+  const ov = parseFloat(String(el.textContent||'').replace(/[^\d.-]/g,''));
+  const nv = parseFloat(d.replace(/[^\d.-]/g,''));
+  if (!isNaN(ov)&&!isNaN(nv)&&el.textContent!=='—'&&el.textContent!=='--') {
+    countUp(el, d);
+  } else {
+    el.classList.add('hash-jump');
+    el.textContent = d;
+    setTimeout(()=>el.classList.remove('hash-jump'), 400);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   11 · syncAppState() —— 全量 DOM 灌注
+   ═══════════════════════════════════════════════════════════════════════ */
+function syncAppState(state) {
+  const s = state || window.AppState;
+  if (!s) return;
+
+  /* FM 绑定 */
+  FM.forEach(({ c, p, compute, f, a }) => {
+    const els = document.querySelectorAll('.' + c);
+    if (!els.length) return;
+    let raw = compute ? compute(s) : gp(s, p);
+    let d;
+    if (raw==null||raw==='') d='—';
+    else if (f) { try { d=f(raw); } catch { d=String(raw); } }
+    else d = String(raw);
+    els.forEach(el => setEl(el, d, a));
+  });
+
+  /* topbar GM 芯片 */
+  const gmChips = document.querySelectorAll('.gm-chip-val, .topbar-gm-val, #headerTopGMValue');
+  const gmVal   = Number(s.user?.gmBalance||0).toLocaleString();
+  gmChips.forEach(el => { if (el.textContent !== gmVal) el.textContent = gmVal; });
+
+  /* 用户名 / 头像首字 */
+  const name    = s.user?.name || '访客';
+  document.querySelectorAll('.topbar-user-name, #headerIdentityName').forEach(el => el.textContent = name);
+  document.querySelectorAll('.topbar-user-avatar, #headerIdentityAvatar').forEach(el => el.textContent = name[0].toUpperCase());
+
+  /* Phase badge */
+  const ph    = gp(s,'flags.currentPhase') || 'Phase1';
+  const badge = document.getElementById('t-phase-badge');
+  if (badge) {
+    badge.className = 't-phase';
+    badge.classList.add(ph==='Phase3'?'ph3':ph==='Phase2'?'ph2':'ph1');
+    const sp = badge.querySelector('.dyn-phase-code');
+    if (sp) sp.textContent = ph;
+  }
+
+  /* Menu locks (Phase 2/3 gates) */
+  const ul = new Set(gp(s,'flags.unlockedMenusList')||[]);
+  document.querySelectorAll('[data-slug]').forEach(el => {
+    el.classList.toggle('locked', !ul.has(el.dataset.slug));
+  });
+
+  /* Sidebar active item */
+  const fn  = decodeURIComponent((location.pathname.split('/').pop()||'').split('?')[0]);
+  const PAGE_MAP = {
+    '全域中心.html':'overview','index.html':'overview',
+    'HengAI_星火成就档案.html':'achieve',
+    'HengAI_CBAM测算工具.html':'cbam',
+    'HengAI_算力资源.html':'compute',
+    'HengAI_法规知识库.html':'regulation',
+    'HengAI_企业数字档案.html':'company',
+    'HengAI_供应链协同.html':'supplychain',
+    'HengAI_全域诊断报告.html':'diagnosis',
+    'HengAI_决策层呈送包生成器.html':'package',
+    'HengAI_荣誉体系.html':'honor',
+    'HengAI_Governance.html':'governance',
+    'HengAI_GM_Wallet.html':'wallet',
+    'HengAI_EU_Customs.html':'customs',
+    'HengAI_DLD_Credit.html':'dld',
+    'HengAI_ACF_Cert.html':'acf',
+  };
+  const currentPage = PAGE_MAP[fn];
+  if (currentPage) {
+    document.querySelectorAll('.sidebar .sb-item[data-page]').forEach(el => {
+      el.classList.toggle('active', el.dataset.page === currentPage);
+    });
+    document.querySelectorAll('.nav[data-slug]').forEach(el => {
+      el.classList.toggle('active', el.dataset.slug === currentPage);
+    });
+  }
+
+  /* 侧边栏 Phase Strip */
+  const phaseStrip = document.getElementById('sb-phase-text');
+  if (phaseStrip) phaseStrip.textContent = gp(s,'flags.phaseLabel') || '';
+  const phaseRole = document.getElementById('sb-urole');
+  if (phaseRole) phaseRole.textContent = s.user?.tier || '';
+
+  EventBus.emit('STATE_SYNCED', s);
+}
+window.syncAppState = syncAppState;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   12 · deepMerge —— 深合并 API 响应到 AppState
+   ═══════════════════════════════════════════════════════════════════════ */
+function deepMerge(target, source) {
+  if (!source || typeof source !== 'object') return target;
+  const result = Object.assign({}, target);
+  for (const k of Object.keys(source)) {
+    if (source[k] !== null && typeof source[k] === 'object' && !Array.isArray(source[k]) && target[k] && typeof target[k] === 'object') {
+      result[k] = deepMerge(target[k], source[k]);
+    } else if (source[k] !== null && source[k] !== undefined) {
+      result[k] = source[k];
+    }
+  }
+  return result;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   13 · API 层 —— 在线优先，3s 超时自动降级 MOCK
+   ═══════════════════════════════════════════════════════════════════════ */
+async function fetchWithTimeout(url, opts={}, ms=API_TIMEOUT_MS) {
+  const ctrl  = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), ms);
+  try {
+    const r = await fetch(url, { ...opts, signal:ctrl.signal });
+    clearTimeout(timer);
+    return r;
+  } catch(e) {
+    clearTimeout(timer);
+    throw e;
+  }
+}
+
+async function apiFetch(endpoint, options={}) {
+  const token = getToken();
+  const headers = { 'Content-Type':'application/json', ...(options.headers||{}) };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const r = await fetchWithTimeout(`${API_BASE}${endpoint}`, { ...options, headers });
+  if (r.status === 401) { clearToken(); return null; }
+  if (!r.ok) {
+    let msg = `HTTP ${r.status}`;
+    try { const d = await r.json(); msg = d.detail||d.error||msg; } catch{}
+    throw new Error(msg);
+  }
+  if (r.status === 204) return null;
+  return r.json();
+}
+window.apiFetch = apiFetch;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   14 · LocalStorage 缓存持久化
+   ═══════════════════════════════════════════════════════════════════════ */
+function loadCachedState() {
+  try {
+    const raw = localStorage.getItem(LS_CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+function saveCachedState(state) {
+  try {
+    const slim = { user:state.user, company:state.company, metrics:state.metrics,
+                   flags:state.flags, wallet:state.wallet, macro:state.macro,
+                   _ts: Date.now() };
+    localStorage.setItem(LS_CACHE_KEY, JSON.stringify(slim));
+  } catch {}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   15 · 宏观价源 —— BroadcastChannel + localStorage 跨标签同步
+   ═══════════════════════════════════════════════════════════════════════ */
+const MACRO_SRC_ID     = 'appstate_' + Math.random().toString(36).slice(2,8);
+let _macroSyncLastTs   = 0;
+let _macroChannel      = null;
+let _macroDebounce     = null;
+let _macroPillTimer    = null;
+
+function getMacroOracle() {
+  const fb = { cbam_current_price:75.36, eur_cny_rate:7.85, last_updated:'2026-04-20' };
+  if (!window.AppState) return fb;
+  if (!window.AppState.macro) window.AppState.macro = { ...fb };
+  return window.AppState.macro;
+}
+window.getMacroOracle = getMacroOracle;
+
+function pulseMacroSyncPill(text) {
+  let el = document.getElementById('macroSyncPill');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'macroSyncPill';
+    el.style.cssText = 'position:fixed;right:14px;bottom:14px;z-index:10002;padding:6px 10px;border-radius:999px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.45);color:#8ff2cc;font-size:11px;font-weight:600;pointer-events:none;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;';
+    document.body?.appendChild(el);
+  }
+  el.textContent = text||'宏观价源已同步';
+  el.style.opacity='1'; el.style.transform='translateY(0)';
+  clearTimeout(_macroPillTimer);
+  _macroPillTimer = setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateY(6px)'; }, 1400);
+}
+
+function publishMacroSync(patch) {
+  const macro   = getMacroOracle();
+  const payload = {
+    cbam_current_price: Number(patch?.cbam_current_price ?? macro.cbam_current_price) || 75.36,
+    eur_cny_rate:       Number(patch?.eur_cny_rate       ?? macro.eur_cny_rate)        || 7.85,
+    last_updated:       patch?.last_updated || macro.last_updated || new Date().toISOString().slice(0,10),
+    _ts: Date.now(),
+    _src: MACRO_SRC_ID,
+  };
+  macro.cbam_current_price = payload.cbam_current_price;
+  macro.eur_cny_rate       = payload.eur_cny_rate;
+  macro.last_updated       = payload.last_updated;
+  syncMacroUi();
+  pulseMacroSyncPill('已同步');
+  try { localStorage.setItem(LS_MACRO_KEY, JSON.stringify(payload)); } catch {}
+  try { _macroChannel?.postMessage(payload); } catch {}
+}
+window.publishMacroSync = publishMacroSync;
+
+function applyIncomingMacroSync(payload) {
+  if (!payload || payload._src === MACRO_SRC_ID) return;
+  const ts = Number(payload._ts||0);
+  if (ts && ts <= _macroSyncLastTs) return;
+  _macroSyncLastTs = ts || Date.now();
+  const macro = getMacroOracle();
+  const p     = Number(payload.cbam_current_price);
+  const fx    = Number(payload.eur_cny_rate);
+  if (!isNaN(p)  && p  > 0) macro.cbam_current_price = p;
+  if (!isNaN(fx) && fx > 0) macro.eur_cny_rate = fx;
+  if (payload.last_updated) macro.last_updated = payload.last_updated;
+  syncMacroUi();
+  pulseMacroSyncPill('跨标签同步成功');
+}
+
+function syncMacroUi() {
+  const macro = getMacroOracle();
+  const price = Number(macro.cbam_current_price)||75.36;
+  const fx    = Number(macro.eur_cny_rate)||7.85;
+  const updated = macro.last_updated || '';
+  const ids = {
+    'f-price':        String(price.toFixed(2)),
+    'f-fx':           String(fx.toFixed(2)),
+    'wgCbamPrice':    String(price.toFixed(2)),
+    'wgFxRate':       String(fx.toFixed(2)),
+    'rb-price':       `€${price.toFixed(2)}`,
+    'slider-display': `€${price.toFixed(2)}（当前）`,
+  };
+  Object.entries(ids).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.tagName==='INPUT') { if (el.value!==val) el.value=val; }
+    else { if (el.textContent!==val) el.textContent=val; }
+  });
+  const sliders = ['slider-price','result-slider'];
+  sliders.forEach(id => { const el=document.getElementById(id); if(el) el.value=String(Math.round(price)); });
+  const hPrice = document.getElementById('h-price');
+  if (hPrice) hPrice.textContent = `⚡ 实时挂钩 EU ETS 官方牌价：€${price.toFixed(2)}（更新于 ${updated}）`;
+}
+window.syncMacroUi = syncMacroUi;
+
+function initMacroRealtimeSync() {
+  if (typeof BroadcastChannel !== 'undefined') {
+    try {
+      _macroChannel = new BroadcastChannel(BC_MACRO_CHANNEL);
+      _macroChannel.onmessage = e => applyIncomingMacroSync(e?.data);
+    } catch {}
+  }
+  window.addEventListener('storage', e => {
+    if (e.key!==LS_MACRO_KEY||!e.newValue) return;
+    try { applyIncomingMacroSync(JSON.parse(e.newValue)); } catch {}
+  });
+  /* 监听 CBAM 价格输入框 */
+  document.addEventListener('input', e => {
+    const id = e?.target?.id;
+    if (!['f-price','f-fx','wgCbamPrice','wgFxRate'].includes(id)) return;
+    clearTimeout(_macroDebounce);
+    _macroDebounce = setTimeout(() => {
+      const macro = getMacroOracle();
+      const priceEl = document.getElementById('f-price') || document.getElementById('wgCbamPrice');
+      const fxEl    = document.getElementById('f-fx')    || document.getElementById('wgFxRate');
+      publishMacroSync({
+        cbam_current_price: Number(priceEl?.value || macro.cbam_current_price),
+        eur_cny_rate:       Number(fxEl?.value    || macro.eur_cny_rate),
+      });
+    }, 120);
+  });
+  /* 恢复上次缓存的宏观值 */
+  try {
+    const cached = JSON.parse(localStorage.getItem(LS_MACRO_KEY)||'{}');
+    if (cached.cbam_current_price) applyIncomingMacroSync(cached);
+  } catch {}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   16 · Toast 通知（全局复用）
+   ═══════════════════════════════════════════════════════════════════════ */
+let _toastTimer;
+function showToast(msg, type='ok') {
+  let el = document.getElementById('toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toast';
+    el.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);z-index:9999;padding:9px 18px;border-radius:12px;font-size:13px;font-weight:500;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;';
+    document.body?.appendChild(el);
+  }
+  const colors = {
+    ok:   { bg:'rgba(29,158,117,0.18)', border:'rgba(29,158,117,0.45)', color:'#6dd5b0' },
+    err:  { bg:'rgba(226,75,74,0.16)',  border:'rgba(226,75,74,0.4)',   color:'#fca5a5' },
+    warn: { bg:'rgba(201,168,76,0.16)', border:'rgba(201,168,76,0.4)',  color:'#f0d080' },
+  };
+  const c = colors[type] || colors.ok;
+  el.style.background = c.bg;
+  el.style.border     = `1px solid ${c.border}`;
+  el.style.color      = c.color;
+  el.textContent      = msg;
+  el.style.opacity    = '1';
+  el.style.transform  = 'translateX(-50%) translateY(0)';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 2800);
+}
+window.showToast = showToast;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   17 · initAppState() —— 每页异步初始化入口
+       调用方式：在 DOMContentLoaded 后执行
+       window.addEventListener('DOMContentLoaded', () => initAppState(onReady));
+   ═══════════════════════════════════════════════════════════════════════ */
+async function initAppState(onReady) {
+  /* Step 1: 先从缓存恢复，让 UI 立刻有数据 */
+  const cached = loadCachedState();
+  if (cached) {
+    Object.assign(window.AppState, deepMerge(window.AppState, cached));
+    syncAppState();
+  }
+
+  /* Step 2: 尝试在线 API（3s 超时降级） */
+  const token = getToken();
+  let liveState = null;
+  if (token) {
+    try {
+      const r = await fetchWithTimeout(
+        API_HUB_OVERVIEW,
+        { credentials:'include', headers:{ Accept:'application/json', Authorization:`Bearer ${token}` } },
+        API_TIMEOUT_MS
+      );
+      if (r.ok) {
+        liveState = await r.json();
+        window.AppState._mode = 'live';
+      }
+    } catch (e) {
+      console.info('[HengAI] 在线底座超时，使用本地演示数据：', e.message);
+    }
+  }
+
+  /* Step 3: 合并并灌注 */
+  if (liveState) {
+    Object.assign(window.AppState, deepMerge(window.AppState, liveState));
+    saveCachedState(window.AppState);
+  } else if (!cached) {
+    /* 纯离线演示：MOCK_STATE 已是默认值，无需重新赋值 */
+    window.AppState._mode = 'mock';
+  }
+
+  /* Step 4: 同步 auth 状态 */
+  if (token && liveState?.user) {
+    window.AppState.auth.user  = liveState.user;
+    window.AppState.auth.token = token;
+  }
+
+  /* Step 5: 初始化宏观价源跨标签同步 */
+  initMacroRealtimeSync();
+
+  /* Step 6: 全量 DOM 灌注 */
+  syncAppState();
+
+  /* Step 7: 回调 */
+  if (typeof onReady === 'function') {
+    try { onReady(window.AppState); } catch(e) { console.warn('[AppState] onReady error', e); }
+  }
+
+  EventBus.emit('APP_READY', window.AppState);
+  return window.AppState;
+}
+window.initAppState = initAppState;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   18 · 便捷工具
+   ═══════════════════════════════════════════════════════════════════════ */
+/* 防抖 */
+function debounce(fn, ms=200) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(()=>fn(...args), ms); };
+}
+window.debounce = debounce;
+
+/* 简写 $ */
+window.$ = id => document.getElementById(id);
+
+/* 模式标识（console 提示） */
+console.info(
+  '%c[HengAI AppState V3.2]%c 引擎已装载 · 等待 initAppState() 调用',
+  'color:#6dd5b0;font-weight:700', 'color:#8a95a8'
+);
+</script>
+<script>
+(function patchAppState(){
+  function w(cb){if(window.AppState)cb();else setTimeout(function(){w(cb);},40);}
+  w(function(){
+    if(AppState.update)return;
+    AppState.update=function(path,value){
+      var keys=path.split('.');var obj=AppState;
+      for(var i=0;i<keys.length-1;i++){if(obj[keys[i]]==null)obj[keys[i]]={};obj=obj[keys[i]];}
+      obj[keys[keys.length-1]]=value;
+    };
+    AppState.save=function(){
+      if(typeof syncAppState==='function')syncAppState();
+      try{localStorage.setItem('hengai_hub_cache_v1',JSON.stringify({
+        user:AppState.user,company:AppState.company,metrics:AppState.metrics,
+        dld:AppState.dld,acf:AppState.acf,_ts:Date.now()}));}catch(e){}
+      EventBus.emit('STATE_SYNCED',AppState);
+    };
+  });
+})();
+</script>
+<style>
+:root{--bg0:#06080f;--bg1:#0a0d16;--bg2:#0e1220;--bg3:rgba(255,255,255,.04);--bg4:rgba(255,255,255,.07);--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--ink:#e2e8f4;--ink2:#8896aa;--ink3:#44556a;--green:#10b981;--green-l:#6ee7b7;--green-d:rgba(16,185,129,.13);--green-b:rgba(16,185,129,.30);--gold:#c9a84c;--gold-l:#f0d080;--gold-d:rgba(201,168,76,.13);--gold-b:rgba(201,168,76,.30);--blue:#3b82f6;--blue-l:#93c5fd;--blue-d:rgba(59,130,246,.13);--blue-b:rgba(59,130,246,.30);--teal:#14b8a6;--teal-l:#5eead4;--teal-d:rgba(20,184,166,.13);--teal-b:rgba(20,184,166,.30);--purple:#8b5cf6;--purple-l:#c4b5fd;--purple-d:rgba(139,92,246,.13);--purple-b:rgba(139,92,246,.30);--red:#ef4444;--red-l:#fca5a5;--sb-w:220px;--tb-h:52px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--ink);font-family:"Noto Sans SC",sans-serif;font-size:13px;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh}
+.sidebar{width:var(--sb-w);flex-shrink:0;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto;scrollbar-width:thin}
+.sb-brand{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-ic{width:32px;height:32px;border-radius:9px;background:var(--green-d);border:1px solid var(--green-b);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-name{font-size:14px;font-weight:700} .sb-sub{font-size:9.5px;color:var(--ink3);margin-top:1px}
+.sb-phase{margin:10px 12px 2px;padding:7px 12px;border-radius:9px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:8px;background:var(--purple-d);border:1px solid var(--purple-b);color:var(--purple-l)}
+.sb-phase-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.sb-gt{padding:10px 14px 3px;font-size:9px;color:var(--ink3);letter-spacing:1.4px;text-transform:uppercase;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:12.5px;color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all .14s}
+.sb-item:hover{color:var(--ink);background:var(--bg4)}
+.sb-item.on{color:var(--ink);background:rgba(255,255,255,.06);border-left-color:var(--green)}
+.sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-footer{border-top:1px solid var(--border);padding:10px 14px;margin-top:auto}
+.sb-user{display:flex;align-items:center;gap:9px}
+.sb-av{width:30px;height:30px;border-radius:50%;background:var(--green-d);border:1px solid var(--green-b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green-l);flex-shrink:0;text-transform:uppercase}
+.sb-uname{font-size:12px;font-weight:600} .sb-urole{font-size:10px;color:var(--ink3);margin-top:1px}
+.main-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:var(--tb-h);display:flex;align-items:center;padding:0 18px;gap:10px;border-bottom:1px solid var(--border);background:var(--bg1);flex-shrink:0}
+.tb-l{display:flex;align-items:center;gap:8px;flex:1} .tb-r{display:flex;align-items:center;gap:8px}
+.tb-title{font-size:14px;font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid transparent}
+.p-g{background:var(--green-d);color:var(--green-l);border-color:var(--green-b)}
+.p-y{background:var(--gold-d);color:var(--gold-l);border-color:var(--gold-b)}
+.p-b{background:var(--blue-d);color:var(--blue-l);border-color:var(--blue-b)}
+.p-t{background:var(--teal-d);color:var(--teal-l);border-color:var(--teal-b)}
+.p-r{background:var(--red-d);color:var(--red-l);border-color:var(--red-b)}
+.gm-chip{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:8px;background:var(--gold-d);border:1px solid var(--gold-b);cursor:pointer}
+.gm-chip-lbl{font-size:9.5px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.5px}
+.gm-chip-val{font-family:"DM Mono",monospace;font-size:13px;font-weight:700;color:var(--gold-l)}
+.btn{padding:6px 13px;border-radius:7px;border:1px solid var(--border2);background:var(--bg4);font-size:11.5px;color:var(--ink2);cursor:pointer;transition:all .14s;font-family:"Noto Sans SC",sans-serif}
+.btn:hover{border-color:var(--green-b);color:var(--green-l)}
+.btn-p{background:var(--green-d);border-color:var(--green-b);color:var(--green-l)}
+.btn-p:hover{background:rgba(16,185,129,.22)}
+.main-scroll{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.main-scroll::-webkit-scrollbar{width:4px}
+.main-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.main-pad{padding:18px;max-width:940px;margin:0 auto}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sh-t{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700}
+.sh-line{width:18px;height:1px;background:var(--border2)}
+.sh-a{font-size:11px;color:var(--ink3);cursor:pointer;transition:color .14s}
+.sh-a:hover{color:var(--green-l)}
+.hero{background:var(--bg2);border:1px solid rgba(16,185,129,.3);border-radius:18px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 5%,var(--green) 50%,transparent 95%)}
+.cc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.cc{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden}
+.cc-lbl{font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.cc-val{font-family:"DM Mono",monospace;font-size:22px;font-weight:700;line-height:1.1;margin-bottom:4px}
+.cc-sub{font-size:11px;color:var(--ink3)}
+.asset-tbl{width:100%;border-collapse:collapse}
+.asset-tbl th{padding:7px 10px;font-size:9.5px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);text-align:left}
+.asset-tbl td{padding:9px 10px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.asset-tbl tr:last-child td{border-bottom:none}
+.asset-tbl tr:hover td{background:var(--bg3)}
+.f-grp{margin-bottom:12px}
+.f-lbl{display:block;font-size:10.5px;color:var(--ink3);font-weight:500;margin-bottom:5px}
+.f-inp,.f-sel{width:100%;padding:8px 11px;background:var(--bg1);border:1px solid var(--border2);border-radius:8px;color:var(--ink);font-size:12.5px;outline:none;transition:border-color .14s;font-family:"Noto Sans SC",sans-serif}
+.f-inp:focus,.f-sel:focus{border-color:var(--green-b)}
+.cta{width:100%;padding:11px;border-radius:10px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;font-family:"Noto Sans SC",sans-serif}
+.cta:hover{opacity:.87}
+.bank-list{display:flex;flex-direction:column;gap:7px}
+.bank-item{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:9px}
+.bank-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.bank-name{font-size:12px;font-weight:600;flex:1}
+.bank-st{font-size:10.5px;color:var(--green-l)}
+.ins{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-radius:10px;font-size:12px;line-height:1.7;margin-bottom:12px}
+.ins-g{background:var(--green-d);border:1px solid var(--green-b);color:var(--green-l)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .35s ease both} .fu2{animation-delay:.07s} .fu3{animation-delay:.14s}
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);z-index:9999;padding:8px 16px;border-radius:12px;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:var(--green-l);font-size:12.5px;font-weight:500;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;display:flex;align-items:center;gap:7px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-ic"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z" stroke="var(--green)" stroke-width="1.2" fill="var(--green-d)"/><polyline points="5,8 7.5,10.5 11.5,6.5" stroke="var(--green-l)" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+    <div><div class="sb-name">HengAI</div><div class="sb-sub">Co2Lion 全域合规中心</div></div>
+  </div>
+  <div class="sb-phase"><div class="sb-phase-dot" style="background:var(--purple)"></div><span data-state-bind="flags.phaseLabel">...</span></div>
+  <div class="sb-gt">深潜模块</div>
+  <div class="sb-item" onclick="nav('HengAI_EU_Customs.html')"><div class="sb-dot" style="background:var(--blue)"></div>欧盟海关直连</div>
+  <div class="sb-item on"><div class="sb-dot" style="background:var(--green)"></div>DLD 绿色信贷</div>
+  <div class="sb-item" onclick="nav('HengAI_ACF_Cert.html')"><div class="sb-dot" style="background:var(--teal)"></div>ACF 认证</div>
+  <div class="sb-item" onclick="nav('HengAI_GM_Wallet.html')"><div class="sb-dot" style="background:var(--gold)"></div>GM 绿印钱包</div>
+  <div class="sb-gt">企业工作台</div>
+  <div class="sb-item" onclick="nav('全域中心.html')"><div class="sb-dot" style="background:var(--green)"></div>全域总览</div>
+  <div class="sb-item" onclick="nav('HengAI_全域诊断报告.html')"><div class="sb-dot" style="background:var(--blue-l)"></div>全域诊断报告</div>
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-av" data-state-bind="user.name" data-bind-transform="initial">...</div>
+      <div><div class="sb-uname" data-state-bind="user.name">...</div><div class="sb-urole" data-state-bind="user.tier">...</div></div>
+    </div>
+  </div>
+</div>
+<div class="main-wrap">
+  <div class="topbar">
+    <div class="tb-l">
+      <span class="tb-title">DLD · 碳资产绿色信贷确权</span>
+      <span class="tb-pill p-y">信贷额度 <span data-state-bind="dld.creditLimit">...</span></span>
+      <span class="tb-pill p-g" id="tb-credit-status">...</span>
+    </div>
+    <div class="tb-r">
+      <div class="gm-chip" onclick="nav('HengAI_GM_Wallet.html')">
+        <span class="gm-chip-lbl">GM</span>
+        <span class="gm-chip-val" data-state-bind="user.gmBalance" data-bind-format="number">0</span>
+      </div>
+      <button class="btn" onclick="showToast('申请记录已打开')">申请记录</button>
+      <button class="btn btn-p" onclick="scrollToApply()">申请绿色信贷 →</button>
+    </div>
+  </div>
+  <div class="main-scroll"><div class="main-pad">
+
+    <!-- HERO -->
+    <div class="hero fu">
+      <div style="display:flex;align-items:flex-start;gap:16px">
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--green);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">链上确权碳资产</div>
+          <div style="font-family:'DM Mono',monospace;font-size:40px;font-weight:700;color:var(--green-l);letter-spacing:-1px;line-height:1;margin-bottom:4px">
+            <span data-state-bind="dld.certifiedCO2e">0</span>
+          </div>
+          <div style="font-size:12px;color:var(--ink2);margin-bottom:10px">tCO₂e · DLD 国家认证 · CL-IVC 链上不可篡改</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="pill p-g" data-state-bind="dld.creditStatus">...</span>
+            <span class="pill p-b" id="hero-banks-pill">...</span>
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:9.5px;color:var(--ink3);margin-bottom:4px">信贷额度</div>
+          <div style="font-family:'DM Mono',monospace;font-size:26px;font-weight:700;color:var(--green-l)" data-state-bind="dld.creditLimit">...</div>
+          <div style="font-size:9.5px;color:var(--ink3);margin-top:8px;margin-bottom:4px">年化节省利息</div>
+          <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--teal-l)" data-state-bind="dld.interestSave">...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREDIT CARDS -->
+    <div class="cc-grid fu fu2">
+      <div class="cc">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--green);border-radius:14px 14px 0 0"></div>
+        <div class="cc-lbl">已确权碳资产</div>
+        <div class="cc-val" style="color:var(--green-l)"><span data-state-bind="dld.certifiedCO2e">0</span> tCO₂e</div>
+        <div class="cc-sub">DLD 国家认证 · CL-IVC 存证</div>
+      </div>
+      <div class="cc">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);border-radius:14px 14px 0 0"></div>
+        <div class="cc-lbl">授信额度</div>
+        <div class="cc-val" style="color:var(--gold-l)" data-state-bind="dld.creditLimit">...</div>
+        <div class="cc-sub" id="banks-count-sub">... 家银行联合授信</div>
+      </div>
+      <div class="cc">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--teal);border-radius:14px 14px 0 0"></div>
+        <div class="cc-lbl">年化节省利息</div>
+        <div class="cc-val" style="color:var(--teal-l)" data-state-bind="dld.interestSave">...</div>
+        <div class="cc-sub">绿色利率优惠</div>
+      </div>
+    </div>
+
+    <!-- ASSET TABLE + APPLY FORM -->
+    <div class="g2 fu fu2">
+      <div class="card">
+        <div class="sh"><div class="sh-t">碳资产台账 <div class="sh-line"></div></div>
+          <span class="sh-a" onclick="showToast('台账CSV已导出')">导出台账 →</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="asset-tbl">
+            <thead><tr><th>批次ID</th><th>减排量</th><th>认证机构</th><th>有效期</th><th>状态</th></tr></thead>
+            <tbody id="asset-tbody"><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink3)">加载中...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card" id="apply-card">
+        <div class="sh"><div class="sh-t">申请新增绿色信贷 <div class="sh-line"></div></div></div>
+        <div class="ins ins-g">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="flex-shrink:0;margin-top:1px"><path d="M6.5 1L12 3.5V8C12 10.5 9.5 12.5 6.5 13C3.5 12.5 1 10.5 1 8V3.5L6.5 1Z" stroke="var(--green-l)" stroke-width="1"/><polyline points="4,6.5 5.5,8 9,5" stroke="var(--green-l)" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <span>材料由 CL-IVC 链上数据自动生成，无需纸质材料，5 分钟提交。</span>
+        </div>
+        <div class="f-grp"><label class="f-lbl">选择金融机构</label>
+          <select class="f-sel" id="apply-bank"><option value="">加载中...</option></select>
+        </div>
+        <div class="f-grp"><label class="f-lbl">申请金额</label>
+          <input class="f-inp" type="text" id="apply-amount" placeholder="例：¥ 1,200,000" oninput="updatePreview()">
+        </div>
+        <div class="f-grp"><label class="f-lbl">资金用途</label>
+          <input class="f-inp" type="text" id="apply-purpose" placeholder="例：设备升级 · 绿电改造">
+        </div>
+        <div id="apply-preview" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:12px;font-size:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="color:var(--ink3)">抵押碳资产</span>
+            <span style="font-family:'DM Mono',monospace" id="ap-co2">0 tCO₂e</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:var(--ink3)">预计利率优惠</span>
+            <span style="font-family:'DM Mono',monospace;color:var(--green-l)">-0.8% ~ -1.2%</span>
+          </div>
+        </div>
+        <button class="cta" onclick="submitApply()">提交绿色信贷申请</button>
+      </div>
+    </div>
+
+    <!-- BANKS -->
+    <div class="card fu fu3">
+      <div class="sh"><div class="sh-t">合作金融机构 <div class="sh-line"></div></div>
+        <span class="pill p-g" id="bank-count-pill">...</span>
+      </div>
+      <div class="bank-list" id="bank-list"><div style="color:var(--ink3);font-size:12px;padding:12px 0;text-align:center">加载中...</div></div>
+    </div>
+
+  </div></div>
+</div>
+</div>
+
+<div id="toast"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="var(--green-l)" stroke-width="1.5" stroke-linecap="round"/></svg><span id="toast-msg"></span></div>
+
+<script>
+/* ── DLD 绿色信贷 · 入网协议 ── */
+
+function getPath(obj,path){if(!obj||!path)return null;return path.split('.').reduce(function(c,k){return c!=null?c[k]:null;},obj);}
+function setText(id,val){var el=document.getElementById(id);if(el&&val!=null)el.textContent=String(val);}
+function nav(url){window.location.href=url;}
+function showToast(msg){var t=document.getElementById('toast'),m=document.getElementById('toast-msg');if(!t||!m)return;m.textContent=msg;t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';clearTimeout(window._tt);window._tt=setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';},2800);}
+
+function bindStateNodes(state){
+  document.querySelectorAll('[data-state-bind]').forEach(function(el){
+    var path=el.getAttribute('data-state-bind'),fmt=el.getAttribute('data-bind-format')||'',tx=el.getAttribute('data-bind-transform')||'';
+    var val=getPath(state,path);if(val==null)return;
+    var d=fmt==='number'?Number(val).toLocaleString('zh-CN'):String(val);
+    if(tx==='initial')d=d[0]?d[0].toUpperCase():'?';
+    if(el.tagName==='INPUT')el.value=d;else el.textContent=d;
+  });
+}
+
+function updateModuleUI(state){
+  bindStateNodes(state);
+  var dld=getPath(state,'dld')||{};
+  var banks=dld.banks||[];
+  setText('tb-credit-status', dld.creditStatus||'...');
+  setText('hero-banks-pill', banks.length?banks.slice(0,2).join(' · '):'...');
+  setText('bank-count-pill', banks.length+' 家已授信');
+  setText('banks-count-sub', banks.length+' 家银行联合授信');
+  setText('ap-co2', (dld.certifiedCO2e||0)+' tCO₂e 已确权');
+  renderAssetTable(dld.assets||[]);
+  renderBankList(banks);
+  var bankSel=document.getElementById('apply-bank');
+  if(bankSel&&banks.length){
+    bankSel.innerHTML='<option value="">请选择...</option>'+
+      banks.map(function(b){return'<option value="'+b+'">'+b+'</option>';}).join('');
+  }
+}
+
+var ASSET_STATUS={valid:{cls:'p-g',txt:'有效'},pending:{cls:'p-y',txt:'认证中'},expired:{cls:'p-r',txt:'已过期'}};
+
+function renderAssetTable(assets){
+  var tbody=document.getElementById('asset-tbody');if(!tbody)return;
+  if(!assets.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--ink3)">暂无碳资产记录</td></tr>';return;}
+  tbody.innerHTML=assets.map(function(a){
+    var sm=ASSET_STATUS[a.status]||ASSET_STATUS.pending;
+    return'<tr><td><strong>'+(a.batchId||'—')+'</strong></td>'+
+      '<td style="font-family:\'DM Mono\',monospace">'+(a.co2e!=null?a.co2e+' tCO₂e':'—')+'</td>'+
+      '<td style="color:var(--ink2)">'+(a.org||'—')+'</td>'+
+      '<td style="font-family:\'DM Mono\',monospace">'+(a.expiry||'—')+'</td>'+
+      '<td><span class="pill '+sm.cls+'">'+sm.txt+'</span></td></tr>';
+  }).join('');
+}
+
+function renderBankList(banks){
+  var el=document.getElementById('bank-list');if(!el)return;
+  if(!banks.length){el.innerHTML='<div style="color:var(--ink3);font-size:12px;text-align:center;padding:12px">暂无合作金融机构</div>';return;}
+  el.innerHTML=banks.map(function(b){
+    return'<div class="bank-item"><div class="bank-dot"></div><div class="bank-name">'+b+'</div><div class="bank-st">已授信 · 综色利率</div></div>';
+  }).join('');
+}
+
+function scrollToApply(){document.getElementById('apply-card').scrollIntoView({behavior:'smooth'});}
+function updatePreview(){
+  var amt=document.getElementById('apply-amount').value;
+  var prev=document.getElementById('apply-preview');
+  if(prev)prev.style.display=amt?'block':'none';
+}
+
+function submitApply(){
+  var bank=(document.getElementById('apply-bank')||{}).value||'';
+  var amt=(document.getElementById('apply-amount')||{}).value||'';
+  if(!bank){showToast('请选择金融机构');return;}
+  if(!amt){showToast('请填写申请金额');return;}
+  if(window.AppState&&typeof AppState.update==='function'){
+    AppState.update('dld.creditStatus','申请中');
+    AppState.update('dld.lastApplyBank',bank);
+    AppState.save();
+  }
+  showToast('✓ 申请已提交至 '+bank+' · 预计 3 个工作日审批');
+}
+
+(function hookBus(){
+  if(!window.EventBus){setTimeout(hookBus,60);return;}
+  EventBus.on('STATE_SYNCED',function(state){updateModuleUI(state);});
+})();
+
+window.addEventListener('DOMContentLoaded',function(){
+  initAppState(function onReady(state){EventBus.emit('STATE_SYNCED',state);});
+});
+</script>
+</body></html>

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · 法规知识库</title>
+<script>
+/* 嵌入模式：?embed=1 时隐藏原页 chrome (sidebar/topbar)，仅呈现内容模块 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<style>
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .sb,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] .main,
+html[data-embed="1"] .main-wrap { margin-left: 0 !important; }
+html[data-embed="1"] body { padding-left: 0 !important; background: var(--night, #06080f) !important; }
+</style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --night:#06080f;--dark:#0a0e1a;--panel:#0d1220;--panel2:#111827;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --ink:#e8edf5;--ink2:#8a95a8;--ink3:#4a5568;--ink4:#2d3748;
+  --gold:#c9a84c;--gold-l:#f0d080;--gold-d:rgba(201,168,76,0.11);
+  --green:#3b9e4a;--green-l:#7dd98a;--green-d:rgba(59,158,74,0.11);
+  --teal:#1d9e75;--teal-l:#6dd5b0;--teal-d:rgba(29,158,117,0.1);
+  --blue:#185fa5;--blue-l:#93c5fd;--blue-d:rgba(24,95,165,0.11);
+  --red:#e24b4a;--red-l:#fca5a5;--red-d:rgba(226,75,74,0.1);
+  --purple:#7f77dd;--purple-l:#c4b5fd;--purple-d:rgba(127,119,221,0.1);
+  --amber:#c9a84c;--amber-l:#fcd34d;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--night);color:var(--ink);
+  font-family:'Noto Sans SC',sans-serif;font-size:13px;line-height:1.6;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{width:200px;background:var(--dark);border-right:1px solid var(--border);
+  position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50;
+  overflow-y:auto}
+.logo-area{padding:16px 14px 12px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:9px;flex-shrink:0}
+.logo-ic{width:28px;height:28px;border-radius:7px;background:var(--green-d);
+  border:1px solid rgba(59,158,74,0.35);display:flex;align-items:center;justify-content:center}
+.logo-tx{font-size:13px;font-weight:700}
+.logo-sub{font-size:9px;color:var(--ink3);margin-top:1px}
+.nav-s{padding:10px 13px 4px;font-size:9px;color:var(--ink3);letter-spacing:1px;
+  text-transform:uppercase;font-weight:600}
+.nav-i{display:flex;align-items:center;gap:8px;padding:7px 13px;font-size:12px;
+  color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all 0.15s}
+.nav-i:hover{color:var(--ink);background:rgba(255,255,255,0.04)}
+.nav-i.active{color:var(--ink);background:rgba(255,255,255,0.06);border-left-color:var(--teal)}
+.nav-d{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sf{margin-top:auto;padding:11px 13px;border-top:1px solid var(--border);flex-shrink:0}
+.u-av{width:28px;height:28px;border-radius:50%;background:var(--teal-d);
+  border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:var(--teal-l);flex-shrink:0}
+
+/* ── MAIN ── */
+.main{margin-left:200px;min-height:100vh}
+
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:40;background:rgba(6,8,15,0.94);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--border);
+  padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.tb-l{display:flex;align-items:center;gap:10px}
+.tb-title{font-size:14px;font-weight:500}
+.tab-btn{padding:5px 14px;border-radius:7px;font-size:12px;font-weight:500;
+  border:1px solid;cursor:pointer;font-family:inherit;transition:all 0.18s}
+.tab-on{background:var(--teal-d);border-color:rgba(29,158,117,0.4);color:var(--teal-l)}
+.tab-off{background:transparent;border-color:var(--border2);color:var(--ink2)}
+.tab-off:hover{color:var(--ink);border-color:var(--border2)}
+.tb-r{display:flex;align-items:center;gap:8px}
+.gm-chip{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;
+  background:var(--gold-d);border:1px solid rgba(201,168,76,0.3)}
+.gm-v{font-size:13px;font-weight:700;color:var(--gold);font-family:'DM Mono',monospace}
+.tb-btn{padding:5px 13px;border-radius:7px;font-size:11.5px;font-weight:500;
+  border:1px solid var(--border2);background:transparent;color:var(--ink);
+  cursor:pointer;font-family:inherit;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.07)}
+.tb-btn.pri{background:var(--teal-d);border-color:rgba(29,158,117,0.4);color:var(--teal-l)}
+
+/* ── PAGE VIEWS ── */
+.view{display:none}
+.view.active{display:block}
+.page-content{padding:24px 28px 72px;max-width:1100px}
+
+/* ── CARD / GRID ── */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+
+/* ── SECTION HEAD ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-t{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.1px;
+  text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sh-line{flex:1;height:1px;background:var(--border)}
+.sh-a{font-size:11px;color:var(--teal-l);cursor:pointer;white-space:nowrap}
+
+/* pill */
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:20px;white-space:nowrap}
+.pl-g{background:var(--green-d);color:var(--green-l);border:1px solid rgba(59,158,74,0.3)}
+.pl-y{background:var(--gold-d);color:var(--gold-l);border:1px solid rgba(201,168,76,0.3)}
+.pl-b{background:var(--blue-d);color:var(--blue-l);border:1px solid rgba(24,95,165,0.3)}
+.pl-t{background:var(--teal-d);color:var(--teal-l);border:1px solid rgba(29,158,117,0.3)}
+.pl-r{background:var(--red-d);color:var(--red-l);border:1px solid rgba(226,75,74,0.3)}
+.pl-p{background:var(--purple-d);color:var(--purple-l);border:1px solid rgba(127,119,221,0.3)}
+.pl-gray{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--border)}
+
+/* insight */
+.ins{padding:11px 14px;border-radius:9px;font-size:11.5px;line-height:1.75;
+  display:flex;gap:9px;align-items:flex-start;margin-bottom:14px}
+.ins-t{background:var(--teal-d);border:1px solid rgba(29,158,117,0.2);color:var(--teal-l)}
+.ins-y{background:var(--gold-d);border:1px solid rgba(201,168,76,0.2);color:var(--gold-l)}
+.ins-g{background:var(--green-d);border:1px solid rgba(59,158,74,0.2);color:var(--green-l)}
+.ins svg{flex-shrink:0;margin-top:2px}
+
+/* ────────────────────────────────────────
+   法规知识库
+──────────────────────────────────────── */
+
+/* search */
+.search-bar{
+  display:flex;align-items:center;gap:10px;
+  background:var(--panel);border:1px solid var(--border2);border-radius:12px;
+  padding:10px 16px;margin-bottom:16px;
+  transition:border-color 0.2s;
+}
+.search-bar:focus-within{border-color:rgba(29,158,117,0.5)}
+.search-bar input{flex:1;background:transparent;border:none;outline:none;
+  font-family:inherit;font-size:13px;color:var(--ink)}
+.search-bar input::placeholder{color:var(--ink3)}
+
+/* category tabs */
+.cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.cat-tab{padding:5px 13px;border-radius:20px;font-size:11.5px;font-weight:500;
+  cursor:pointer;border:1px solid;transition:all 0.15s}
+.ct-active{background:var(--teal-d);border-color:rgba(29,158,117,0.4);color:var(--teal-l)}
+.ct-off{background:rgba(255,255,255,0.04);border-color:var(--border);color:var(--ink2)}
+.ct-off:hover{color:var(--ink);border-color:var(--border2)}
+
+/* alert banner */
+.alert-banner{
+  background:var(--red-d);border:1px solid rgba(226,75,74,0.28);
+  border-radius:12px;padding:12px 16px;margin-bottom:16px;
+  display:flex;align-items:flex-start;gap:11px;
+}
+.ab-dot{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:3px;
+  animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.ab-body{flex:1}
+.ab-title{font-size:12.5px;font-weight:600;color:var(--red-l);margin-bottom:3px}
+.ab-desc{font-size:11.5px;color:rgba(252,165,165,0.75);line-height:1.65}
+.ab-date{font-size:10.5px;font-family:'DM Mono',monospace;color:rgba(252,165,165,0.5);margin-top:4px}
+
+/* regulation card */
+.reg-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:14px;padding:16px 18px;margin-bottom:12px;
+  cursor:pointer;transition:all 0.18s;position:relative;
+}
+.reg-card:last-child{margin-bottom:0}
+.reg-card:hover{border-color:var(--border2);background:rgba(13,18,34,0.98)}
+.reg-card.relevant{border-left:3px solid var(--teal)}
+.reg-card.urgent{border-left:3px solid var(--red)}
+.reg-card.neutral{border-left:3px solid var(--border)}
+.rc-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:8px}
+.rc-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0}
+.rc-head{flex:1;min-width:0}
+.rc-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px;
+  display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.rc-en{font-size:10.5px;color:var(--ink3);margin-bottom:5px}
+.rc-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rc-right{flex-shrink:0;text-align:right}
+.rc-date{font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace;margin-bottom:5px}
+
+/* Impact summary — the key innovation */
+.rc-impact{
+  padding:9px 13px;border-radius:8px;font-size:11.5px;line-height:1.7;
+  margin-bottom:9px;
+}
+.impact-g{background:var(--green-d);border:1px solid rgba(59,158,74,0.2);color:var(--green-l)}
+.impact-r{background:var(--red-d);border:1px solid rgba(226,75,74,0.2);color:var(--red-l)}
+.impact-y{background:var(--gold-d);border:1px solid rgba(201,168,76,0.2);color:var(--gold-l)}
+.impact-b{background:var(--blue-d);border:1px solid rgba(24,95,165,0.2);color:var(--blue-l)}
+.impact-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  margin-bottom:3px;opacity:0.7}
+
+/* key points */
+.rc-pts{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.rc-pt{display:flex;align-items:flex-start;gap:7px;font-size:11.5px;color:var(--ink2);line-height:1.55}
+.pt-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:5px}
+
+/* reading progress */
+.read-bar{height:3px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
+.read-fill{height:100%;border-radius:2px;background:var(--teal)}
+
+/* knowledge card in grid */
+.know-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.know-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;cursor:pointer;transition:all 0.18s;
+  display:flex;flex-direction:column;gap:8px}
+.know-card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.kc-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.kc-title{font-size:12.5px;font-weight:600;line-height:1.35}
+.kc-count{font-size:10px;color:var(--ink3)}
+.kc-tags{display:flex;gap:4px;flex-wrap:wrap}
+
+/* timeline for law updates */
+.law-tl{display:flex;flex-direction:column;gap:10px}
+.lt-item{display:flex;gap:12px;align-items:flex-start;
+  padding:10px 13px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:10px}
+.lt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.lt-body{flex:1}
+.lt-title{font-size:12px;font-weight:500;color:var(--ink);margin-bottom:2px}
+.lt-desc{font-size:11px;color:var(--ink2);line-height:1.55}
+.lt-date{font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace;margin-top:3px}
+
+/* FAQ accordion */
+.faq-item{background:var(--panel);border:1px solid var(--border);border-radius:11px;
+  margin-bottom:8px;overflow:hidden;transition:border-color 0.15s}
+.faq-item:last-child{margin-bottom:0}
+.faq-q{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;font-size:12.5px;font-weight:500;color:var(--ink);gap:12px}
+.faq-q:hover{background:rgba(255,255,255,0.03)}
+.faq-arrow{font-size:14px;color:var(--ink3);transition:transform 0.2s;flex-shrink:0}
+.faq-a{display:none;padding:0 16px 13px;font-size:12px;color:var(--ink2);line-height:1.75;
+  border-top:1px solid var(--border)}
+.faq-item.open .faq-a{display:block;padding-top:12px}
+.faq-item.open .faq-arrow{transform:rotate(180deg)}
+.faq-item.open{border-color:rgba(29,158,117,0.3)}
+
+/* toast */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--panel2);
+  border:1px solid rgba(29,158,117,0.45);border-radius:11px;
+  padding:11px 16px;display:flex;align-items:center;gap:9px;
+  font-size:12.5px;color:var(--teal-l);z-index:9999;
+  opacity:0;transform:translateY(8px);transition:all 0.3s;
+  pointer-events:none;min-width:240px}
+
+/* animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp 0.4s ease both}
+.fu1{animation-delay:.05s}.fu2{animation-delay:.12s}.fu3{animation-delay:.19s}
+.fu4{animation-delay:.26s}.fu5{animation-delay:.33s}
+</style>
+<style id="qa-sidebar-css">
+/* HengAI V2.0 QA · 全站统一侧栏基线
+   设计原则：
+   1. 容器级规则使用 :where() 零特异性 —— 页面自己的 .sidebar{} 原生规则优先
+   2. 内部元素 (.sb-brand/.sb-item/...) 使用普通选择器 —— 提供基线视觉
+   3. 不动 .main —— 每页主区偏移由自家 CSS 决定（不污染 flex 布局）
+*/
+:where(.sidebar#sidebar[data-qa-version="2.0"]){width:200px;background:#0b0f19;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;overflow-y:auto;font-family:inherit}
+.sidebar .sb-brand{padding:17px 15px 13px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sidebar .sb-brand-ic{width:32px;height:32px;border-radius:9px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar .sb-brand-name{font-size:14px;font-weight:700;letter-spacing:.2px;color:#e6e9f2}
+.sidebar .sb-brand-sub{font-size:9.5px;color:#8a92a8;margin-top:1px}
+.sidebar .sb-group-title{font-size:9.5px;text-transform:uppercase;color:#8a92a8;letter-spacing:.6px;padding:14px 18px 6px;font-weight:600}
+.sidebar .sb-item{padding:9px 18px;font-size:12.5px;color:#c3cbdc;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .12s;border-left:2px solid transparent;font-family:inherit;line-height:1.3}
+.sidebar .sb-item:hover{background:rgba(255,255,255,0.03);color:#e6e9f2}
+.sidebar .sb-item.active{background:rgba(16,185,129,0.08);border-left-color:#10b981;color:#e6e9f2;font-weight:600}
+.sidebar .sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* 嵌入模式（?embed=1）：只露内容，侧栏/顶栏/老 .sb 全部隐藏，主区 margin 归零 */
+html[data-embed="1"] .sidebar,html[data-embed="1"] .sb,html[data-embed="1"] .topbar{display:none !important}
+html[data-embed="1"] body{padding-left:0 !important}
+html[data-embed="1"] .main,html[data-embed="1"] .main-wrap,html[data-embed="1"] .main-content{margin-left:0 !important}
+</style>
+</head>
+<body>
+
+<!-- CANONICAL SIDEBAR — HengAI V2.0 QA 统一版 -->
+<div class="sidebar" id="sidebar" data-qa-version="2.0">
+  <div class="sb-brand">
+    <div class="sb-brand-ic">
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+    </div>
+    <div>
+      <div class="sb-brand-name">HengAI</div>
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+    </div>
+  </div>
+
+  <!-- 逃生舱：返回 HengAI 对话大厅 -->
+  <div style="padding:12px 14px 4px;">
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      返回 HengAI 对话
+    </div>
+  </div>
+
+  <div class="sb-group-title">个人工作台</div>
+  <div class="sb-item" data-page="overview"   onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+  <div class="sb-item" data-page="achieve"    onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+  <div class="sb-item" data-page="calc"       onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+  <div class="sb-item" data-page="resource"   onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+  <div class="sb-item" data-page="knowledge"  onclick="window.location.href='HengAI_法规知识库.html'"><div class="sb-dot" style="background:#c4b5fd"></div>企业法规库</div>
+
+  <div class="sb-group-title">企业工作台</div>
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+  <div class="sb-item" data-page="supply"     onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" style="background:#6dd5b0"></div>供应链协同</div>
+  <div class="sb-item" data-page="report"     onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+  <div class="sb-item" data-page="decision"   onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-group-title">大国重器</div>
+  <div class="sb-item" data-page="honor"      onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+  <div class="sb-item" data-page="gov"        onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:#6dd5b0"></div>生态共治委员会</div>
+
+  <div class="sb-group-title">深潜模块</div>
+  <div class="sb-item" data-page="wallet"     onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+  <div class="sb-item" data-page="eu"         onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:#93c5fd"></div>欧盟海关直连</div>
+  <div class="sb-item" data-page="dld"        onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:#10b981"></div>DLD 绿色信贷</div>
+  <div class="sb-item" data-page="acf"        onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:#6dd5b0"></div>ACF 大湾区认证</div>
+</div>
+<script id="qa-sidebar-active-script">
+/* 基于当前文件名自动高亮对应菜单项（全站共用） */
+(function(){
+  var map = {"全域中心.html":"overview","index.html":"overview","HengAI_星火成就档案.html":"achieve","HengAI_CBAM测算工具.html":"calc","HengAI_算力资源.html":"resource","HengAI_法规知识库.html":"knowledge","HengAI_企业数字档案.html":"enterprise","HengAI_供应链协同.html":"supply","HengAI_全域诊断报告.html":"report","HengAI_决策层呈送包生成器.html":"decision","HengAI_荣誉体系.html":"honor","HengAI_Governance.html":"gov","HengAI_GM_Wallet.html":"wallet","HengAI_EU_Customs.html":"eu","HengAI_DLD_Credit.html":"dld","HengAI_ACF_Cert.html":"acf"};
+  try {
+    var fn = decodeURIComponent((location.pathname.split("/").pop() || "").split("?")[0]);
+    var id = map[fn]; if (!id) return;
+    document.querySelectorAll(".sidebar .sb-item[data-page]").forEach(function(el){
+      if (el.getAttribute("data-page") === id) el.classList.add("active");
+    });
+  } catch(e){}
+})();
+</script>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="tb-l">
+      <span class="tb-title" id="page-title">法规知识库</span>
+    </div>
+    <div class="tb-r">
+      <div class="gm-chip" onclick="window.location.href='HengAI_GM_Wallet.html'">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+          <path d="M5.5 1L10 3.5V8.5L5.5 10L1 8.5V3.5L5.5 1Z" stroke="#c9a84c" stroke-width="0.9" fill="rgba(201,168,76,0.15)"/>
+        </svg>
+        <span style="font-size:10px;color:var(--ink2)">GM</span>
+        <span class="gm-v">128</span>
+      </div>
+      <button class="tb-btn" id="tb-secondary" onclick="showToast('订阅我的法规动态推送')">订阅动态推送</button>
+      <button class="tb-btn pri" id="tb-primary" onclick="window.location.href='HengAI_算力资源.html'">算力资源 →</button>
+    </div>
+  </div>
+
+  <div class="view active" id="view-knowledge">
+  <div class="page-content">
+
+    <!-- Search -->
+    <div class="search-bar fu fu1">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="7" cy="7" r="5" stroke="var(--ink3)" stroke-width="1.2"/>
+        <line x1="11" y1="11" x2="14.5" y2="14.5" stroke="var(--ink3)" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+      <input placeholder="搜索法规名称、关键词…例如：CBAM 申报截止日期" id="search-input"
+        oninput="filterRegs(this.value)">
+      <span style="font-size:11px;color:var(--ink3);white-space:nowrap">AI 精准检索</span>
+    </div>
+
+    <!-- Urgent alert -->
+    <div class="alert-banner fu fu1">
+      <div class="ab-dot"></div>
+      <div class="ab-body">
+        <div class="ab-title">⚡ 重要更新：欧盟 CBAM 2026 年执行细则正式发布</div>
+        <div class="ab-desc">申报数据底稿格式有重大变更，新增"生产工艺核实"章节，要求提供更详细的排放因子溯源文件。<strong style="color:var(--red-l)">影响您的下次申报</strong>——建议优先阅读。</div>
+        <div class="ab-date">官方发布：2026-03-28 · HengAI 解读更新：2026-04-01</div>
+      </div>
+      <button style="flex-shrink:0;padding:7px 14px;border-radius:8px;font-size:11.5px;font-weight:600;border:1px solid rgba(226,75,74,0.4);background:var(--red-d);color:var(--red-l);cursor:pointer;font-family:inherit" onclick="showToast('CBAM 2026 执行细则解读已打开')">立即阅读</button>
+    </div>
+
+    <!-- Category tabs -->
+    <div class="cat-tabs fu fu1">
+      <button class="cat-tab ct-active" onclick="setCat(this,'all')">全部</button>
+      <button class="cat-tab ct-off" onclick="setCat(this,'cbam')">CBAM 碳关税</button>
+      <button class="cat-tab ct-off" onclick="setCat(this,'esg')">ESG 披露</button>
+      <button class="cat-tab ct-off" onclick="setCat(this,'carbon')">碳排放交易</button>
+      <button class="cat-tab ct-off" onclick="setCat(this,'china')">中国政策</button>
+      <button class="cat-tab ct-off" onclick="setCat(this,'faq')">常见问题</button>
+    </div>
+
+    <!-- Pinned for you -->
+    <div class="sh fu fu2">
+      <div class="sh-t">与您最相关 <div class="sh-line"></div></div>
+      <span style="font-size:10.5px;color:var(--ink3)">基于企业档案智能推送</span>
+    </div>
+
+    <div id="reg-list" class="fu fu2">
+
+      <!-- REG 1 -->
+      <div class="reg-card relevant" onclick="toggleExpand(this)">
+        <div class="rc-top">
+          <div class="rc-icon" style="background:var(--red-d);border:1px solid rgba(226,75,74,0.28)">
+            <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+              <path d="M8.5 1.5L15.5 5.5V11.5L8.5 15.5L1.5 11.5V5.5L8.5 1.5Z" stroke="var(--red-l)" stroke-width="1.2" fill="var(--red-d)"/>
+              <text x="8.5" y="11" text-anchor="middle" font-size="6.5" font-weight="700" fill="var(--red-l)" font-family="sans-serif">EU</text>
+            </svg>
+          </div>
+          <div class="rc-head">
+            <div class="rc-title">
+              欧盟碳边境调节机制（CBAM）执行细则 2026
+              <span class="pill pl-r">紧急</span>
+              <span class="pill pl-t" style="font-size:9px">直接相关</span>
+            </div>
+            <div class="rc-en">EU Carbon Border Adjustment Mechanism · Implementation Regulation 2026</div>
+            <div class="rc-meta">
+              <span class="pill pl-gray">欧盟</span>
+              <span class="pill pl-gray">2026-01-01 生效</span>
+              <span class="pill pl-gray">CBAM</span>
+            </div>
+          </div>
+          <div class="rc-right">
+            <div class="rc-date">更新 2026-04-01</div>
+            <div class="read-bar" style="width:80px"><div class="read-fill" style="width:65%"></div></div>
+            <div style="font-size:9px;color:var(--ink3);margin-top:3px">已读 65%</div>
+          </div>
+        </div>
+        <div class="rc-impact impact-r">
+          <div class="impact-label">对您企业的影响</div>
+          铝制品出口欧盟须按此规定申报碳含量。当前申报方式（Lv.2 人工凭证）将承担 35% 惩罚溢价，预计额外损失 € 38,000/年。最新细则新增生产工艺核实章节，下次申报前需补充。
+        </div>
+        <div class="rc-pts" id="pts-1" style="display:none">
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--red)"></div>申报截止日期：进口商须于货物进关后 30 天内提交 CBAM 申报</div>
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--amber)"></div>新增章节：生产工艺核实报告（Section 4C），要求提供排放因子第三方来源证明</div>
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--amber)"></div>Lv.2 申报将额外缴纳不确定性附加费（≈ 35%），Lv.4 物理认证免除</div>
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--green)"></div>HengAI 已更新底稿模板，可一键生成符合新细则的申报文件</div>
+        </div>
+        <div style="font-size:11px;color:var(--teal-l);margin-top:8px;display:flex;align-items:center;gap:5px" class="expand-hint">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="2,4 5,7 8,4" stroke="var(--teal-l)" stroke-width="1.2" stroke-linecap="round"/></svg>
+          展开查看关键条款
+        </div>
+      </div>
+
+      <!-- REG 2 -->
+      <div class="reg-card relevant" onclick="toggleExpand(this)">
+        <div class="rc-top">
+          <div class="rc-icon" style="background:var(--blue-d);border:1px solid rgba(24,95,165,0.28)">
+            <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+              <circle cx="8.5" cy="8.5" r="7" stroke="var(--blue-l)" stroke-width="1.2"/>
+              <path d="M8.5 3C8.5 3 6 5.5 6 8.5C6 11.5 8.5 14 8.5 14C8.5 14 11 11.5 11 8.5C11 5.5 8.5 3 8.5 3Z" stroke="var(--blue-l)" stroke-width="0.9"/>
+              <line x1="2" y1="8.5" x2="15" y2="8.5" stroke="var(--blue-l)" stroke-width="0.8"/>
+            </svg>
+          </div>
+          <div class="rc-head">
+            <div class="rc-title">
+              欧盟 ETS 碳价格走势与 CBAM 联动机制
+              <span class="pill pl-b">重要</span>
+            </div>
+            <div class="rc-en">EU ETS Carbon Price & CBAM Linkage Mechanism</div>
+            <div class="rc-meta">
+              <span class="pill pl-gray">欧盟</span>
+              <span class="pill pl-gray">持续更新</span>
+              <span class="pill pl-gray">碳价参考</span>
+            </div>
+          </div>
+          <div class="rc-right">
+            <div class="rc-date">更新 2026-04-10</div>
+            <div class="read-bar" style="width:80px"><div class="read-fill" style="width:100%;background:var(--green)"></div></div>
+            <div style="font-size:9px;color:var(--green);margin-top:3px">已读完</div>
+          </div>
+        </div>
+        <div class="rc-impact impact-y">
+          <div class="impact-label">对您企业的影响</div>
+          当前碳价 €65/tCO₂e，2026 年预测区间 €60-80，2028 年或达 €100。您的年度碳税敞口将从 待测算 上升至 €212k（2028年）。尽早锁定低碳认证，先于碳价上涨完成布局。
+        </div>
+        <div class="rc-pts" id="pts-2" style="display:none">
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--gold)"></div>当前 EU ETS 价格：€65/tCO₂e（2026-04-10 收盘）</div>
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--amber)"></div>分析师共识：2027 年 €75-85，2028 年 €90-105</div>
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--blue-l)"></div>CBAM 税率 = ETS 价格 × 申报碳含量，与 ETS 完全挂钩</div>
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--green)"></div>若已持有绿电证书（GEC），可在申报时扣减对应 Scope 2 排放</div>
+        </div>
+        <div style="font-size:11px;color:var(--teal-l);margin-top:8px;display:flex;align-items:center;gap:5px" class="expand-hint">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="2,4 5,7 8,4" stroke="var(--teal-l)" stroke-width="1.2" stroke-linecap="round"/></svg>
+          展开查看关键条款
+        </div>
+      </div>
+
+      <!-- REG 3 -->
+      <div class="reg-card relevant" onclick="toggleExpand(this)">
+        <div class="rc-top">
+          <div class="rc-icon" style="background:var(--green-d);border:1px solid rgba(59,158,74,0.28)">
+            <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+              <rect x="2" y="2" width="13" height="13" rx="2" stroke="var(--green-l)" stroke-width="1.1"/>
+              <path d="M5 9L7.5 11.5L12 7" stroke="var(--green-l)" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="rc-head">
+            <div class="rc-title">
+              中国碳排放统计核算制度（2026 修订版）
+              <span class="pill pl-g">政策利好</span>
+            </div>
+            <div class="rc-en">China GHG Emission Accounting & Reporting Standards · 2026 Revision</div>
+            <div class="rc-meta">
+              <span class="pill pl-gray">中国</span>
+              <span class="pill pl-gray">2026-07-01 实施</span>
+              <span class="pill pl-gray">碳核算</span>
+            </div>
+          </div>
+          <div class="rc-right">
+            <div class="rc-date">更新 2026-02-15</div>
+            <div class="read-bar" style="width:80px"><div class="read-fill" style="width:20%;background:var(--gold)"></div></div>
+            <div style="font-size:9px;color:var(--gold);margin-top:3px">未读</div>
+          </div>
+        </div>
+        <div class="rc-impact impact-g">
+          <div class="impact-label">对您企业的影响</div>
+          新版核算标准与欧盟 CBAM 口径高度对齐，中国工厂按此标准产生的碳数据，经 MAT 物理核验后可直接用于 CBAM 申报，<strong style="color:var(--green-l)">无需二次换算</strong>，大幅降低合规成本。
+        </div>
+        <div class="rc-pts" id="pts-3" style="display:none">
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--green)"></div>新版排放因子库与 IPCC 2024 保持一致，与欧盟 CBAM 口径基本对齐</div>
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--green)"></div>电网碳因子更新：华东 0.576（下降 0.5%），对 Scope 2 计算有微小影响</div>
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--blue-l)"></div>HengAI 已按新标准更新测算引擎，历史数据自动重算，无需重新填报</div>
+        </div>
+        <div style="font-size:11px;color:var(--teal-l);margin-top:8px;display:flex;align-items:center;gap:5px" class="expand-hint">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="2,4 5,7 8,4" stroke="var(--teal-l)" stroke-width="1.2" stroke-linecap="round"/></svg>
+          展开查看关键条款
+        </div>
+      </div>
+
+      <!-- REG 4 -->
+      <div class="reg-card neutral" onclick="toggleExpand(this)">
+        <div class="rc-top">
+          <div class="rc-icon" style="background:rgba(127,119,221,0.1);border:1px solid rgba(127,119,221,0.28)">
+            <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+              <path d="M8.5 1.5L15.5 5V12L8.5 15.5L1.5 12V5L8.5 1.5Z" stroke="var(--purple-l)" stroke-width="1.1"/>
+              <line x1="8.5" y1="5" x2="8.5" y2="9.5" stroke="var(--purple-l)" stroke-width="1.1"/>
+              <line x1="5.5" y1="7.2" x2="11.5" y2="7.2" stroke="var(--purple-l)" stroke-width="0.8"/>
+            </svg>
+          </div>
+          <div class="rc-head">
+            <div class="rc-title">欧盟企业可持续发展报告指令（CSRD）</div>
+            <div class="rc-en">Corporate Sustainability Reporting Directive · CSRD</div>
+            <div class="rc-meta">
+              <span class="pill pl-gray">欧盟</span>
+              <span class="pill pl-gray">2025 年起分阶段</span>
+              <span class="pill pl-gray">ESG 披露</span>
+            </div>
+          </div>
+          <div class="rc-right">
+            <div class="rc-date">更新 2025-11-20</div>
+            <div class="read-bar" style="width:80px"><div class="read-fill" style="width:0%"></div></div>
+            <div style="font-size:9px;color:var(--ink3);margin-top:3px">未读</div>
+          </div>
+        </div>
+        <div class="rc-impact impact-b">
+          <div class="impact-label">对您企业的影响</div>
+          若贵司的欧盟客户年营收超 4000 万欧元，他们须对供应链碳数据进行 CSRD 披露，并可能要求您提供标准化碳数据。您的 Co2Lion 档案可直接用于支持客户 CSRD 报告。
+        </div>
+        <div class="rc-pts" id="pts-4" style="display:none">
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--purple-l)"></div>首批适用：2025 年（大型企业）；2026 年（中小企业上市公司）；2028 年（SME）</div>
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--blue-l)"></div>要求披露 Scope 1/2/3 排放、气候风险、转型计划</div>
+          <div class="rc-pt"><div class="pt-dot" style="background:var(--green)"></div>提前建立碳档案，可直接响应下游欧盟客户的供应链数据请求</div>
+        </div>
+        <div style="font-size:11px;color:var(--teal-l);margin-top:8px;display:flex;align-items:center;gap:5px" class="expand-hint">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="2,4 5,7 8,4" stroke="var(--teal-l)" stroke-width="1.2" stroke-linecap="round"/></svg>
+          展开查看关键条款
+        </div>
+      </div>
+
+    </div><!-- /reg-list -->
+
+    <!-- Law update timeline + FAQ -->
+    <div class="g2" style="margin-top:20px">
+      <div>
+        <div class="sh fu fu4">
+          <div class="sh-t">法规动态时间轴 <div class="sh-line"></div></div>
+        </div>
+        <div class="law-tl fu fu4">
+          <div class="lt-item">
+            <div class="lt-dot" style="background:var(--red)"></div>
+            <div class="lt-body">
+              <div class="lt-title">CBAM 2026 执行细则：新增生产工艺核实章节</div>
+              <div class="lt-desc">申报底稿格式重大变更，须提供排放因子溯源文件</div>
+              <div class="lt-date">2026-03-28 · 官方来源</div>
+            </div>
+          </div>
+          <div class="lt-item">
+            <div class="lt-dot" style="background:var(--gold)"></div>
+            <div class="lt-body">
+              <div class="lt-title">EU ETS 碳价突破 €70，创近期新高</div>
+              <div class="lt-desc">分析师上调 2027 年预测至 €80-90，建议提前布局低碳认证</div>
+              <div class="lt-date">2026-04-10 · Reuters</div>
+            </div>
+          </div>
+          <div class="lt-item">
+            <div class="lt-dot" style="background:var(--blue-l)"></div>
+            <div class="lt-body">
+              <div class="lt-title">中国与欧盟碳市场互认机制进入磋商阶段</div>
+              <div class="lt-desc">若达成，中国 CCER 碳信用可抵扣部分 CBAM 税款，利好低碳供应链企业</div>
+              <div class="lt-date">2026-03-15 · 生态环境部</div>
+            </div>
+          </div>
+          <div class="lt-item">
+            <div class="lt-dot" style="background:var(--green)"></div>
+            <div class="lt-body">
+              <div class="lt-title">国家绿色电力证书（GEC）可抵扣 CBAM Scope 2 正式确认</div>
+              <div class="lt-desc">欧盟官方确认中国 GEC 的抵扣资质，引入绿电证书可直接降低碳税</div>
+              <div class="lt-date">2026-02-20 · 欧盟委员会</div>
+            </div>
+          </div>
+          <div class="lt-item">
+            <div class="lt-dot" style="background:var(--purple-l)"></div>
+            <div class="lt-body">
+              <div class="lt-title">CSRD 中小企业简化版标准（VSME）正式发布</div>
+              <div class="lt-desc">SME 供应商可使用简化版披露模板，降低合规门槛</div>
+              <div class="lt-date">2026-01-08 · 欧盟委员会</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sh fu fu4">
+          <div class="sh-t">常见问题 <div class="sh-line"></div></div>
+        </div>
+        <div class="fu fu4">
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">CBAM 到底从什么时候开始正式征税？<span class="faq-arrow">▾</span></div>
+            <div class="faq-a">2026 年 1 月 1 日起正式进入付费阶段。2023-2025 年为过渡期，企业只需填报数据无需缴税。2026 年起须为进口商品的碳含量购买 CBAM 证书，价格与 EU ETS 挂钩。</div>
+          </div>
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">供应商不愿意配合填报碳数据怎么办？<span class="faq-arrow">▾</span></div>
+            <div class="faq-a">两个路径并行：①发送 Co2Lion 穿透卡片，让供应商看到填报对他自身获客和降低碳税的好处；②对确实无法获得数据的供应商，可使用欧盟认可的行业默认值，但会承担估算不确定性溢价。HengAI 可自动判断哪些供应商应优先处理。</div>
+          </div>
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">Lv.2 和 Lv.4 申报模式税款差别有多大？<span class="faq-arrow">▾</span></div>
+            <div class="faq-a">Lv.2 人工凭证会被附加 35% 不确定性溢价，即实际税额 = 核定税额 × 1.35。以您企业为例，核定税额 €107,407，附加溢价 €37,593，总计 待测算。升级至 Lv.4 MAT 物理认证后，溢价消除，仅需缴纳核定税额 €107,407，每年直接节省约 €38,000。</div>
+          </div>
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">绿电证书（GEC）真的能抵扣 CBAM 税款吗？<span class="faq-arrow">▾</span></div>
+            <div class="faq-a">可以。2026 年 2 月欧盟官方确认，持有中国国家绿色电力证书（GEC）的企业，可在申报时扣减对应的 Scope 2 排放量。您的工厂年用电 124,000 kWh，若全部购买 GEC（约 ¥1.2 万/年），可抵扣 Scope 2 排放约 72 tCO₂e，降低碳税约 €4,680。</div>
+          </div>
+          <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">什么情况下需要做 CSRD 报告？<span class="faq-arrow">▾</span></div>
+            <div class="faq-a">您的企业本身目前不强制要求做 CSRD（适用于在欧盟上市或营收超门槛的企业）。但如果您的欧盟客户需要做 CSRD，他们可能要求您提供供应链碳数据。提前建立 Co2Lion 档案，可直接响应这类请求，成为下游客户优先保留的供应商。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </div><!-- /view-knowledge -->
+
+</div><!-- /main -->
+
+<!-- Toast -->
+<div id="toast">
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="var(--teal-l)" stroke-width="1.5" stroke-linecap="round"/></svg>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+// Knowledge-only page (compute view removed)
+
+// ── REG EXPAND ────────────────────────────
+function toggleExpand(card) {
+  const pts = card.querySelector('[id^="pts-"]');
+  const hint = card.querySelector('.expand-hint');
+  if (!pts) return;
+  const open = pts.style.display !== 'none';
+  pts.style.display = open ? 'none' : 'flex';
+  if (hint) {
+    hint.innerHTML = open
+      ? '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="2,4 5,7 8,4" stroke="var(--teal-l)" stroke-width="1.2" stroke-linecap="round"/></svg> 展开查看关键条款'
+      : '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="2,7 5,4 8,7" stroke="var(--teal-l)" stroke-width="1.2" stroke-linecap="round"/></svg> 收起';
+  }
+}
+
+// ── FAQ TOGGLE ────────────────────────────
+function toggleFaq(item) {
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// ── CATEGORY FILTER ────────────────────────────
+function setCat(el, cat) {
+  document.querySelectorAll('.cat-tab').forEach(t => t.className = 'cat-tab ct-off');
+  el.className = 'cat-tab ct-active';
+  showToast(cat === 'all' ? '显示全部法规' :
+    cat === 'cbam' ? '筛选：CBAM 碳关税' :
+    cat === 'esg' ? '筛选：ESG 披露' :
+    cat === 'carbon' ? '筛选：碳排放交易' :
+    cat === 'china' ? '筛选：中国政策' : '显示常见问题');
+}
+
+// ── SEARCH ────────────────────────────
+function filterRegs(v) {
+  if (v.length > 0) showToast('AI 检索中：' + v);
+}
+
+// ── TOAST ────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.style.opacity = '1'; t.style.transform = 'translateY(0)';
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => {
+    t.style.opacity = '0'; t.style.transform = 'translateY(8px)';
+  }, 2600);
+}
+
+</script>
+<script>
+(function () {
+  function applyKnowledgePipeline(p) {
+    if (!p) return;
+    // 目前法规库主要为内容型模块：保持原有内容不删不改，仅保证 GM 等全局资产一致
+    var user = p.user || {};
+    var gm = Number(user.gmBalance != null ? user.gmBalance : user.gm_balance != null ? user.gm_balance : 0);
+    var chip = document.querySelector('.gm-chip-val');
+    if (chip) chip.textContent = gm.toLocaleString();
+  }
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || ev.data.type !== 'HENGAI_HUB_PIPELINE') return;
+    applyKnowledgePipeline(ev.data.payload);
+  });
+})();
+</script>
+</body>
+</html>

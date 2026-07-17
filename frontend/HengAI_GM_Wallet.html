@@ -1,0 +1,855 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · GreenMark 绿印钱包</title>
+<script>
+/* 嵌入模式：?embed=1 时隐藏原页 chrome (sidebar/topbar)，仅呈现内容模块 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<link rel="stylesheet" href="hengai-embed-layout.css">
+<style>
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .sb,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] .main,
+html[data-embed="1"] .main-wrap { margin-left: 0 !important; }
+html[data-embed="1"] body { padding-left: 0 !important; background: var(--night, #06080f) !important; }
+</style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+:root{
+  --night:#06080f;--dark:#0a0e1a;--panel:#0d1220;--p2:#111827;
+  --b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);
+  --ink:#e8edf5;--ink2:#8a95a8;--ink3:#4a5568;
+  --gold:#c9a84c;--gl:#f0d080;--gd:rgba(201,168,76,0.11);
+  --green:#3b9e4a;--greenl:#7dd98a;--greend:rgba(59,158,74,0.1);
+  --teal:#1d9e75;--teall:#6dd5b0;--teald:rgba(29,158,117,0.09);
+  --blue:#185fa5;--bluel:#93c5fd;--blued:rgba(24,95,165,0.1);
+  --red:#e24b4a;--redl:#fca5a5;--redd:rgba(226,75,74,0.09);
+  --purple:#7f77dd;--purpl:#c4b5fd;--purpd:rgba(127,119,221,0.09);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--night);color:var(--ink);
+  font-family:'Noto Sans SC',sans-serif;font-size:13px;line-height:1.6;min-height:100vh}
+
+/* sidebar */
+.sb{width:200px;background:var(--dark);border-right:1px solid var(--b);
+  position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50}
+.sb-logo{padding:15px 14px 12px;border-bottom:1px solid var(--b);
+  display:flex;align-items:center;gap:9px}
+.sb-li{width:28px;height:28px;border-radius:7px;background:var(--greend);
+  border:1px solid rgba(59,158,74,0.35);display:flex;align-items:center;justify-content:center}
+.sb-tx{font-size:13px;font-weight:700}
+.sb-sub{font-size:9px;color:var(--ink3);margin-top:1px}
+.nav-s{padding:10px 13px 4px;font-size:9px;color:var(--ink3);letter-spacing:1px;
+  text-transform:uppercase;font-weight:600}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 13px;font-size:12px;
+  color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all 0.15s}
+.ni:hover{color:var(--ink);background:rgba(255,255,255,0.04)}
+.ni.on{color:var(--ink);background:rgba(255,255,255,0.06);border-left-color:var(--gold)}
+.nd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-ft{margin-top:auto;padding:11px 13px;border-top:1px solid var(--b)}
+.u-av{width:28px;height:28px;border-radius:50%;background:var(--teald);
+  border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:var(--teall);flex-shrink:0}
+
+/* main */
+.main{margin-left:200px}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(6,8,15,0.94);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--b);
+  padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.tl{display:flex;align-items:center;gap:10px}
+.tt{font-size:14px;font-weight:500}
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;
+  padding:2px 8px;border-radius:20px;white-space:nowrap}
+.pl-y{background:var(--gd);color:var(--gl);border:1px solid rgba(201,168,76,0.3)}
+.pl-g{background:var(--greend);color:var(--greenl);border:1px solid rgba(59,158,74,0.3)}
+.pl-b{background:var(--blued);color:var(--bluel);border:1px solid rgba(24,95,165,0.3)}
+.pl-t{background:var(--teald);color:var(--teall);border:1px solid rgba(29,158,117,0.3)}
+.pl-p{background:var(--purpd);color:var(--purpl);border:1px solid rgba(127,119,221,0.3)}
+.pl-gray{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--b)}
+.pl-r{background:var(--redd);color:var(--redl);border:1px solid rgba(226,75,74,0.3)}
+.tr{display:flex;align-items:center;gap:8px}
+.tb-btn{padding:5px 13px;border-radius:7px;font-size:11.5px;font-weight:500;
+  border:1px solid var(--b2);background:transparent;color:var(--ink);
+  cursor:pointer;font-family:inherit;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.07)}
+.tb-btn.pri{background:var(--gd);border-color:rgba(201,168,76,0.4);color:var(--gl)}
+
+/* layout */
+.page{padding:24px 28px 72px;max-width:1060px}
+.card{background:var(--panel);border:1px solid var(--b);border-radius:14px;padding:18px 20px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.div{border:none;border-top:1px solid var(--b);margin:14px 0}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-t{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.1px;
+  text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sh-line{flex:1;height:1px;background:var(--b)}
+.sh-a{font-size:11px;color:var(--teall);cursor:pointer;white-space:nowrap}
+
+/* WALLET HERO */
+.wallet-hero{
+  background:var(--panel);
+  border:1px solid rgba(201,168,76,0.28);
+  border-radius:18px;padding:0;overflow:hidden;
+  margin-bottom:18px;position:relative;
+}
+.wallet-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 5%,var(--gold) 40%,var(--teall) 80%,transparent 95%)}
+.wh-top{padding:24px 26px 20px;display:flex;align-items:flex-start;gap:20px;
+  background:linear-gradient(160deg,rgba(201,168,76,0.06) 0%,transparent 60%)}
+.wh-coin{width:72px;height:72px;border-radius:50%;flex-shrink:0;
+  background:var(--gd);border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center}
+.wh-main{flex:1}
+.wh-label{font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:6px}
+.wh-balance{font-family:'DM Mono',monospace;font-size:48px;font-weight:700;
+  letter-spacing:-2px;line-height:1;color:var(--gold)}
+.wh-unit{font-size:16px;font-weight:400;color:rgba(201,168,76,0.55);margin-left:6px}
+.wh-sub{font-size:12px;color:var(--ink2);margin-top:6px;display:flex;align-items:center;gap:12px}
+.wh-sub-item{display:flex;align-items:center;gap:5px}
+.wh-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.wh-right{flex-shrink:0;min-width:200px}
+.wh-addr{background:rgba(0,0,0,0.35);border:1px solid var(--b2);border-radius:10px;
+  padding:11px 14px;margin-bottom:10px}
+.wh-addr-label{font-size:9.5px;color:var(--ink3);font-weight:600;letter-spacing:0.5px;
+  text-transform:uppercase;margin-bottom:4px}
+.wh-addr-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink2);
+  word-break:break-all;line-height:1.5}
+.wh-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.wa-btn{padding:8px 10px;border-radius:9px;font-size:12px;font-weight:600;
+  border:none;cursor:pointer;font-family:inherit;transition:all 0.18s;
+  display:flex;align-items:center;justify-content:center;gap:6px}
+.wa-btn:active{transform:scale(0.97)}
+.wa-send{background:rgba(29,158,117,0.16);border:1px solid rgba(29,158,117,0.4);color:var(--teall)}
+.wa-send:hover{background:rgba(29,158,117,0.26)}
+.wa-recv{background:rgba(24,95,165,0.13);border:1px solid rgba(24,95,165,0.35);color:var(--bluel)}
+.wa-recv:hover{background:rgba(24,95,165,0.22)}
+.wa-hist{background:rgba(255,255,255,0.05);border:1px solid var(--b2);color:var(--ink2)}
+.wa-hist:hover{background:rgba(255,255,255,0.09);color:var(--ink)}
+.wa-earn{background:var(--gd);border:1px solid rgba(201,168,76,0.38);color:var(--gl)}
+.wa-earn:hover{background:rgba(201,168,76,0.2)}
+
+/* stats strip */
+.wh-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--b);
+  border-top:1px solid var(--b)}
+.whs-box{background:rgba(10,14,24,0.9);padding:14px 18px;text-align:center}
+.whs-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;
+  letter-spacing:-0.5px;line-height:1;margin-bottom:3px}
+.whs-unit{font-size:10px;font-weight:400;opacity:0.6;margin-left:1px}
+.whs-label{font-size:10px;color:var(--ink3)}
+.whs-delta{font-size:10px;font-weight:600;margin-top:3px}
+
+/* earn ways */
+.earn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.earn-card{background:rgba(0,0,0,0.25);border:1px solid var(--b);border-radius:11px;
+  padding:13px 14px;display:flex;flex-direction:column;gap:7px;position:relative;overflow:hidden}
+.earn-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px}
+.earn-card.c-g::before{background:var(--green)}
+.earn-card.c-b::before{background:var(--bluel)}
+.earn-card.c-y::before{background:var(--gold)}
+.earn-card.c-t::before{background:var(--teal)}
+.earn-card.c-p::before{background:var(--purple)}
+.earn-card.c-r::before{background:var(--teall)}
+.ec-head{display:flex;align-items:center;justify-content:space-between}
+.ec-title{font-size:12.5px;font-weight:600;color:var(--ink)}
+.ec-gm{font-size:13px;font-weight:700;font-family:'DM Mono',monospace}
+.ec-desc{font-size:11px;color:var(--ink2);line-height:1.55}
+.ec-prog{height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden}
+.ec-pfill{height:100%;border-radius:2px}
+
+/* asset distribution */
+.distrib{display:flex;flex-direction:column;gap:9px}
+.db-row{display:flex;align-items:center;gap:10px}
+.db-label{width:100px;flex-shrink:0}
+.db-name{font-size:12px;font-weight:500;color:var(--ink)}
+.db-sub{font-size:9.5px;color:var(--ink3)}
+.db-bar-track{flex:1;height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,0.04)}
+.db-bar-fill{height:100%;border-radius:4px}
+.db-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;
+  width:80px;text-align:right;flex-shrink:0}
+.db-pct{font-size:10.5px;color:var(--ink3);width:32px;text-align:right;flex-shrink:0}
+
+/* tx list */
+.tx-list{display:flex;flex-direction:column;gap:0}
+.tx-item{display:flex;align-items:center;gap:11px;
+  padding:11px 14px;border-bottom:1px solid rgba(255,255,255,0.04);
+  transition:background 0.12s;cursor:default}
+.tx-item:last-child{border-bottom:none}
+.tx-item:hover{background:rgba(255,255,255,0.02)}
+.tx-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0}
+.tx-body{flex:1;min-width:0}
+.tx-title{font-size:12.5px;font-weight:500;color:var(--ink)}
+.tx-desc{font-size:10.5px;color:var(--ink2);margin-top:1px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.tx-right{text-align:right;flex-shrink:0}
+.tx-val{font-size:14px;font-weight:700;font-family:'DM Mono',monospace}
+.tx-hash{font-size:9.5px;color:var(--ink3);font-family:'DM Mono',monospace;margin-top:2px}
+.tx-time{font-size:10px;color:var(--ink3);font-family:'DM Mono',monospace}
+
+/* send modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);
+  z-index:200;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--p2);border:1px solid var(--b2);border-radius:18px;
+  padding:26px 28px;max-width:440px;width:92%;position:relative}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;
+  color:var(--ink3);font-size:18px;cursor:pointer;font-family:inherit;line-height:1}
+.modal-title{font-size:15px;font-weight:600;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--ink2);margin-bottom:20px;line-height:1.6}
+.m-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.m-label{font-size:11.5px;font-weight:500;color:var(--ink)}
+.m-input{background:rgba(0,0,0,0.35);border:1px solid var(--b2);border-radius:9px;
+  padding:10px 13px;font-family:'DM Mono',monospace;font-size:13px;color:var(--ink);
+  outline:none;transition:border-color 0.2s}
+.m-input:focus{border-color:rgba(29,158,117,0.5)}
+.m-input::placeholder{color:var(--ink3);font-family:'Noto Sans SC',sans-serif;font-size:12px}
+.m-hint{font-size:10.5px;color:var(--ink3);line-height:1.5}
+.m-preview{background:rgba(0,0,0,0.25);border:1px solid var(--b);border-radius:9px;
+  padding:11px 13px;margin-bottom:14px}
+.m-prev-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;
+  border-bottom:1px solid rgba(255,255,255,0.05)}
+.m-prev-row:last-child{border-bottom:none;font-weight:600}
+.m-prev-label{color:var(--ink2)}
+.m-confirm{width:100%;padding:11px;border-radius:10px;font-size:13px;font-weight:600;
+  border:none;cursor:pointer;font-family:inherit;background:var(--gd);
+  border:1px solid rgba(201,168,76,0.4);color:var(--gl);transition:all 0.18s}
+.m-confirm:hover{background:rgba(201,168,76,0.2)}
+
+/* toast */
+#toast{position:fixed;bottom:22px;right:22px;background:var(--p2);
+  border:1px solid rgba(29,158,117,0.4);border-radius:11px;
+  padding:11px 16px;display:flex;align-items:center;gap:9px;
+  font-size:12.5px;color:var(--teall);z-index:9999;
+  opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;min-width:240px}
+
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu 0.4s ease both}
+.fu1{animation-delay:.05s}.fu2{animation-delay:.12s}.fu3{animation-delay:.19s}.fu4{animation-delay:.26s}
+</style>
+<style id="qa-sidebar-css">
+/* HengAI V2.0 QA · 全站统一侧栏基线
+   设计原则：
+   1. 容器级规则使用 :where() 零特异性 —— 页面自己的 .sidebar{} 原生规则优先
+   2. 内部元素 (.sb-brand/.sb-item/...) 使用普通选择器 —— 提供基线视觉
+   3. 不动 .main —— 每页主区偏移由自家 CSS 决定（不污染 flex 布局）
+*/
+:where(.sidebar#sidebar[data-qa-version="2.0"]){width:200px;background:#0b0f19;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;overflow-y:auto;font-family:inherit}
+.sidebar .sb-brand{padding:17px 15px 13px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sidebar .sb-brand-ic{width:32px;height:32px;border-radius:9px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar .sb-brand-name{font-size:14px;font-weight:700;letter-spacing:.2px;color:#e6e9f2}
+.sidebar .sb-brand-sub{font-size:9.5px;color:#8a92a8;margin-top:1px}
+.sidebar .sb-group-title{font-size:9.5px;text-transform:uppercase;color:#8a92a8;letter-spacing:.6px;padding:14px 18px 6px;font-weight:600}
+.sidebar .sb-item{padding:9px 18px;font-size:12.5px;color:#c3cbdc;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .12s;border-left:2px solid transparent;font-family:inherit;line-height:1.3}
+.sidebar .sb-item:hover{background:rgba(255,255,255,0.03);color:#e6e9f2}
+.sidebar .sb-item.active{background:rgba(16,185,129,0.08);border-left-color:#10b981;color:#e6e9f2;font-weight:600}
+.sidebar .sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* 嵌入模式（?embed=1）：只露内容，侧栏/顶栏/老 .sb 全部隐藏，主区 margin 归零 */
+html[data-embed="1"] .sidebar,html[data-embed="1"] .sb,html[data-embed="1"] .topbar{display:none !important}
+html[data-embed="1"] body{padding-left:0 !important}
+html[data-embed="1"] .main,html[data-embed="1"] .main-wrap,html[data-embed="1"] .main-content{margin-left:0 !important}
+</style>
+<script src="hengai-embed-boot.js"></script>
+</head>
+<body>
+
+<!-- CANONICAL SIDEBAR — HengAI V3.5 工业主权网络 · MPA 统一版 -->
+
+<div class="sidebar" id="sidebar" data-qa-version="3.5">
+
+  <div class="sb-brand">
+
+    <div class="sb-brand-ic">
+
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+
+    </div>
+
+    <div>
+
+      <div class="sb-brand-name">HengAI</div>
+
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+
+    </div>
+
+  </div>
+
+
+
+  <div style="padding:12px 14px 4px;">
+
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+      返回 HengAI 对话
+
+    </div>
+
+  </div>
+
+
+
+  <div class="sb-group-title" id="g-personal">个人空间</div>
+
+  <div class="sb-item" data-page="overview" onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+
+  <div class="sb-item" data-page="achieve" onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+
+  <div class="sb-item" data-page="calc" onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+
+  <div class="sb-item" data-page="wallet" onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+
+  <div class="sb-item" data-page="resource" onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+
+
+
+  <div class="sb-group-title" id="g-business">企业工作台</div>
+
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+
+  <div class="sb-item" data-page="report" onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+
+  <div class="sb-item" data-page="decision" onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-item locked" data-page="supply" id="nav-supply" data-role-nav="sme-only" onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" id="dot-supply" style="background:var(--ink3)"></div>供应链协同</div>
+
+  <div class="sb-item locked" data-page="origin-audit" id="n-origin-audit" data-role-nav="origin-only" onclick="window.location.href='HengAI_HeavyIndustry_Suite.html'"><div class="sb-dot" id="dot-origin-audit" style="background:var(--ink3)"></div>产业主权看板</div>
+
+
+
+  <div class="sb-group-title" id="g-sovereign">大国重器 / 生态</div>
+
+  <div class="sb-item" data-page="honor" onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+
+  <div class="sb-item locked" data-page="eu" onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:var(--ink3)"></div>欧盟海关直连</div>
+
+  <div class="sb-item locked" data-page="dld" onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:var(--ink3)"></div>DLD 绿色信贷</div>
+
+  <div class="sb-item locked" data-page="acf" onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:var(--ink3)"></div>ACF 认证通道</div>
+
+  <div class="sb-item locked" data-page="gov" onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:var(--ink3)"></div>生态共治委员会</div>
+
+</div>
+
+<script id="qa-sidebar-active-script">
+
+(function(){
+
+  var map = {"全域中心.html":"overview","index.html":"overview","HengAI_CBAM测算工具.html":"calc","HengAI_星火成就档案.html":"achieve","HengAI_GM_Wallet.html":"wallet","HengAI_算力资源.html":"resource","HengAI_企业数字档案.html":"enterprise","HengAI_供应链协同.html":"supply","HengAI_全域诊断报告.html":"report","HengAI_决策层呈送包生成器.html":"decision","HengAI_HeavyIndustry_Suite.html":"origin-audit","HengAI_荣誉体系.html":"honor","HengAI_EU_Customs.html":"eu","HengAI_DLD_Credit.html":"dld","HengAI_ACF_Cert.html":"acf","HengAI_Governance.html":"gov"};
+
+  try {
+
+    var fn = decodeURIComponent((location.pathname.split("/").pop() || "").split("?")[0]);
+
+    var id = map[fn]; if (!id) return;
+
+    document.querySelectorAll(".sidebar .sb-item[data-page]").forEach(function(el){
+
+      if (el.getAttribute("data-page") === id) el.classList.add("active");
+
+    });
+
+  } catch(e){}
+
+})();
+
+</script>
+<!-- main -->
+<div class="main">
+<div class="topbar">
+  <div class="tl">
+    <span class="tt">GreenMark 绿印钱包</span>
+    <span class="pill pl-y">可流转资产</span>
+    <span class="pill" style="background:rgba(255,255,255,0.04);color:var(--ink2);border:1px solid var(--b)">
+      <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--green);margin-right:5px;animation:pulse 2s infinite"></span>
+      链上实时同步
+    </span>
+  </div>
+  <div class="tr">
+    <button class="tb-btn" onclick="openSend()">赠与合作伙伴</button>
+    <button class="tb-btn pri" onclick="showToast('获取更多 GM → 推动供应商填报可立即获得')">如何获取更多 GM</button>
+  </div>
+</div>
+<style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}</style>
+
+<div class="page">
+
+  <!-- WALLET HERO -->
+  <div class="wallet-hero fu fu1">
+    <div class="wh-top">
+      <div class="wh-coin">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <path d="M18 2L32 9V23C32 29 25.5 34 18 36C10.5 34 4 29 4 23V9L18 2Z" fill="rgba(201,168,76,0.12)" stroke="#c9a84c" stroke-width="1.5"/>
+          <path d="M12 11L15.5 14.5L18 10L20.5 14.5L24 11" fill="none" stroke="#c9a84c" stroke-width="1" stroke-linecap="round"/>
+          <text x="18" y="26" text-anchor="middle" font-size="9" font-weight="700" fill="#c9a84c" font-family="sans-serif">GM</text>
+        </svg>
+      </div>
+      <div class="wh-main">
+        <div class="wh-label">GreenMark 绿印 · 可流转余额</div>
+        <div>
+          <span class="wh-balance" id="wallet-balance-val">0</span>
+          <span class="wh-unit">GM</span>
+        </div>
+        <div class="wh-sub">
+          <div class="wh-sub-item"><div class="wh-dot" style="background:var(--greenl)"></div><span style="color:var(--greenl)">本月 +320 GM</span></div>
+          <div class="wh-sub-item"><div class="wh-dot" style="background:var(--teall)"></div><span style="color:var(--teall)">代际收益 +148 GM</span></div>
+          <div class="wh-sub-item"><div class="wh-dot" style="background:var(--ink3)"></div><span>已赠出 0 GM</span></div>
+        </div>
+      </div>
+      <div class="wh-right">
+        <div class="wh-addr">
+          <div class="wh-addr-label">CL-IVC 钱包地址</div>
+          <div class="wh-addr-val" id="wallet-address-val">#WL-TEMP</div>
+        </div>
+        <div class="wh-actions">
+          <button class="wa-btn wa-send" onclick="openSend()">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 10L10 2M10 2H5M10 2V7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>赠与
+          </button>
+          <button class="wa-btn wa-recv" onclick="showToast('收款二维码已生成')">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v8M6 9l-3-3M6 9l3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="1" y1="11" x2="11" y2="11" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>收款
+          </button>
+          <button class="wa-btn wa-hist" onclick="showToast('完整流水已导出')">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="1.5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1"/><line x1="3.5" y1="5" x2="8.5" y2="5" stroke="currentColor" stroke-width="0.9"/><line x1="3.5" y1="7" x2="6.5" y2="7" stroke="currentColor" stroke-width="0.9"/></svg>流水
+          </button>
+          <button class="wa-btn wa-earn" onclick="showToast('获取更多 GM → 推动供应商填报')">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1.5L7 4.5L10.5 5L8 7.5L8.5 11L6 9.5L3.5 11L4 7.5L1.5 5L5 4.5L6 1.5Z" stroke="currentColor" stroke-width="1"/></svg>获取
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="wh-stats">
+      <div class="whs-box">
+        <div class="whs-val" style="color:var(--gold)"><span id="wallet-strip-gm">0</span><span class="whs-unit">GM</span></div>
+        <div class="whs-label">可用余额</div>
+        <div class="whs-delta" style="color:var(--greenl)">↑ 本月净增 +320</div>
+      </div>
+      <div class="whs-box">
+        <div class="whs-val" style="color:var(--teall)">148<span class="whs-unit">GM</span></div>
+        <div class="whs-label">代际收益（本月）</div>
+        <div class="whs-delta" style="color:var(--teall)">来自 2 个二级节点</div>
+      </div>
+      <div class="whs-box">
+        <div class="whs-val" style="color:var(--ink2)">0<span class="whs-unit">GM</span></div>
+        <div class="whs-label">已赠出总量</div>
+        <div class="whs-delta" style="color:var(--ink3)">赠与不减少等级</div>
+      </div>
+      <div class="whs-box">
+        <div class="whs-val" style="color:var(--bluel)">2,160<span class="whs-unit">GM</span></div>
+        <div class="whs-label">距 Lv.4 还差</div>
+        <div class="whs-delta" style="color:var(--bluel)">2 个关键行动可达</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2 fu fu2" style="margin-bottom:16px">
+
+    <!-- Earn ways -->
+    <div class="card">
+      <div class="sh"><div class="sh-t">获取方式 <div class="sh-line"></div></div></div>
+      <div class="earn-grid" style="grid-template-columns:1fr 1fr">
+        <div class="earn-card c-g">
+          <div class="ec-head">
+            <div class="ec-title">推动供应商注册</div>
+            <span class="pill pl-g">+100 GM</span>
+          </div>
+          <div class="ec-desc">对方完成注册即算，无需等到填报完成</div>
+          <div class="ec-prog"><div class="ec-pfill" style="width:47%;background:var(--green)"></div></div>
+          <div style="font-size:10px;color:var(--ink3)">已触发 8 次 / 无上限</div>
+        </div>
+        <div class="earn-card c-b">
+          <div class="ec-head">
+            <div class="ec-title">供应商完成填报</div>
+            <span class="pill pl-b">+200 GM</span>
+          </div>
+          <div class="ec-desc">对方提交数据，链上核验通过即发放</div>
+          <div class="ec-prog"><div class="ec-pfill" style="width:24%;background:var(--bluel)"></div></div>
+          <div style="font-size:10px;color:var(--ink3)">已触发 2 次 / 无上限</div>
+        </div>
+        <div class="earn-card c-y">
+          <div class="ec-head">
+            <div class="ec-title">供应商付费升级</div>
+            <span class="pill pl-y">+500 GM</span>
+          </div>
+          <div class="ec-desc">你推动的节点升级为 HengAI 付费会员</div>
+          <div class="ec-prog"><div class="ec-pfill" style="width:20%;background:var(--gold)"></div></div>
+          <div style="font-size:10px;color:var(--ink3)">已触发 1 次 / 无上限</div>
+        </div>
+        <div class="earn-card c-t">
+          <div class="ec-head">
+            <div class="ec-title">代际收益</div>
+            <span class="pill pl-t">×20%</span>
+          </div>
+          <div class="ec-desc">你的节点推动了它的下游，自动计入</div>
+          <div class="ec-prog"><div class="ec-pfill" style="width:30%;background:var(--teal)"></div></div>
+          <div style="font-size:10px;color:var(--ink3)">累计 +348 GM · 持续流入</div>
+        </div>
+        <div class="earn-card c-p">
+          <div class="ec-head">
+            <div class="ec-title">CBAM 通关预演</div>
+            <span class="pill pl-p">+150 GM</span>
+          </div>
+          <div class="ec-desc">每完成一次预演，无论结果如何都算</div>
+          <div class="ec-prog"><div class="ec-pfill" style="width:60%;background:var(--purple)"></div></div>
+          <div style="font-size:10px;color:var(--ink3)">已触发 3 次 / 月度无上限</div>
+        </div>
+        <div class="earn-card c-r">
+          <div class="ec-head">
+            <div class="ec-title">数据置信度升级</div>
+            <span class="pill pl-t">+1,000 GM</span>
+          </div>
+          <div class="ec-desc">升至 <span class="dyn-customs-level">待确权</span> 时一次性发放</div>
+          <div class="ec-prog"><div class="ec-pfill" style="width:0%;background:var(--teall)"></div></div>
+          <div style="font-size:10px;color:var(--gold)">未解锁 · 接驳 MAT 网关触发</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Asset distribution -->
+    <div class="card">
+      <div class="sh"><div class="sh-t">资产来源分布 <div class="sh-line"></div></div></div>
+      <div class="distrib">
+        <div class="db-row">
+          <div class="db-label"><div class="db-name">供应链推动</div><div class="db-sub">主要贡献</div></div>
+          <div class="db-bar-track"><div class="db-bar-fill" style="width:44%;background:var(--green)"></div></div>
+          <div class="db-val" style="color:var(--greenl)">1,250</div>
+          <div class="db-pct">44%</div>
+        </div>
+        <div class="db-row">
+          <div class="db-label"><div class="db-name">合规认证</div><div class="db-sub">徽章 + 预演</div></div>
+          <div class="db-bar-track"><div class="db-bar-fill" style="width:25%;background:var(--bluel)"></div></div>
+          <div class="db-val" style="color:var(--bluel)">720</div>
+          <div class="db-pct">25%</div>
+        </div>
+        <div class="db-row">
+          <div class="db-label"><div class="db-name">代际收益</div><div class="db-sub">网络效应</div></div>
+          <div class="db-bar-track"><div class="db-bar-fill" style="width:12%;background:var(--teall)"></div></div>
+          <div class="db-val" style="color:var(--teall)">348</div>
+          <div class="db-pct">12%</div>
+        </div>
+        <div class="db-row">
+          <div class="db-label"><div class="db-name">会员权益</div><div class="db-sub">付费 + 注册</div></div>
+          <div class="db-bar-track"><div class="db-bar-fill" style="width:18%;background:var(--gold)"></div></div>
+          <div class="db-val" style="color:var(--gl)">522</div>
+          <div class="db-pct">18%</div>
+        </div>
+        <div class="db-row">
+          <div class="db-label"><div class="db-name">测算奖励</div><div class="db-sub">CBAM 工具</div></div>
+          <div class="db-bar-track"><div class="db-bar-fill" style="width:4%;background:var(--purpl)"></div></div>
+          <div class="db-val" style="color:var(--purpl)">100</div>
+          <div class="db-pct">4%</div>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div style="background:rgba(0,0,0,0.25);border:1px solid var(--b);border-radius:9px;padding:11px 13px">
+        <div style="font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">赠与规则说明</div>
+        <div style="font-size:11.5px;color:var(--ink2);line-height:1.75">
+          GM 可以赠与合作伙伴，赠与不影响您的等级判定（等级由<strong style="color:var(--ink)">历史累计 GM</strong>决定，不是当前余额）。类似比特币，您的算力记录是永久的，当前余额是流动的。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transaction history -->
+  <div class="sh fu fu3"><div class="sh-t">流水记录 <div class="sh-line"></div></div>
+    <span class="sh-a" onclick="showToast('完整流水 PDF 已生成')">导出全部 →</span>
+  </div>
+  <div class="card fu fu3" style="padding:0;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:8px 14px;
+      background:rgba(0,0,0,0.2);font-size:10px;color:var(--ink3);font-weight:600;
+      text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--b)">
+      <div>交易类型</div><div>对方 / 来源</div><div>链上哈希</div><div style="text-align:right">金额 / 时间</div>
+    </div>
+    <div class="tx-list">
+
+      <div class="tx-item">
+        <div class="tx-ic" style="background:var(--greend);border:1px solid rgba(59,158,74,0.3)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 12L12 2M12 2H7M12 2V7" stroke="var(--greenl)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="tx-body">
+          <div class="tx-title">供应商填报奖励</div>
+          <div class="tx-desc"><span class="dyn-ent-name">待完善企业档案</span> · Scope 3 数据核验通过</div>
+        </div>
+        <div style="flex:1;min-width:0;padding:0 12px">
+          <div class="tx-hash"><span class="dyn-wallet-hash">待确权</span></div>
+          <div style="font-size:10px;color:var(--teal);margin-top:2px">链上已确认</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-val" style="color:var(--greenl)">+200 GM</div>
+          <div class="tx-time">---</div>
+        </div>
+      </div>
+
+      <div class="tx-item">
+        <div class="tx-ic" style="background:var(--teald);border:1px solid rgba(29,158,117,0.3)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="3.5" r="1.8" stroke="var(--teall)" stroke-width="1"/><circle cx="2.5" cy="11" r="1.5" stroke="var(--teall)" stroke-width="1"/><circle cx="11.5" cy="11" r="1.5" stroke="var(--teall)" stroke-width="1"/><line x1="7" y1="5.3" x2="3.5" y2="9.5" stroke="var(--teall)" stroke-width="0.8"/><line x1="7" y1="5.3" x2="10.5" y2="9.5" stroke="var(--teall)" stroke-width="0.8"/></svg>
+        </div>
+        <div class="tx-body">
+          <div class="tx-title">代际收益</div>
+          <div class="tx-desc"><span class="dyn-ent-name">待完善企业档案</span> → 其供应商完成注册 × 20%</div>
+        </div>
+        <div style="flex:1;min-width:0;padding:0 12px">
+          <div class="tx-hash"><span class="dyn-wallet-hash">待确权</span></div>
+          <div style="font-size:10px;color:var(--teal);margin-top:2px">链上已确认</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-val" style="color:var(--teall)">+40 GM</div>
+          <div class="tx-time">---</div>
+        </div>
+      </div>
+
+      <div class="tx-item">
+        <div class="tx-ic" style="background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.28)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L8.3 5.3L12.5 5.8L9.5 8.8L10.3 13L7 11.2L3.7 13L4.5 8.8L1.5 5.8L5.7 5.3L7 1.5Z" stroke="var(--gold)" stroke-width="1.1"/></svg>
+        </div>
+        <div class="tx-body">
+          <div class="tx-title">CBAM 通关预演奖励</div>
+          <div class="tx-desc">第 3 次通关预演完成 · 置信度升 Lv.4 额外奖励</div>
+        </div>
+        <div style="flex:1;min-width:0;padding:0 12px">
+          <div class="tx-hash"><span class="dyn-wallet-hash">待确权</span></div>
+          <div style="font-size:10px;color:var(--teal);margin-top:2px">链上已确认</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-val" style="color:var(--gl)">+650 GM</div>
+          <div class="tx-time">---</div>
+        </div>
+      </div>
+
+      <div class="tx-item">
+        <div class="tx-ic" style="background:var(--blued);border:1px solid rgba(24,95,165,0.28)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="3.5" width="10" height="8" rx="1.5" stroke="var(--bluel)" stroke-width="1"/><path d="M5 3.5V3a2 2 0 014 0v.5" stroke="var(--bluel)" stroke-width="1"/><polyline points="5.5,7.5 6.5,8.5 8.5,7" stroke="var(--bluel)" stroke-width="1.1" stroke-linecap="round"/></svg>
+        </div>
+        <div class="tx-body">
+          <div class="tx-title">企业档案建立奖励</div>
+          <div class="tx-desc"><span class="dyn-ent-name">待完善企业档案</span> · 数字档案正式建立</div>
+        </div>
+        <div style="flex:1;min-width:0;padding:0 12px">
+          <div class="tx-hash"><span class="dyn-wallet-hash">待确权</span></div>
+          <div style="font-size:10px;color:var(--teal);margin-top:2px">链上已确认</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-val" style="color:var(--bluel)">+50 GM</div>
+          <div class="tx-time">---</div>
+        </div>
+      </div>
+
+      <div class="tx-item">
+        <div class="tx-ic" style="background:var(--purpd);border:1px solid rgba(127,119,221,0.28)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="var(--purpl)" stroke-width="1"/><line x1="7" y1="4" x2="7" y2="7.5" stroke="var(--purpl)" stroke-width="1.1"/><circle cx="7" cy="9.5" r="0.7" fill="var(--purpl)"/></svg>
+        </div>
+        <div class="tx-body">
+          <div class="tx-title">月度会员开通</div>
+          <div class="tx-desc">个人月度会员 · ¥99 · <span class="dyn-user-reg-date">待定</span> 起效</div>
+        </div>
+        <div style="flex:1;min-width:0;padding:0 12px">
+          <div class="tx-hash"><span class="dyn-wallet-hash">待确权</span></div>
+          <div style="font-size:10px;color:var(--teal);margin-top:2px">链上已确认</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-val" style="color:var(--purpl)">+50 GM</div>
+          <div class="tx-time">---</div>
+        </div>
+      </div>
+
+      <div class="tx-item">
+        <div class="tx-ic" style="background:var(--teald);border:1px solid rgba(29,158,117,0.28)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2L12.5 4.8V10.5L7 12.8L1.5 10.5V4.8L7 2Z" stroke="var(--teall)" stroke-width="1"/><polyline points="4.5,7 6.5,9 9.5,5.5" stroke="var(--teall)" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="tx-body">
+          <div class="tx-title">注册 · 首次 AI 问答</div>
+          <div class="tx-desc">HengAI 账户创建 · 完成 7 条 CBAM 问答</div>
+        </div>
+        <div style="flex:1;min-width:0;padding:0 12px">
+          <div class="tx-hash"><span class="dyn-wallet-hash">待确权</span></div>
+          <div style="font-size:10px;color:var(--teal);margin-top:2px">链上已确认</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-val" style="color:var(--teall)">+50 GM</div>
+          <div class="tx-time">---</div>
+        </div>
+      </div>
+
+    </div>
+    <div style="padding:12px 16px;background:rgba(0,0,0,0.2);border-top:1px solid var(--b);
+      display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:11.5px;color:var(--ink2)">历史累计获得 · 共 6 笔记录</span>
+      <span style="font-family:'DM Mono',monospace;font-size:17px;font-weight:700;color:var(--gold)"><span class="dyn-gm-balance">0</span> GM</span>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SEND MODAL -->
+<div class="modal-bg" id="send-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSend()">✕</button>
+    <div style="display:flex;align-items:center;gap:11px;margin-bottom:16px">
+      <div style="width:40px;height:40px;border-radius:10px;background:var(--teald);
+        border:1px solid rgba(29,158,117,0.3);display:flex;align-items:center;justify-content:center">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 16L16 2M16 2H9M16 2V9" stroke="var(--teall)" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div class="modal-title">赠与 GreenMark</div>
+        <div class="modal-sub">赠与不影响您的等级，历史累计 GM 永久计入等级判定</div>
+      </div>
+    </div>
+    <div class="m-field">
+      <div class="m-label">收款方钱包地址 / 供应商邀请码</div>
+      <input class="m-input" placeholder="输入 #WL- 开头的地址或供应商邀请码" id="send-to"
+        oninput="updatePreview()">
+      <div class="m-hint">收款方须为已注册 HengAI 的用户，赠与记录将永久链上存证</div>
+    </div>
+    <div class="m-field">
+      <div class="m-label">赠与数量（GM）</div>
+      <input class="m-input" type="number" placeholder="例：100" id="send-amount" min="1" max="999999"
+        oninput="updatePreview()" value="">
+      <div class="m-hint" id="send-hint" style="color:var(--gold)">当前可用余额：<span class="dyn-gm-balance">0</span> GM</div>
+    </div>
+    <div class="m-field">
+      <div class="m-label">备注（可选）</div>
+      <input class="m-input" placeholder="例：感谢配合碳数据填报" id="send-note">
+    </div>
+    <div class="m-preview" id="send-preview" style="display:none">
+      <div class="m-prev-row"><span class="m-prev-label">赠与金额</span><span id="pv-amount" style="color:var(--gold);font-family:'DM Mono',monospace;font-weight:700"></span></div>
+      <div class="m-prev-row"><span class="m-prev-label">赠与后余额</span><span id="pv-after" style="font-family:'DM Mono',monospace"></span></div>
+      <div class="m-prev-row"><span class="m-prev-label">等级影响</span><span style="color:var(--greenl)">无影响（历史累计不变）</span></div>
+      <div class="m-prev-row"><span class="m-prev-label">链上记录</span><span style="color:var(--teall)">永久存证</span></div>
+    </div>
+    <button class="m-confirm" onclick="confirmSend()">确认赠与 →</button>
+  </div>
+</div>
+
+<div id="toast"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="var(--teall)" stroke-width="1.5" stroke-linecap="round"/></svg><span id="toast-msg"></span></div>
+
+<script>
+function openSend(){document.getElementById('send-modal').classList.add('open')}
+function closeSend(){document.getElementById('send-modal').classList.remove('open')}
+function getWalletLiveBalance(){
+  var g=typeof window.__hengaiEmbedGm==='number'?window.__hengaiEmbedGm:0;
+  if(!g){
+    var el=document.getElementById('wallet-balance-val');
+    if(el){var n=parseInt(String(el.textContent).replace(/[^\d]/g,''),10);if(!isNaN(n))g=n;}
+  }
+  return g;
+}
+function updatePreview(){
+  const amt=parseInt(document.getElementById('send-amount').value)||0;
+  const to=document.getElementById('send-to').value;
+  const pv=document.getElementById('send-preview');
+  const bal=getWalletLiveBalance();
+  if(amt>0&&to){
+    pv.style.display='block';
+    document.getElementById('pv-amount').textContent=amt+' GM';
+    document.getElementById('pv-after').textContent=Math.max(0,bal-amt)+' GM';
+  } else {pv.style.display='none'}
+}
+function confirmSend(){
+  const amt=parseInt(document.getElementById('send-amount').value)||0;
+  const to=document.getElementById('send-to').value;
+  const bal=getWalletLiveBalance();
+  if(!to){showToast('请输入收款方地址');return}
+  if(!amt||amt<1){showToast('请输入赠与数量');return}
+  if(amt>bal){showToast('余额不足');return}
+  closeSend();
+  showToast('已赠出 '+amt+' GM · 链上存证中 · 等级不受影响');
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.style.opacity='1';t.style.transform='translateY(0)';
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)'},2600);
+}
+</script>
+<script>
+(function () {
+  function applyWalletPipeline(p) {
+    if (!p) return;
+    var user = p.user || {};
+    var gm = Number(user.gmBalance != null ? user.gmBalance : user.gm_balance != null ? user.gm_balance : 0);
+    window.__hengaiEmbedGm = gm;
+    var el = document.getElementById('wallet-balance-val');
+    if (el) el.textContent = gm.toLocaleString();
+    var st = document.getElementById('wallet-strip-gm');
+    if (st) st.textContent = gm.toLocaleString();
+    document.querySelectorAll('.dyn-gm-balance').forEach(function (node) { node.textContent = gm.toLocaleString(); });
+    var addr = document.getElementById('wallet-address-val');
+    if (addr) {
+      if (user.email) {
+        var local = String(user.email)
+          .split('@')[0]
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, '')
+          .slice(0, 10) || 'USER';
+        addr.innerHTML = '#WL-' + local + '-E87D<br>-B4F2-9A1C';
+      } else addr.innerHTML = '#WL-TEMP';
+    }
+    var hashText = (addr && addr.textContent ? addr.textContent : '').trim() || '待确权';
+    document.querySelectorAll('.dyn-wallet-hash').forEach(function (node) { node.textContent = hashText; });
+    var hint = document.getElementById('send-hint');
+    if (hint) hint.innerHTML = '当前可用余额：' + gm.toLocaleString() + ' GM';
+
+    var ledger = Array.isArray(p.gmLedger) ? p.gmLedger : [];
+    var genGm = Number(user.generationalGm != null ? user.generationalGm : user.generational_gm != null ? user.generational_gm : 0);
+    if (!Number.isFinite(genGm)) genGm = 0;
+    document.querySelectorAll('.dyn-generational-income').forEach(function (n) {
+      n.textContent = String(Math.max(0, Math.round(genGm)));
+    });
+
+    var list = document.querySelector('.tx-list');
+    var items = list ? list.querySelectorAll('.tx-item') : [];
+    if (!ledger.length) {
+      items.forEach(function (row, i) {
+        if (i === 0) {
+          row.style.display = '';
+          var t0 = row.querySelector('.tx-title');
+          var d0 = row.querySelector('.tx-desc');
+          var tm0 = row.querySelector('.tx-time');
+          var v0 = row.querySelector('.tx-val');
+          if (t0) t0.textContent = '暂无记录';
+          if (d0) d0.textContent = '完成 CBAM 测算或企业档案保存后，流水将在此显示';
+          if (tm0) tm0.textContent = '—';
+          if (v0) v0.textContent = '0 GM';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      return;
+    }
+    items.forEach(function (row) { row.style.display = ''; });
+    if (typeof window.hengaiBindTimelinesFromPayload === 'function') {
+      try { window.hengaiBindTimelinesFromPayload({ gmLedger: ledger }); } catch (_) {}
+    } else {
+      ledger.forEach(function (rec, i) {
+        if (!items[i]) return;
+        var timeEl = items[i].querySelector('.tx-time');
+        if (timeEl && rec && rec.createdAt) {
+          try {
+            var d = new Date(rec.createdAt);
+            timeEl.textContent = Number.isNaN(d.getTime()) ? '—' : (
+              String(d.getMonth() + 1).padStart(2, '0') + '-' +
+              String(d.getDate()).padStart(2, '0') + ' ' +
+              d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })
+            );
+          } catch (_) { timeEl.textContent = '—'; }
+        }
+      });
+    }
+  }
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || ev.data.type !== 'HENGAI_HUB_PIPELINE') return;
+    applyWalletPipeline(ev.data.payload);
+  });
+})();
+</script>
+<script src="hengai-module-pipeline.js"></script>
+</body>
+</html>

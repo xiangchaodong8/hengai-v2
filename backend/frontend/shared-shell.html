@@ -1,0 +1,317 @@
+<!--
+╔══════════════════════════════════════════════════════════════════════════╗
+║   HengAI Co2Lion · 全站共用外壳 V3.2                                     ║
+║   Topbar + Sidebar — 14 个模块 100% 统一引用                              ║
+║                                                                          ║
+║   使用方法（每个模块页面 <body> 开头直接粘贴此文件内容）：                  ║
+║     1. <link rel="stylesheet" href="shared-shell.css">                   ║
+║     2. <script src="AppState.js"></script>  （必须在 shell 之前）         ║
+║     3. 粘贴 #app-shell 区块                                              ║
+║     4. 在页面底部 DOMContentLoaded 中调用 initAppState(onReady)          ║
+╚══════════════════════════════════════════════════════════════════════════╝
+-->
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     TOPBAR
+     ═══════════════════════════════════════════════════════════════════ -->
+<header id="hg-topbar">
+
+  <!-- 左区：Logo + Phase Badge -->
+  <div class="hg-tb-left">
+    <div class="hg-tb-logo">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 1.5L16 5V11.5C16 14.5 12.8 17 9 18C5.2 17 2 14.5 2 11.5V5L9 1.5Z"
+              fill="rgba(0,229,160,0.12)" stroke="var(--accent)" stroke-width="1.3"/>
+        <polyline points="5.5,9.2 8,11.5 12.5,6.8"
+                  stroke="var(--accent-bright)" stroke-width="1.5"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Heng<em>AI</em></span>
+    </div>
+
+    <div class="hg-tb-phase ph1" id="hg-phase-badge">
+      <span class="hg-phase-dot"></span>
+      <span class="dyn-phase-code">P1</span>
+    </div>
+
+    <!-- 当前页面标题（各模块通过 data-page-title 覆盖） -->
+    <div class="hg-tb-title" id="hg-page-title">全域合规中心</div>
+  </div>
+
+  <!-- 中区：数据芯片 -->
+  <div class="hg-tb-chips">
+    <div class="hg-chip hg-chip-gm" title="GreenMark 绿印余额">
+      <span class="hg-chip-ico">🪙</span>
+      <span class="hg-chip-lbl">GM</span>
+      <span class="hg-chip-val dyn-gm-balance-num" id="headerTopGMValue">--</span>
+    </div>
+    <div class="hg-chip hg-chip-risk" title="CBAM 风险敞口">
+      <span class="hg-chip-lbl">风险</span>
+      <span class="hg-chip-val hg-danger dyn-risk-eur">--</span>
+    </div>
+    <div class="hg-chip hg-chip-co2" title="总碳排放">
+      <span class="hg-chip-lbl">tCO₂e</span>
+      <span class="hg-chip-val dyn-tco2e-topbar">--</span>
+    </div>
+    <div class="hg-chip hg-chip-tok" title="算力剩余">
+      <span class="hg-chip-lbl">Token</span>
+      <span class="hg-chip-val dyn-tokens-left">--</span>
+    </div>
+  </div>
+
+  <!-- 右区：用户头像 + 模式标识 -->
+  <div class="hg-tb-right">
+    <div class="hg-tb-mode-badge" id="hg-mode-badge" title="数据来源">MOCK</div>
+    <div class="hg-tb-avatar" id="headerIdentityAvatar"
+         onclick="window.location.href='HengAI_星火成就档案.html'"
+         title="查看个人档案">
+      ?
+    </div>
+    <span class="hg-tb-uname dyn-user-name" id="headerIdentityName">访客</span>
+  </div>
+
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SIDEBAR
+     ═══════════════════════════════════════════════════════════════════ -->
+<nav id="hg-sidebar">
+
+  <!-- Brand -->
+  <div class="hg-sb-brand">
+    <div class="hg-sb-brand-ic">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <path d="M11 2L20 6.5V14C20 17.5 16 20.5 11 22C6 20.5 2 17.5 2 14V6.5L11 2Z"
+              fill="rgba(0,229,160,0.10)" stroke="var(--accent)" stroke-width="1.3"/>
+        <polyline points="6.5,11.5 9.5,14.5 15.5,8.5"
+                  stroke="var(--accent-bright)" stroke-width="1.6"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="hg-sb-name">HengAI</div>
+      <div class="hg-sb-sub">Co2Lion 全域合规中心</div>
+    </div>
+  </div>
+
+  <!-- Phase Strip -->
+  <div class="hg-sb-phase-strip" id="hg-phase-strip">
+    <div class="hg-sb-phase-dot"></div>
+    <span id="sb-phase-text" class="dyn-phase-label">Phase 1 · 启蒙期</span>
+  </div>
+
+  <!-- User mini card -->
+  <div class="hg-sb-usercard">
+    <div class="hg-sb-uavatar dyn-user-name-initial">?</div>
+    <div class="hg-sb-uinfo">
+      <div class="hg-sb-uname dyn-user-name">访客</div>
+      <div class="hg-sb-utier" id="sb-urole">--</div>
+    </div>
+    <div class="hg-sb-ugm">
+      <span class="dyn-gm-balance-num">--</span>
+      <span class="hg-sb-ugm-unit">GM</span>
+    </div>
+  </div>
+
+  <!-- 返回对话 -->
+  <div class="hg-sb-back" onclick="window.location.href='index.html'">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path d="M1 6H11M1 6L4 3M1 6L4 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    返回 HengAI 对话
+  </div>
+
+  <!-- ── 个人工作台 ── -->
+  <div class="hg-sb-label">个人工作台</div>
+
+  <div class="hg-nav" data-slug="overview"
+       onclick="window.location.href='全域中心.html'">
+    <span class="hg-nav-ico">⚡</span>
+    <span class="hg-nav-lbl">全域总览</span>
+  </div>
+  <div class="hg-nav" data-slug="achieve"
+       onclick="window.location.href='HengAI_星火成就档案.html'">
+    <span class="hg-nav-ico">🏆</span>
+    <span class="hg-nav-lbl">星火成就档案</span>
+  </div>
+  <div class="hg-nav" data-slug="cbam"
+       onclick="window.location.href='HengAI_CBAM测算工具.html'">
+    <span class="hg-nav-ico">🔴</span>
+    <span class="hg-nav-lbl">CBAM 测算</span>
+  </div>
+  <div class="hg-nav" data-slug="compute"
+       onclick="window.location.href='HengAI_算力资源.html'">
+    <span class="hg-nav-ico">⚙️</span>
+    <span class="hg-nav-lbl">算力资源</span>
+  </div>
+  <div class="hg-nav" data-slug="regulation"
+       onclick="window.location.href='HengAI_法规知识库.html'">
+    <span class="hg-nav-ico">📜</span>
+    <span class="hg-nav-lbl">法规库</span>
+  </div>
+
+  <!-- ── 企业工作台 ── -->
+  <div class="hg-sb-label" style="margin-top:6px">企业工作台</div>
+
+  <div class="hg-nav" data-slug="company"
+       onclick="window.location.href='HengAI_企业数字档案.html'">
+    <span class="hg-nav-ico">🏢</span>
+    <span class="hg-nav-lbl">企业档案</span>
+  </div>
+  <div class="hg-nav" data-slug="supplychain"
+       onclick="window.location.href='HengAI_供应链协同.html'">
+    <span class="hg-nav-ico">🔗</span>
+    <span class="hg-nav-lbl">供应链协同</span>
+  </div>
+  <div class="hg-nav" data-slug="diagnosis"
+       onclick="window.location.href='HengAI_全域诊断报告.html'">
+    <span class="hg-nav-ico">🩺</span>
+    <span class="hg-nav-lbl">诊断报告</span>
+  </div>
+  <div class="hg-nav" data-slug="package"
+       onclick="window.location.href='HengAI_决策层呈送包生成器.html'">
+    <span class="hg-nav-ico">📦</span>
+    <span class="hg-nav-lbl">呈送包生成</span>
+  </div>
+
+  <!-- ── 大国重器 ── -->
+  <div class="hg-sb-label" style="margin-top:6px">大国重器</div>
+
+  <div class="hg-nav" data-slug="honor"
+       onclick="window.location.href='HengAI_荣誉体系.html'">
+    <span class="hg-nav-ico">🎖️</span>
+    <span class="hg-nav-lbl">荣誉体系</span>
+  </div>
+  <div class="hg-nav" data-slug="governance"
+       onclick="window.location.href='HengAI_Governance.html'">
+    <span class="hg-nav-ico">🌐</span>
+    <span class="hg-nav-lbl">共治委员会</span>
+  </div>
+
+  <!-- ── 深潜模块 ── -->
+  <div class="hg-sb-label" style="margin-top:6px">深潜模块</div>
+
+  <div class="hg-nav" data-slug="wallet"
+       onclick="window.location.href='HengAI_GM_Wallet.html'">
+    <span class="hg-nav-ico">🪙</span>
+    <span class="hg-nav-lbl">GM 绿印钱包</span>
+    <span class="hg-nav-badge dyn-gm-balance-num">--</span>
+  </div>
+  <div class="hg-nav" data-slug="customs"
+       onclick="window.location.href='HengAI_EU_Customs.html'">
+    <span class="hg-nav-ico">🛃</span>
+    <span class="hg-nav-lbl">欧盟海关直连</span>
+  </div>
+  <div class="hg-nav" data-slug="dld"
+       onclick="window.location.href='HengAI_DLD_Credit.html'">
+    <span class="hg-nav-ico">💎</span>
+    <span class="hg-nav-lbl">DLD 绿色信贷</span>
+  </div>
+  <div class="hg-nav" data-slug="acf"
+       onclick="window.location.href='HengAI_ACF_Cert.html'">
+    <span class="hg-nav-ico">🎗️</span>
+    <span class="hg-nav-lbl">ACF 大湾区认证</span>
+  </div>
+
+  <!-- 底部留白 -->
+  <div style="height:32px"></div>
+
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SHELL INIT SCRIPT  ——  自动高亮当前页菜单 + Phase badge 颜色
+     ═══════════════════════════════════════════════════════════════════ -->
+<script>
+(function initShell() {
+  /* ── 1. 页面 slug 识别 ── */
+  const PAGE_SLUG_MAP = {
+    '全域中心.html':                     'overview',
+    'index.html':                        'overview',
+    'HengAI_星火成就档案.html':          'achieve',
+    'HengAI_CBAM测算工具.html':          'cbam',
+    'HengAI_算力资源.html':              'compute',
+    'HengAI_法规知识库.html':            'regulation',
+    'HengAI_企业数字档案.html':          'company',
+    'HengAI_供应链协同.html':            'supplychain',
+    'HengAI_全域诊断报告.html':          'diagnosis',
+    'HengAI_决策层呈送包生成器.html':    'package',
+    'HengAI_荣誉体系.html':              'honor',
+    'HengAI_Governance.html':            'governance',
+    'HengAI_GM_Wallet.html':             'wallet',
+    'HengAI_EU_Customs.html':            'customs',
+    'HengAI_DLD_Credit.html':            'dld',
+    'HengAI_ACF_Cert.html':              'acf',
+  };
+  const PAGE_TITLE_MAP = {
+    'overview':    '全域总览',
+    'achieve':     '星火成就档案',
+    'cbam':        'CBAM 测算工具',
+    'compute':     '算力资源',
+    'regulation':  '法规知识库',
+    'company':     '企业数字档案',
+    'supplychain': '供应链协同',
+    'diagnosis':   '全域诊断报告',
+    'package':     '决策层呈送包',
+    'honor':       '荣誉体系',
+    'governance':  '共治委员会',
+    'wallet':      'GM 绿印钱包',
+    'customs':     '欧盟海关直连',
+    'dld':         'DLD 绿色信贷',
+    'acf':         'ACF 大湾区认证',
+  };
+
+  try {
+    const fn      = decodeURIComponent((location.pathname.split('/').pop() || '').split('?')[0]);
+    const slug    = PAGE_SLUG_MAP[fn] || '';
+    const titleEl = document.getElementById('hg-page-title');
+
+    /* 设置页面标题（若各模块页有 data-page-title attribute 则以模块为准） */
+    if (titleEl && slug) {
+      const override = document.body?.dataset?.pageTitle;
+      titleEl.textContent = override || PAGE_TITLE_MAP[slug] || '全域合规中心';
+    }
+
+    /* 高亮侧边栏当前项 */
+    if (slug) {
+      document.querySelectorAll('#hg-sidebar .hg-nav[data-slug]').forEach(el => {
+        el.classList.toggle('active', el.dataset.slug === slug);
+      });
+    }
+  } catch(e) {}
+
+  /* ── 2. Phase badge 颜色（由 AppState 初始化后的 syncAppState 负责更新，
+           此处提供初始占位颜色） ── */
+  function setPhaseColor(code) {
+    const badge = document.getElementById('hg-phase-badge');
+    if (!badge) return;
+    badge.className = 'hg-tb-phase';
+    if (code === 'Phase3') badge.classList.add('ph3');
+    else if (code === 'Phase2') badge.classList.add('ph2');
+    else badge.classList.add('ph1');
+  }
+
+  /* ── 3. 挂到 EventBus（AppState 可能晚于 shell 加载） ── */
+  function hookEventBus() {
+    if (!window.EventBus) return setTimeout(hookEventBus, 80);
+    EventBus.on('STATE_SYNCED', s => {
+      const phase = s?.flags?.currentPhase || 'Phase1';
+      setPhaseColor(phase);
+
+      const modeBadge = document.getElementById('hg-mode-badge');
+      if (modeBadge) {
+        const mode = s?._mode === 'live' ? 'LIVE' : 'MOCK';
+        modeBadge.textContent = mode;
+        modeBadge.style.background = mode === 'LIVE'
+          ? 'rgba(0,229,160,0.15)'
+          : 'rgba(167,139,250,0.15)';
+        modeBadge.style.color = mode === 'LIVE' ? 'var(--accent)' : 'var(--purple)';
+        modeBadge.style.borderColor = mode === 'LIVE'
+          ? 'rgba(0,229,160,0.35)'
+          : 'rgba(167,139,250,0.35)';
+      }
+    });
+  }
+  hookEventBus();
+
+})();
+</script>

@@ -1,0 +1,23 @@
+// ⚡ HengAI 子模块接管引擎 (V4.5)
+(function initEmbed() {
+    console.log("🛡️ HengAI 子模块已被特种部队接管...");
+    // 1. 静默等待父页面的数据灌注
+    window.addEventListener('message', function(e) {
+        if (e.data.type === 'HENGAI_HUB_PIPELINE') {
+            const data = e.data.payload;
+            // 2. 暴力消杀：直接用 API 数据覆盖全场所有的 dyn-* 节点
+            Object.keys(window.UI_MAP || {}).forEach(path => {
+                const ids = window.UI_MAP[path];
+                const value = path.split('.').reduce((o, i) => o?.[i], data);
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = (value != null) ? value : '---';
+                });
+            });
+            // 3. 驱动页面内的专用重绘（如雷达图、ROI瀑布图）
+            if (typeof window.refreshModuleUI === 'function') window.refreshModuleUI(data);
+        }
+    });
+    // 告知父页面：我已就绪，请倒水（发数据）
+    window.parent.postMessage({ type: 'EMBED_READY' }, '*');
+})();

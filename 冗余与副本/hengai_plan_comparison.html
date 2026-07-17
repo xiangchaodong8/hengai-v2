@@ -1,0 +1,268 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'SF Pro Text',sans-serif;background:transparent;color:var(--color-text-primary)}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:16px 18px}
+.lbl{font-size:11px;color:var(--color-text-secondary);letter-spacing:0.4px;text-transform:uppercase;font-weight:500;margin-bottom:10px}
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.bg-green{background:#eaf3de;color:#27500a}.bg-blue{background:#e6f1fb;color:#0c447c}
+.bg-amber{background:#faeeda;color:#633806}.bg-gray{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.bg-purple{background:#eeedfe;color:#3c3489}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:12px;font-weight:500;padding:7px 14px;border-radius:8px;border:0.5px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);cursor:pointer;transition:background 0.15s;white-space:nowrap}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-primary{background:#185fa5;border-color:#185fa5;color:#fff}
+.btn-primary:hover{background:#0c447c}
+.divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:12px 0}
+.feat-row{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.feat-row:last-child{border-bottom:none}
+.check{width:16px;height:16px;flex-shrink:0;margin-top:1px}
+.trigger-card{background:var(--color-background-secondary);border-radius:9px;padding:11px 13px;margin-bottom:8px;border-left:2.5px solid #185fa5}
+.trigger-card:last-child{margin-bottom:0}
+.trigger-card.green{border-left-color:#3b6d11}
+.trigger-card.amber{border-left-color:#854f0b}
+</style>
+
+<div style="display:flex;flex-direction:column;gap:14px;padding:2px 0">
+
+  <!-- 三栏对比卡 -->
+  <div class="g3">
+
+    <!-- 个人会员 -->
+    <div class="card">
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">个人会员</div>
+        <div style="font-size:26px;font-weight:500;color:var(--color-text-primary);letter-spacing:-0.5px;line-height:1">¥ 99<span style="font-size:13px;color:var(--color-text-secondary);font-weight:400"> / 月</span></div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px">或 ¥799 / 年（省 33%）</div>
+      </div>
+      <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">核心定位</div>
+      <div style="font-size:12.5px;color:var(--color-text-primary);line-height:1.65;margin-bottom:12px;background:var(--color-background-secondary);border-radius:8px;padding:9px 11px">个人解焦虑，用小钱化解工作难题，推动所在企业的供应链数据填报</div>
+      <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">功能权益</div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">企业碳数据上传与解析</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">CBAM 通关预演与底稿生成</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">ROI 测算与关税节省分析</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">邀请供应商填报（漏斗追踪）</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">基础碳档案 + 对外名片生成</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">决策层呈送包一键生成</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="none" stroke="var(--color-border-secondary)" stroke-width="1"/><line x1="6" y1="8" x2="10" y2="8" stroke="var(--color-border-secondary)" stroke-width="1.2"/></svg>
+        <div style="font-size:12px;color:var(--color-text-secondary)">多成员协作（仅限本人）</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="none" stroke="var(--color-border-secondary)" stroke-width="1"/><line x1="6" y1="8" x2="10" y2="8" stroke="var(--color-border-secondary)" stroke-width="1.2"/></svg>
+        <div style="font-size:12px;color:var(--color-text-secondary)">MAT / ZCP 基础设施接驳</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="none" stroke="var(--color-border-secondary)" stroke-width="1"/><line x1="6" y1="8" x2="10" y2="8" stroke="var(--color-border-secondary)" stroke-width="1.2"/></svg>
+        <div style="font-size:12px;color:var(--color-text-secondary)">欧盟海关系统直连申报</div>
+      </div>
+    </div>
+
+    <!-- 企业标准版（推荐，高亮） -->
+    <div class="card" style="border:2px solid var(--color-border-info)">
+      <div style="background:var(--color-background-info);color:var(--color-text-info);font-size:11px;font-weight:500;padding:4px 10px;border-radius:6px;display:inline-block;margin-bottom:10px">推荐升级目标</div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">企业标准版</div>
+        <div style="font-size:26px;font-weight:500;color:#185fa5;letter-spacing:-0.5px;line-height:1">¥ 29,800<span style="font-size:13px;color:var(--color-text-secondary);font-weight:400"> / 年</span></div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px">无限席位 · 全供应链协同</div>
+      </div>
+      <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">核心定位</div>
+      <div style="font-size:12.5px;color:var(--color-text-primary);line-height:1.65;margin-bottom:12px;background:#e6f1fb;border-radius:8px;padding:9px 11px;color:#0c447c">企业决策层正式接管，从个体推动升级为组织级运营，解锁全供应链数据协同与合规资产管理</div>
+      <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">在个人版基础上新增</div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)"><span style="font-weight:500">无限席位</span>，全部门成员可接入</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">全供应链数据协同看板</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">双向产业链位置全视图</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">合规资产库企业级归档</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">MAT / ZCP 基础设施接驳</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">欧盟海关系统直连申报</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">CL-IVC 供应链隐私存证</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">DLD 绿色信贷数据对接</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#e6f1fb" stroke="#185fa5" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">专属客户成功经理</div>
+      </div>
+    </div>
+
+    <!-- 企业旗舰版 -->
+    <div class="card">
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">企业旗舰版</div>
+        <div style="font-size:26px;font-weight:500;color:#27500a;letter-spacing:-0.5px;line-height:1">定制<span style="font-size:13px;color:var(--color-text-secondary);font-weight:400"> / 按需</span></div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px">含基础设施矩阵全套接入</div>
+      </div>
+      <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">核心定位</div>
+      <div style="font-size:12.5px;color:var(--color-text-primary);line-height:1.65;margin-bottom:12px;background:#eaf3de;border-radius:8px;padding:9px 11px;color:#27500a">从合规应对升级为主动经营，数据实时物理级采集，通关从被动变主动，构建竞争壁垒</div>
+      <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">在标准版基础上新增</div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#eaf3de" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">MAT 网关现场部署（实施服务）</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#eaf3de" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">置信度 Lv.4 物理级免检认证</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#eaf3de" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">ZCP 零碳套利全量启用</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#eaf3de" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">绿能资产时空动态映射</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#eaf3de" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">CL-GTS 欧盟海关直连报文</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#eaf3de" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">三年碳税趋势预测与对冲建议</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#eaf3de" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">专属实施顾问 + SLA 保障</div>
+      </div>
+      <div class="feat-row">
+        <svg class="check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#eaf3de" stroke="#3b6d11" stroke-width="1"/><polyline points="5,8 7,10.5 11,5.5" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <div style="font-size:12px;color:var(--color-text-primary)">产业链机密物理隐匿（可选）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 核心差异一句话总结 -->
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:12px">
+    <div style="background:var(--color-background-secondary);border-radius:9px;padding:12px 14px;text-align:center;border:0.5px solid var(--color-border-tertiary)">
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">个人会员的本质</div>
+      <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">一个人的救命稻草</div>
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px">自掏腰包·无需审批·解个人工作之困</div>
+    </div>
+    <div style="background:#e6f1fb;border-radius:9px;padding:12px 14px;text-align:center;border:0.5px solid #85b7eb">
+      <div style="font-size:11px;color:#185fa5;margin-bottom:5px">企业标准版的本质</div>
+      <div style="font-size:13px;font-weight:500;color:#0c447c">组织级的合规资产</div>
+      <div style="font-size:11px;color:#185fa5;margin-top:4px">决策层认可·多人协作·系统化运营</div>
+    </div>
+    <div style="background:#eaf3de;border-radius:9px;padding:12px 14px;text-align:center;border:0.5px solid #97c459">
+      <div style="font-size:11px;color:#3b6d11;margin-bottom:5px">企业旗舰版的本质</div>
+      <div style="font-size:13px;font-weight:500;color:#27500a">竞争维度的护城河</div>
+      <div style="font-size:11px;color:#3b6d11;margin-top:4px">物理级数据·主动套利·无惧任何审查</div>
+    </div>
+  </div>
+
+  <!-- 升级最佳时机 -->
+  <div class="card">
+    <div class="lbl">升级企业账户的最佳时机</div>
+    <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:14px;line-height:1.6">以下任意一个信号出现时，就是向决策层开口的最佳窗口——不需要等到"准备好了"，信号本身就是最好的开场白。</div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px">
+
+      <div class="trigger-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+          <div style="width:18px;height:18px;border-radius:50%;background:#e6f1fb;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div style="font-size:12.5px;font-weight:500;color:var(--color-text-primary)">ROI 报告生成后</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--color-text-secondary);line-height:1.6">你已经有了一份经财务审计的完整测算——ROI 1:9.1 是你向上司开口最有力的底气，数字会替你说话。</div>
+      </div>
+
+      <div class="trigger-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+          <div style="width:18px;height:18px;border-radius:50%;background:#e6f1fb;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div style="font-size:12.5px;font-weight:500;color:var(--color-text-primary)">供应商邀请漏斗超过 3 家</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--color-text-secondary);line-height:1.6">当供应链网络开始形成规模，多人协作和组织级管理的需求自然浮现，个人账户的边界开始显现。</div>
+      </div>
+
+      <div class="trigger-card green">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+          <div style="width:18px;height:18px;border-radius:50%;background:#eaf3de;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div style="font-size:12.5px;font-weight:500;color:var(--color-text-primary)">第一次 CBAM 申报窗口临近</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--color-text-secondary);line-height:1.6">申报截止日期是最天然的决策催化剂。企业标准版包含欧盟海关直连，可一键生成带互认签章的正式申报文件。</div>
+      </div>
+
+      <div class="trigger-card green">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+          <div style="width:18px;height:18px;border-radius:50%;background:#eaf3de;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div style="font-size:12.5px;font-weight:500;color:var(--color-text-primary)">决策层看过呈送报告后</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--color-text-secondary);line-height:1.6">当 CFO 或 CEO 确认数字逻辑成立，升级的障碍从"说服"变成"流程"，此时动作要快，趁热签单。</div>
+      </div>
+
+      <div class="trigger-card amber">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+          <div style="width:18px;height:18px;border-radius:50%;background:#faeeda;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="#854f0b" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div style="font-size:12.5px;font-weight:500;color:var(--color-text-primary)">竞争对手已开始行动</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--color-text-secondary);line-height:1.6">当同行开始接驳物理感知基础设施、获得 Lv.4 置信度时，Lv.2 数据将在欧盟海关形成明显劣势，先发优势窗口正在关闭。</div>
+      </div>
+
+      <div class="trigger-card amber">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+          <div style="width:18px;height:18px;border-radius:50%;background:#faeeda;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><polyline points="1,5 4,8 9,2" stroke="#854f0b" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <div style="font-size:12.5px;font-weight:500;color:var(--color-text-primary)">欧盟大客户提出要求</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--color-text-secondary);line-height:1.6">当下游欧盟买家要求提供高置信度碳数据证明时，企业级账户是响应这一要求的最快路径，也是维护大客户关系的直接理由。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部行动出口 -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn btn-primary" onclick="sendPrompt('帮我生成一份向决策层申请升级企业账户的内部请示，包含ROI数据和升级后的新增功能对比')">生成升级申请 ↗</button>
+    <button class="btn" onclick="sendPrompt('我们公司下个季度有CBAM申报窗口，帮我制定一个从个人会员升级到企业标准版的最优时间规划')">规划升级时间 ↗</button>
+    <button class="btn" onclick="sendPrompt('帮我详细介绍企业旗舰版的MAT网关和ZCP零碳签证接入流程')">了解旗舰版接入 ↗</button>
+  </div>
+
+</div>

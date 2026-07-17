@@ -1,0 +1,1232 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>全域碳合规诊断报告 · 企业版 · 2026</title>
+<script>
+/* 嵌入模式：?embed=1 时隐藏原页 chrome (sidebar/topbar)，仅呈现内容模块 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<style>
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .sb,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] .main,
+html[data-embed="1"] .main-wrap { margin-left: 0 !important; }
+html[data-embed="1"] body { padding-left: 0 !important; background: var(--night, #06080f) !important; }
+</style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --paper:#faf9f6;
+  --paper2:#f4f3ef;
+  --ink:#1a1c24;
+  --ink2:#52566a;
+  --ink3:#9297a8;
+  --ink4:#c8cad4;
+  --rule:#e4e3de;
+  --night:#06080f;
+  --red:#c0392b;--red-l:#e74c3c;--red-bg:#fdf2f0;--red-border:#f5c6c2;
+  --green:#1a6b2a;--green-m:#27ae60;--green-bg:#f0faf2;--green-border:#a8ddb5;
+  --gold:#8b6914;--gold-m:#c9a84c;--gold-bg:#fdf8ec;--gold-border:#e8d08a;
+  --blue:#0f4d8a;--blue-m:#185fa5;--blue-bg:#eef5fc;--blue-border:#a8c8ed;
+  --teal:#0d5c42;--teal-m:#1d9e75;--teal-bg:#ebf7f3;--teal-border:#7dd5b5;
+  --purple:#3d3591;--purple-m:#7f77dd;--purple-bg:#f0effb;--purple-border:#b8b4ed;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+html,body{
+  background:var(--paper2);
+  color:var(--ink);
+  font-family:'Noto Sans SC',sans-serif;
+  font-size:14px;
+  line-height:1.7;
+  min-height:100vh;
+}
+
+/* ── TOOLBAR ── */
+.toolbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:var(--night);
+  padding:0 32px;height:48px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;
+}
+.tb-brand{display:flex;align-items:center;gap:9px;font-size:12px;color:rgba(255,255,255,0.6)}
+.tb-brand strong{color:#fff;font-size:13px}
+.tb-center{display:flex;align-items:center;gap:6px}
+.mode-btn{
+  padding:5px 14px;border-radius:6px;font-size:11.5px;font-weight:600;
+  border:none;cursor:pointer;font-family:inherit;transition:all 0.2s;
+  letter-spacing:0.3px;
+}
+.mode-btn.active{background:#fff;color:var(--night)}
+.mode-btn.inactive{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.6)}
+.mode-btn.inactive:hover{background:rgba(255,255,255,0.18)}
+.tb-right{display:flex;align-items:center;gap:8px}
+.tb-btn{
+  padding:5px 14px;border-radius:6px;font-size:11.5px;font-weight:500;
+  cursor:pointer;font-family:inherit;transition:all 0.15s;border:none;
+}
+.tb-outline{background:transparent;border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.75)}
+.tb-outline:hover{border-color:rgba(255,255,255,0.5);color:#fff}
+.tb-primary{background:#1d9e75;color:#fff}
+.tb-primary:hover{background:#16836a}
+
+/* ── SHELL ── */
+.shell{padding-top:48px;min-height:100vh}
+
+/* ── VIEW MODES ── */
+.view{display:none}
+.view.active{display:block}
+
+/* ══════════════════════════════════════════
+   DECISION BRIEF (极简一页 for 决策层)
+══════════════════════════════════════════ */
+.brief-wrap{
+  max-width:820px;margin:0 auto;
+  padding:40px 32px 60px;
+}
+
+/* Brief cover line */
+.brief-header{
+  padding:32px 40px 28px;
+  background:var(--night);
+  border-radius:18px;
+  margin-bottom:28px;
+  position:relative;
+  overflow:hidden;
+}
+.brief-header::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#1d9e75,#c9a84c,#185fa5);
+}
+.bh-eyebrow{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,0.35);margin-bottom:12px}
+.bh-title{font-family:'Noto Serif SC',serif;font-size:24px;font-weight:700;
+  color:#fff;line-height:1.3;margin-bottom:6px}
+.bh-sub{font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:20px}
+.bh-meta{display:flex;gap:20px;flex-wrap:wrap}
+.bh-meta-item{font-size:11.5px;color:rgba(255,255,255,0.45)}
+.bh-meta-item strong{color:rgba(255,255,255,0.8);font-weight:500}
+
+/* Brief — three numbers */
+.brief-three{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+  margin-bottom:24px;
+}
+.b3-box{
+  border-radius:14px;padding:22px 20px;
+  border:1.5px solid;
+  position:relative;overflow:hidden;
+}
+.b3-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:8px}
+.b3-num{font-family:'DM Mono',monospace;font-size:36px;font-weight:700;
+  letter-spacing:-1.5px;line-height:1;margin-bottom:4px}
+.b3-unit{font-size:13px;font-weight:400}
+.b3-desc{font-size:11.5px;line-height:1.6;margin-top:8px}
+
+/* Brief — decision table */
+.decision-table{
+  border-radius:14px;overflow:hidden;border:1px solid var(--rule);
+  margin-bottom:24px;
+  background:#fff;
+}
+.dt-head{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  padding:10px 18px;background:var(--ink);
+  font-size:10px;font-weight:700;letter-spacing:0.8px;
+  text-transform:uppercase;color:rgba(255,255,255,0.55);
+}
+.dt-row{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  padding:13px 18px;
+  border-bottom:1px solid var(--rule);
+  align-items:center;
+  transition:background 0.1s;
+}
+.dt-row:last-child{border-bottom:none}
+.dt-row:hover{background:var(--paper)}
+.dt-measure{font-size:13px;font-weight:500;color:var(--ink)}
+.dt-measure-sub{font-size:10.5px;color:var(--ink3);margin-top:2px}
+.dt-status{font-size:12px;font-weight:600;font-family:'DM Mono',monospace}
+.dt-risk{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;
+  padding:2px 9px;border-radius:20px}
+.risk-high{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.risk-mid{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border)}
+.risk-low{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.dt-action{font-size:11.5px;color:var(--ink2)}
+
+/* Brief — single decision box */
+.decision-box{
+  background:var(--night);border-radius:14px;padding:24px 26px;
+  border-left:4px solid #1d9e75;
+  margin-bottom:24px;
+}
+.db-head{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:#1d9e75;margin-bottom:10px}
+.db-ask{font-size:19px;font-weight:600;color:#fff;margin-bottom:8px;line-height:1.4}
+.db-reason{font-size:12.5px;color:rgba(255,255,255,0.55);line-height:1.75}
+
+/* Brief — sign off */
+.signoff{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+  padding:18px 22px;background:#fff;border-radius:12px;
+  border:1px solid var(--rule);
+}
+.so-left{flex:1}
+.so-label{font-size:10px;color:var(--ink3);font-weight:600;letter-spacing:0.5px;
+  text-transform:uppercase;margin-bottom:4px}
+.so-name{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.so-meta{font-size:11.5px;color:var(--ink2)}
+.so-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;
+  padding:4px 12px;border-radius:20px;margin-top:8px;
+  background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)}
+.so-right{text-align:right;flex-shrink:0}
+.so-chain{font-size:9.5px;color:var(--ink3);margin-bottom:3px}
+.so-hash{font-family:'DM Mono',monospace;font-size:11px;color:var(--blue-m)}
+
+/* ══════════════════════════════════════════
+   FULL REPORT
+══════════════════════════════════════════ */
+.full-wrap{
+  max-width:900px;margin:0 auto;
+  padding:32px 28px 80px;
+  display:flex;flex-direction:column;gap:0;
+}
+
+/* Report cover */
+.rep-cover{
+  background:var(--night);border-radius:20px;
+  padding:0;overflow:hidden;margin-bottom:28px;
+  position:relative;
+}
+.rep-cover::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#1d9e75 0%,#c9a84c 50%,#185fa5 100%);
+}
+.rc-inner{padding:36px 40px 32px;display:flex;align-items:flex-start;gap:24px}
+.rc-left{flex:1}
+.rc-stamp{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,255,255,0.35);margin-bottom:14px;
+  padding:4px 12px;border-radius:20px;
+  border:1px solid rgba(255,255,255,0.1);
+}
+.rc-title{
+  font-family:'Noto Serif SC',serif;
+  font-size:30px;font-weight:700;color:#fff;
+  line-height:1.25;margin-bottom:8px;letter-spacing:-0.5px;
+}
+.rc-sub{font-size:13.5px;color:rgba(255,255,255,0.45);margin-bottom:20px}
+.rc-tags{display:flex;gap:8px;flex-wrap:wrap}
+.rc-tag{font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px}
+.rc-right{
+  flex-shrink:0;width:180px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:14px;padding:16px 18px;
+}
+.rc-kv{margin-bottom:10px}
+.rc-kv:last-child{margin-bottom:0}
+.rc-kv-l{font-size:9.5px;color:rgba(255,255,255,0.3);font-weight:600;letter-spacing:0.5px;
+  text-transform:uppercase;margin-bottom:2px}
+.rc-kv-v{font-size:13px;font-weight:500;color:rgba(255,255,255,0.8)}
+.rc-kv-v.danger{color:var(--red-l)}
+
+/* Section header */
+.sec{margin-bottom:28px}
+.sec-hd{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:16px;padding-bottom:10px;
+  border-bottom:1px solid var(--rule);
+}
+.sec-num{
+  width:28px;height:28px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;
+}
+.sec-title{font-family:'Noto Serif SC',serif;font-size:17px;font-weight:700;color:var(--ink)}
+.sec-en{font-size:10.5px;color:var(--ink3);margin-left:2px;letter-spacing:0.5px}
+.sec-badge{margin-left:auto}
+
+/* cards */
+.r-card{
+  background:#fff;border:1px solid var(--rule);
+  border-radius:14px;padding:20px 22px;
+  margin-bottom:14px;
+}
+.r-card:last-child{margin-bottom:0}
+
+/* KPI grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi-box{
+  background:#fff;border:1px solid var(--rule);
+  border-radius:12px;padding:14px 16px;
+  border-top:3px solid var(--rule);
+}
+.kpi-label{font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;
+  letter-spacing:0.5px;margin-bottom:6px}
+.kpi-val{font-family:'DM Mono',monospace;font-size:24px;font-weight:700;
+  letter-spacing:-0.5px;line-height:1;margin-bottom:3px}
+.kpi-unit{font-size:11px;font-weight:400;margin-left:2px}
+.kpi-sub{font-size:11px;color:var(--ink2);line-height:1.4;margin-top:4px}
+.kpi-trend{font-size:10px;font-weight:600;margin-top:5px}
+
+/* inline two-col */
+.r-g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-bottom:14px}
+.r-g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
+
+/* scope chart */
+.scope-chart{display:flex;flex-direction:column;gap:11px;padding:4px 0}
+.sc-row{display:flex;align-items:center;gap:12px}
+.sc-label{width:88px;flex-shrink:0}
+.sc-name{font-size:12.5px;font-weight:500;color:var(--ink)}
+.sc-sub{font-size:10px;color:var(--ink3)}
+.sc-bar-track{flex:1;height:10px;background:var(--paper2);border-radius:5px;overflow:hidden;border:1px solid var(--rule)}
+.sc-bar-fill{height:100%;border-radius:5px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.sc-val-wrap{width:100px;flex-shrink:0;text-align:right}
+.sc-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:600}
+.sc-pct{font-size:11px;color:var(--ink3);margin-left:6px}
+
+/* ROI waterfall */
+.waterfall{display:flex;flex-direction:column;gap:10px}
+.wf-row{display:flex;align-items:center;gap:14px;padding:10px 14px;
+  border-radius:10px;border:1px solid var(--rule);background:#fff}
+.wf-label{flex:1;font-size:12.5px;color:var(--ink)}
+.wf-sub{font-size:10.5px;color:var(--ink3);margin-top:2px}
+.wf-bar{width:140px;height:8px;background:var(--paper2);border-radius:4px;overflow:hidden;flex-shrink:0}
+.wf-bar-fill{height:100%;border-radius:4px}
+.wf-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;
+  width:80px;text-align:right;flex-shrink:0}
+
+/* supply chain table */
+.sc-table{width:100%;border-collapse:collapse}
+.sc-table th{
+  font-size:10px;color:var(--ink3);font-weight:700;text-transform:uppercase;
+  letter-spacing:0.5px;padding:8px 12px;
+  border-bottom:1px solid var(--rule);text-align:left;background:var(--paper)}
+.sc-table td{padding:11px 12px;border-bottom:1px solid var(--paper2);
+  font-size:12.5px;vertical-align:middle}
+.sc-table tr:last-child td{border-bottom:none}
+.sc-table tr:hover td{background:var(--paper)}
+.pill{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;
+  padding:2px 9px;border-radius:20px;white-space:nowrap}
+
+/* year projection */
+.year-bars{display:flex;align-items:flex-end;justify-content:center;gap:24px;
+  height:100px;margin:16px 0 12px}
+.yb-col{display:flex;flex-direction:column;align-items:center;gap:5px;width:56px}
+.yb-bar{width:40px;border-radius:5px 5px 0 0;transition:height 1s ease}
+.yb-val{font-family:'DM Mono',monospace;font-size:13px;font-weight:700}
+.yb-yr{font-size:10px;color:var(--ink3)}
+.yb-price{font-size:9.5px;color:var(--ink4)}
+
+/* recommendation cards */
+.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.rec-card{
+  border-radius:14px;padding:18px 18px;
+  border:1px solid;
+}
+.rec-num{font-size:11px;font-weight:700;margin-bottom:10px;letter-spacing:0.3px}
+.rec-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;
+  justify-content:center;margin-bottom:10px}
+.rec-title{font-size:13.5px;font-weight:600;margin-bottom:5px}
+.rec-desc{font-size:11.5px;line-height:1.7}
+.rec-impact{margin-top:10px;padding:7px 10px;border-radius:7px;font-size:11px;font-weight:600}
+.rec-timeline{margin-top:6px;font-size:10.5px;font-weight:500}
+
+/* milestone roadmap */
+.roadmap{display:flex;flex-direction:column;gap:0;position:relative;padding-left:36px}
+.roadmap::before{content:'';position:absolute;left:14px;top:20px;bottom:20px;
+  width:2px;background:var(--rule)}
+.rm-item{display:flex;gap:16px;padding-bottom:20px;position:relative}
+.rm-item:last-child{padding-bottom:0}
+.rm-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;
+  z-index:1;position:absolute;left:-36px}
+.rm-content{flex:1;background:#fff;border:1px solid var(--rule);
+  border-radius:12px;padding:14px 16px}
+.rm-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.rm-when{font-size:10.5px;font-weight:700;letter-spacing:0.5px}
+.rm-title{font-size:13px;font-weight:600;flex:1}
+.rm-desc{font-size:11.5px;color:var(--ink2);line-height:1.65}
+.rm-gm{font-size:10.5px;font-weight:600;color:var(--gold);margin-top:6px}
+
+/* divider */
+.divider{border:none;border-top:1px solid var(--rule);margin:16px 0}
+
+/* inline note */
+.note{
+  padding:11px 14px;border-radius:9px;font-size:12px;line-height:1.75;
+  display:flex;gap:10px;align-items:flex-start;margin-bottom:14px;
+}
+.note-g{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.note-r{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red)}
+.note-b{background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--blue)}
+.note-y{background:var(--gold-bg);border:1px solid var(--gold-border);color:var(--gold)}
+.note-t{background:var(--teal-bg);border:1px solid var(--teal-border);color:var(--teal)}
+.note svg{flex-shrink:0;margin-top:2px}
+
+/* footer */
+.rep-footer{
+  margin-top:32px;padding:20px 24px;
+  background:var(--night);border-radius:14px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+}
+.rf-left{font-size:11.5px;color:rgba(255,255,255,0.4);line-height:1.7}
+.rf-right{text-align:right;flex-shrink:0}
+.rf-chain{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:3px}
+.rf-sig{font-size:12.5px;font-weight:600;color:rgba(255,255,255,0.7)}
+
+/* confidence bar */
+.conf-bar{display:flex;gap:4px;margin:6px 0}
+.cb-step{flex:1;height:5px;border-radius:2px}
+
+/* print style */
+@media print{
+  .toolbar{display:none}
+  .shell{padding-top:0}
+  .brief-wrap,.full-wrap{padding-top:24px}
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp 0.5s ease both}
+.fu-1{animation-delay:0.1s}
+.fu-2{animation-delay:0.2s}
+.fu-3{animation-delay:0.3s}
+.fu-4{animation-delay:0.4s}
+.fu-5{animation-delay:0.5s}
+</style>
+<style>
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:220px;background:#0f1720;
+  border-right:1px solid rgba(255,255,255,0.08);padding:16px 14px;overflow:auto;z-index:50;
+}
+.sidebar .logo-tx{font-size:16px;font-weight:700;color:#e5e7eb}
+.sidebar .logo-sub{font-size:11px;color:#8aa0b6;margin-top:2px}
+.sidebar .nav-s{font-size:11px;color:#7f8ea3;margin:16px 0 8px}
+.sidebar .nav-i{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;color:#c7d2df;cursor:pointer}
+.sidebar .nav-i.active{background:rgba(59,158,74,0.14);color:#d4f5dc}
+.sidebar .nav-d{width:7px;height:7px;border-radius:50%}
+body{padding-left:220px}
+</style>
+<style id="qa-sidebar-css">
+/* HengAI V2.0 QA · 全站统一侧栏基线
+   设计原则：
+   1. 容器级规则使用 :where() 零特异性 —— 页面自己的 .sidebar{} 原生规则优先
+   2. 内部元素 (.sb-brand/.sb-item/...) 使用普通选择器 —— 提供基线视觉
+   3. 不动 .main —— 每页主区偏移由自家 CSS 决定（不污染 flex 布局）
+*/
+:where(.sidebar#sidebar[data-qa-version="2.0"]){width:200px;background:#0b0f19;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;overflow-y:auto;font-family:inherit}
+.sidebar .sb-brand{padding:17px 15px 13px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sidebar .sb-brand-ic{width:32px;height:32px;border-radius:9px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar .sb-brand-name{font-size:14px;font-weight:700;letter-spacing:.2px;color:#e6e9f2}
+.sidebar .sb-brand-sub{font-size:9.5px;color:#8a92a8;margin-top:1px}
+.sidebar .sb-group-title{font-size:9.5px;text-transform:uppercase;color:#8a92a8;letter-spacing:.6px;padding:14px 18px 6px;font-weight:600}
+.sidebar .sb-item{padding:9px 18px;font-size:12.5px;color:#c3cbdc;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .12s;border-left:2px solid transparent;font-family:inherit;line-height:1.3}
+.sidebar .sb-item:hover{background:rgba(255,255,255,0.03);color:#e6e9f2}
+.sidebar .sb-item.active{background:rgba(16,185,129,0.08);border-left-color:#10b981;color:#e6e9f2;font-weight:600}
+.sidebar .sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* 嵌入模式（?embed=1）：只露内容，侧栏/顶栏/老 .sb 全部隐藏，主区 margin 归零 */
+html[data-embed="1"] .sidebar,html[data-embed="1"] .sb,html[data-embed="1"] .topbar{display:none !important}
+html[data-embed="1"] body{padding-left:0 !important}
+html[data-embed="1"] .main,html[data-embed="1"] .main-wrap,html[data-embed="1"] .main-content{margin-left:0 !important}
+</style>
+<script src="hengai-embed-boot.js"></script>
+</head>
+<body>
+<!-- 🚨 任务 4D · 演示数据 Banner -->
+<div id="demo-data-watermark" style="position:fixed;top:0;left:0;right:0;z-index:9998;background:linear-gradient(90deg,rgba(201,168,76,0.18) 0%,rgba(59,158,74,0.12) 100%);border-bottom:1px solid rgba(201,168,76,0.35);color:#f0d080;padding:7px 18px;font-size:11.5px;display:flex;align-items:center;gap:10px;line-height:1.5;backdrop-filter:blur(8px)">
+  <svg width="13" height="13" viewBox="0 0 14 14" fill="none" style="flex-shrink:0"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="#f0d080" stroke-width="1.1" fill="rgba(201,168,76,0.12)"/><text x="7" y="9" text-anchor="middle" font-size="7" font-weight="700" fill="#f0d080">!</text></svg>
+  <div><b>诊断引擎 Demo · 等待真实数据</b> · 图表与 KPI 均由 AppState 与测算结果动态灌注；未建档前展示为零或占位符。完成企业数字档案后，AI 将基于您的实际数据重新生成诊断。</div>
+  <span style="margin-left:auto;cursor:pointer;color:rgba(240,208,128,.6);font-size:14px" onclick="document.getElementById('demo-data-watermark').style.display='none'">×</span>
+</div>
+<style>body{padding-top:36px}</style>
+
+<!-- CANONICAL SIDEBAR — HengAI V3.5 工业主权网络 · MPA 统一版 -->
+
+<div class="sidebar" id="sidebar" data-qa-version="3.5">
+
+  <div class="sb-brand">
+
+    <div class="sb-brand-ic">
+
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+
+    </div>
+
+    <div>
+
+      <div class="sb-brand-name">HengAI</div>
+
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+
+    </div>
+
+  </div>
+
+
+
+  <div style="padding:12px 14px 4px;">
+
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+      返回 HengAI 对话
+
+    </div>
+
+  </div>
+
+
+
+  <div class="sb-group-title" id="g-personal">个人空间</div>
+
+  <div class="sb-item" data-page="overview" onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+
+  <div class="sb-item" data-page="achieve" onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+
+  <div class="sb-item" data-page="calc" onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+
+  <div class="sb-item" data-page="wallet" onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+
+  <div class="sb-item" data-page="resource" onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+
+
+
+  <div class="sb-group-title" id="g-business">企业工作台</div>
+
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+
+  <div class="sb-item" data-page="report" onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+
+  <div class="sb-item" data-page="decision" onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-item locked" data-page="supply" id="nav-supply" data-role-nav="sme-only" onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" id="dot-supply" style="background:var(--ink3)"></div>供应链协同</div>
+
+  <div class="sb-item locked" data-page="origin-audit" id="n-origin-audit" data-role-nav="origin-only" onclick="window.location.href='HengAI_HeavyIndustry_Suite.html'"><div class="sb-dot" id="dot-origin-audit" style="background:var(--ink3)"></div>产业主权看板</div>
+
+
+
+  <div class="sb-group-title" id="g-sovereign">大国重器 / 生态</div>
+
+  <div class="sb-item" data-page="honor" onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+
+  <div class="sb-item locked" data-page="eu" onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:var(--ink3)"></div>欧盟海关直连</div>
+
+  <div class="sb-item locked" data-page="dld" onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:var(--ink3)"></div>DLD 绿色信贷</div>
+
+  <div class="sb-item locked" data-page="acf" onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:var(--ink3)"></div>ACF 认证通道</div>
+
+  <div class="sb-item locked" data-page="gov" onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:var(--ink3)"></div>生态共治委员会</div>
+
+</div>
+
+<script id="qa-sidebar-active-script">
+
+(function(){
+
+  var map = {"全域中心.html":"overview","index.html":"overview","HengAI_CBAM测算工具.html":"calc","HengAI_星火成就档案.html":"achieve","HengAI_GM_Wallet.html":"wallet","HengAI_算力资源.html":"resource","HengAI_企业数字档案.html":"enterprise","HengAI_供应链协同.html":"supply","HengAI_全域诊断报告.html":"report","HengAI_决策层呈送包生成器.html":"decision","HengAI_HeavyIndustry_Suite.html":"origin-audit","HengAI_荣誉体系.html":"honor","HengAI_EU_Customs.html":"eu","HengAI_DLD_Credit.html":"dld","HengAI_ACF_Cert.html":"acf","HengAI_Governance.html":"gov"};
+
+  try {
+
+    var fn = decodeURIComponent((location.pathname.split("/").pop() || "").split("?")[0]);
+
+    var id = map[fn]; if (!id) return;
+
+    document.querySelectorAll(".sidebar .sb-item[data-page]").forEach(function(el){
+
+      if (el.getAttribute("data-page") === id) el.classList.add("active");
+
+    });
+
+  } catch(e){}
+
+})();
+
+</script>
+<!-- ── TOOLBAR ── -->
+<div class="toolbar">
+  <div class="tb-brand">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M8 1L15 4.5V11.5L8 15L1 11.5V4.5L8 1Z" stroke="#1d9e75" stroke-width="1.2" fill="rgba(29,158,117,0.15)"/>
+      <polyline points="5,8 7.5,10.5 11.5,6" stroke="#6dd5b0" stroke-width="1.3" stroke-linecap="round"/>
+    </svg>
+    <span>HengAI</span>
+    <span style="color:rgba(255,255,255,0.2)">·</span>
+    <strong>全域碳合规诊断报告</strong>
+  </div>
+  <div class="tb-center">
+    <button class="mode-btn active" id="btn-brief" onclick="setMode('brief')">决策层简报</button>
+    <button class="mode-btn inactive" id="btn-full" onclick="setMode('full')">完整诊断报告</button>
+  </div>
+  <div class="tb-right">
+    <button class="tb-btn tb-outline" onclick="window.print()">导出 PDF</button>
+    <button class="tb-btn tb-outline" onclick="shareReport()">分享链接</button>
+    <button class="tb-btn tb-primary" onclick="showToast('企业档案已关联，供应链协同已解锁')">建立企业档案 →</button>
+  </div>
+</div>
+
+<div class="shell">
+
+<!-- ══════════════════════════════════════════════
+     VIEW 1: DECISION BRIEF (决策层简报)
+══════════════════════════════════════════════ -->
+<div class="view active" id="view-brief">
+<div class="brief-wrap">
+
+  <!-- Cover -->
+  <div class="brief-header fu fu-1">
+    <div class="bh-eyebrow">HengAI 全域碳合规诊断 · 决策层简报</div>
+    <div class="bh-title"><span class="dyn-ent-name">未录入</span><br>2026 年度 CBAM 合规风险与对冲方案</div>
+    <div class="bh-sub">本报告由 HengAI 个人智库生成，供决策层评估合规风险与升级投资决策</div>
+    <div class="bh-meta">
+      <div class="bh-meta-item">报告人 <strong><span class="dyn-user-name"></span> · 合规负责人</strong></div>
+      <div class="bh-meta-item">生成时间 <strong><span data-state-bind="diagnostic.generatedAt" data-state-fmt="dt" data-empty="待记录">---</span></strong></div>
+      <div class="bh-meta-item">数据基准 <strong>CBAM 官方算法 v2.4</strong></div>
+      <div class="bh-meta-item">链上存证 <strong>CL-IVC · 待确权-9A1C</strong></div>
+    </div>
+  </div>
+
+  <!-- Three critical numbers -->
+  <div class="brief-three fu fu-2">
+    <div class="b3-box" style="background:var(--red-bg);border-color:var(--red-border)">
+      <div class="b3-eyebrow" style="color:var(--red)">如果什么都不做</div>
+      <div class="b3-num" style="color:var(--red)"><span id="rep-tax-exposure" class="dyn-rep-tax">待测算</span></div>
+      <div class="b3-desc" style="color:#7a2020">2026 年 CBAM 碳税预测敞口。若不处理，随碳价上涨将逐年递增——2028 年预测突破 € 230k。</div>
+    </div>
+    <div class="b3-box" style="background:var(--gold-bg);border-color:var(--gold-border)">
+      <div class="b3-eyebrow" style="color:var(--gold)">如果启动三项方案</div>
+      <div class="b3-num" style="color:var(--gold)">¥ 58<span class="b3-unit">,000</span></div>
+      <div class="b3-desc" style="color:#6b4f10">三项合规升级的年度总投入：MAT 网关、ZCP 签证、供应链协同工具。一次性部署，长期有效。</div>
+    </div>
+    <div class="b3-box" style="background:var(--green-bg);border-color:var(--green-border)">
+      <div class="b3-eyebrow" style="color:var(--green)">净效益</div>
+      <div class="b3-num" style="color:var(--green)"><span id="rep-roi-ratio" class="dyn-rep-roi">待测算</span></div>
+      <div class="b3-desc" style="color:#1a4a25">投资回报比。投入 ¥58k，年度净节税 <span class="dyn-rep-save">待测算</span>（€ 67,274 等值）。同行已开始部署，先发优势窗口正在关闭。</div>
+    </div>
+  </div>
+
+  <!-- Decision table -->
+  <div class="decision-table fu fu-3">
+    <div class="dt-head">
+      <div>问题维度</div><div>当前状态</div><div>风险等级</div><div>建议行动</div>
+    </div>
+    <div class="dt-row">
+      <div><div class="dt-measure">数据申报置信度</div><div class="dt-measure-sub">欧盟海关数据核验层级</div></div>
+      <div class="dt-status" style="color:#c0392b">Lv.2 人工凭证</div>
+      <div><span class="dt-risk risk-high">高风险</span></div>
+      <div class="dt-action">接驳 MAT 物理网关 → 升至 Lv.4，消除 35% 惩罚溢价</div>
+    </div>
+    <div class="dt-row">
+      <div><div class="dt-measure">供应链穿透率</div><div class="dt-measure-sub">Scope 3 数据覆盖现状</div></div>
+      <div class="dt-status dyn-sup-pct" style="color:#c0392b">待测算</div>
+      <div><span class="dt-risk risk-high">高风险</span></div>
+      <div class="dt-action">启动供应链协同 → 目标 80%，降低 Scope 3 估算偏差</div>
+    </div>
+    <div class="dt-row">
+      <div><div class="dt-measure">绿电使用比例</div><div class="dt-measure-sub">Scope 2 降碳潜力</div></div>
+      <div class="dt-status" style="color:#c9a84c">0%</div>
+      <div><span class="dt-risk risk-mid">中等</span></div>
+      <div class="dt-action">引入 ZCP 绿电签证 → 可降低 Scope 2 排放 40-60%</div>
+    </div>
+    <div class="dt-row">
+      <div><div class="dt-measure">产品碳强度</div><div class="dt-measure-sub">vs 行业均值基准</div></div>
+      <div class="dt-status dyn-carbon-intensity" style="color:#c9a84c">—</div>
+      <div><span class="dt-risk risk-mid">中等</span></div>
+      <div class="dt-action">切换云南水电铝原料 → 碳强度可降至约 0.95 t/t</div>
+    </div>
+    <div class="dt-row">
+      <div><div class="dt-measure">CBAM 申报合规性</div><div class="dt-measure-sub">欧盟通关就绪度</div></div>
+      <div class="dt-status" style="color:#27ae60">首次预演完成</div>
+      <div><span class="dt-risk risk-low">可控</span></div>
+      <div class="dt-action">已完成 3 次通关预演，正式申报路径清晰</div>
+    </div>
+  </div>
+
+  <!-- The ask -->
+  <div class="decision-box fu fu-4">
+    <div class="db-head">请管理层决策</div>
+    <div class="db-ask">授权启动 Co2Lion 企业合规基础设施升级，年度预算 ¥58,000</div>
+    <div class="db-reason">
+      此投入将消除 <span class="dyn-rep-tax">待测算</span> 的碳税敞口，净节税 <span class="dyn-rep-save">待测算</span>，ROI <span class="dyn-rep-roi">待测算</span>。<br>
+      当前同行企业已开始接驳 MAT 物理传感器，率先完成 Lv.4 认证的企业将在欧盟采购商评级中获得优势，
+      先发窗口预计在 2026 Q3 关闭。<br>
+      本方案由合规负责人<span class="dyn-user-name"></span>使用 HengAI 个人智库完成全程诊断，数据已通过 CL-IVC 主权链存证，可供独立核验。
+    </div>
+  </div>
+
+  <!-- Sign off -->
+  <div class="signoff fu fu-5">
+    <div class="so-left">
+      <div class="so-label">报告提交方</div>
+      <div class="so-name"><span class="dyn-user-name"></span></div>
+      <div class="so-meta"><span class="dyn-ent-name">未录入</span> · 合规负责人 · <span data-state-bind="diagnostic.generatedAt" data-state-fmt="dt" data-empty="待记录">---</span></div>
+      <div class="so-badge">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L11 3.5V8.5L6 11L1 8.5V3.5L6 1Z" stroke="var(--teal)" stroke-width="1" fill="var(--teal-bg)"/><polyline points="3.5,6 5.5,8 8.5,4.5" stroke="var(--teal)" stroke-width="1.1" stroke-linecap="round"/></svg>
+        HengAI 个人智库生成 · CL-IVC 链上存证 · 待确权-9A1C-2604
+      </div>
+    </div>
+    <div class="so-right">
+      <div class="so-chain">链上核验码</div>
+      <div class="so-hash">待确权-9A1C-2604-E87D</div>
+      <div style="margin-top:8px;display:flex;justify-content:flex-end;gap:8px">
+        <button style="padding:6px 14px;border-radius:7px;font-size:11.5px;font-weight:600;border:1px solid var(--rule);background:#fff;cursor:pointer;font-family:inherit;color:var(--ink)" onclick="setMode('full')">查看完整诊断报告</button>
+        <button style="padding:6px 14px;border-radius:7px;font-size:11.5px;font-weight:600;border:none;background:var(--ink);color:#fff;cursor:pointer;font-family:inherit" onclick="window.print()">下载 PDF</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     VIEW 2: FULL REPORT
+══════════════════════════════════════════════ -->
+<div class="view" id="view-full">
+<div class="full-wrap">
+
+  <!-- Cover -->
+  <div class="rep-cover fu fu-1">
+    <div class="rc-inner">
+      <div class="rc-left">
+        <div class="rc-stamp">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 0.8L9.5 3V7L5 9.2L0.5 7V3L5 0.8Z" stroke="#1d9e75" stroke-width="0.9"/><polyline points="2.5,5 4.5,7 7.5,3" stroke="#6dd5b0" stroke-width="1" stroke-linecap="round"/></svg>
+          HengAI 全域诊断报告 · 已链上存证
+        </div>
+        <div class="rc-title">全域碳合规诊断报告<br><span class="dyn-ent-name">未录入</span></div>
+        <div class="rc-sub">2026 年度 · CBAM 风险全景 · 供应链穿透 · 升级路径</div>
+        <div class="rc-tags">
+          <span class="rc-tag" style="background:rgba(226,75,74,0.2);color:#fca5a5;border:1px solid rgba(226,75,74,0.3)">碳税敞口 <span class="dyn-rep-tax">待测算</span></span>
+          <span class="rc-tag" style="background:rgba(201,168,76,0.2);color:#fcd34d;border:1px solid rgba(201,168,76,0.3)">供应链覆盖率 <span class="dyn-sup-pct">待测算</span></span>
+          <span class="rc-tag" style="background:rgba(29,158,117,0.2);color:#6dd5b0;border:1px solid rgba(29,158,117,0.3)">ROI <span class="dyn-rep-roi">待测算</span></span>
+          <span class="rc-tag" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1)">数据置信度 Lv.2</span>
+        </div>
+      </div>
+      <div class="rc-right">
+        <div class="rc-kv"><div class="rc-kv-l">企业</div><div class="rc-kv-v"><span class="dyn-ent-name">未录入</span></div></div>
+        <div class="rc-kv"><div class="rc-kv-l">报告人</div><div class="rc-kv-v"><span class="dyn-user-name"></span> · 合规负责人</div></div>
+        <div class="rc-kv"><div class="rc-kv-l">报告日期</div><div class="rc-kv-v"><span class="dyn-diag-date" data-state-bind="diagnostic.generatedAt" data-state-fmt="dt" data-empty="待记录">---</span></div></div>
+        <div class="rc-kv"><div class="rc-kv-l">算法版本</div><div class="rc-kv-v">CBAM v2.4</div></div>
+        <div class="rc-kv"><div class="rc-kv-l">碳税敞口</div><div class="rc-kv-v danger"><span class="dyn-rep-tax">待测算</span></div></div>
+        <div class="rc-kv"><div class="rc-kv-l">链上核验</div><div class="rc-kv-v" style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.5)">待确权-9A1C</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S1: EXECUTIVE KPIs -->
+  <div class="sec fu fu-2">
+    <div class="sec-hd">
+      <div class="sec-num" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)">01</div>
+      <div><div class="sec-title">核心风险指标</div><div class="sec-en">Core Risk Metrics</div></div>
+      <div class="sec-badge"><span class="pill" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)">须立即关注</span></div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-box" style="border-top-color:var(--red-l)">
+        <div class="kpi-label">年度碳税敞口</div>
+        <div class="kpi-val" style="color:var(--red)"><span class="dyn-rep-tax">待测算</span></div>
+        <div class="kpi-sub">含 Lv.2 惩罚溢价 ×1.35</div>
+        <div class="kpi-trend" style="color:var(--red)">↑ 2028 年预测 € 230k</div>
+      </div>
+      <div class="kpi-box" style="border-top-color:var(--gold-m)">
+        <div class="kpi-label">综合碳强度</div>
+        <div class="kpi-val" style="color:var(--gold)"><span class="dyn-tax-intensity">0.00</span><span class="kpi-unit"> t/t</span></div>
+        <div class="kpi-sub">行业均值 2.14 t/t</div>
+        <div class="kpi-trend" style="color:var(--gold-m)">优于均值 15% · 仍有提升空间</div>
+      </div>
+      <div class="kpi-box" style="border-top-color:var(--red-l)">
+        <div class="kpi-label">供应链穿透率</div>
+        <div class="kpi-val dyn-sup-pct" style="color:var(--red)">待测算</div>
+        <div class="kpi-sub"><span class="dyn-sup-count">0</span> / <span class="dyn-sup-total">0</span> 家供应商已填报</div>
+        <div class="kpi-trend" style="color:var(--red)">↓ Scope 3 黑盒风险极高</div>
+      </div>
+      <div class="kpi-box" style="border-top-color:var(--gold-m)">
+        <div class="kpi-label">数据置信度</div>
+        <div class="kpi-val" style="color:var(--gold)">Lv.2</div>
+        <div class="kpi-sub">人工凭证申报</div>
+        <div class="kpi-trend" style="color:var(--gold-m)">惩罚系数 ×1.35 · 每年损耗 € 38k</div>
+      </div>
+    </div>
+    <div class="note note-r">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0;margin-top:2px"><path d="M7 1.5L13 4.5V10.5L7 13.5L1 10.5V4.5L7 1.5Z" stroke="var(--red)" stroke-width="1" fill="var(--red-bg)"/><line x1="7" y1="5" x2="7" y2="8.5" stroke="var(--red)" stroke-width="1.1"/><circle cx="7" cy="10" r="0.7" fill="var(--red)"/></svg>
+      <div>当前 Lv.2 人工凭证申报模式每年额外承担 <strong>€ 38,000 惩罚溢价</strong>（35% 不确定性附加）。接驳 MAT 物理网关升至 Lv.4 后，此部分损耗可立即消除，年节税效果直接可见。</div>
+    </div>
+  </div>
+
+  <!-- S2: EMISSION BREAKDOWN -->
+  <div class="sec fu fu-3">
+    <div class="sec-hd">
+      <div class="sec-num" style="background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border)">02</div>
+      <div><div class="sec-title">排放来源深度拆解</div><div class="sec-en">Emission Source Breakdown</div></div>
+    </div>
+    <div class="r-g2">
+      <div class="r-card">
+        <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.5px">三大排放维度</div>
+        <div class="scope-chart">
+          <div class="sc-row">
+            <div class="sc-label"><div class="sc-name">Scope 1</div><div class="sc-sub">直接燃烧</div></div>
+            <div class="sc-bar-track"><div class="sc-bar-fill" style="width:5%;background:var(--red-l)"></div></div>
+            <div class="sc-val-wrap"><span class="sc-val" style="color:var(--red)">0 t</span><span class="sc-pct">5%</span></div>
+          </div>
+          <div class="sc-row">
+            <div class="sc-label"><div class="sc-name">Scope 2</div><div class="sc-sub">外购电力</div></div>
+            <div class="sc-bar-track"><div class="sc-bar-fill" style="width:38%;background:var(--gold-m)"></div></div>
+            <div class="sc-val-wrap"><span class="sc-val" style="color:var(--gold)">72 t</span><span class="sc-pct">38%</span></div>
+          </div>
+          <div class="sc-row">
+            <div class="sc-label"><div class="sc-name">Scope 3</div><div class="sc-sub">供应链上游</div></div>
+            <div class="sc-bar-track"><div class="sc-bar-fill" style="width:57%;background:var(--blue-m)"></div></div>
+            <div class="sc-val-wrap"><span class="sc-val" style="color:var(--blue)">5,376 t</span><span class="sc-pct">57%</span></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:var(--ink2)">总排放量</span>
+          <span style="font-family:'DM Mono',monospace;font-size:17px;font-weight:700;color:var(--ink)">3,494 tCO₂e</span>
+        </div>
+      </div>
+      <div class="r-card">
+        <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.5px">关键节能降碳路径</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="padding:10px 13px;background:var(--paper);border-radius:9px;border:1px solid var(--rule)">
+            <div style="font-size:11.5px;font-weight:600;color:var(--teal);margin-bottom:4px">★ 最高优先：切换云南水电铝</div>
+            <div style="font-size:11.5px;color:var(--ink2);line-height:1.6">原材料碳因子从 11.2 → 4.1 t/tAl，Scope 3 可降低 <strong style="color:var(--green)">63%</strong>，碳强度预计降至 0.95 t/t</div>
+          </div>
+          <div style="padding:10px 13px;background:var(--paper);border-radius:9px;border:1px solid var(--rule)">
+            <div style="font-size:11.5px;font-weight:600;color:var(--blue);margin-bottom:4px">▲ 高优先：ZCP 绿电证书</div>
+            <div style="font-size:11.5px;color:var(--ink2);line-height:1.6">引入绿电证书（GEC），Scope 2 可降低 <strong style="color:var(--green)">40-60%</strong>，年省 ¥8,000 碳税</div>
+          </div>
+          <div style="padding:10px 13px;background:var(--paper);border-radius:9px;border:1px solid var(--rule)">
+            <div style="font-size:11.5px;font-weight:600;color:var(--gold);margin-bottom:4px">◆ 中优先：供应商填报穿透</div>
+            <div style="font-size:11.5px;color:var(--ink2);line-height:1.6">将供应链覆盖率从 <span class="dyn-sup-pct">待测算</span> → 80%，消除 Scope 3 估算黑盒，置信度提升至 Lv.3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S3: SUPPLY CHAIN -->
+  <div class="sec fu fu-3">
+    <div class="sec-hd">
+      <div class="sec-num" style="background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)">03</div>
+      <div><div class="sec-title">供应链穿透现状</div><div class="sec-en">Supply Chain Transparency Status</div></div>
+      <div class="sec-badge"><span class="pill" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)">覆盖率 <span class="dyn-sup-pct">待测算</span></span></div>
+    </div>
+    <div class="r-card" style="padding:0;overflow:hidden">
+      <table class="sc-table">
+        <thead><tr>
+          <th>供应商</th><th>产品类别</th><th>数据状态</th><th>覆盖碳强度</th>
+          <th>GM 贡献潜力</th><th>风险评级</th><th>建议行动</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><div style="font-weight:500"><span class="dyn-sup-sample-name">---</span></div><div style="font-size:10.5px;color:var(--ink3)">Tier 1 · ---</div></td>
+            <td style="color:var(--ink2);font-size:12px">---</td>
+            <td><span class="pill" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)">✓ 已完成</span></td>
+            <td><span style="font-family:'DM Mono',monospace;font-weight:600;color:var(--green)">---</span></td>
+            <td style="color:var(--gold);font-weight:600">---</td>
+            <td><span class="pill" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)">低</span></td>
+            <td style="font-size:11.5px;color:var(--teal)">已达标</td>
+          </tr>
+          <tr>
+            <td><div style="font-weight:500">---</div><div style="font-size:10.5px;color:var(--ink3)">Tier 1 · ---</div></td>
+            <td style="color:var(--ink2);font-size:12px">---</td>
+            <td><span class="pill" style="background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border)">⚡ 部分填报</span></td>
+            <td><span style="font-family:'DM Mono',monospace;font-weight:600;color:var(--gold)">---</span></td>
+            <td style="color:var(--gold);font-weight:600">---</td>
+            <td><span class="pill" style="background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border)">中</span></td>
+            <td style="font-size:11.5px;color:var(--blue);cursor:pointer;text-decoration:underline" onclick="openH5ShareModal()">催促补全</td>
+          </tr>
+          <tr style="background:rgba(194,57,43,0.03)">
+            <td><div style="font-weight:500">---</div><div style="font-size:10.5px;color:var(--ink3)">Tier 1 · ---</div></td>
+            <td style="color:var(--ink2);font-size:12px">---</td>
+            <td><span class="pill" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)">✗ 数据缺口</span></td>
+            <td><span style="font-family:'DM Mono',monospace;font-weight:600;color:var(--ink3)">未知（黑盒）</span></td>
+            <td style="color:var(--ink3)">待解锁</td>
+            <td><span class="pill" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)">高</span></td>
+            <td style="font-size:11.5px;color:var(--red);font-weight:600;cursor:pointer;text-decoration:underline" onclick="openH5ShareModal()">立即催办</td>
+          </tr>
+          <tr>
+            <td><div style="font-weight:500">---</div><div style="font-size:10.5px;color:var(--ink3)">Tier 2 · ---</div></td>
+            <td style="color:var(--ink2);font-size:12px">---</td>
+            <td><span class="pill" style="background:var(--paper2);color:var(--ink3);border:1px solid var(--ink4)">○ 待邀请</span></td>
+            <td style="color:var(--ink3)">—</td>
+            <td style="color:var(--ink3)">---</td>
+            <td><span class="pill" style="background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border)">中</span></td>
+            <td style="font-size:11.5px;color:var(--blue);cursor:pointer;text-decoration:underline" onclick="openH5ShareModal()">发送邀请</td>
+          </tr>
+          <tr>
+            <td><div style="font-weight:500">---</div><div style="font-size:10.5px;color:var(--ink3)">Tier 2 · ---</div></td>
+            <td style="color:var(--ink2);font-size:12px">---</td>
+            <td><span class="pill" style="background:var(--paper2);color:var(--ink3);border:1px solid var(--ink4)">○ 待邀请</span></td>
+            <td style="color:var(--ink3)">—</td>
+            <td style="color:var(--ink3)">---</td>
+            <td><span class="pill" style="background:var(--paper2);color:var(--ink3);border:1px solid var(--ink4)">低</span></td>
+            <td style="font-size:11.5px;color:var(--ink2)">下季度处理</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note note-b" style="margin-top:12px;margin-bottom:0">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="flex-shrink:0;margin-top:2px"><circle cx="6.5" cy="6.5" r="5.5" stroke="var(--blue)" stroke-width="1" fill="var(--blue-bg)"/><line x1="6.5" y1="3.5" x2="6.5" y2="7" stroke="var(--blue)" stroke-width="1.1"/><circle cx="6.5" cy="9" r="0.7" fill="var(--blue)"/></svg>
+      <div>最高优先级供应商以「供应链协同」看板为准：完成穿透填报后，Scope 3 黑盒风险与碳税敞口将随系统核算更新。</div>
+    </div>
+  </div>
+
+  <!-- S4: ROI ANALYSIS -->
+  <div class="sec fu fu-4">
+    <div class="sec-hd">
+      <div class="sec-num" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)">04</div>
+      <div><div class="sec-title">投资回报拆解</div><div class="sec-en">ROI Breakdown · Three-Action Plan</div></div>
+      <div class="sec-badge"><span class="pill" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)">ROI <span class="dyn-rep-roi">待测算</span></span></div>
+    </div>
+    <div class="r-g2">
+      <div class="r-card">
+        <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.5px">三项行动投入 vs 节税</div>
+        <div class="waterfall">
+          <div class="wf-row" style="background:var(--red-bg);border-color:var(--red-border)">
+            <div><div class="wf-label" style="color:var(--red);font-weight:600">当前碳税敞口（年度）</div><div class="wf-sub" style="color:var(--red)">含 Lv.2 惩罚溢价</div></div>
+            <div class="wf-bar"><div class="wf-bar-fill" style="width:100%;background:var(--red-l)"></div></div>
+            <div class="wf-val dyn-rep-tax" style="color:var(--red)">待测算</div>
+          </div>
+          <div class="wf-row">
+            <div><div class="wf-label">① MAT 物理网关接驳</div><div class="wf-sub">消除 35% 惩罚溢价，升至 Lv.4</div></div>
+            <div class="wf-bar"><div class="wf-bar-fill" style="width:30%;background:var(--teal-m)"></div></div>
+            <div class="wf-val" style="color:var(--teal)">¥ 28k/年</div>
+          </div>
+          <div class="wf-row">
+            <div><div class="wf-label">② ZCP 绿电签证</div><div class="wf-sub">降低 Scope 2，切换低碳电力</div></div>
+            <div class="wf-bar"><div class="wf-bar-fill" style="width:20%;background:var(--blue-m)"></div></div>
+            <div class="wf-val" style="color:var(--blue)">¥ 18k/年</div>
+          </div>
+          <div class="wf-row">
+            <div><div class="wf-label">③ 供应链协同工具</div><div class="wf-sub">推动 15 家供应商填报，覆盖率 80%</div></div>
+            <div class="wf-bar"><div class="wf-bar-fill" style="width:10%;background:var(--gold-m)"></div></div>
+            <div class="wf-val" style="color:var(--gold)">¥ 12k/年</div>
+          </div>
+          <div class="wf-row" style="background:var(--green-bg);border-color:var(--green-border)">
+            <div><div class="wf-label" style="color:var(--green);font-weight:600">年度净节税</div><div class="wf-sub" style="color:var(--green)">优化后总税额 vs 当前敞口</div></div>
+            <div class="wf-bar"><div class="wf-bar-fill" style="width:90%;background:var(--green-m)"></div></div>
+            <div class="wf-val" style="color:var(--green);font-size:16px"><span id="rep-net-savings" class="dyn-rep-save">待测算</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="r-card">
+        <div style="font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:14px;text-transform:uppercase;letter-spacing:0.5px">三年碳税走势预测</div>
+        <div class="year-bars">
+          <div class="yb-col">
+            <div class="yb-val dyn-rep-tax" style="color:var(--red)">待测算</div>
+            <div class="yb-bar" style="height:60px;background:var(--red-l)"></div>
+            <div class="yb-yr">2026</div>
+            <div class="yb-price">碳价 €65</div>
+          </div>
+          <div class="yb-col">
+            <div class="yb-val" style="color:var(--red)">€ 179k</div>
+            <div class="yb-bar" style="height:75px;background:var(--red-l)"></div>
+            <div class="yb-yr">2027</div>
+            <div class="yb-price">碳价 €80</div>
+          </div>
+          <div class="yb-col">
+            <div class="yb-val" style="color:var(--red)">€ 212k</div>
+            <div class="yb-bar" style="height:88px;background:var(--red)"></div>
+            <div class="yb-yr">2028</div>
+            <div class="yb-price">碳价 €95</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="padding:10px 12px;background:var(--red-bg);border-radius:9px;border:1px solid var(--red-border);text-align:center">
+            <div style="font-size:10px;color:var(--red);font-weight:600;margin-bottom:4px">三年累计（不处理）</div>
+            <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--red)">€ 536k</div>
+          </div>
+          <div style="padding:10px 12px;background:var(--green-bg);border-radius:9px;border:1px solid var(--green-border);text-align:center">
+            <div style="font-size:10px;color:var(--green);font-weight:600;margin-bottom:4px">三年累计节税（处理后）</div>
+            <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:var(--green)">¥ 1.58M</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S5: RECOMMENDATIONS -->
+  <div class="sec fu fu-4">
+    <div class="sec-hd">
+      <div class="sec-num" style="background:var(--teal-bg);color:var(--teal);border:1px solid var(--teal-border)">05</div>
+      <div><div class="sec-title">优先行动建议</div><div class="sec-en">Prioritized Action Plan</div></div>
+    </div>
+    <div class="rec-grid">
+      <div class="rec-card" style="background:var(--teal-bg);border-color:var(--teal-border)">
+        <div class="rec-num" style="color:var(--teal)">P0 · 立即启动</div>
+        <div class="rec-icon" style="background:rgba(29,158,117,0.15)">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="5" width="14" height="10" rx="2" stroke="var(--teal)" stroke-width="1.2"/><path d="M6 5V4a3 3 0 016 0v1" stroke="var(--teal)" stroke-width="1.1"/><polyline points="6,10 8.5,12.5 12.5,8" stroke="var(--teal)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="rec-title" style="color:var(--teal)">建立企业数字档案</div>
+        <div class="rec-desc" style="color:#1a4a40">将此次诊断数据正式存档，解锁供应链协同功能与精确诊断报告自动更新。无额外成本，当日可完成。</div>
+        <div class="rec-impact" style="background:rgba(29,158,117,0.1);color:var(--teal)">解锁 +50 GM · 供应链协同</div>
+        <div class="rec-timeline" style="color:var(--teal)">今日可完成</div>
+      </div>
+      <div class="rec-card" style="background:var(--gold-bg);border-color:var(--gold-border)">
+        <div class="rec-num" style="color:var(--gold)">P1 · 本季度启动</div>
+        <div class="rec-icon" style="background:rgba(201,168,76,0.15)">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2L17 6V12L9 16L1 12V6L9 2Z" stroke="var(--gold)" stroke-width="1.2" fill="none"/><path d="M5 9L8.5 12.5L13.5 7" stroke="var(--gold-m)" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="rec-title" style="color:var(--gold)">申请企业账户升级 + MAT 网关</div>
+        <div class="rec-desc" style="color:#6b4f10">向管理层呈送《全域升级报告》，申请接驳 MAT 物理传感器。消除 35% 惩罚溢价，节税以测算为准。</div>
+        <div class="rec-impact" style="background:rgba(201,168,76,0.1);color:var(--gold)">年节税 --- · GM ---</div>
+        <div class="rec-timeline" style="color:var(--gold)">2026 Q2 完成</div>
+      </div>
+      <div class="rec-card" style="background:var(--blue-bg);border-color:var(--blue-border)">
+        <div class="rec-num" style="color:var(--blue)">P2 · 上半年完成</div>
+        <div class="rec-icon" style="background:rgba(24,95,165,0.12)">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="5" r="2.5" stroke="var(--blue)" stroke-width="1.1"/><circle cx="3" cy="14" r="2" stroke="var(--blue)" stroke-width="1"/><circle cx="15" cy="14" r="2" stroke="var(--blue)" stroke-width="1"/><line x1="9" y1="7.5" x2="4" y2="12" stroke="var(--blue)" stroke-width="0.9"/><line x1="9" y1="7.5" x2="14" y2="12" stroke="var(--blue)" stroke-width="0.9"/></svg>
+        </div>
+        <div class="rec-title" style="color:var(--blue)">推动供应链穿透至 80%</div>
+        <div class="rec-desc" style="color:#1a3a6b">优先催办数据缺口供应商。在「全域中心」使用供应链协同工具批量发送填报邀请，GM 以行为流水为准。</div>
+        <div class="rec-impact" style="background:rgba(24,95,165,0.08);color:var(--blue)">消除黑盒风险 · GM ---</div>
+        <div class="rec-timeline" style="color:var(--blue)">2026 H1 完成</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S6: ROADMAP -->
+  <div class="sec fu fu-5">
+    <div class="sec-hd">
+      <div class="sec-num" style="background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)">06</div>
+      <div><div class="sec-title">成长里程碑路径</div><div class="sec-en">From Compliance to Competitive Advantage</div></div>
+    </div>
+    <div class="roadmap">
+      <div class="rm-item">
+        <div class="rm-dot" style="background:var(--green-bg);border:2px solid var(--green-m);color:var(--green)">✓</div>
+        <div class="rm-content">
+          <div class="rm-head">
+            <span class="rm-when" style="color:var(--green)">已完成 · 2026-04</span>
+            <span class="rm-title">注册 HengAI · 完成首次 CBAM 粗测 · 发现真实敞口</span>
+          </div>
+          <div class="rm-desc"><span class="dyn-user-name"></span>以 ¥99 月费完成了过去需要 ¥30 万咨询费才能得到的诊断。从"知道问题存在"进入"量化了问题的规模"。</div>
+          <div class="rm-gm">已获 <span class="dyn-gm-balance-num">0</span> GM · Lv.1 观察员</div>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-dot" style="background:var(--blue-bg);border:2px solid var(--blue-m);color:var(--blue);font-size:9px">当前</div>
+        <div class="rm-content" style="border-color:var(--blue-border);background:var(--blue-bg)">
+          <div class="rm-head">
+            <span class="rm-when" style="color:var(--blue)">进行中 · 2026 Q2</span>
+            <span class="rm-title">建立企业档案 · 启动供应链协同 · 呈送决策层</span>
+          </div>
+          <div class="rm-desc">将个人知识转化为企业的合规资产。向管理层提交本报告，申请 MAT 网关与 ZCP 签证升级。</div>
+          <div class="rm-gm">目标 500 GM → 升至 Lv.2 实践者</div>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-dot" style="background:var(--gold-bg);border:2px dashed var(--gold-m);color:var(--gold)">3</div>
+        <div class="rm-content">
+          <div class="rm-head">
+            <span class="rm-when" style="color:var(--gold)">2026 Q3</span>
+            <span class="rm-title">MAT 网关上线 · 数据置信度升至 Lv.4 · 惩罚溢价清零</span>
+          </div>
+          <div class="rm-desc">企业碳数据实现物理级证明，欧盟海关免审。年节税 € 38,000。ZCP 绿电签证同期激活。</div>
+          <div class="rm-gm">目标 2,000 GM → 升至 Lv.3 架构师</div>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-dot" style="background:var(--teal-bg);border:2px dashed var(--teal-border);color:var(--teal)">4</div>
+        <div class="rm-content">
+          <div class="rm-head">
+            <span class="rm-when" style="color:var(--teal)">2026 Q4</span>
+            <span class="rm-title">供应链覆盖率 80% · 首次 CBAM 正式申报 · 企业文明进步奖候选</span>
+          </div>
+          <div class="rm-desc">完成正式 CBAM 申报，成为中国制造出海的绿色标杆。GreenMark 生态价值可向下游供应商传导。</div>
+          <div class="rm-gm">目标 5,000 GM → 升至 Lv.4 战略家 · 企业文明进步奖候选资格</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="rep-footer">
+    <div class="rf-left">
+      本报告由 <strong style="color:rgba(255,255,255,0.65)">HengAI 个人智库</strong> 自动生成<br>
+      报告人：<span class="dyn-user-name"></span> · <span class="dyn-ent-name">未录入</span> · 合规负责人 · <span data-state-bind="diagnostic.generatedAt" data-state-fmt="dt" data-empty="待记录">---</span><br>
+      算法版本：CBAM Official Algorithm v2.4 · EU ETS Reference Price: €65/tCO₂e · FX: 7.85
+    </div>
+    <div class="rf-right">
+      <div class="rf-chain">CL-IVC 主权链存证核验码</div>
+      <div class="rf-sig">待确权-9A1C-2604-E87D-F3A2</div>
+      <div style="margin-top:6px;font-size:10.5px;color:rgba(255,255,255,0.3)">数据不可篡改 · 可独立核验</div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /view full -->
+
+</div><!-- /shell -->
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:22px;right:22px;background:#111827;border:1px solid rgba(29,158,117,0.45);border-radius:11px;padding:12px 16px;display:flex;align-items:center;gap:9px;font-size:12.5px;color:#6dd5b0;z-index:999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;min-width:240px">
+  <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><polyline points="2,6.5 5.5,10 11,3.5" stroke="#6dd5b0" stroke-width="1.5" stroke-linecap="round"/></svg>
+  <span id="toast-msg">操作成功</span>
+</div>
+
+<script>
+function setMode(m) {
+  document.getElementById('view-brief').classList.toggle('active', m==='brief');
+  document.getElementById('view-full').classList.toggle('active', m==='full');
+  document.getElementById('btn-brief').className = 'mode-btn '+(m==='brief'?'active':'inactive');
+  document.getElementById('btn-full').className  = 'mode-btn '+(m==='full'?'active':'inactive');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.style.opacity='1';t.style.transform='translateY(0)';
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)'},2800);
+}
+function shareReport(){showToast('报告分享链接已复制 · 有效期 72 小时')}
+</script>
+<!-- ═══════════════════════════════════════════
+     H5 裂变二维码弹窗 · 客户端 qr-lib.js 渲染 · V2.0 QA
+═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="h5-share-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); z-index:99999; align-items:center; justify-content:center;">
+  <div style="background:#0f1320; border:1px solid #7f77dd; border-radius:16px; padding:24px; width:340px; text-align:center; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(127,119,221,0.25); color:#e6e9f2; font-family:inherit;">
+    <button onclick="document.getElementById('h5-share-modal').style.display='none'" style="position:absolute; top:12px; right:16px; background:none; border:none; color:#8a92a8; font-size:18px; cursor:pointer; line-height:1; font-family:inherit;">✕</button>
+    <div style="font-size:14px; font-weight:bold; color:#e6e9f2; margin-bottom:8px;">邀请供应商完成 CL-IVC 极速填报</div>
+    <div style="font-size:11px; color:#8a92a8; margin-bottom:16px; line-height:1.5;">对方扫码打开移动端安全页面，BOM 数据保留本地，仅向您反馈最终碳强度。</div>
+    <div id="h5-qr-container" style="width:160px; height:160px; background:#fff; border-radius:12px; margin:0 auto 16px; display:flex; align-items:center; justify-content:center; border:4px solid #7f77dd; overflow:hidden; padding:4px;"><div style="font-size:10px;color:#444">加载中...</div></div>
+    <div id="h5-invite-url" style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; font-size:11px; color:#93c5fd; word-break:break-all; margin-bottom:10px; font-family:ui-monospace,Consolas,monospace;">…</div>
+    <div id="h5-invite-tip" style="font-size:10px; color:#f0c96b; margin-bottom:14px; line-height:1.5; display:none; text-align:left; background:rgba(240,201,107,0.08); border:1px solid rgba(240,201,107,0.25); border-radius:6px; padding:8px 10px;"></div>
+    <button id="h5-copy-btn" style="width:100%; background:#7f77dd; color:#fff; border:none; border-radius:8px; padding:11px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:all .15s;" onmouseenter="this.style.transform='translateY(-1px)'" onmouseleave="this.style.transform='translateY(0)'" onclick="copyH5InviteLink()">复制专属邀请链接</button>
+  </div>
+</div>
+<script src="qr-lib.js"></script>
+<script>
+(function(){
+  function buildInviteUrl(){
+    var loc = window.location;
+    var base = loc.href;
+    try {
+      if (window.parent && window.parent !== window && window.parent.location && window.parent.location.origin === loc.origin) {
+        base = window.parent.location.href;
+      }
+    } catch(e) {}
+    var hashIdx = base.indexOf('#'); if (hashIdx >= 0) base = base.substring(0, hashIdx);
+    var qIdx = base.indexOf('?'); if (qIdx >= 0) base = base.substring(0, qIdx);
+    var slashIdx = base.lastIndexOf('/');
+    if (slashIdx >= 0) base = base.substring(0, slashIdx + 1);
+    var inviteId = 'WL' + Date.now().toString(36).slice(-5).toUpperCase();
+    return { url: base + 'HengAI_Supplier_H5.html?invite_id=' + inviteId, isFile: loc.protocol === 'file:' };
+  }
+  function renderQR(container, url){
+    container.innerHTML = '';
+    if (typeof qrcode !== 'function') {
+      container.innerHTML = '<div style="padding:12px;font-size:10px;color:#444;text-align:center;line-height:1.5;">QR 库未加载<br/>请用链接手动分享</div>';
+      return;
+    }
+    try {
+      var qr = qrcode(0, 'M');
+      qr.addData(url);
+      qr.make();
+      // 使用 SVG 而非 img，完全本地化渲染
+      var cellSize = 4, margin = 0;
+      container.innerHTML = qr.createSvgTag({cellSize: cellSize, margin: margin, scalable: true});
+      var svg = container.querySelector('svg');
+      if (svg) { svg.setAttribute('width', '148'); svg.setAttribute('height', '148'); svg.style.display = 'block'; }
+    } catch(e) {
+      container.innerHTML = '<div style="padding:12px;font-size:10px;color:#b00;text-align:center;line-height:1.5;">二维码生成失败<br/>'+ (e && e.message ? e.message : '') +'</div>';
+    }
+  }
+  window.openH5ShareModal = function(){
+    var modal = document.getElementById('h5-share-modal');
+    if (!modal) return;
+    var info = buildInviteUrl();
+    var container = document.getElementById('h5-qr-container');
+    if (container) renderQR(container, info.url);
+    var linkEl = document.getElementById('h5-invite-url');
+    if (linkEl) linkEl.textContent = info.url;
+    var tipEl = document.getElementById('h5-invite-tip');
+    if (tipEl){
+      if (info.isFile){
+        tipEl.innerHTML = '⚠️ 当前为 <code style="color:#7f77dd">file://</code> 模式，手机扫码后无法访问本地文件。<br/>请在项目目录运行 <code style="color:#7f77dd;background:rgba(127,119,221,0.1);padding:1px 4px;border-radius:3px;">python -m http.server 8000</code>，再用 <code style="color:#7f77dd">http://局域网IP:8000</code> 访问本站。';
+        tipEl.style.display = 'block';
+      } else {
+        tipEl.style.display = 'none';
+      }
+    }
+    modal.style.display = 'flex';
+  };
+  window.copyH5InviteLink = function(){
+    var linkEl = document.getElementById('h5-invite-url');
+    var url = linkEl ? linkEl.textContent : '';
+    if (!url || url === '…') return;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).then(
+        function(){ alert('✓ 链接已复制！请发送给供应商。'); },
+        function(){ window.prompt('请手动复制链接：', url); }
+      );
+    } else {
+      window.prompt('请手动复制链接：', url);
+    }
+  };
+})();
+</script>
+<!-- ═════════ END H5 MODAL ═════════ -->
+
+<script>
+(function () {
+  function applyReportPipeline(p) {
+    if (!p) return;
+    var user = p.user || {};
+    var company = p.company || {};
+    var impact = p.impact || {};
+    var metrics = p.metrics || {};
+    var gm = Number(user.gmBalance != null ? user.gmBalance : user.gm_balance != null ? user.gm_balance : 0);
+
+    var riskRaw = impact.riskExposureEur != null ? impact.riskExposureEur : company.cbamRiskRaw;
+    var riskNum = Number(riskRaw);
+    var riskText = company.cbamRisk || (Number.isFinite(riskNum) && riskNum > 0 ? ('€ ' + Math.round(riskNum).toLocaleString('en-US')) : '待测算');
+
+    var roi = (company.roiRatio || company.roi_ratio || '').toString().trim();
+    if (!roi) roi = '待测算';
+    var save = (company.netSavings || company.net_savings || '').toString().trim();
+    if (!save) save = '待测算';
+    var scope = Number(company.scope3Rate != null ? company.scope3Rate : metrics && metrics.scope3Rate != null ? metrics.scope3Rate : 0);
+    if (!Number.isFinite(scope) || scope <= 0) scope = 0;
+    var scopeText = scope > 0 ? (scope + '%') : '待测算';
+    var supTotal = Number(metrics && metrics.supplierCount != null ? metrics.supplierCount : 0);
+    if (!Number.isFinite(supTotal) || supTotal < 0) supTotal = 0;
+    var supDone = Number(metrics && metrics.supplierSubmittedCount != null ? metrics.supplierSubmittedCount : 0);
+    if (!Number.isFinite(supDone) || supDone < 0) supDone = 0;
+    var coName = String(company.name || '未录入');
+    var uName = String(user.name || '新用户');
+
+    var el;
+    if ((el = document.getElementById('rep-tax-exposure'))) el.textContent = riskText;
+    if ((el = document.getElementById('rep-roi-ratio'))) el.textContent = roi;
+    if ((el = document.getElementById('rep-net-savings'))) el.textContent = save;
+    document.querySelectorAll('.dyn-rep-tax').forEach(function (n) { n.textContent = riskText; });
+    document.querySelectorAll('.dyn-rep-roi').forEach(function (n) { n.textContent = roi; });
+    document.querySelectorAll('.dyn-rep-save').forEach(function (n) { n.textContent = save; });
+    document.querySelectorAll('.dyn-ent-name').forEach(function (n) { n.textContent = coName; });
+    document.querySelectorAll('.dyn-user-name').forEach(function (n) { n.textContent = uName; });
+    document.querySelectorAll('.dyn-sup-pct').forEach(function (n) { n.textContent = scopeText; });
+    document.querySelectorAll('.dyn-sup-total').forEach(function (n) { n.textContent = String(supTotal); });
+    document.querySelectorAll('.dyn-sup-count').forEach(function (n) { n.textContent = String(supDone); });
+
+    // 页面上其它 GM 芯片保持一致（不删原结构，仅覆盖显示）
+    var chip = document.querySelector('.gm-chip-val');
+    if (chip) chip.textContent = gm.toLocaleString();
+  }
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || ev.data.type !== 'HENGAI_HUB_PIPELINE') return;
+    applyReportPipeline(ev.data.payload);
+  });
+})();
+</script>
+<script src="hengai-module-pipeline.js"></script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · 原厂因子精算 · VO 草稿</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+if (/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed', '1');
+</script>
+<script src="hengai-dev-preview.js"></script>
+<script src="hengai-load-appstate.js"></script>
+<script src="hengai-embed-boot.js"></script>
+<link rel="stylesheet" href="hengai-factor-vo-draft.css">
+<style>
+/* 全域壳层：与 HengAI_工业原厂精算.html 同规格 */
+:root{--bg0:#06080f;--bg1:#0a0d16;--bg2:#0e1220;--bg3:rgba(255,255,255,.04);--bg4:rgba(255,255,255,.07);--border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);--ink:#e2e8f4;--ink2:#8896aa;--ink3:#44556a;--green:#10b981;--green-l:#6ee7b7;--green-d:rgba(16,185,129,.13);--green-b:rgba(16,185,129,.30);--gold:#c9a84c;--gold-l:#f0d080;--gold-d:rgba(201,168,76,.13);--gold-b:rgba(201,168,76,.30);--blue:#3b82f6;--blue-l:#93c5fd;--blue-d:rgba(59,130,246,.13);--blue-b:rgba(59,130,246,.30);--teal:#14b8a6;--teal-l:#5eead4;--teal-d:rgba(20,184,166,.13);--teal-b:rgba(20,184,166,.30);--purple:#8b5cf6;--purple-l:#c4b5fd;--purple-d:rgba(139,92,246,.13);--purple-b:rgba(139,92,246,.30);--red:#ef4444;--red-l:#fca5a5;--red-d:rgba(239,68,68,.13);--red-b:rgba(239,68,68,.30);--orange:#f97316;--orange-l:#fdba74;--orange-d:rgba(249,115,22,.13);--orange-b:rgba(249,115,22,.30);--sb-w:220px;--tb-h:52px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg0);color:var(--ink);font-family:"Noto Sans SC",sans-serif;font-size:13px;-webkit-font-smoothing:antialiased}
+.app{display:flex;height:100vh}
+.sidebar{width:var(--sb-w);flex-shrink:0;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto;scrollbar-width:thin}
+.sb-brand{padding:16px 14px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-ic{width:32px;height:32px;border-radius:9px;background:var(--orange-d);border:1px solid var(--orange-b);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-name{font-size:14px;font-weight:700}.sb-sub{font-size:9.5px;color:var(--ink3);margin-top:1px}
+.sb-phase{margin:10px 12px 2px;padding:7px 12px;border-radius:9px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:8px;background:var(--purple-d);border:1px solid var(--purple-b);color:var(--purple-l)}
+.sb-phase-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.sb-gt{padding:10px 14px 3px;font-size:9px;color:var(--ink3);letter-spacing:1.4px;text-transform:uppercase;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 14px;font-size:12.5px;color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all .14s}
+.sb-item:hover{color:var(--ink);background:var(--bg4)}
+.sb-item.on{color:var(--ink);background:rgba(255,255,255,.06);border-left-color:var(--orange)}
+.sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-footer{border-top:1px solid var(--border);padding:10px 14px;margin-top:auto}
+.sb-av{width:30px;height:30px;border-radius:50%;background:var(--orange-d);border:1px solid var(--orange-b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--orange-l);flex-shrink:0;text-transform:uppercase}
+.sb-uname{font-size:12px;font-weight:600}.sb-urole{font-size:10px;color:var(--ink3);margin-top:1px}
+.main-wrap{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:var(--tb-h);display:flex;align-items:center;padding:0 24px;gap:10px;flex-shrink:0;border-bottom:1px solid var(--border);background:rgba(6,8,15,.93);backdrop-filter:blur(18px)}
+.tb-l{display:flex;align-items:center;gap:8px;flex:1}.tb-r{display:flex;align-items:center;gap:8px}
+.tb-title{font-size:14px;font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid transparent}
+.p-o{background:var(--orange-d);color:var(--orange-l);border-color:var(--orange-b)}
+.p-g{background:var(--green-d);color:var(--green-l);border-color:var(--green-b)}
+.p-y{background:var(--gold-d);color:var(--gold-l);border-color:var(--gold-b)}
+.gm-chip{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:8px;background:var(--gold-d);border:1px solid var(--gold-b);cursor:pointer}
+.gm-chip-lbl{font-size:9.5px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.5px}
+.gm-chip-val{font-family:"DM Mono",monospace;font-size:13px;font-weight:700;color:var(--gold-l)}
+.btn{padding:6px 13px;border-radius:7px;border:1px solid var(--border2);background:var(--bg4);font-size:11.5px;color:var(--ink2);cursor:pointer;transition:all .14s;font-family:"Noto Sans SC",sans-serif}
+.btn:hover{border-color:var(--orange-b);color:var(--orange-l)}
+.btn-o{background:var(--orange-d);border-color:var(--orange-b);color:var(--orange-l)}
+.main-scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.main-scroll::-webkit-scrollbar{width:4px}
+.main-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.main-pad{padding:24px 28px 72px;width:100%;box-sizing:border-box}
+html[data-embed="1"] .sidebar,html[data-embed="1"] .topbar{display:none!important}
+html[data-embed="1"] body{background:var(--bg0)!important;overflow:hidden!important;height:100%!important}
+html[data-embed="1"] .app{height:100%!important;min-height:0!important;overflow:hidden!important}
+html[data-embed="1"] .main-wrap{margin-left:0!important;width:100%!important;flex:1;min-width:0;min-height:0;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+html[data-embed="1"] .main-scroll{flex:1;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important}
+html[data-embed="1"] .main-pad{max-width:none!important;margin:0!important;width:100%!important;padding:24px 28px 72px!important;box-sizing:border-box}
+html[data-embed="1"] #fa-embed-toolbar{display:flex!important}
+.fa-embed-toolbar{display:none;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:14px;padding:10px 14px;border-radius:12px;background:var(--bg3);border:1px solid var(--border)}
+.fa-embed-toolbar .fa-et-title{font-size:12px;font-weight:700;margin-right:auto}
+.fa-embed-gtcid{font-family:"DM Mono",monospace;font-size:11px;color:var(--teal-l);margin-left:auto}
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);z-index:9999;padding:8px 16px;border-radius:12px;background:var(--orange-d);border:1px solid var(--orange-b);color:var(--orange-l);font-size:12.5px;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s}
+@media(max-width:560px){.main-pad{padding:18px 16px 56px}html[data-embed="1"] .main-pad{padding:18px 16px 56px!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-ic"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L14 4.5V11.5L8 15L2 11.5V4.5L8 1Z" stroke="var(--orange-l)" stroke-width="1.2" fill="var(--orange-d)"/><path d="M5 8.5L7 10.5L11.5 6" stroke="var(--orange-l)" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+      <div><div class="sb-name">HengAI</div><div class="sb-sub">Co2Lion 全域合规中心</div></div>
+    </div>
+    <div class="sb-phase"><div class="sb-phase-dot" style="background:var(--purple)"></div><span data-state-bind="flags.phaseLabel">...</span></div>
+    <div class="sb-gt">个人工作台</div>
+    <div class="sb-item" onclick="nav('全域中心.html')"><div class="sb-dot" style="background:var(--green)"></div>全域总览</div>
+    <div class="sb-item" onclick="nav('HengAI_CBAM测算工具.html')"><div class="sb-dot" style="background:var(--gold)"></div>CBAM 测算工具</div>
+    <div class="sb-item" onclick="nav('HengAI_算力资源.html')"><div class="sb-dot" style="background:var(--blue-l)"></div>算力资源</div>
+    <div class="sb-item" onclick="nav('HengAI_法规知识库.html')"><div class="sb-dot" style="background:var(--purple-l)"></div>企业法规库</div>
+    <div class="sb-item on"><div class="sb-dot" style="background:var(--orange)"></div>原厂因子精算 <span style="font-size:9px;color:var(--orange-l);margin-left:auto">VO</span></div>
+    <div class="sb-gt">企业工作台</div>
+    <div class="sb-item" onclick="nav('HengAI_企业数字档案.html')"><div class="sb-dot" style="background:var(--teal-l)"></div>企业数字档案</div>
+    <div class="sb-item" onclick="nav('HengAI_供应链协同.html')"><div class="sb-dot" style="background:var(--teal)"></div>供应链协同</div>
+    <div class="sb-item" onclick="nav('HengAI_核验.html')"><div class="sb-dot" style="background:var(--blue)"></div>产业链核验</div>
+    <div class="sb-item" onclick="nav('HengAI_HeavyIndustry_Suite.html')"><div class="sb-dot" style="background:var(--gold)"></div>产业主权看板</div>
+    <div class="sb-item" onclick="nav('HengAI_全域诊断报告.html')"><div class="sb-dot" style="background:var(--blue-l)"></div>全域诊断报告</div>
+    <div class="sb-gt">深潜模块</div>
+    <div class="sb-item" onclick="nav('HengAI_GM_Wallet.html')"><div class="sb-dot" style="background:var(--gold)"></div>GM 绿印钱包</div>
+    <div class="sb-item" onclick="nav('HengAI_EU_Customs.html')"><div class="sb-dot" style="background:var(--blue)"></div>欧盟海关直连</div>
+    <div class="sb-footer">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div class="sb-av" data-state-bind="user.name" data-bind-transform="initial">...</div>
+        <div><div class="sb-uname" data-state-bind="user.name">...</div><div class="sb-urole" data-state-bind="user.tier">...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-wrap">
+    <div class="topbar">
+      <div class="tb-l">
+        <span class="tb-title">原厂因子精算</span>
+        <span class="pill p-o">VO 布局草稿</span>
+        <span class="pill p-g">本地精算就绪</span>
+      </div>
+      <div class="tb-r">
+        <div class="gm-chip" onclick="nav('HengAI_GM_Wallet.html')">
+          <span class="gm-chip-lbl">GM</span>
+          <span class="gm-chip-val" data-state-bind="user.gmBalance" data-bind-format="number">0</span>
+        </div>
+        <button type="button" class="btn" data-draft-action="export">导出月报</button>
+        <button type="button" class="btn btn-o" data-draft-action="pool">确权入池 →</button>
+      </div>
+    </div>
+
+    <div class="main-scroll">
+      <div class="main-pad">
+        <div id="fa-embed-toolbar" class="fa-embed-toolbar" aria-label="精算快捷入口">
+          <span class="fa-et-title">原厂因子精算 · VO 草稿</span>
+          <span class="pill p-o">Factor Authority</span>
+          <span class="fa-embed-gtcid" id="vo-gtcid">GTCID · —</span>
+          <button type="button" class="btn" data-draft-action="export">导出月报</button>
+          <button type="button" class="btn btn-o" data-draft-action="pool">确权入池 →</button>
+        </div>
+
+        <div class="vo-content-stack">
+          <div class="vo-draft-note">
+            <strong>VO 内容区草稿</strong>
+            <span>左侧菜单 + 右侧工作区与全域中心一致；仅中间内容借 VO 矩阵分栏，非全屏复制。</span>
+            <a href="HengAI_工业原厂精算.html?dev=1&amp;scenario=origin-preview">对比现网页 →</a>
+          </div>
+
+          <div class="vo-kpi-strip">
+            <div class="vo-kpi-cell">
+              <div class="vo-kpi-k">本月入池碳强度</div>
+              <div class="vo-kpi-v" style="color:var(--green-l)">1.842</div>
+              <div style="font-size:10px;color:var(--ink3)">tCO₂e/吨钢</div>
+            </div>
+            <div class="vo-kpi-cell">
+              <div class="vo-kpi-k">同比增减率</div>
+              <div class="vo-kpi-v" style="color:var(--green-l)">-6.2%</div>
+              <div style="font-size:10px;color:var(--ink3)">优于行业均值</div>
+            </div>
+            <div class="vo-kpi-cell">
+              <div class="vo-kpi-k">核验池状态</div>
+              <div class="vo-kpi-v" style="font-size:15px;color:var(--teal-l)">待确权入池</div>
+              <a class="vo-kpi-link" href="HengAI_HeavyIndustry_Suite.html?dev=1&amp;scenario=origin-approved">完整共振 KPI → 产业主权看板</a>
+            </div>
+          </div>
+
+          <div class="vo-work-grid">
+            <section class="vo-panel" id="vo-matrix-panel">
+              <div class="vo-panel-head">
+                <div class="vo-tabs" id="vo-ind-tabs" role="tablist"></div>
+                <div class="vo-tools">
+                  <span>数据周期</span>
+                  <button type="button" class="vo-tool-btn">2024年10月 ▾</button>
+                  <button type="button" class="vo-tool-btn" data-draft-action="import">导入模板</button>
+                  <button type="button" class="vo-tool-btn" data-draft-action="clear">清空本地</button>
+                </div>
+              </div>
+              <div class="vo-flow" id="vo-flow"></div>
+              <div class="vo-matrix-wrap">
+                <table class="vo-matrix" id="vo-matrix">
+                  <thead><tr id="vo-matrix-head"></tr></thead>
+                  <tbody id="vo-matrix-body"></tbody>
+                </table>
+              </div>
+              <p class="vo-matrix-foot">⚠ 所有原始能耗数据仅保存在本地浏览器，不会上传服务器</p>
+            </section>
+
+            <section class="vo-panel">
+              <div class="vo-panel-head">
+                <div class="vo-panel-title">★ 精算结果 <span class="vo-panel-note">(本地计算完成)</span></div>
+                <span style="color:var(--green-l);font-size:14px">✓</span>
+              </div>
+              <div class="vo-result-body">
+                <div class="vo-result-main">
+                  <div class="vo-gauge-wrap">
+                    <div style="font-size:11px;color:var(--ink2);margin-bottom:6px">单位产品碳强度</div>
+                    <svg width="120" height="72" viewBox="0 0 120 72" style="margin:0 auto;display:block">
+                      <defs>
+                        <linearGradient id="gGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                          <stop offset="0%" stop-color="#ef4444"/>
+                          <stop offset="60%" stop-color="#22c55e"/>
+                          <stop offset="100%" stop-color="#06b6d4"/>
+                        </linearGradient>
+                      </defs>
+                      <path d="M 12 60 A 48 48 0 1 1 108 60" fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
+                      <path d="M 12 60 A 48 48 0 1 1 108 60" fill="none" stroke="url(#gGrad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="200" stroke-dashoffset="48"/>
+                    </svg>
+                    <div class="vo-gauge-val">1.842</div>
+                    <div style="font-size:10px;color:var(--ink3)">tCO₂e/吨钢</div>
+                    <div class="vo-bench">
+                      <div><span style="color:var(--ink3)">行业对标</span><strong>2.156</strong></div>
+                      <div><span style="color:var(--ink3)">优秀水平</span><strong style="color:var(--teal-l)">1.650</strong></div>
+                    </div>
+                  </div>
+                  <div class="vo-chart-wrap">
+                    <div class="vo-chart-title">
+                      <span>同比增减率</span>
+                      <span class="vo-chart-delta">-6.20% ↓</span>
+                    </div>
+                    <svg viewBox="0 0 200 100" width="100%" height="90" style="display:block">
+                      <line x1="0" y1="10" x2="200" y2="10" stroke="#334155" stroke-width="0.5" stroke-dasharray="3 3"/>
+                      <line x1="0" y1="50" x2="200" y2="50" stroke="#475569" stroke-width="0.8"/>
+                      <line x1="0" y1="90" x2="200" y2="90" stroke="#334155" stroke-width="0.5" stroke-dasharray="3 3"/>
+                      <path d="M 10 30 L 46 46 L 82 52 L 118 59 L 154 66 L 190 75 L 190 50 L 10 50 Z" fill="rgba(34,197,94,0.2)"/>
+                      <path d="M 10 30 L 46 46 L 82 52 L 118 59 L 154 66 L 190 75" fill="none" stroke="#22c55e" stroke-width="2"/>
+                    </svg>
+                    <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--ink3);margin-top:4px">
+                      <span>05</span><span>06</span><span>07</span><span>08</span><span>09</span><span>10</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="vo-struct">
+                  <div style="font-size:11px;font-weight:600;margin-bottom:6px">碳排放结构占比</div>
+                  <div class="vo-struct-bar">
+                    <div style="width:62%;background:#3b82f6"></div>
+                    <div style="width:28%;background:#22c55e"></div>
+                    <div style="width:10%;background:#ef4444"></div>
+                  </div>
+                  <div class="vo-struct-legend">
+                    <span><i class="vo-struct-dot" style="background:#3b82f6"></i>直接排放 62%</span>
+                    <span><i class="vo-struct-dot" style="background:#22c55e"></i>间接排放 28%</span>
+                    <span><i class="vo-struct-dot" style="background:#ef4444"></i>工艺排放 10%</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <section class="vo-panel">
+            <div class="vo-panel-head">
+              <div class="vo-panel-title" style="color:var(--green-l)">🔒 数据保密铁律</div>
+            </div>
+            <div class="vo-pipeline">
+              <div class="vo-pipe-node">
+                <div class="vo-pipe-ico" style="background:var(--bg3);border:1px solid var(--border)">🗄</div>
+                <div><div style="font-weight:600;font-size:12px">本地数据计算</div><div style="font-size:10px;color:var(--ink3)">LOCAL_VAULT</div></div>
+              </div>
+              <div class="vo-pipe-arrow">— 脱敏 →</div>
+              <div class="vo-pipe-node">
+                <div class="vo-pipe-ico" style="background:var(--teal-d);border:1px solid var(--teal-b)">🛡</div>
+                <div><div style="font-weight:600;font-size:12px">脱敏存证</div><div style="font-size:10px;color:var(--ink3)">仅存计算结果</div></div>
+              </div>
+              <div class="vo-pipe-arrow">— 上链 →</div>
+              <div class="vo-pipe-node">
+                <div class="vo-pipe-ico" style="background:var(--gold-d);border:1px solid var(--gold-b)">☁</div>
+                <div><div style="font-weight:600;font-size:12px">核验池存证</div><div style="font-size:10px;color:var(--ink3)">单位碳强度 + 同比增减率</div></div>
+              </div>
+            </div>
+            <p style="padding:0 12px 8px;font-size:10px;color:var(--ink3)">⚠ 原始工序级数据仅存于本地，计算结果脱敏后存证，绝不上传服务器</p>
+            <div class="vo-cta-grid">
+              <button type="button" class="vo-cta primary" data-draft-action="pool">
+                <span class="vo-cta-ico">✓</span>
+                <span><div class="vo-cta-title" style="color:var(--teal-l)">确权存入核验池</div><div class="vo-cta-sub">存入脱敏结果，供产业链共享</div></span>
+              </button>
+              <button type="button" class="vo-cta" data-draft-action="export">
+                <span class="vo-cta-ico">📄</span>
+                <span><div class="vo-cta-title">导出合规月报</div><div class="vo-cta-sub">生成 CISA 标准月报 PDF</div></span>
+              </button>
+              <button type="button" class="vo-cta" data-draft-action="history">
+                <span class="vo-cta-ico">🕐</span>
+                <span><div class="vo-cta-title">查看历史记录</div><div class="vo-cta-sub">确权记录与版本管理</div></span>
+              </button>
+            </div>
+            <div class="vo-pledge">
+              <span>⚠ 操作前需签署《重工业核心数据保密承诺书》</span>
+              <button type="button" class="vo-tool-btn" data-draft-action="pledge">签署承诺书</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><span id="toast-msg"></span></div>
+
+<script>
+function nav(u) { window.location.href = u; }
+function showToast(msg) {
+  var t = document.getElementById('toast'), m = document.getElementById('toast-msg');
+  if (!t || !m) return;
+  m.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(window._tt);
+  window._tt = setTimeout(function () {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(20px)';
+  }, 3200);
+}
+
+(function () {
+  var IND = {
+    steel: {
+      label: '钢铁', icon: '🏭',
+      steps: [
+        { id: 1, name: '焦化', icon: '焦' }, { id: 2, name: '球团', icon: '球' }, { id: 3, name: '烧结', icon: '烧' },
+        { id: 4, name: '炼铁', icon: '铁' }, { id: 5, name: '炼钢', icon: '钢' }, { id: 6, name: '转炉', icon: '转' },
+        { id: 7, name: '电炉', icon: '电' }, { id: 8, name: '轧烧等', icon: '轧' }, { id: 9, name: '其他', icon: '他' }
+      ],
+      data: {
+        1: { production: '850,000', energyConsumption: '3.42', emissionFactor: '0.094', carbonEmission: '275,934' },
+        2: { production: '1,020,000', energyConsumption: '1.15', emissionFactor: '0.094', carbonEmission: '110,058' },
+        3: { production: '980,000', energyConsumption: '1.25', emissionFactor: '0.094', carbonEmission: '115,472' },
+        4: { production: '1,150,000', energyConsumption: '13.85', emissionFactor: '0.085', carbonEmission: '1,362,738' },
+        5: { production: '1,120,000', energyConsumption: '7.65', emissionFactor: '0.085', carbonEmission: '1,190,680' },
+        6: { production: '680,000', energyConsumption: '5.32', emissionFactor: '0.085', carbonEmission: '894,468' },
+        7: { production: '320,000', energyConsumption: '4.18', emissionFactor: '0.512', carbonEmission: '1,460,313' },
+        8: { production: '210,000', energyConsumption: '1.08', emissionFactor: '0.085', carbonEmission: '19,134' },
+        9: { production: '', energyConsumption: '', emissionFactor: '', carbonEmission: '' }
+      }
+    },
+    aluminum: {
+      label: '铝业', icon: '🔲',
+      steps: [
+        { id: 1, name: '采矿', icon: '矿' }, { id: 2, name: '氧化铝', icon: '氧' }, { id: 3, name: '电解', icon: '电' },
+        { id: 4, name: '熔铸', icon: '熔' }, { id: 5, name: '轧制', icon: '轧' }, { id: 6, name: '挤压', icon: '挤' },
+        { id: 7, name: '表面处理', icon: '表' }, { id: 8, name: '其他', icon: '他' }
+      ],
+      data: {
+        1: { production: '2,500,000', energyConsumption: '0.85', emissionFactor: '0.045', carbonEmission: '95,625' },
+        2: { production: '1,800,000', energyConsumption: '12.50', emissionFactor: '0.092', carbonEmission: '2,070,000' },
+        3: { production: '920,000', energyConsumption: '52.80', emissionFactor: '0.095', carbonEmission: '4,614,720' },
+        4: { production: '890,000', energyConsumption: '2.35', emissionFactor: '0.085', carbonEmission: '177,818' },
+        5: { production: '780,000', energyConsumption: '1.68', emissionFactor: '0.085', carbonEmission: '111,384' },
+        6: { production: '650,000', energyConsumption: '1.25', emissionFactor: '0.085', carbonEmission: '69,063' },
+        7: { production: '620,000', energyConsumption: '0.92', emissionFactor: '0.078', carbonEmission: '44,491' },
+        8: { production: '', energyConsumption: '', emissionFactor: '', carbonEmission: '' }
+      }
+    },
+    cement: {
+      label: '水泥', icon: '🏗',
+      steps: [
+        { id: 1, name: '原料开采', icon: '采' }, { id: 2, name: '破碎', icon: '碎' }, { id: 3, name: '生料制备', icon: '生' },
+        { id: 4, name: '预热器', icon: '热' }, { id: 5, name: '回转窑', icon: '窑' }, { id: 6, name: '冷却', icon: '冷' },
+        { id: 7, name: '粉磨', icon: '磨' }, { id: 8, name: '包装', icon: '包' }
+      ],
+      data: {
+        1: { production: '3,200,000', energyConsumption: '0.45', emissionFactor: '0.035', carbonEmission: '50,400' },
+        2: { production: '3,150,000', energyConsumption: '0.65', emissionFactor: '0.042', carbonEmission: '85,995' },
+        3: { production: '3,000,000', energyConsumption: '1.85', emissionFactor: '0.088', carbonEmission: '488,400' },
+        4: { production: '2,850,000', energyConsumption: '0.95', emissionFactor: '0.092', carbonEmission: '249,090' },
+        5: { production: '2,800,000', energyConsumption: '3.25', emissionFactor: '0.520', carbonEmission: '4,732,000' },
+        6: { production: '2,780,000', energyConsumption: '0.35', emissionFactor: '0.045', carbonEmission: '43,785' },
+        7: { production: '2,650,000', energyConsumption: '1.45', emissionFactor: '0.088', carbonEmission: '338,195' },
+        8: { production: '2,600,000', energyConsumption: '0.15', emissionFactor: '0.025', carbonEmission: '9,750' }
+      }
+    }
+  };
+
+  var active = 'steel';
+  var store = JSON.parse(JSON.stringify(IND));
+
+  function renderTabs() {
+    var html = '';
+    Object.keys(IND).forEach(function (k) {
+      var t = IND[k];
+      html += '<button type="button" class="vo-tab' + (k === active ? ' on' : '') + '" data-ind="' + k + '">'
+        + t.icon + ' ' + t.label + '</button>';
+    });
+    document.getElementById('vo-ind-tabs').innerHTML = html;
+  }
+
+  function renderFlow() {
+    var steps = store[active].steps;
+    var html = '';
+    steps.forEach(function (s, i) {
+      html += '<div class="vo-flow-step"><div class="vo-flow-ico"><span class="vo-flow-num">' + s.id + '</span>' + s.icon + '</div><span class="vo-flow-name">' + s.name + '</span></div>';
+      if (i < steps.length - 1) html += '<div class="vo-flow-arrow"></div>';
+    });
+    document.getElementById('vo-flow').innerHTML = html;
+  }
+
+  function cellInput(stepId, field, val) {
+    return '<input type="text" data-step="' + stepId + '" data-field="' + field + '" value="' + (val || '') + '" placeholder="-" />';
+  }
+
+  function renderMatrix() {
+    var steps = store[active].steps;
+    var data = store[active].data;
+    var head = '<th class="vo-row-k">参数类别</th>';
+    steps.forEach(function (s) { head += '<th>' + s.name + '</th>'; });
+    document.getElementById('vo-matrix-head').innerHTML = head;
+    var rows = [
+      { k: '产量 (吨)', field: 'production' },
+      { k: '综合能耗<small>(GJ/吨)</small>', field: 'energyConsumption' },
+      { k: '碳排放因子<small>(tCO₂e/GJ)</small>', field: 'emissionFactor' },
+      { k: '碳排放量<small>(tCO₂e)</small>', out: 'carbonEmission' },
+      { k: '操作', action: true }
+    ];
+    var body = '';
+    rows.forEach(function (row) {
+      body += '<tr><td class="vo-row-k">' + row.k + '</td>';
+      steps.forEach(function (s) {
+        var d = data[s.id] || {};
+        if (row.action) body += '<td><button type="button" class="vo-mini-btn" data-calc="' + s.id + '">自动计算</button></td>';
+        else if (row.out) body += '<td class="vo-calc-out">' + (d[row.out] || '—') + '</td>';
+        else body += '<td>' + cellInput(s.id, row.field, d[row.field]) + '</td>';
+      });
+      body += '</tr>';
+    });
+    document.getElementById('vo-matrix-body').innerHTML = body;
+  }
+
+  function bindMatrix() {
+    document.getElementById('vo-matrix-body').onclick = function (e) {
+      if (e.target.closest('[data-calc]')) showToast('草稿预览：自动计算将在并入现网页时对接 Co2Lion 引擎');
+    };
+    document.getElementById('vo-matrix-body').oninput = function (e) {
+      var inp = e.target.closest('input[data-step]');
+      if (!inp) return;
+      var sid = +inp.dataset.step;
+      store[active].data[sid] = store[active].data[sid] || {};
+      store[active].data[sid][inp.dataset.field] = inp.value;
+    };
+  }
+
+  document.getElementById('vo-ind-tabs').onclick = function (e) {
+    var tab = e.target.closest('[data-ind]');
+    if (!tab) return;
+    active = tab.dataset.ind;
+    renderTabs(); renderFlow(); renderMatrix(); bindMatrix();
+  };
+
+  document.querySelectorAll('[data-draft-action]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var msgs = {
+        pool: '草稿预览：确权入池 → 确认后接入现网 pipeline',
+        export: '草稿预览：导出月报 → 确认后对接 PDF',
+        history: '草稿预览：历史记录 → Action_Ledger',
+        pledge: '草稿预览：承诺书签署流程',
+        import: '草稿预览：导入 Excel 模板',
+        clear: '草稿预览：已模拟清空 LOCAL_VAULT'
+      };
+      showToast(msgs[btn.getAttribute('data-draft-action')] || '草稿预览操作');
+    });
+  });
+
+  whenHengaiAppStateReady(function () {
+    if (typeof initAppState === 'function') initAppState();
+    if (window.AppState && AppState.getGTCID) {
+      try {
+        var g = 'GTCID · ' + (AppState.getGTCID() || '—');
+        var el = document.getElementById('vo-gtcid');
+        if (el) el.textContent = g;
+      } catch (e) {}
+    }
+  });
+
+  renderTabs(); renderFlow(); renderMatrix(); bindMatrix();
+})();
+</script>
+</body>
+</html>

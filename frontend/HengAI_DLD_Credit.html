@@ -1,0 +1,403 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HengAI · DLD 绿色信贷确权</title>
+<script>
+/* 嵌入模式：?embed=1 时隐藏原页 chrome (sidebar/topbar)，仅呈现内容模块 */
+if(/[?&]embed=1/.test(location.search)) document.documentElement.setAttribute('data-embed','1');
+</script>
+<link rel="stylesheet" href="hengai-embed-layout.css">
+<style>
+html[data-embed="1"] .sidebar,
+html[data-embed="1"] .sb,
+html[data-embed="1"] .topbar { display: none !important; }
+html[data-embed="1"] .main,
+html[data-embed="1"] .main-wrap { margin-left: 0 !important; }
+html[data-embed="1"] body { padding-left: 0 !important; background: var(--night, #06080f) !important; }
+</style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=DM+Mono:wght@400;500;600&display=swap');
+:root{--night:#06080f;--dark:#0a0e1a;--panel:#0d1220;--p2:#111827;--b:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.13);--ink:#e8edf5;--ink2:#8a95a8;--ink3:#4a5568;--gold:#c9a84c;--gl:#f0d080;--gd:rgba(201,168,76,0.11);--green:#3b9e4a;--greenl:#7dd98a;--greend:rgba(59,158,74,0.1);--teal:#1d9e75;--teall:#6dd5b0;--teald:rgba(29,158,117,0.09);--blue:#185fa5;--bluel:#93c5fd;--blued:rgba(24,95,165,0.1);--red:#e24b4a;--redl:#fca5a5;--redd:rgba(226,75,74,0.09);--purple:#7f77dd;--purpl:#c4b5fd;--purpd:rgba(127,119,221,0.09);}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--night);color:var(--ink);font-family:'Noto Sans SC',sans-serif;font-size:13px;line-height:1.6;min-height:100vh}
+.sb{width:200px;background:var(--dark);border-right:1px solid var(--b);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50}
+.sb-logo{padding:15px 14px 12px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:9px}
+.sb-li{width:28px;height:28px;border-radius:7px;background:var(--greend);border:1px solid rgba(59,158,74,0.35);display:flex;align-items:center;justify-content:center}
+.sb-tx{font-size:13px;font-weight:700}.sb-sub{font-size:9px;color:var(--ink3);margin-top:1px}
+.nav-s{padding:10px 13px 4px;font-size:9px;color:var(--ink3);letter-spacing:1px;text-transform:uppercase;font-weight:600}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 13px;font-size:12px;color:var(--ink2);cursor:pointer;border-left:2px solid transparent;transition:all 0.15s}
+.ni:hover{color:var(--ink);background:rgba(255,255,255,0.04)}
+.ni.on{color:var(--ink);background:rgba(255,255,255,0.06);border-left-color:var(--greenl)}
+.nd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sb-ft{margin-top:auto;padding:11px 13px;border-top:1px solid var(--b)}
+.u-av{width:28px;height:28px;border-radius:50%;background:var(--teald);border:1.5px solid var(--teal);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--teall);flex-shrink:0}
+.main{margin-left:200px}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(6,8,15,0.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--b);padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between}
+.tl{display:flex;align-items:center;gap:10px}
+.tt{font-size:14px;font-weight:500}
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.pl-g{background:var(--greend);color:var(--greenl);border:1px solid rgba(59,158,74,0.3)}
+.pl-b{background:var(--blued);color:var(--bluel);border:1px solid rgba(24,95,165,0.3)}
+.pl-t{background:var(--teald);color:var(--teall);border:1px solid rgba(29,158,117,0.3)}
+.pl-y{background:var(--gd);color:var(--gl);border:1px solid rgba(201,168,76,0.3)}
+.pl-gray{background:rgba(255,255,255,0.05);color:var(--ink2);border:1px solid var(--b)}
+.tr{display:flex;align-items:center;gap:8px}
+.tb-btn{padding:5px 13px;border-radius:7px;font-size:11.5px;font-weight:500;border:1px solid var(--b2);background:transparent;color:var(--ink);cursor:pointer;font-family:inherit;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.07)}
+.tb-btn.pri{background:var(--greend);border-color:rgba(59,158,74,0.45);color:var(--greenl)}
+.page{padding:24px 28px 72px;max-width:1060px}
+.card{background:var(--panel);border:1px solid var(--b);border-radius:14px;padding:18px 20px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.div{border:none;border-top:1px solid var(--b);margin:14px 0}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sh-t{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.1px;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.sh-line{flex:1;height:1px;background:var(--b)}
+.sh-a{font-size:11px;color:var(--teall);cursor:pointer;white-space:nowrap}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fu 0.4s ease both}
+.fu1{animation-delay:.05s}.fu2{animation-delay:.12s}.fu3{animation-delay:.18s}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--p2);border:1px solid rgba(29,158,117,0.4);border-radius:11px;padding:11px 16px;display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--teall);z-index:9999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;min-width:240px}
+
+/* DLD specific */
+.asset-hero{background:var(--panel);border:1px solid rgba(59,158,74,0.28);border-radius:16px;padding:0;overflow:hidden;margin-bottom:18px;position:relative}
+.asset-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,158,74,0.6),rgba(29,158,117,0.5),transparent)}
+.ah-inner{padding:22px 26px;background:linear-gradient(135deg,rgba(59,158,74,0.07) 0%,transparent 60%)}
+.ah-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--b);border-top:1px solid var(--b)}
+.ahk{background:rgba(8,12,22,0.95);padding:13px 16px;text-align:center}
+.ahk-v{font-family:'DM Mono',monospace;font-size:19px;font-weight:700;letter-spacing:-0.5px;line-height:1;margin-bottom:3px}
+.ahk-l{font-size:10px;color:var(--ink3)}
+.ahk-s{font-size:9.5px;font-weight:600;margin-top:3px}
+
+/* Credit cards */
+.credit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.credit-card{border-radius:13px;padding:16px 16px;border:1px solid;position:relative;overflow:hidden}
+.credit-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.cc-tag{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.cc-val{font-family:'DM Mono',monospace;font-size:26px;font-weight:700;letter-spacing:-1px;line-height:1;margin-bottom:3px}
+.cc-unit{font-size:11px;font-weight:400;margin-left:2px}
+.cc-label{font-size:11px;margin-bottom:10px}
+.cc-bar-track{height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;margin-bottom:6px}
+.cc-bar-fill{height:100%;border-radius:3px}
+.cc-sub{font-size:10px;opacity:0.6}
+
+/* Asset table */
+.asset-table{width:100%;border-collapse:collapse}
+.asset-table th{font-size:10px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;border-bottom:1px solid var(--b);text-align:left}
+.asset-table td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12.5px;vertical-align:middle}
+.asset-table tr:last-child td{border-bottom:none}
+.asset-table tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* Apply form */
+.apply-card{background:var(--greend);border:1px solid rgba(59,158,74,0.25);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden}
+.apply-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(59,158,74,0.6),transparent)}
+.f-group{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+.f-label{font-size:11.5px;font-weight:500;color:var(--ink)}
+.f-input{background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;transition:border-color 0.2s;width:100%}
+.f-input:focus{border-color:rgba(59,158,74,0.5)}
+.f-select{background:rgba(0,0,0,0.3);border:1px solid var(--b2);border-radius:9px;padding:9px 12px;font-family:inherit;font-size:12.5px;color:var(--ink);outline:none;width:100%;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%234a5568' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.apply-btn{width:100%;padding:12px;border-radius:10px;font-size:13px;font-weight:600;border:1px solid rgba(59,158,74,0.5);cursor:pointer;font-family:inherit;background:rgba(59,158,74,0.2);color:var(--greenl);transition:all 0.2s;margin-top:4px}
+.apply-btn:hover{background:rgba(59,158,74,0.3)}
+</style>
+<style id="qa-sidebar-css">
+/* HengAI V2.0 QA · 全站统一侧栏基线
+   设计原则：
+   1. 容器级规则使用 :where() 零特异性 —— 页面自己的 .sidebar{} 原生规则优先
+   2. 内部元素 (.sb-brand/.sb-item/...) 使用普通选择器 —— 提供基线视觉
+   3. 不动 .main —— 每页主区偏移由自家 CSS 决定（不污染 flex 布局）
+*/
+:where(.sidebar#sidebar[data-qa-version="2.0"]){width:200px;background:#0b0f19;border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:50;overflow-y:auto;font-family:inherit}
+.sidebar .sb-brand{padding:17px 15px 13px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sidebar .sb-brand-ic{width:32px;height:32px;border-radius:9px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar .sb-brand-name{font-size:14px;font-weight:700;letter-spacing:.2px;color:#e6e9f2}
+.sidebar .sb-brand-sub{font-size:9.5px;color:#8a92a8;margin-top:1px}
+.sidebar .sb-group-title{font-size:9.5px;text-transform:uppercase;color:#8a92a8;letter-spacing:.6px;padding:14px 18px 6px;font-weight:600}
+.sidebar .sb-item{padding:9px 18px;font-size:12.5px;color:#c3cbdc;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .12s;border-left:2px solid transparent;font-family:inherit;line-height:1.3}
+.sidebar .sb-item:hover{background:rgba(255,255,255,0.03);color:#e6e9f2}
+.sidebar .sb-item.active{background:rgba(16,185,129,0.08);border-left-color:#10b981;color:#e6e9f2;font-weight:600}
+.sidebar .sb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* 嵌入模式（?embed=1）：只露内容，侧栏/顶栏/老 .sb 全部隐藏，主区 margin 归零 */
+html[data-embed="1"] .sidebar,html[data-embed="1"] .sb,html[data-embed="1"] .topbar{display:none !important}
+html[data-embed="1"] body{padding-left:0 !important}
+html[data-embed="1"] .main,html[data-embed="1"] .main-wrap,html[data-embed="1"] .main-content{margin-left:0 !important}
+</style>
+<script src="hengai-embed-boot.js"></script>
+</head>
+<body>
+<!-- CANONICAL SIDEBAR — HengAI V3.5 工业主权网络 · MPA 统一版 -->
+
+<div class="sidebar" id="sidebar" data-qa-version="3.5">
+
+  <div class="sb-brand">
+
+    <div class="sb-brand-ic">
+
+      <img src="logo.png" alt="HengAI" style="width:22px;height:22px;object-fit:contain;" onerror="this.outerHTML='<svg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' fill=\'none\'><path d=\'M8 1.5L14 5V11L8 14.5L2 11V5L8 1.5Z\' stroke=\'%2310b981\' stroke-width=\'1.2\' fill=\'rgba(16,185,129,.15)\'/><polyline points=\'5,8 7.5,10.5 11.5,6.5\' stroke=\'%236ee7b7\' stroke-width=\'1.4\' stroke-linecap=\'round\'/></svg>'">
+
+    </div>
+
+    <div>
+
+      <div class="sb-brand-name">HengAI</div>
+
+      <div class="sb-brand-sub">Co2Lion 全域合规中心</div>
+
+    </div>
+
+  </div>
+
+
+
+  <div style="padding:12px 14px 4px;">
+
+    <div onclick="window.location.href='index.html'" style="cursor:pointer;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:8px;padding:9px 12px;color:#10b981;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 10px rgba(16,185,129,0.1);transition:all .15s;" onmouseenter="this.style.background='rgba(16,185,129,0.18)'" onmouseleave="this.style.background='rgba(16,185,129,0.1)'">
+
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7H13M1 7L5 3M1 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+      返回 HengAI 对话
+
+    </div>
+
+  </div>
+
+
+
+  <div class="sb-group-title" id="g-personal">个人空间</div>
+
+  <div class="sb-item" data-page="overview" onclick="window.location.href='全域中心.html'"><div class="sb-dot" style="background:#10b981"></div>全域总览</div>
+
+  <div class="sb-item" data-page="achieve" onclick="window.location.href='HengAI_星火成就档案.html'"><div class="sb-dot" style="background:#c9a84c"></div>星火成就档案</div>
+
+  <div class="sb-item" data-page="calc" onclick="window.location.href='HengAI_CBAM测算工具.html'"><div class="sb-dot" style="background:#c9a84c"></div>CBAM 测算工具</div>
+
+  <div class="sb-item" data-page="wallet" onclick="window.location.href='HengAI_GM_Wallet.html'"><div class="sb-dot" style="background:#c9a84c"></div>GM 绿印钱包</div>
+
+  <div class="sb-item" data-page="resource" onclick="window.location.href='HengAI_算力资源.html'"><div class="sb-dot" style="background:#93c5fd"></div>算力资源</div>
+
+
+
+  <div class="sb-group-title" id="g-business">企业工作台</div>
+
+  <div class="sb-item" data-page="enterprise" onclick="window.location.href='HengAI_企业数字档案.html'"><div class="sb-dot" style="background:#6dd5b0"></div>企业数字档案</div>
+
+  <div class="sb-item" data-page="report" onclick="window.location.href='HengAI_全域诊断报告.html'"><div class="sb-dot" style="background:#93c5fd"></div>全域诊断报告</div>
+
+  <div class="sb-item" data-page="decision" onclick="window.location.href='HengAI_决策层呈送包生成器.html'"><div class="sb-dot" style="background:#c9a84c"></div>决策层呈送包</div>
+
+  <div class="sb-item locked" data-page="supply" id="nav-supply" data-role-nav="sme-only" onclick="window.location.href='HengAI_供应链协同.html'"><div class="sb-dot" id="dot-supply" style="background:var(--ink3)"></div>供应链协同</div>
+
+  <div class="sb-item locked" data-page="origin-audit" id="n-origin-audit" data-role-nav="origin-only" onclick="window.location.href='HengAI_HeavyIndustry_Suite.html'"><div class="sb-dot" id="dot-origin-audit" style="background:var(--ink3)"></div>产业主权看板</div>
+
+
+
+  <div class="sb-group-title" id="g-sovereign">大国重器 / 生态</div>
+
+  <div class="sb-item" data-page="honor" onclick="window.location.href='HengAI_荣誉体系.html'"><div class="sb-dot" style="background:#c4b5fd"></div>荣誉体系</div>
+
+  <div class="sb-item locked" data-page="eu" onclick="window.location.href='HengAI_EU_Customs.html'"><div class="sb-dot" style="background:var(--ink3)"></div>欧盟海关直连</div>
+
+  <div class="sb-item locked" data-page="dld" onclick="window.location.href='HengAI_DLD_Credit.html'"><div class="sb-dot" style="background:var(--ink3)"></div>DLD 绿色信贷</div>
+
+  <div class="sb-item locked" data-page="acf" onclick="window.location.href='HengAI_ACF_Cert.html'"><div class="sb-dot" style="background:var(--ink3)"></div>ACF 认证通道</div>
+
+  <div class="sb-item locked" data-page="gov" onclick="window.location.href='HengAI_Governance.html'"><div class="sb-dot" style="background:var(--ink3)"></div>生态共治委员会</div>
+
+</div>
+
+<script id="qa-sidebar-active-script">
+
+(function(){
+
+  var map = {"全域中心.html":"overview","index.html":"overview","HengAI_CBAM测算工具.html":"calc","HengAI_星火成就档案.html":"achieve","HengAI_GM_Wallet.html":"wallet","HengAI_算力资源.html":"resource","HengAI_企业数字档案.html":"enterprise","HengAI_供应链协同.html":"supply","HengAI_全域诊断报告.html":"report","HengAI_决策层呈送包生成器.html":"decision","HengAI_HeavyIndustry_Suite.html":"origin-audit","HengAI_荣誉体系.html":"honor","HengAI_EU_Customs.html":"eu","HengAI_DLD_Credit.html":"dld","HengAI_ACF_Cert.html":"acf","HengAI_Governance.html":"gov"};
+
+  try {
+
+    var fn = decodeURIComponent((location.pathname.split("/").pop() || "").split("?")[0]);
+
+    var id = map[fn]; if (!id) return;
+
+    document.querySelectorAll(".sidebar .sb-item[data-page]").forEach(function(el){
+
+      if (el.getAttribute("data-page") === id) el.classList.add("active");
+
+    });
+
+  } catch(e){}
+
+})();
+
+</script>
+<div class="main">
+<div class="topbar">
+  <div class="tl">
+    <span class="tt">DLD · 碳资产绿色信贷确权</span>
+    <span class="pill pl-g">碳资产已确权</span>
+    <span class="pill pl-y">信贷额度 <span id="dld-credit-limit" class="dyn-credit-limit">正在评估中...</span></span>
+  </div>
+  <div class="tr">
+    <button class="tb-btn" onclick="showToast('信贷申请记录已打开')">申请记录</button>
+    <button class="tb-btn pri" onclick="showToast('新建绿色信贷申请已打开')">申请绿色信贷 →</button>
+  </div>
+</div>
+
+<div class="page">
+  <!-- ASSET HERO -->
+  <div class="asset-hero fu fu1">
+    <div class="ah-inner">
+      <div style="font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--greenl);margin-bottom:8px">DLD · Digital Low-carbon Data</div>
+      <div style="font-size:18px;font-weight:600;margin-bottom:6px">碳减排资产已通过 DLD 确权，可用于申请绿色信贷优惠</div>
+      <div style="font-size:12px;color:var(--ink2);line-height:1.75;max-width:600px;margin-bottom:14px">Co2Lion 链上存证的真实减排数据，经 DLD（数字低碳数据）机构认定后，可向合作金融机构申请绿色信贷优惠利率和专项授信额度。这不是补贴，是你用真实减排行动换来的金融议价权。</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <span class="pill pl-g"><span id="dld-certified-co2">0</span> tCO₂e 已确权</span>
+        <span class="pill pl-t">CL-IVC 链上可核验</span>
+        <span class="pill pl-y">3 家银行已接受数据</span>
+      </div>
+    </div>
+    <div class="ah-kpis">
+      <div class="ahk"><div class="ahk-v" style="color:var(--greenl)"><span id="dld-credit-limit-kpi" class="dyn-credit-limit">正在评估中...</span></div><div class="ahk-l">绿色信贷额度</div><div class="ahk-s" style="color:var(--greenl)"><span id="dld-credit-status">待激活</span></div></div>
+      <div class="ahk"><div class="ahk-v" style="color:var(--teall)">-0.45%</div><div class="ahk-l">利率优惠</div><div class="ahk-s" style="color:var(--teall)">较基准利率</div></div>
+      <div class="ahk"><div class="ahk-v" style="color:var(--gold)"><span class="dyn-interest-save">正在评估中...</span></div><div class="ahk-l">年利息节省</div><div class="ahk-s" style="color:var(--gold)">授信后自动测算</div></div>
+      <div class="ahk"><div class="ahk-v" style="color:var(--bluel)">3</div><div class="ahk-l">合作金融机构</div><div class="ahk-s" style="color:var(--bluel)">工行 · 建行 · 绿色银行</div></div>
+    </div>
+  </div>
+
+  <!-- CREDIT CARDS -->
+  <div class="sh fu fu2"><div class="sh-t">碳资产信贷额度 <div class="sh-line"></div></div></div>
+  <div class="credit-grid fu fu2">
+    <div class="credit-card" style="background:rgba(59,158,74,0.07);border-color:rgba(59,158,74,0.3)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--green)"></div>
+      <div class="cc-tag" style="color:var(--greenl)">中国工商银行</div>
+      <div class="cc-val" style="color:var(--greenl)">¥ 120<span class="cc-unit" style="color:var(--ink2)">万</span></div>
+      <div class="cc-label" style="color:rgba(125,217,138,0.7)">绿色流动资金贷款</div>
+      <div class="cc-bar-track"><div class="cc-bar-fill" style="width:0%;background:var(--green)"></div></div>
+      <div class="cc-sub" style="color:var(--greenl)">已授信 · 未使用 · 利率 LPR-0.45%</div>
+      <button style="width:100%;margin-top:10px;padding:7px;border-radius:8px;background:rgba(59,158,74,0.15);border:1px solid rgba(59,158,74,0.35);color:var(--greenl);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit" onclick="showToast('工行绿色信贷申请通道已打开')">立即申请 →</button>
+    </div>
+    <div class="credit-card" style="background:rgba(24,95,165,0.07);border-color:rgba(24,95,165,0.28)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--bluel)"></div>
+      <div class="cc-tag" style="color:var(--bluel)">中国建设银行</div>
+      <div class="cc-val" style="color:var(--bluel)">¥ 100<span class="cc-unit" style="color:var(--ink2)">万</span></div>
+      <div class="cc-label" style="color:rgba(147,197,253,0.7)">绿色设备融资</div>
+      <div class="cc-bar-track"><div class="cc-bar-fill" style="width:42%;background:var(--blue)"></div></div>
+      <div class="cc-sub" style="color:var(--bluel)">已使用 ¥42万 · 余 ¥58万</div>
+      <button style="width:100%;margin-top:10px;padding:7px;border-radius:8px;background:rgba(24,95,165,0.13);border:1px solid rgba(24,95,165,0.3);color:var(--bluel);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit" onclick="showToast('建行账单明细已打开')">查看明细 →</button>
+    </div>
+    <div class="credit-card" style="background:rgba(29,158,117,0.07);border-color:rgba(29,158,117,0.28)">
+      <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--teal)"></div>
+      <div class="cc-tag" style="color:var(--teall)">绿色发展银行</div>
+      <div class="cc-val" style="color:var(--teall)">¥ 60<span class="cc-unit" style="color:var(--ink2)">万</span></div>
+      <div class="cc-label" style="color:rgba(109,213,176,0.7)">碳减排专项信贷</div>
+      <div class="cc-bar-track"><div class="cc-bar-fill" style="width:100%;background:var(--teal)"></div></div>
+      <div class="cc-sub" style="color:var(--teall)">已足额使用 · 还款中</div>
+      <button style="width:100%;margin-top:10px;padding:7px;border-radius:8px;background:rgba(29,158,117,0.12);border:1px solid rgba(29,158,117,0.28);color:var(--teall);font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit" onclick="showToast('还款计划已打开')">还款计划 →</button>
+    </div>
+  </div>
+
+  <div class="g2 fu fu3">
+    <!-- Asset confirmation list -->
+    <div>
+      <div class="sh"><div class="sh-t">碳资产确权记录 <div class="sh-line"></div></div></div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="asset-table">
+          <thead><tr><th>确权批次</th><th>减排量</th><th>确权机构</th><th>有效期</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div style="font-weight:500">DLD-2026-0412</div><div style="font-size:10.5px;color:var(--ink3)"><span data-state-bind="recentReports.0.submittedAt" data-state-fmt="dt" data-empty="待记录">---</span> 确权</div></td>
+              <td style="font-family:'DM Mono',monospace;color:var(--greenl)"><span class="dyn-total-co2">0</span> tCO₂e</td>
+              <td style="font-size:11.5px;color:var(--ink2)">DLD 国家认证</td>
+              <td style="font-size:11.5px;font-family:'DM Mono',monospace"><span data-state-bind="company.certValidUntil" data-state-fmt="dt" data-empty="待记录">---</span></td>
+              <td><span class="pill pl-g">有效</span></td>
+            </tr>
+            <tr>
+              <td><div style="font-weight:500;color:var(--gold)">DLD-2026-Q2</div><div style="font-size:10.5px;color:var(--ink3)">预计 2026-07 确权</div></td>
+              <td style="font-family:'DM Mono',monospace;color:var(--ink3)">~110 t</td>
+              <td style="font-size:11.5px;color:var(--ink3)">预测值</td>
+              <td style="font-size:11.5px;color:var(--ink3)">—</td>
+              <td><span class="pill" style="background:var(--gd);color:var(--gl);border:1px solid rgba(201,168,76,0.3)">待生成</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;padding:11px 14px;background:rgba(0,0,0,0.2);border:1px solid var(--b);border-radius:9px;font-size:11.5px;color:var(--ink2);line-height:1.75">
+        <strong style="color:var(--ink)">DLD 确权机制：</strong>CL-IVC 链上减排数据每季度自动发送至 DLD 国家认证中心，核验通过后生成碳资产证书，金融机构直接调用链上数据进行信贷评估，无需人工提交材料。
+      </div>
+    </div>
+
+    <!-- Apply form -->
+    <div>
+      <div class="sh"><div class="sh-t">申请新增绿色信贷 <div class="sh-line"></div></div></div>
+      <div class="apply-card">
+        <div style="font-size:12.5px;color:var(--greenl);margin-bottom:14px;line-height:1.7">
+          基于当前 <strong><span class="dyn-total-co2">0</span> tCO₂e</strong> 确权资产，预计可新增授信额度 <strong style="color:var(--gl)"><span class="dyn-credit-limit">正在评估中...</span></strong>，利率优惠区间 <strong>LPR-0.3% 至 -0.6%</strong>。
+        </div>
+        <div class="f-group">
+          <div class="f-label">目标金融机构</div>
+          <select class="f-select"><option>工商银行 · 绿色信贷部</option><option>农业银行 · ESG 专项</option><option>兴业银行 · 绿色金融</option><option>其他金融机构</option></select>
+        </div>
+        <div class="f-group">
+          <div class="f-label">申请用途</div>
+          <select class="f-select"><option>MAT 物理网关采购（合规设备）</option><option>绿电设备改造</option><option>供应链数字化升级</option><option>流动资金</option></select>
+        </div>
+        <div class="f-group">
+          <div class="f-label">申请金额（万元）</div>
+          <input class="f-input" type="number" value="80" placeholder="例：80">
+        </div>
+        <div style="padding:9px 12px;background:rgba(0,0,0,0.2);border-radius:8px;font-size:11px;color:var(--greenl);margin-bottom:10px">
+          预计利率：LPR（3.45%）- 0.45% = <strong>3.0%</strong> · 80万×3年×3% ≈ 节省利息 <strong>¥10,800</strong> vs 普通贷款
+        </div>
+        <button class="apply-btn" onclick="showToast('绿色信贷申请材料已自动生成 · 数据来自链上 · 无需纸质材料')">
+          一键生成申请材料 · 无需纸质文件 →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="toast"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><polyline points="1.5,6 5,9.5 10.5,3" stroke="var(--teall)" stroke-width="1.5" stroke-linecap="round"/></svg><span id="toast-msg"></span></div>
+<script>
+function showToast(msg){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.style.opacity='1';t.style.transform='translateY(0)';clearTimeout(window._tt);window._tt=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(8px)'},2800);}
+</script>
+<script>
+(function () {
+  function applyDldPipeline(p) {
+    if (!p) return;
+    var user = p.user || {};
+    var impact = p.impact || {};
+    var co2 = Number(user.tCO2e_total != null ? user.tCO2e_total : user.tco2e_total != null ? user.tco2e_total : 0);
+    if (!Number.isFinite(co2)) co2 = 0;
+    var limit = (p.company && (p.company.creditLimit || p.company.credit_limit)) || '';
+    if (!limit) {
+      // 兜底：按减排量映射一个“看起来合理”的额度（Phase1 为 0）
+      var wan = Math.max(0, Math.round(co2 / 10)); // 142 -> 14 (万) 只是兜底
+      limit = co2 > 0 ? ('¥ ' + (Math.max(80, wan) + '万')) : '待测算';
+    }
+    var el;
+    var interestSave = '正在评估中...';
+    if ((el = document.getElementById('dld-certified-co2'))) el.textContent = co2.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    if ((el = document.getElementById('dld-credit-limit'))) el.textContent = limit;
+    if ((el = document.getElementById('dld-credit-limit-kpi'))) el.textContent = limit;
+    if ((el = document.getElementById('dld-credit-status'))) el.textContent = co2 > 0 ? '已授信' : '待激活';
+    if (co2 > 0) {
+      var limitNum = Number(String(limit).replace(/[^\d.]/g, ''));
+      if (Number.isFinite(limitNum) && limitNum > 0) {
+        interestSave = '¥ ' + Math.round(limitNum * 10000 * 0.0045).toLocaleString('en-US');
+      }
+    }
+    document.querySelectorAll('.dyn-credit-limit').forEach(function (node) { node.textContent = limit; });
+    document.querySelectorAll('.dyn-interest-save').forEach(function (node) { node.textContent = interestSave; });
+    document.querySelectorAll('.dyn-total-co2').forEach(function (node) {
+      node.textContent = co2.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    });
+  }
+  window.addEventListener('message', function (ev) {
+    if (!ev.data || ev.data.type !== 'HENGAI_HUB_PIPELINE') return;
+    applyDldPipeline(ev.data.payload);
+  });
+})();
+</script>
+<script src="hengai-module-pipeline.js"></script>
+</body>
+</html>
